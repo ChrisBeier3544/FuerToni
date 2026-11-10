@@ -149,7 +149,7 @@ const KALENDER = {
     },
     20: {
       titel: "Noch fünf Türchen",
-      text: "Nur noch fünf Türchen bis Heiligabend. Ich freu mich so sehr darauf, Weihnachten mit dir zu feiern ♥️",
+      text: "Nur noch fünf Türchen bis Heiligabend. Ich freu mich so sehr auf die Weihnachtstage mit dir ♥️",
       briefzahl: 20,
       paeckchen: 72,
     },
@@ -167,7 +167,7 @@ const KALENDER = {
     },
     23: {
       titel: "Noch einmal schlafen",
-      text: "Morgen ist Heiligabend! Nur noch einmal schlafen und dann feiern wir zusammen Weihnachten. Ich kann es kaum erwarten ♥️",
+      text: "Morgen ist schon Heiligabend! Und dann geht es direkt weiter: am ersten Feiertag ins Sauerland zu deiner Familie und am zweiten zur großen Wichtelrunde bei meiner.\nIch freu mich so auf die Feiertage mit dir ♥️",
       briefzahl: 23,
       paeckchen: 64,
     },
