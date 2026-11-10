@@ -618,10 +618,78 @@
   }
 
   /* ------------------------------------------------------------
+   * Fotos: Polaroids oben, Fotostreifen unten, große Ansicht
+   * ------------------------------------------------------------ */
+  const fotoListe = [];
+  const lightbox = document.getElementById("lightbox");
+  const lightboxBild = document.getElementById("lightbox-bild");
+  const lightboxText = document.getElementById("lightbox-text");
+  let fotoIndex = 0;
+
+  function baueFotos() {
+    const fotos = KALENDER.fotos || {};
+    const ziele = [
+      [fotos.titel || [], document.getElementById("titelfotos")],
+      [fotos.galerie || [], document.getElementById("fotostreifen")],
+    ];
+    for (const [liste, ziel] of ziele) {
+      for (const f of liste) {
+        if (!f || !f.datei) continue;
+        const index = fotoListe.length;
+        fotoListe.push(f);
+        const knopf = document.createElement("button");
+        knopf.type = "button";
+        knopf.className = "polaroid";
+        knopf.setAttribute("aria-label", "Foto ansehen: " + (f.text || ""));
+        const img = document.createElement("img");
+        img.src = "bilder/klein/" + f.datei;
+        img.alt = f.text || "";
+        if (f.fokus) img.style.objectPosition = f.fokus;
+        img.loading = ziel.id === "titelfotos" ? "eager" : "lazy";
+        img.onerror = () => { knopf.remove(); };
+        const text = document.createElement("span");
+        text.textContent = f.text || "";
+        knopf.append(img, text);
+        knopf.addEventListener("click", () => zeigeFoto(index));
+        ziel.appendChild(knopf);
+      }
+    }
+    document.getElementById("momente").hidden = !(fotos.galerie && fotos.galerie.length);
+  }
+
+  function zeigeFoto(index) {
+    fotoIndex = (index + fotoListe.length) % fotoListe.length;
+    const f = fotoListe[fotoIndex];
+    lightboxBild.src = "bilder/" + f.datei;
+    lightboxBild.alt = f.text || "";
+    lightboxText.textContent = f.text || "";
+    lightboxText.hidden = !f.text;
+    if (!lightbox.open) oeffne(lightbox);
+  }
+
+  lightbox.querySelector(".schliessen").addEventListener("click", () => schliesse(lightbox));
+  lightbox.querySelector(".zurueck").addEventListener("click", () => zeigeFoto(fotoIndex - 1));
+  lightbox.querySelector(".weiter").addEventListener("click", () => zeigeFoto(fotoIndex + 1));
+  lightbox.addEventListener("click", (e) => { if (e.target === lightbox) schliesse(lightbox); });
+  lightbox.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") zeigeFoto(fotoIndex - 1);
+    if (e.key === "ArrowRight") zeigeFoto(fotoIndex + 1);
+  });
+  let wischStart = null;
+  lightbox.addEventListener("touchstart", (e) => { wischStart = e.touches[0].clientX; }, { passive: true });
+  lightbox.addEventListener("touchend", (e) => {
+    if (wischStart === null) return;
+    const dx = e.changedTouches[0].clientX - wischStart;
+    wischStart = null;
+    if (Math.abs(dx) > 50) zeigeFoto(fotoIndex + (dx < 0 ? 1 : -1));
+  });
+
+  /* ------------------------------------------------------------
    * Start
    * ------------------------------------------------------------ */
   baueKalender();
   baueEier();
+  baueFotos();
   baueHerzen();
   aktualisiere();
 

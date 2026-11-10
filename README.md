@@ -40,6 +40,16 @@ Fünf versteckte Gutscheine, die nach und nach auf der Seite auftauchen
 Gefundene Gutscheine kann sie jederzeit über „🎟️ Meine Gutscheine“ wieder ansehen.
 Der Knopf erscheint erst, wenn der erste Gutschein gefunden wurde.
 
+## Fotos
+
+Die Fotos liegen in `bilder/` (große Ansicht) und `bilder/klein/` (Vorschau).
+Welche wo erscheinen, steht unter `fotos` in `inhalte.js`:
+
+- `titel`: die drei Polaroids oben unter der Überschrift
+- `galerie`: der Fotostreifen „Unsere Momente“ unter dem Kalender
+
+Ein Tipp auf ein Foto öffnet es groß. Dort kann man wischen oder die Pfeile benutzen.
+
 ## Lokal ansehen und testen
 
 ```bash

@@ -17,6 +17,7 @@
   <header class="kopf">
     <h1 id="titel">Für Toni ♥️</h1>
     <p id="untertitel" class="untertitel"></p>
+    <div id="titelfotos" class="titelfotos"></div>
     <p id="status" class="status" aria-live="polite"></p>
     <p><button id="sammlung-knopf" class="sammlung-knopf" type="button" hidden>🎟️ Meine Gutscheine</button></p>
   </header>
@@ -24,6 +25,11 @@
   <main>
     <div id="kalender" class="kalender" aria-label="Adventskalender mit 24 Türchen"></div>
   </main>
+
+  <section id="momente" class="momente" aria-labelledby="momente-titel" hidden>
+    <h2 id="momente-titel">Unsere Momente</h2>
+    <div id="fotostreifen" class="fotostreifen"></div>
+  </section>
 
   <footer class="fuss">Mit ganz viel Liebe gemacht ♥️</footer>
 
@@ -75,6 +81,16 @@
       <h2 id="sammlung-titel">Deine Gutscheine</h2>
       <div id="sammlung-liste" class="sammlung-liste"></div>
     </div>
+  </dialog>
+
+  <dialog id="lightbox" class="lightbox" aria-label="Foto">
+    <button class="schliessen" type="button" aria-label="Schließen">×</button>
+    <figure class="lightbox-figur">
+      <img id="lightbox-bild" alt="">
+      <figcaption id="lightbox-text"></figcaption>
+    </figure>
+    <button class="lightbox-pfeil zurueck" type="button" aria-label="Vorheriges Foto">‹</button>
+    <button class="lightbox-pfeil weiter" type="button" aria-label="Nächstes Foto">›</button>
   </dialog>
 
   <canvas id="konfetti-regen" class="konfetti-regen" popover="manual" aria-hidden="true"></canvas>

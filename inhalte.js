@@ -26,6 +26,37 @@ const KALENDER = {
   untertitel: "24 kleine Überraschungen bis Weihnachten",
 
   /*
+   * Fotos (liegen im Ordner bilder/, kleine Vorschau in bilder/klein/)
+   *   titel   : die Polaroids oben unter der Überschrift (am besten 3)
+   *   galerie : der Fotostreifen „Unsere Momente“ unter dem Kalender
+   *   text    : kleine Beschriftung unter dem Foto
+   *   fokus   : (optional) welcher Bildteil im Ausschnitt zu sehen ist,
+   *             z. B. "70% 50%" = etwas weiter rechts
+   */
+  fotos: {
+    titel: [
+      { datei: "kuss-am-meer.jpg", text: "Am Meer", fokus: "68% 50%" },
+      { datei: "bank.jpg", text: "Lieblingsmensch" },
+      { datei: "wangenkuss.jpg", text: "Küsschen", fokus: "40% 50%" },
+    ],
+    galerie: [
+      { datei: "sonnenuntergang.jpg", text: "Mein liebstes Motiv" },
+      { datei: "palma.jpg", text: "Palma" },
+      { datei: "partnerlook.jpg", text: "Partnerlook" },
+      { datei: "sofa.jpg", text: "Festhalten" },
+      { datei: "bucht.jpg", text: "Sommer am Meer" },
+      { datei: "caps.jpg", text: "Caps im Partnerlook" },
+      { datei: "gondel.jpg", text: "Ganz oben" },
+      { datei: "bahn.jpg", text: "Heimweg" },
+      { datei: "palma-kuesschen.jpg", text: "Küsschen in Palma" },
+      { datei: "muetzen.jpg", text: "Mützenmodels" },
+      { datei: "abendspaziergang.jpg", text: "Abendspaziergang" },
+      { datei: "gondel-abend.jpg", text: "Gondelfahrt" },
+      { datei: "capybaras.jpg", text: "Capybara Kuschelparty" },
+    ],
+  },
+
+  /*
    * Versteckte Easter Eggs (Gutscheine)
    *   emblem : welches kleine Bild (matcha, acai, ente, blumen, heimat)
    *   ab     : ab welchem Dezembertag es auf der Seite auftaucht
