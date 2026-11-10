@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Für Toni ❤️</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❤️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="herzen" aria-hidden="true"></div>
+
+  <header class="kopf">
+    <h1 id="titel">Für Toni ❤️</h1>
+    <p id="untertitel" class="untertitel"></p>
+    <p id="status" class="status" aria-live="polite"></p>
+  </header>
+
+  <main>
+    <div id="kalender" class="kalender" aria-label="Adventskalender mit 24 Türchen"></div>
+  </main>
+
+  <footer class="fuss">Mit ganz viel Liebe gemacht ❤️</footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="dialog" class="dialog" aria-labelledby="dialog-titel">
+    <div class="dialog-inhalt">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <p class="dialog-tag" id="dialog-tag"></p>
+      <h2 id="dialog-titel"></h2>
+      <img id="dialog-bild" class="dialog-bild" alt="" hidden>
+      <p id="dialog-text" class="dialog-text"></p>
+      <div id="dialog-hinweis" class="hinweis" hidden>
+        <span class="hinweis-icon" aria-hidden="true">🎁</span>
+        <span id="dialog-hinweis-text"></span>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="inhalte.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
