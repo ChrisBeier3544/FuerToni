@@ -627,6 +627,7 @@ main {
 }
 .ticket h2 { margin: 2px 0 10px; }
 .ticket-text { margin: 0; line-height: 1.55; }
+.ticket-fuss strong { display: block; margin-bottom: 4px; color: var(--beere); }
 .ticket-fuss {
   margin: 14px 0 0;
   padding-top: 10px;

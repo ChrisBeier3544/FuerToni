@@ -88,7 +88,7 @@ const KALENDER = {
       emblem: "acai",
       ab: 7,
       titel: "Ein Acai Bowl Date",
-      text: "Wir gehen zusammen Acai Bowls essen. Du suchst aus, wann und wo ♥️",
+      text: "Wir gehen zusammen Acai Bowls essen. Wo, das bestimmst ganz allein du ♥️",
     },
     {
       emblem: "capybara",
