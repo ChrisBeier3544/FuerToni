@@ -300,6 +300,7 @@
       else delete capy.dataset.outfit;
     }
     aktualisiereZusammen(echt);
+    aktualisiereBriefkopf(echt, d);
     const rk = document.getElementById("rueckblick-knopf");
     if (rk) rk.hidden = !(zeitBereit && nachWeihnachten(d));
     aktualisiereLichter(d);
@@ -799,10 +800,38 @@
       return;
     }
     box.classList.remove("jubilaeum");
-    const teile = [];
-    if (zusammen !== null && zusammen >= 0) teile.push("♥️ " + zusammen + " Tage zusammen");
-    if (kennen !== null && kennen >= 0) teile.push(kennen + " Tage, seit wir uns kennen");
-    box.textContent = teile.join(" · ");
+    box.textContent = "";
+    const kachel = (zahl, text) => {
+      const k = document.createElement("p");
+      k.className = "zaehler-kachel";
+      const z = document.createElement("span");
+      z.className = "zaehler-zahl";
+      z.textContent = zahl.toLocaleString("de-DE");
+      const t = document.createElement("span");
+      t.className = "zaehler-text";
+      t.textContent = text;
+      k.append(z, t);
+      box.appendChild(k);
+    };
+    if (zusammen !== null && zusammen >= 0) kachel(zusammen, "Tage zusammen ♥️");
+    if (kennen !== null && kennen >= 0) kachel(kennen, "Tage, seit wir uns kennen");
+  }
+
+  /* Datum mit Wochentag und Countdown im Untertitel */
+  const WOCHENTAG = new Intl.DateTimeFormat("de-DE", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
+  function aktualisiereBriefkopf(echt, d) {
+    const datum = document.getElementById("datum");
+    if (datum) datum.textContent = zeitBereit ? WOCHENTAG.format(new Date(Date.UTC(echt.jahr, echt.monat - 1, echt.tag))) : "";
+    if (!zeitBereit) return;
+    let text = KALENDER.untertitel || "";
+    if (nachWeihnachten(d)) text = "Danke für 24 wunderschöne Tage ♥️";
+    else if (d.jahr === KALENDER.jahr && d.monat === 12) {
+      const rest = 24 - d.tag;
+      text = rest > 1 ? "Noch " + rest + " Überraschungen bis Weihnachten"
+        : rest === 1 ? "Noch 1 Überraschung bis Weihnachten"
+        : "Die letzte Überraschung wartet auf dich 🎄";
+    }
+    el.untertitel.textContent = text;
   }
 
   function nachWeihnachten(d) {

@@ -1603,3 +1603,97 @@ html[data-tageszeit="nacht"] .rauch circle, html[data-abend] .rauch circle { fil
   .rauch circle { opacity: 0.5; }
   .tuer-rueck { transition: none; }
 }
+
+
+/* =========================================================
+   Briefkopf und Heute-Karte
+   ========================================================= */
+.briefkopf { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.datum {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--beere);
+  opacity: 0.6;
+  min-height: 1.2em;
+}
+.briefkopf .gruss { margin: 0 0 2px; font-size: 1rem; }
+.briefkopf h1 { margin: 2px 0 0; }
+.briefkopf .untertitel { margin: 4px 0 0; font-size: 0.98rem; }
+.briefkopf .untertitel::before, .briefkopf .untertitel::after { content: " ✦ "; color: var(--gold); font-size: 0.8em; }
+
+.heute-karte {
+  position: relative;
+  max-width: 440px;
+  margin: 34px auto 0;
+  padding: 16px 18px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(253, 164, 184, 0.7);
+  box-shadow: 0 10px 26px rgba(157, 36, 73, 0.12);
+  backdrop-filter: blur(4px);
+  display: grid;
+  gap: 12px;
+  text-align: center;
+}
+.heute-label {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  margin: 0;
+  padding: 3px 14px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--gold-hell), var(--gold));
+  color: var(--beere-dunkel);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  box-shadow: 0 3px 8px rgba(157, 36, 73, 0.18);
+}
+.heute-karte .status {
+  display: block;
+  margin: 4px 0 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+.heute-karte .zusammen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(232, 93, 126, 0.35);
+  opacity: 1;
+}
+.heute-karte .zusammen:empty { display: none; }
+.zaehler-kachel { margin: 0; display: grid; gap: 1px; padding: 0 6px; }
+.zaehler-kachel + .zaehler-kachel { border-left: 1px dashed rgba(232, 93, 126, 0.35); }
+.zaehler-zahl { font: 700 2rem/1 "Dancing Script", cursive; color: var(--beere); font-variant-numeric: tabular-nums; }
+.zaehler-text { font-size: 0.76rem; font-weight: 700; color: var(--text); opacity: 0.7; }
+.heute-karte .zusammen.jubilaeum {
+  display: block;
+  grid-template-columns: none;
+  padding: 10px 12px;
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fff8e6, var(--gold-hell));
+  color: var(--beere-dunkel);
+  font-weight: 800;
+}
+.heute-karte .kopf-knoepfe { margin: 0; padding-top: 12px; border-top: 1px dashed rgba(232, 93, 126, 0.35); }
+.heute-karte .sammlung-knopf { box-shadow: none; }
+
+html[data-abend] .heute-karte { background: rgba(40, 14, 40, 0.55); border-color: rgba(255, 179, 198, 0.3); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+html[data-abend] .heute-karte .status { color: #ffe4ea; }
+html[data-abend] .zaehler-zahl { color: #ffb3c6; }
+html[data-abend] .zaehler-text { color: #ffe4ea; }
+html[data-abend] .datum { color: #ffd0dc; }
+html[data-abend] .heute-karte .zusammen.jubilaeum { color: var(--beere-dunkel); }
+html[data-abend] .heute-karte .status { background: none; border: 0; box-shadow: none; }

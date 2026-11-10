@@ -41,6 +41,12 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
 - **Finale:** Sind alle 24 Türchen offen, fliegen alle Fotos zu einem Herz zusammen.
   Danach lässt es sich über „♥️ Unser Herz“ jederzeit wieder ansehen.
 
+## Kopfbereich
+
+Oben stehen Datum mit Wochentag, der Gruß zur Tageszeit, der Titel und ein Countdown
+(„Noch 9 Überraschungen bis Weihnachten“). Darunter die Polaroids und die Karte „Dein Tag“
+mit Statuszeile, Zähler und den Knöpfen für Gutscheine, Foto-Herz und Rückblick.
+
 ## Feine Details
 
 - Geöffnete Türchen zeigen die aufgeklappte Papierseite, eine kleine Illustration und einen Stempel mit dem Datum.
