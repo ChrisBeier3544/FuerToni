@@ -1697,3 +1697,37 @@ html[data-abend] .zaehler-text { color: #ffe4ea; }
 html[data-abend] .datum { color: #ffd0dc; }
 html[data-abend] .heute-karte .zusammen.jubilaeum { color: var(--beere-dunkel); }
 html[data-abend] .heute-karte .status { background: none; border: 0; box-shadow: none; }
+
+
+/* ---------- Häuser antippen: Capybaras schauen kurz raus ---------- */
+.landschaft .haus, .landschaft .baum { cursor: pointer; }
+.fenster-capy.kurz { display: inline; }
+.fenster-capy.kurz .capy-kopf { animation: capy-gucken-rein 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both; }
+.fenster-capy.geht .capy-kopf { animation: capy-gucken-raus 0.4s ease-in both; }
+.capy-kopf { transform-box: view-box; }
+@keyframes capy-gucken-rein { from { transform: translateY(12px); } to { transform: translateY(0); } }
+@keyframes capy-gucken-raus { from { transform: translateY(0); } to { transform: translateY(13px); } }
+
+/* ---------- Bäume schütteln ---------- */
+.baum-wackel { transform-box: fill-box; transform-origin: 50% 100%; }
+.baum-wackel.wackelt { animation: baum-wackeln 0.7s ease-out; }
+@keyframes baum-wackeln {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-6deg); }
+  45% { transform: rotate(5deg); }
+  70% { transform: rotate(-2.5deg); }
+}
+.baum-schnee { transform-box: fill-box; transform-origin: 50% 100%; }
+.baum-schnee.faellt { animation: schnee-faellt 1s ease-in forwards; }
+.baum-schnee.weg { opacity: 0; }
+.baum-schnee.waechst { animation: schnee-waechst 1.6s ease-out; }
+@keyframes schnee-faellt {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--seite, 4px), 40px) rotate(25deg) scale(0.6); opacity: 0; }
+}
+@keyframes schnee-waechst { from { opacity: 0; transform: scale(0.3, 0.2); } to { opacity: 1; transform: none; } }
+.baum-schnee:nth-of-type(2n) { --seite: -6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fenster-capy.kurz .capy-kopf, .fenster-capy.geht .capy-kopf, .baum-wackel.wackelt, .baum-schnee.faellt, .baum-schnee.waechst { animation: none; }
+}

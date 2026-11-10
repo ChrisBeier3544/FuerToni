@@ -71,6 +71,8 @@ mit Statuszeile, Zähler und den Knöpfen für Gutscheine, Foto-Herz und Rückbl
   Rentiergeweih (16. bis 18.), Lichterkette (19. bis 21.), Krone und Schleife (22. bis 24.).
 - **Capybara-Fenster:** In der Winterlandschaft schauen Capybaras mit verschiedenen
   Accessoires aus den Fenstern. Am 1.12. eins, an Heiligabend fast alle.
+- **Häuser antippen:** In den leeren Fenstern schauen 4 Sekunden lang Capybaras heraus.
+- **Bäume antippen:** Der Baum wackelt, der Schnee fällt ab und wächst in 30 Sekunden nach.
 - **Schneekugel:** Handy schütteln für ein Schneegestöber mit Herzen.
 - **Quiz vor den Easter Eggs** (`quiz` bei `eastereggs`). Leere Antwort = kein Quiz.
 - **Lichtershow** an Heiligabend, bevor Türchen 24 aufgeht.

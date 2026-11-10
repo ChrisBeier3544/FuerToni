@@ -1004,16 +1004,27 @@
     while (x < B - 40) {
       if (k % 4 === 2) {
         const bh = 38 + rnd() * 26, bx = x + 16;
-        teile += '<g style="fill:var(--baum)">' +
-          '<path d="M' + bx + ' ' + (BODEN - bh) + ' l-16 ' + (bh * 0.55) + ' h32z"/>' +
+        const spitze = BODEN - bh, stufe1 = BODEN - bh * 0.45, mitte = BODEN - bh * 0.32;
+        const f = (v) => v.toFixed(1);
+        const flocken = [
+          'M' + f(bx) + ' ' + f(spitze) + ' l-6.5 ' + f(bh * 0.21) + ' q3 -2.6 6.5 -1 q3.5 -1.6 6.5 1z',
+          'M' + f(bx - 15.5) + ' ' + f(stufe1) + ' q4 -4.5 8 -1.4 q4 -4.5 7.5 -0.6 q4 -4.5 8 -0.4 q4 -4 7.5 2.4z',
+          'M' + f(bx - 14) + ' ' + f(mitte) + ' q4 -4 8.5 -0.5 q-2 3.2 -8.5 0.5z',
+          'M' + f(bx + 3) + ' ' + f(mitte + 5) + ' q5 -4.5 10 -0.6 q-2.6 3.4 -10 0.6z',
+          'M' + f(bx - 19) + ' ' + f(BODEN - 1) + ' q5 -5 10 -1.5 q5 -5 9.5 -0.5 q5 -5 9.5 -0.5 q5 -4.5 9 2.5z',
+        ];
+        teile += '<g class="baum" data-baum="' + k + '" role="button" aria-label="Baum schütteln"><rect class="trefferflaeche" x="' + f(bx - 24) + '" y="' + f(spitze - 6) + '" width="48" height="' + f(bh + 8) + '" fill="transparent"/>' +
+          '<g class="baum-wackel"><g style="fill:var(--baum)">' +
+          '<path d="M' + bx + ' ' + spitze + ' l-16 ' + (bh * 0.55) + ' h32z"/>' +
           '<path d="M' + bx + ' ' + (BODEN - bh * 0.7) + ' l-20 ' + (bh * 0.7) + ' h40z"/></g>' +
-          '<path style="fill:var(--schnee)" d="M' + bx + ' ' + (BODEN - bh) + ' l-6 ' + (bh * 0.2) + ' q6 -3 12 0z"/>';
+          flocken.map((d) => '<path class="baum-schnee" style="fill:var(--schnee)" d="' + d + '"/>').join("") +
+          "</g></g>";
         x += 46;
       } else {
         const hw = 60 + rnd() * 46, hh = 72 + rnd() * 62, dh = 22 + rnd() * 16;
         const farbe = ["--haus-a", "--haus-b", "--haus-c"][k % 3];
         const oben = BODEN - hh;
-        teile += '<rect style="fill:var(' + farbe + ')" x="' + x + '" y="' + oben + '" width="' + hw + '" height="' + hh + '"/>';
+        teile += '<rect class="haus" data-haus="' + k + '" style="fill:var(' + farbe + ')" x="' + x + '" y="' + oben + '" width="' + hw + '" height="' + hh + '"/>';
         if (rnd() < 0.5) {
           const kx = x + hw * 0.68, ky = oben - dh * 0.9;
           teile += '<rect style="fill:var(--dach)" x="' + kx + '" y="' + ky + '" width="9" height="' + dh * 0.7 + '"/>';
@@ -1021,7 +1032,7 @@
           teile += '<g class="rauch" transform="translate(' + (kx + 4.5).toFixed(1) + ' ' + (ky - 2).toFixed(1) + ')">' +
             [0, 1, 2].map((i) => '<circle r="' + (3 + i) + '" style="animation-delay:-' + (+verz + i * 1.3).toFixed(2) + 's"/>').join("") + "</g>";
         }
-        teile += '<path style="fill:var(--dach)" d="M' + (x - 7) + ' ' + oben + ' L' + (x + hw / 2) + ' ' + (oben - dh) + ' L' + (x + hw + 7) + ' ' + oben + 'Z"/>';
+        teile += '<path class="haus" data-haus="' + k + '" style="fill:var(--dach)" d="M' + (x - 7) + ' ' + oben + ' L' + (x + hw / 2) + ' ' + (oben - dh) + ' L' + (x + hw + 7) + ' ' + oben + 'Z"/>';
         teile += '<polyline style="stroke:var(--schnee)" fill="none" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" points="' + (x - 7) + ',' + (oben - 1) + ' ' + (x + hw / 2) + ',' + (oben - dh - 1) + ' ' + (x + hw + 7) + ',' + (oben - 1) + '"/>';
         const spalten = Math.max(2, Math.floor(hw / 27)), reihen = Math.max(2, Math.floor((hh - 14) / 26));
         for (let r = 0; r < reihen; r++) {
@@ -1029,8 +1040,8 @@
             if (rnd() < 0.12) continue;
             const fx = x + (hw / spalten) * (sp + 0.5) - 8, fy = oben + 9 + r * 26;
             const gruppe = rnd() < 0.35 ? "f1" : "f2";
-            teile += '<rect class="fenster ' + gruppe + '" x="' + fx.toFixed(1) + '" y="' + fy.toFixed(1) + '" width="16" height="17" rx="2"/>';
-            fensterListe.push({ x: fx, y: fy, rang: Math.abs(fx + 8 - B / 2) / (B / 2) + rnd() * 0.55 });
+            teile += '<rect class="fenster haus ' + gruppe + '" data-haus="' + k + '" x="' + fx.toFixed(1) + '" y="' + fy.toFixed(1) + '" width="16" height="17" rx="2"/>';
+            fensterListe.push({ x: fx, y: fy, haus: k, rang: Math.abs(fx + 8 - B / 2) / (B / 2) + rnd() * 0.55 });
           }
         }
         x += hw + 14 + rnd() * 18;
@@ -1040,14 +1051,22 @@
     // Capybaras in den Fenstern: die mittleren (auch auf dem Handy sichtbaren) zuerst
     fensterListe.sort((a, b) => a.rang - b.rang);
     fensterListe.forEach((f, i) => {
-      teile += '<g class="fenster-capy" data-nr="' + i + '" transform="translate(' + f.x.toFixed(1) + ' ' + f.y.toFixed(1) + ')">' +
+      teile += '<g class="fenster-capy haus" data-nr="' + i + '" data-haus="' + f.haus + '" transform="translate(' + f.x.toFixed(1) + ' ' + f.y.toFixed(1) + ')">' +
         '<rect class="fenster-hell" width="16" height="17" rx="2"/>' +
-        FENSTER_CAPY + FENSTER_EXTRAS[i % FENSTER_EXTRAS.length] +
+        '<g clip-path="url(#fensterclip)"><g class="capy-kopf">' + FENSTER_CAPY + FENSTER_EXTRAS[i % FENSTER_EXTRAS.length] + "</g></g>" +
         '<rect x="-1" y="15.5" width="18" height="2.5" rx="1" class="fenster-bank"/></g>';
     });
     teile += '<path transform="scale(' + sx + ' 1)" style="fill:var(--huegel-1)" d="M0 198 Q 300 182 600 196 T 1200 190 V230 H0Z"/>';
-    box.innerHTML = '<svg viewBox="0 0 ' + B + ' 230" preserveAspectRatio="xMidYMax slice">' + teile + '</svg>';
+    box.innerHTML = '<svg viewBox="0 0 ' + B + ' 230" preserveAspectRatio="xMidYMax slice">' +
+      '<defs><clipPath id="fensterclip"><rect width="16" height="17" rx="2"/></clipPath></defs>' + teile + '</svg>';
     baueCapyBegleiter(box);
+    const svg = box.querySelector("svg");
+    svg.addEventListener("click", (e) => {
+      const baum = e.target.closest(".baum");
+      if (baum) { schuettleBaum(baum); return; }
+      const haus = e.target.closest("[data-haus]");
+      if (haus) zeigeHausCapys(haus.dataset.haus);
+    });
   }
 
   /* Kleine Capybaras, die aus den Fenstern schauen */
@@ -1067,6 +1086,46 @@
     '<path d="M3 9Q3 3.4 8 3.4T13 9" fill="none" stroke="#e85d7e" stroke-width="1.1"/><circle cx="2.6" cy="9.6" r="1.8" fill="#fda4b8"/><circle cx="13.4" cy="9.6" r="1.8" fill="#fda4b8"/>',
     '<rect x="11" y="11.5" width="3.6" height="4.6" rx=".8" fill="#eef7e6" stroke="#4a7c3a" stroke-width=".5"/><rect x="11.3" y="13" width="3" height="2.8" fill="#8fbf5a"/><path d="M13.2 11.5l.8-2" stroke="#9d2449" stroke-width=".6"/>',
   ];
+  /* Tippen aufs Haus: in den leeren Fenstern schauen kurz Capybaras raus */
+  const hausTimer = new Map();
+  function zeigeHausCapys(haus) {
+    const fenster = [...document.querySelectorAll('.fenster-capy[data-haus="' + haus + '"]')].filter((g) => !g.classList.contains("da"));
+    if (!fenster.length) return;
+    clearTimeout(hausTimer.get(haus));
+    fenster.forEach((g, i) => {
+      g.classList.remove("geht");
+      setTimeout(() => g.classList.add("kurz"), bewegungReduziert ? 0 : i * 110);
+    });
+    hausTimer.set(haus, setTimeout(() => {
+      fenster.forEach((g) => g.classList.add("geht"));
+      setTimeout(() => fenster.forEach((g) => g.classList.remove("kurz", "geht")), bewegungReduziert ? 0 : 450);
+    }, 4000));
+  }
+
+  /* Tippen auf einen Baum: Schnee fällt ab und wächst in 30 Sekunden nach */
+  function schuettleBaum(baum) {
+    const wackel = baum.querySelector(".baum-wackel");
+    wackel.classList.remove("wackelt");
+    void wackel.getBoundingClientRect();
+    wackel.classList.add("wackelt");
+    const schnee = [...baum.querySelectorAll(".baum-schnee:not(.weg)")];
+    if (!schnee.length) return;
+    clearTimeout(baum.nachwachsen);
+    (baum.timerListe || []).forEach(clearTimeout);
+    schnee.forEach((s, i) => {
+      s.classList.remove("waechst");
+      s.style.animationDelay = (i * 0.06).toFixed(2) + "s";
+      s.classList.add("faellt");
+      setTimeout(() => { s.classList.add("weg"); s.classList.remove("faellt"); s.style.animationDelay = ""; }, 1100 + i * 60);
+    });
+    // nach und nach wieder einschneien: von unten nach oben, verteilt über 30 Sekunden
+    const alle = [...baum.querySelectorAll(".baum-schnee")].reverse();
+    baum.timerListe = alle.map((s, i) => setTimeout(() => {
+      s.classList.remove("weg");
+      s.classList.add("waechst");
+    }, 1300 + ((i + 1) / alle.length) * 28700));
+  }
+
   function aktualisiereFensterCapys(d) {
     const alle = document.querySelectorAll(".fenster-capy");
     if (!alle.length) return;
