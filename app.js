@@ -279,7 +279,7 @@
     if (!zeitBereit) { el.status.textContent = "Einen Moment …"; return; }
 
     if (d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag > 24)) {
-      el.status.textContent = "Frohe Weihnachten, mein Schatz 🎄♥️";
+      el.status.textContent = "Frohe Weihnachten, Maus 🎄♥️";
       return;
     }
     if (d.jahr === KALENDER.jahr && d.monat === 12) {
@@ -312,9 +312,10 @@
       const rest = 86400 - (d.stunde * 3600 + d.minute * 60 + d.sekunde);
       const std = Math.floor(rest / 3600);
       const min = Math.floor((rest % 3600) / 60);
-      return "Nicht schummeln 😘 Türchen " + n + " öffnet sich in " + std + " Std. " + min + " Min.";
+      return "Nicht schummeln, " + KOSENAMEN[n % KOSENAMEN.length] + " 😘 Türchen " + n + " öffnet sich in " + std + " Std. " + min + " Min.";
     }
-    const spruch = ["Geduld, mein Schatz ♥️", "Nicht schummeln 😘", "Die Capys bewachen dieses Türchen noch 🔒", "Na na na 🙈"][n % 4];
+    const name = KOSENAMEN[n % KOSENAMEN.length];
+    const spruch = ["Geduld, " + name + " ♥️", "Nicht schummeln, " + name + " 😘", "Die Capys bewachen dieses Türchen noch 🔒", "Na na na, " + name + " 🙈"][(n >> 2) % 4];
     return spruch + " Türchen " + n + " öffnet sich erst am " + n + ". Dezember. Noch " + tage + " Tage ♥️";
   }
 
@@ -608,7 +609,7 @@
     { name: "nacht", bis: 6 * 60, gruss: "Schlaf schön, {name} 🌙" },
     { name: "morgen", bis: 9 * 60, gruss: "Guten Morgen, {name} ☀️" },
     { name: "vormittag", bis: 12 * 60, gruss: "Einen schönen Vormittag, {name} 🌤️" },
-    { name: "mittag", bis: 14 * 60, gruss: "Schöne Mittagspause, {name} ☕" },
+    { name: "mittag", bis: 14 * 60, gruss: "Guten Mittag, {name} 🌞" },
     { name: "nachmittag", bis: 16 * 60 + 30, gruss: "Einen gemütlichen Nachmittag, {name} 🍪" },
     { name: "abend", bis: 22 * 60, gruss: "Guten Abend, {name} 🕯️" },
     { name: "nacht", bis: 24 * 60, gruss: "Schlaf schön, {name} 🌙" },

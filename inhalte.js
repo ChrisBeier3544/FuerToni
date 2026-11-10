@@ -135,7 +135,7 @@ const KALENDER = {
   tage: {
     1: {
       titel: "Es geht los ✨",
-      text: "Guten Morgen, mein Schatz ♥️\nHeute öffnest du das erste Türchen. Ab jetzt wartet jeden Morgen eine kleine Überraschung auf dich, weil du mir so unendlich viel bedeutest.",
+      text: "Guten Morgen, Maus ♥️\nHeute öffnest du das erste Türchen. Ab jetzt wartet jeden Morgen eine kleine Überraschung auf dich, weil du mir so unendlich viel bedeutest.",
       briefzahl: 14,
       paeckchen: "",
     },
@@ -167,10 +167,10 @@ const KALENDER = {
     },
     6: {
       titel: "Frohen Nikolaus 🎅",
-      text: "Heute bringt der Nikolaus allen etwas Schönes. Mein schönstes Geschenk habe ich aber schon längst bekommen, und das bist du.\nIch liebe dich, mein Schatz ♥️",
+      text: "Heute bringt der Nikolaus allen etwas Schönes. Mein schönstes Geschenk habe ich aber schon längst bekommen, und das bist du.\nIch liebe dich, Baby ♥️",
       briefzahl: 1,
       paeckchen: 500,
-      status: "Frohen Nikolaus, mein Schatz 🎅",
+      status: "Frohen Nikolaus, Toni 🎅",
     },
     7: {
       titel: "Dein Lächeln",
@@ -238,7 +238,7 @@ const KALENDER = {
     },
     17: {
       titel: "Viel Erfolg in Mathe 🍀",
-      text: "Heute ist Mathe dran! Bleib ganz ruhig, du hast das drauf und es wird gut klappen.\nIch drück dir fest die Daumen, mein Schatz ♥️",
+      text: "Heute ist Mathe dran! Bleib ganz ruhig, du hast das drauf und es wird gut klappen.\nIch drück dir fest die Daumen, Maus ♥️",
       briefzahl: 4,
       paeckchen: "",
       status: "Heute ist deine Matheklausur. Ich drück dir die Daumen 🍀",
