@@ -329,10 +329,10 @@
     ["nov-26-0029", "26. November 0:29 (Brief öffnet sich gleich)"],
     ["nov-26-0031", "26. November 0:31 🎂 Brief offen"],
     ["nov-26-1300", "26. November 🎂 Geburtstagsmodus"],
-    ["nov-27-1300", "27. November 🎀 Capys binden Schleifen"],
-    ["nov-28-1300", "28. November ✨ Lichterkette"],
+    ["nov-27-1300", "27. November 🎁 Capys bauen den Kalender auf"],
+    ["nov-28-1300", "28. November ✨ Capys schmücken"],
     ["nov-29-1300", "29. November 🕯️ 1. Advent"],
-    ["nov-30-1300", "30. November 🧽 Türchen 1 polieren"]];
+    ["nov-30-1300", "30. November 🧽 Großputz"]];
   var besonders = { 4: " 🎉 Joris", 6: " 🎅", 8: " 🍀 Bio", 11: " 🍀 Deutsch", 13: " 🎂 Papa", 17: " 🍀 Mathe", 24: " 🎄 Heiligabend" };
   var eier = {};
   (KALENDER.eastereggs || []).forEach(function (e) { eier[e.ab] = (eier[e.ab] || "") + " 🥚"; });
@@ -377,7 +377,7 @@
   document.getElementById("test-reset").addEventListener("click", function () {
     try {
       schluessel.forEach(function (k) { localStorage.removeItem(k); });
-      Object.keys(localStorage).forEach(function (k) { if (k.indexOf("toni-postkarte-") === 0) localStorage.removeItem(k); });
+      Object.keys(localStorage).forEach(function (k) { if (k.indexOf("toni-postkarte-") === 0 || k.indexOf("toni-aufbau-") === 0) localStorage.removeItem(k); });
       sessionStorage.clear();
     } catch (e) {}
     gehe("");
@@ -391,10 +391,12 @@
 </script>
 
   <script src="specials.js"></script>
+  <script src="aufbau.js"></script>
   <script src="vorfreude.js"></script>
   <script src="spiel.js"></script>
 
   <script src="specials.js"></script>
+  <script src="aufbau.js"></script>
   <script src="vorfreude.js"></script>
   <script src="spiel.js"></script>
 </body>

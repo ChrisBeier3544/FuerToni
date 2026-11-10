@@ -60,9 +60,14 @@ Sie startet beim Öffnen automatisch und lässt sich über „🐹 Capy-Special 
 
 - **26.11. Geburtstagsmodus:** Ballons am Rand, alle Fenster-Capys mit Partyhut,
   Gruß „Happy Birthday“, das Capy unten trägt eine Krone.
-- **Die Capy Crew baut den Kalender auf** (`vorfreude.js`): 27.11. Schleifen binden,
-  28.11. Lichterkette aufhängen (vorher ist sie nicht da), 29.11. Adventskranz bringen und die
-  erste Kerze anzünden, 30.11. Türchen 1 polieren.
+- **Die Capy Crew baut den Kalender auf** (`aufbau.js`), jeweils etwa eine Minute,
+  direkt nach dem Schließen der Postkarte:
+  - Bis zum 26.11. ist das Regal leer (mit Schild).
+  - 27.11.: Die Capys tragen alle 24 Päckchen einzeln herein und bringen sie an.
+  - 28.11.: Schnee auf jedes Brett, Schleifen an jedes Päckchen, Lichterkette, Tannenzweige.
+  - 29.11.: Adventskranz und erste Kerze (`vorfreude.js`).
+  - 30.11.: Großputz: Spinnweben wegfegen, jedes Türchen blank wischen, Lichterkette und Zweige polieren.
+  Fertige Schritte werden gemerkt und nicht wiederholt.
 - **Adventskranz** ab dem 1. Advent (29.11.), am 6., 13. und 20.12. brennt je eine Kerze mehr.
 - **Postkarte:** Jeden Tag bringt ein Capy-Postbote eine Karte mit Foto (`postkarten` in `inhalte.js`).
   Sie kommt einmal automatisch, danach über „📮 Heutige Postkarte“.

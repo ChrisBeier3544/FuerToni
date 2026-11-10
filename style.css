@@ -2011,7 +2011,7 @@ html, body { overflow-x: clip; }
   background:
     linear-gradient(180deg,
       transparent 0 var(--zeile),
-      #ffffff var(--zeile) calc(var(--zeile) + 3px),
+      var(--brett-schnee, #ffffff) var(--zeile) calc(var(--zeile) + 3px),
       #c48c60 calc(var(--zeile) + 3px) calc(var(--zeile) + var(--luecke) - 3px),
       #8a5a3a calc(var(--zeile) + var(--luecke) - 3px) calc(var(--zeile) + var(--luecke))) 0 0 / 100% calc(var(--zeile) + var(--luecke)) repeat-y,
     repeating-linear-gradient(90deg, rgba(169, 111, 71, 0.06) 0 2px, transparent 2px 46px),
@@ -2040,7 +2040,7 @@ html[data-abend] .kalender {
   background:
     linear-gradient(180deg,
       transparent 0 var(--zeile),
-      #efe8f4 var(--zeile) calc(var(--zeile) + 3px),
+      var(--brett-schnee, #efe8f4) var(--zeile) calc(var(--zeile) + 3px),
       #8a5a3a calc(var(--zeile) + 3px) calc(var(--zeile) + var(--luecke) - 3px),
       #5e3c28 calc(var(--zeile) + var(--luecke) - 3px) calc(var(--zeile) + var(--luecke))) 0 0 / 100% calc(var(--zeile) + var(--luecke)) repeat-y,
     linear-gradient(180deg, rgba(60, 30, 50, 0.6), rgba(40, 18, 36, 0.7));
@@ -2277,3 +2277,96 @@ html[data-geburtstag] .geb-ballons { display: block; }
   .postkarte .briefmarke { right: auto; left: calc(50% - 82px); }
   .postkarte .poststempel { right: auto; left: calc(50% - 150px); }
 }
+
+
+/* =========================================================
+   Die Capy Crew baut den Kalender auf (27., 28. und 30. November)
+   ========================================================= */
+.kalender { position: relative; isolation: isolate; }
+/* Leeres Regal */
+.kalender.leer .tuer:not(.angebracht) { visibility: hidden; }
+.kalender.leer .tuer.angebracht { animation: einrasten 0.5s cubic-bezier(0.3, 1.6, 0.5, 1); }
+@keyframes einrasten { 0% { transform: translateY(-14px) scale(0.92); } 60% { transform: translateY(3px) scale(1.02); } 100% { transform: none; } }
+.regal-schild {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  z-index: 5;
+  width: min(80%, 320px);
+  padding: 16px 18px;
+  transform: translateX(-50%) rotate(-2deg);
+  border-radius: 10px;
+  background: #fff8e6;
+  border: 3px solid #c48c60;
+  box-shadow: 0 10px 24px rgba(107, 21, 50, 0.2);
+  text-align: center;
+  font: 700 1.35rem/1.25 "Dancing Script", cursive;
+  color: var(--beere);
+}
+.regal-schild::before, .regal-schild::after { content: ""; position: absolute; top: -26px; width: 2px; height: 26px; background: #8a5a3a; }
+.regal-schild::before { left: 22%; }
+.regal-schild::after { right: 22%; }
+.regal-schild small { display: block; margin-top: 6px; font: 700 0.8rem "Nunito", sans-serif; color: var(--text); opacity: 0.7; }
+
+/* Ohne Deko: keine Schleifen, kein Schnee auf den Brettern, keine Zweige, keine Lichterkette */
+.kalender.ohne-deko { --brett-schnee: #c48c60; }
+html[data-abend] .kalender.ohne-deko { --brett-schnee: #8a5a3a; }
+.kalender.ohne-deko .tuer:not(.dekoriert) .schleife { scale: 0; opacity: 0; }
+.kalender .schleife { transition: scale 0.5s cubic-bezier(0.3, 1.8, 0.5, 1), opacity 0.3s ease; }
+html[data-ohne-deko] .zweig { opacity: 0; transform: translateY(-110%); }
+html[data-ohne-deko] .zweig-rechts { transform: scaleX(-1) translateY(-110%); }
+.zweig { transition: opacity 0.8s ease, transform 1s cubic-bezier(0.3, 1.3, 0.5, 1); }
+.lichterkette { transition: filter 1.5s ease; }
+
+/* Verstaubt (30. November) */
+.staub { position: absolute; inset: 0; z-index: 3; pointer-events: none; display: none; border-radius: inherit;
+  background:
+    radial-gradient(circle, rgba(120, 110, 105, 0.45) 0 1px, transparent 1.6px) 0 0 / 9px 9px,
+    radial-gradient(circle, rgba(140, 130, 120, 0.35) 0 1.4px, transparent 2px) 4px 5px / 13px 13px,
+    linear-gradient(160deg, rgba(200, 190, 180, 0.55), rgba(160, 150, 140, 0.5)); }
+html[data-staubig] .tuer:not(.sauber) .staub { display: block; }
+html[data-staubig] .lichterkette { filter: grayscale(0.8) brightness(0.85); }
+html[data-staubig] .zweig { filter: grayscale(0.7) brightness(0.85); }
+html[data-staubig] .kalender { filter: saturate(0.75); }
+.spinnwebe { position: absolute; z-index: 6; width: 70px; pointer-events: none; display: none; opacity: 0.85; }
+html[data-staubig] .spinnwebe { display: block; }
+.spinnwebe.links { left: 2px; top: 2px; }
+.spinnwebe.rechts { right: 2px; top: 2px; transform: scaleX(-1); }
+
+/* Bau-Capybaras und Werkzeug */
+.bau-capy { position: absolute; z-index: 20; pointer-events: none; filter: drop-shadow(0 4px 4px rgba(60, 20, 30, 0.3)); }
+.bau-capy > svg { display: block; width: 100%; height: auto; overflow: visible; }
+.bau-capy .werkzeug { position: absolute; font-size: 1.3em; right: -8%; top: 28%; transform-origin: 30% 80%; }
+.trage-paket { position: absolute; z-index: 21; pointer-events: none; }
+.trage-paket .tuer { width: 100%; height: 100%; visibility: visible !important; }
+.schnee-streifen {
+  position: absolute;
+  z-index: -1;
+  height: 5px;
+  border-radius: 3px 3px 1px 1px;
+  background: var(--schnee-farbe, #fff);
+  box-shadow: 0 -1px 0 rgba(255, 255, 255, 0.6);
+}
+.bau-funke { position: absolute; z-index: 22; pointer-events: none; font-size: 1rem; }
+.bau-banner {
+  position: fixed;
+  left: 50%;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  z-index: 47;
+  translate: -50% 0;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--beere);
+  font-weight: 800;
+  font-size: 0.92rem;
+  text-align: center;
+  box-shadow: 0 8px 22px rgba(157, 36, 73, 0.2);
+  animation: aufpoppen 0.4s ease both;
+  pointer-events: none;
+}
+.bau-banner small { display: block; font-weight: 700; opacity: 0.7; font-variant-numeric: tabular-nums; }
+.lichterkette.poliert { animation: polieren 1.6s ease-in-out 2; }
+@keyframes polieren { 50% { filter: brightness(1.6) drop-shadow(0 0 10px #ffd36b); } }

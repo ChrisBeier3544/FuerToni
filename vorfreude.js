@@ -121,45 +121,6 @@
   }
 
   const SZENEN = {
-    // 27.11.: die Capys binden die Schleifen
-    "11-27": async () => {
-      const kal = document.getElementById("kalender");
-      await hinScrollen(kal.querySelector(".tuer"));
-      neueBuehne("Die Capy Crew bindet die letzten Schleifen 🎀");
-      const gr = Math.min(window.innerWidth * 0.24, 110);
-      for (let i = 0; i < 3; i++) {
-        const c = figur(grafik.seite({ hut: i === 1 ? "muetze" : null }), { width: gr + "px", left: "0", bottom: "6%", zIndex: 2 });
-        c.animate([{ transform: "translateX(-" + gr * 1.3 + "px)" }, { transform: "translateX(" + (window.innerWidth + gr) + "px)" }],
-          { duration: 6500, delay: i * 650, easing: "linear", fill: "both" });
-      }
-      const sichtbar = [...kal.querySelectorAll(".tuer:not(.offen)")].filter((t) => {
-        const r = t.getBoundingClientRect(); return r.top > 40 && r.bottom < window.innerHeight - 20;
-      }).slice(0, 8);
-      sichtbar.forEach((t, i) => setTimeout(() => {
-        const s = t.querySelector(".schleife");
-        if (s) s.animate([{ transform: "translate(-50%, -56%) scale(.2) rotate(-30deg)" }, { transform: "translate(-50%, -56%) scale(1.25)" }, { transform: "translate(-50%, -56%) scale(1)" }], { duration: 700, easing: "ease-out" });
-        const r = t.getBoundingClientRect();
-        funkeln(r.left + r.width / 2, r.top + r.height * 0.34, 8);
-      }, 800 + i * 520));
-      return ende(7200);
-    },
-    // 28.11.: die Lichterkette wird aufgehängt
-    "11-28": async () => {
-      lichterkette.classList.add("wird-aufgehaengt");
-      lichterkette.classList.remove("noch-nicht");
-      await hinScrollen(lichterkette);
-      neueBuehne("Die Capys hängen die Lichterkette auf ✨");
-      const r = lichterkette.getBoundingClientRect();
-      const gr = Math.min(window.innerWidth * 0.2, 90);
-      figur(grafik.seite({ hut: "muetze" }), { width: gr + "px", left: Math.max(4, r.left - gr * 0.3) + "px", top: r.top + 10 + "px", zIndex: 3 });
-      const rechts = figur(grafik.seite(), { width: gr + "px", left: Math.min(window.innerWidth - gr - 4, r.right - gr * 0.7) + "px", top: r.top + 10 + "px", zIndex: 3 });
-      rechts.firstChild.style.transform = "scaleX(-1)";
-      lichterkette.animate([{ clipPath: "inset(0 100% 0 0)" }, { clipPath: "inset(0 0 0 0)" }], { duration: ruhig ? 1 : 2600, delay: 600, easing: "ease-in-out", fill: "both" });
-      await warte(3400);
-      lichterkette.classList.remove("wird-aufgehaengt");
-      if (ak.starteLichtershow) ak.starteLichtershow();
-      return ende(3800);
-    },
     // 29.11.: der Adventskranz kommt, die erste Kerze geht an
     "11-29": async () => {
       kranzBox.hidden = false;
@@ -178,24 +139,6 @@
       const k = kranzBox.querySelector('.kerze[data-nr="0"]').getBoundingClientRect();
       funkeln(k.left + k.width / 2, k.top, 10);
       return ende(4500);
-    },
-    // 30.11.: Türchen 1 wird poliert
-    "11-30": async () => {
-      const t1 = document.querySelector('.tuer[data-tag="1"]');
-      if (!t1) return;
-      await hinScrollen(t1);
-      neueBuehne("Türchen 1 wird poliert. Morgen geht's los! 🧽");
-      const r = t1.getBoundingClientRect();
-      const gr = Math.min(window.innerWidth * 0.26, 120);
-      const c = figur(grafik.seite({ hut: "muetze" }), { width: gr + "px", left: Math.max(4, r.left + r.width * 0.5 - gr * 0.5) + "px", top: Math.max(60, r.top - gr * 0.55) + "px", zIndex: 3 });
-      c.firstChild.animate([{ transform: "rotate(-8deg)" }, { transform: "rotate(8deg)" }], { duration: 300, iterations: 14, direction: "alternate" });
-      for (let i = 0; i < 6; i++) setTimeout(() => {
-        const rr = t1.getBoundingClientRect();
-        funkeln(rr.left + Math.random() * rr.width, rr.top + Math.random() * rr.height, 6);
-      }, 400 + i * 600);
-      t1.classList.add("glaenzt");
-      setTimeout(() => t1.classList.remove("glaenzt"), 5200);
-      return ende(5600);
     },
   };
 
@@ -247,6 +190,13 @@
     document.body.appendChild(box);
   }
 
+  function karteSchonGezeigt(tag) {
+    try { return localStorage.getItem("toni-postkarte-" + JAHR + "-" + tag) === "1"; } catch (_) { return false; }
+  }
+  function merkeKarte(tag) {
+    try { localStorage.setItem("toni-postkarte-" + JAHR + "-" + tag, "1"); } catch (_) { /* egal */ }
+  }
+
   /* ---------- Ablauf ---------- */
   baueKranz();
   baueBallons();
@@ -254,13 +204,26 @@
   async function ablauf() {
     const d = ak.intro.datum();
     const vorDezember = d.jahr === JAHR && d.monat === 11;
-    // Lichterkette hängt erst ab dem 28.11.
-    lichterkette.classList.toggle("noch-nicht", vorDezember && d.tag < 28);
+    const bau = window.capyAufbau;
+    if (bau) bau.zustand(d);
     aktualisiereKranz(d);
     karteKnopf.hidden = !heutigeKarte(d);
     if (gestartet || !intro.hidden) return;
     gestartet = true;
     const tag = schluessel(d);
+    // 27., 28. und 30.: erst die Postkarte, dann baut die Capy Crew am Kalender
+    if (vorDezember && bau && bau.hatAnimation(d.tag) && !ruhig) {
+      await warte(800);
+      await bisFrei();
+      if (!karteSchonGezeigt(tag)) {
+        await zeigeKarte(true);
+        merkeKarte(tag);
+        await bisFrei();
+        await warte(500);
+      }
+      if (!bau.istFertig(d.tag)) await bau.spiele(d.tag);
+      return;
+    }
     let gesehen = false;
     try { gesehen = sessionStorage.getItem("toni-vorfreude-" + tag) === "1"; } catch (_) { /* egal */ }
     if (gesehen || !vorDezember) return;
@@ -268,13 +231,11 @@
     await warte(800);
     await bisFrei();
     if (SZENEN[tag] && grafik && !ruhig) await SZENEN[tag]();
-    let karteGezeigt = false;
-    try { karteGezeigt = localStorage.getItem("toni-postkarte-" + JAHR + "-" + tag) === "1"; } catch (_) { /* egal */ }
-    if (heutigeKarte(d) && !karteGezeigt) {
+    if (heutigeKarte(d) && !karteSchonGezeigt(tag)) {
       await warte(400);
       await bisFrei();
       await zeigeKarte(true);
-      try { localStorage.setItem("toni-postkarte-" + JAHR + "-" + tag, "1"); } catch (_) { /* egal */ }
+      merkeKarte(tag);
     }
   }
   setInterval(() => { if (ak.intro.bereit() && ak.intro.phase() === "offen") ablauf(); }, 500);
