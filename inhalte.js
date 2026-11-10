@@ -33,7 +33,7 @@ const KALENDER = {
     },
     2: {
       titel: "Mein Lieblingsmensch",
-      text: "Weißt du eigentlich, wie glücklich du mich machst? Jeden einzelnen Tag.\nIch hab dich so lieb ♥️",
+      text: "Weißt du eigentlich, wie glücklich du mich machst? Jeden einzelnen Tag.\nIch liebe dich ♥️",
       briefzahl: 3,
       paeckchen: "",
     },
@@ -45,7 +45,7 @@ const KALENDER = {
     },
     4: {
       titel: "Happy Birthday, Joris 🎉",
-      text: "Heute hat dein Bruder Geburtstag! 🥳\nDrück ihn ganz fest von mir und richte ihm meine allerbesten Wünsche aus. Ich wünsche euch einen wunderschönen Tag zusammen ♥️",
+      text: "Heute hat dein Bruder Geburtstag! 🥳\nRichte ihm schon mal meine besten Glückwünsche aus. Mein kleines Präsent folgt zeitnah!\nIch wünsche euch einen wunderschönen Tag zusammen ♥️",
       briefzahl: 8,
       paeckchen: 2603,
       konfetti: true,
