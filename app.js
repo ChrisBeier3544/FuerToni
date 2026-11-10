@@ -294,7 +294,7 @@
       const min = Math.floor((rest % 3600) / 60);
       return "Nicht schummeln 😘 Türchen " + n + " öffnet sich in " + std + " Std. " + min + " Min.";
     }
-    const spruch = ["Geduld, mein Schatz ♥️", "Nicht schummeln 😘", "Noch nicht! ♥️", "Na na na 🙈"][n % 4];
+    const spruch = ["Geduld, mein Schatz ♥️", "Nicht schummeln 😘", "Die Capys bewachen dieses Türchen noch 🔒", "Na na na 🙈"][n % 4];
     return spruch + " Türchen " + n + " öffnet sich erst am " + n + ". Dezember. Noch " + tage + " Tage ♥️";
   }
 
@@ -515,6 +515,7 @@
     ente: { ort: "kopf", svg: '<svg viewBox="0 0 48 48"><circle cx="9" cy="10" r="3" fill="none" stroke="#7cc4f0" stroke-width="1.5"/><circle cx="15" cy="5" r="2" fill="none" stroke="#7cc4f0" stroke-width="1.5"/><circle cx="5" cy="18" r="1.6" fill="none" stroke="#7cc4f0" stroke-width="1.3"/><ellipse cx="22" cy="33" rx="17" ry="10" fill="#ffd54a"/><path d="M8 30c6 2 12 1 16-3" fill="none" stroke="#f0b400" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="18" r="9" fill="#ffd54a"/><path d="M38 17l8 2.5-8 3.5z" fill="#ff8a3d"/><circle cx="32.5" cy="15.5" r="1.6" fill="#3a2a2a"/><path d="M4 44c6-3 10 0 16-1s10-3 18 0" fill="none" stroke="#7cc4f0" stroke-width="2.2" stroke-linecap="round"/></svg>' },
     acai: { ort: "fuss", svg: '<svg viewBox="0 0 48 48"><path d="M5 22h38a19 17 0 0 1-38 0z" fill="#fff" stroke="#9d2449" stroke-width="2"/><ellipse cx="24" cy="22" rx="18" ry="5" fill="#5b2a6e"/><circle cx="15" cy="20.5" r="3" fill="#f6e27a" stroke="#e6c84a"/><circle cx="21" cy="19" r="3" fill="#f6e27a" stroke="#e6c84a"/><circle cx="28" cy="21" r="2.3" fill="#c2185b"/><circle cx="32" cy="19" r="2.3" fill="#3949ab"/><circle cx="35" cy="22" r="1.8" fill="#c2185b"/><path d="M25 17c1-3 4-4 6-3-1 2-3 4-6 3z" fill="#66bb6a"/><rect x="17" y="38" width="14" height="3.5" rx="1.7" fill="#9d2449"/></svg>' },
     blumen: { ort: "fuss", svg: '<svg viewBox="0 0 48 48"><path d="M24 40 15 18M24 40V13M24 40l9-22" stroke="#4a7c3a" stroke-width="2"/><circle cx="14" cy="16" r="6.5" fill="#f7809b"/><circle cx="24" cy="10" r="6.5" fill="#e85d7e"/><circle cx="34" cy="16" r="6.5" fill="#fda4b8"/><circle cx="14" cy="16" r="2.2" fill="#f3dc9f"/><circle cx="24" cy="10" r="2.2" fill="#f3dc9f"/><circle cx="34" cy="16" r="2.2" fill="#f3dc9f"/><path d="M13 26h22l-8.5 20h-5z" fill="#fff3cf" stroke="#d4a84b" stroke-width="1.6"/><path d="M19 33c3 2 7 2 10 0" fill="none" stroke="#e85d7e" stroke-width="2.2" stroke-linecap="round"/></svg>' },
+    capybara: { ort: "kalender", svg: '<svg viewBox="0 0 56 46"><ellipse cx="14" cy="9" rx="5" ry="4" fill="#7a4e33"/><ellipse cx="42" cy="9" rx="5" ry="4" fill="#7a4e33"/><rect x="7" y="6" width="42" height="36" rx="17" fill="#b07a52"/><ellipse cx="28" cy="31" rx="13" ry="9.5" fill="#9a6844"/><ellipse cx="23.5" cy="28.5" rx="1.8" ry="1.1" fill="#3a2418"/><ellipse cx="32.5" cy="28.5" rx="1.8" ry="1.1" fill="#3a2418"/><path d="M25 35q3 2 6 0" fill="none" stroke="#3a2418" stroke-width="1.4" stroke-linecap="round"/><path d="M14 20q3-2.5 6 0M36 20q3-2.5 6 0" fill="none" stroke="#3a2418" stroke-width="1.8" stroke-linecap="round"/><circle cx="14" cy="27" r="2.6" fill="#f7809b" opacity=".55"/><circle cx="42" cy="27" r="2.6" fill="#f7809b" opacity=".55"/><path d="M27 4c1-3 4-3 5-1-2 0-3 1-5 1z" fill="#66bb6a"/><ellipse cx="17" cy="43" rx="6" ry="3.2" fill="#9a6844"/><ellipse cx="39" cy="43" rx="6" ry="3.2" fill="#9a6844"/></svg>' },
     heimat: { ort: "fuss", svg: '<svg viewBox="0 0 48 48"><rect x="31" y="8" width="5" height="9" fill="#9d2449"/><path d="M6 23 24 7l18 16" fill="none" stroke="#9d2449" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 21v21a2 2 0 0 0 2 2h22a2 2 0 0 0 2-2V21L24 10z" fill="#fff" stroke="#9d2449" stroke-width="2"/><path d="M24 38s-7-4.3-7-9a3.8 3.8 0 0 1 7-2 3.8 3.8 0 0 1 7 2c0 4.7-7 9-7 9z" fill="#e85d7e"/></svg>' },
   };
   const EIER_SCHLUESSEL = "toni-advent-gutscheine-" + KALENDER.jahr;
@@ -554,7 +555,11 @@
   }
 
   function baueEier() {
-    const orte = { kopf: document.querySelector(".kopf"), fuss: document.querySelector(".fuss") };
+    const orte = {
+      kopf: document.querySelector(".kopf"),
+      kalender: document.querySelector("main"),
+      fuss: document.querySelector(".fuss"),
+    };
     for (const ei of eier) {
       const knopf = document.createElement("button");
       knopf.type = "button";
@@ -588,8 +593,13 @@
   }
 
   function zeigeGutschein(ei, neu) {
-    document.getElementById("gutschein-gefunden").textContent =
-      neu ? "Du hast ein Easter Egg gefunden! 🎉" : "Dein Gutschein 🎟️";
+    const istFoto = ei.art === "foto";
+    document.getElementById("gutschein-gefunden").textContent = neu
+      ? (ei.fundtext || "Du hast ein Easter Egg gefunden! 🎉")
+      : (istFoto ? "Dein Fund 🔍" : "Dein Gutschein 🎟️");
+    gutscheinDialog.querySelector(".ticket-label").hidden = istFoto;
+    gutscheinDialog.querySelector(".ticket-fuss").hidden = istFoto;
+    gutscheinDialog.querySelector(".ticket").classList.toggle("ticket-foto", istFoto);
     document.getElementById("gutschein-emblem").innerHTML = EMBLEME[ei.emblem].svg;
     const bild = document.getElementById("gutschein-bild");
     bild.hidden = !ei.bild;

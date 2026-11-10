@@ -65,7 +65,6 @@ const KALENDER = {
       { datei: "abendspaziergang.jpg", text: "Abendspaziergang" },
       { datei: "gondel-abend.jpg", text: "Gondelfahrt" },
       { datei: "capybaras.jpg", text: "Capybara Kuschelparty" },
-      { datei: "capy-crew.jpg", text: "Capy Crew Party" },
     ],
   },
 
@@ -74,6 +73,8 @@ const KALENDER = {
    *   emblem : welches kleine Bild (matcha, acai, ente, blumen, heimat)
    *   ab     : ab welchem Dezembertag es auf der Seite auftaucht
    *   bild   : (optional) Foto auf dem Gutschein, aus bilder/
+   *   art    : (optional) "foto" = kein Gutschein, nur ein lustiger Fund
+   *   fundtext : (optional) eigene Überschrift beim Finden
    */
   eastereggs: [
     {
@@ -88,6 +89,15 @@ const KALENDER = {
       ab: 7,
       titel: "Ein Acai Bowl Date",
       text: "Wir gehen zusammen Acai Bowls essen. Du suchst aus, wann und wo ♥️",
+    },
+    {
+      emblem: "capybara",
+      ab: 10,
+      art: "foto",
+      bild: "capy-crew.jpg",
+      fundtext: "Du hast die Capy Crew gefunden! 🎉",
+      titel: "Geheime Capy Party",
+      text: "Psst … sobald du nicht hinschaust, feiert die Capy Crew heimlich Party. Jetzt kennst du ihr Geheimnis ♥️",
     },
     {
       emblem: "ente",

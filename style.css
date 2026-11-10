@@ -532,6 +532,19 @@ main {
 .ei-ente   { top: 14px; left: 14px; animation-delay: -3s; }
 .ei-acai   { bottom: 34px; left: 16px; animation-delay: -1.5s; }
 .ei-blumen { bottom: 34px; right: 16px; animation-delay: -4.5s; }
+.ei-capybara {
+  top: -22px;
+  right: calc(16px + 10%);
+  width: 50px;
+  height: 42px;
+  z-index: 4;
+  animation: capy-gucken 6s ease-in-out infinite;
+}
+@media (min-width: 860px) { .ei-capybara { right: max(40px, calc(50% - 400px)); } }
+@keyframes capy-gucken {
+  0%, 70%, 100% { translate: 0 0; }
+  78%, 90% { translate: 0 -6px; }
+}
 .ei-heimat { top: 0; left: 50%; margin-left: -21px; animation-delay: -6s; }
 @media (min-width: 860px) {
   .ei-matcha { right: calc(50% - 440px); }
@@ -593,6 +606,8 @@ main {
   transform: rotate(-2deg);
 }
 .ticket-bild[hidden] { display: none; }
+.ticket-label[hidden], .ticket-fuss[hidden] { display: none; }
+.ticket-foto .ticket-bild { width: 100%; transform: rotate(-1deg); }
 .ticket-bild:not([hidden]) + .ticket-emblem {
   width: 46px;
   height: 46px;

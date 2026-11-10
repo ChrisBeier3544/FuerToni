@@ -26,13 +26,14 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
 
 ## Easter Eggs
 
-Fünf versteckte Gutscheine, die nach und nach auf der Seite auftauchen
+Sechs versteckte Funde (fünf Gutscheine und die Capy Crew), die nach und nach auf der Seite auftauchen
 (Einstellungen unter `eastereggs` in `inhalte.js`):
 
 | Emblem       | Gutschein                  | Sichtbar ab | Ort              |
 |--------------|----------------------------|-------------|------------------|
 | Matcha Latte | Iced Matcha Latte          | 1.12.       | oben rechts      |
 | Acai Bowl    | Acai Bowl Date             | 7.12.       | unten links      |
+| Capybara     | Geheime Capy Party (Foto)  | 10.12.      | über dem Kalender|
 | Badeente     | Wellnessabend              | 14.12.      | oben links       |
 | Blumen       | Date deiner Wahl           | 19.12.      | unten rechts     |
 | Häuschen     | Dinner im Restaurant Heimat| 24.12.      | unten Mitte      |
