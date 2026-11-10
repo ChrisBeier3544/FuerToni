@@ -24,6 +24,22 @@ Breite verkleinern, dann lädt die Seite auf dem Handy schneller.
 
 Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertitel.
 
+## Easter Eggs
+
+Fünf versteckte Gutscheine, die nach und nach auf der Seite auftauchen
+(Einstellungen unter `eastereggs` in `inhalte.js`):
+
+| Emblem       | Gutschein                  | Sichtbar ab | Ort              |
+|--------------|----------------------------|-------------|------------------|
+| Matcha Latte | Iced Matcha Latte          | 1.12.       | oben rechts      |
+| Acai Bowl    | Acai Bowl Date             | 7.12.       | unten links      |
+| Badeente     | Wellnessabend              | 14.12.      | oben links       |
+| Blumen       | Date deiner Wahl           | 19.12.      | unten rechts     |
+| Häuschen     | Dinner im Restaurant Heimat| 24.12.      | unten Mitte      |
+
+Gefundene Gutscheine kann sie jederzeit über „🎟️ Meine Gutscheine“ wieder ansehen.
+Der Knopf erscheint erst, wenn der erste Gutschein gefunden wurde.
+
 ## Lokal ansehen und testen
 
 ```bash

@@ -25,6 +25,44 @@ const KALENDER = {
   titel: "Für Toni ♥️",
   untertitel: "24 kleine Überraschungen bis Weihnachten",
 
+  /*
+   * Versteckte Easter Eggs (Gutscheine)
+   *   emblem : welches kleine Bild (matcha, acai, ente, blumen, heimat)
+   *   ab     : ab welchem Dezembertag es auf der Seite auftaucht
+   */
+  eastereggs: [
+    {
+      emblem: "matcha",
+      ab: 1,
+      titel: "Ein Iced Matcha Latte",
+      text: "Einmal Iced Matcha Latte, ganz nach deinem Geschmack. Einzulösen, wann immer du Lust drauf hast ♥️",
+    },
+    {
+      emblem: "acai",
+      ab: 7,
+      titel: "Ein Acai Bowl Date",
+      text: "Wir gehen zusammen Acai Bowls essen. Du suchst aus, wann und wo ♥️",
+    },
+    {
+      emblem: "ente",
+      ab: 14,
+      titel: "Ein Wellnessabend",
+      text: "Ein ganzer Abend nur für dich: Badewanne, Gesichtsmaske und ganz viel Verwöhnprogramm ♥️",
+    },
+    {
+      emblem: "blumen",
+      ab: 19,
+      titel: "Ein Date deiner Wahl",
+      text: "Du planst, ich bin dabei. Egal was du dir aussuchst, es geht auf mich ♥️",
+    },
+    {
+      emblem: "heimat",
+      ab: 24,
+      titel: "Ein Dinner im Restaurant „Heimat“",
+      text: "Ein schöner Abend für uns zwei im Heimat. Ich freu mich jetzt schon darauf ♥️",
+    },
+  ],
+
   tage: {
     1: {
       titel: "Es geht los ✨",

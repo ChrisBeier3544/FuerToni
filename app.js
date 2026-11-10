@@ -252,6 +252,7 @@
       t.knopf.setAttribute("aria-label", label);
     }
     aktualisiereStatus(d);
+    aktualisiereEier(d);
   }
 
   function aktualisiereStatus(d) {
@@ -507,9 +508,120 @@
   }
 
   /* ------------------------------------------------------------
+   * Easter Eggs (versteckte Gutscheine)
+   * ------------------------------------------------------------ */
+  const EMBLEME = {
+    matcha: { ort: "kopf", svg: '<svg viewBox="0 0 48 48"><path d="M26 14 31 2" stroke="#9d2449" stroke-width="3" stroke-linecap="round"/><path d="M12 14h24l-3.2 29.4A3 3 0 0 1 29.8 46H18.2a3 3 0 0 1-3-2.6z" fill="#eef7e6" stroke="#4a7c3a" stroke-width="2"/><path d="M13.7 23h20.6l-2.3 20.3a1.5 1.5 0 0 1-1.5 1.3H17.5a1.5 1.5 0 0 1-1.5-1.3z" fill="#8fbf5a"/><path d="M14 23c4 3 7-2 10 1s7-1 10 0" fill="none" stroke="#f6fbef" stroke-width="2.2" stroke-linecap="round"/><rect x="17.5" y="27" width="6" height="6" rx="1.6" fill="#fff" opacity=".75" transform="rotate(-12 20.5 30)"/><rect x="25" y="31" width="6" height="6" rx="1.6" fill="#fff" opacity=".75" transform="rotate(10 28 34)"/><rect x="10" y="11" width="28" height="4.5" rx="2.2" fill="#4a7c3a"/></svg>' },
+    ente: { ort: "kopf", svg: '<svg viewBox="0 0 48 48"><circle cx="9" cy="10" r="3" fill="none" stroke="#7cc4f0" stroke-width="1.5"/><circle cx="15" cy="5" r="2" fill="none" stroke="#7cc4f0" stroke-width="1.5"/><circle cx="5" cy="18" r="1.6" fill="none" stroke="#7cc4f0" stroke-width="1.3"/><ellipse cx="22" cy="33" rx="17" ry="10" fill="#ffd54a"/><path d="M8 30c6 2 12 1 16-3" fill="none" stroke="#f0b400" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="18" r="9" fill="#ffd54a"/><path d="M38 17l8 2.5-8 3.5z" fill="#ff8a3d"/><circle cx="32.5" cy="15.5" r="1.6" fill="#3a2a2a"/><path d="M4 44c6-3 10 0 16-1s10-3 18 0" fill="none" stroke="#7cc4f0" stroke-width="2.2" stroke-linecap="round"/></svg>' },
+    acai: { ort: "fuss", svg: '<svg viewBox="0 0 48 48"><path d="M5 22h38a19 17 0 0 1-38 0z" fill="#fff" stroke="#9d2449" stroke-width="2"/><ellipse cx="24" cy="22" rx="18" ry="5" fill="#5b2a6e"/><circle cx="15" cy="20.5" r="3" fill="#f6e27a" stroke="#e6c84a"/><circle cx="21" cy="19" r="3" fill="#f6e27a" stroke="#e6c84a"/><circle cx="28" cy="21" r="2.3" fill="#c2185b"/><circle cx="32" cy="19" r="2.3" fill="#3949ab"/><circle cx="35" cy="22" r="1.8" fill="#c2185b"/><path d="M25 17c1-3 4-4 6-3-1 2-3 4-6 3z" fill="#66bb6a"/><rect x="17" y="38" width="14" height="3.5" rx="1.7" fill="#9d2449"/></svg>' },
+    blumen: { ort: "fuss", svg: '<svg viewBox="0 0 48 48"><path d="M24 40 15 18M24 40V13M24 40l9-22" stroke="#4a7c3a" stroke-width="2"/><circle cx="14" cy="16" r="6.5" fill="#f7809b"/><circle cx="24" cy="10" r="6.5" fill="#e85d7e"/><circle cx="34" cy="16" r="6.5" fill="#fda4b8"/><circle cx="14" cy="16" r="2.2" fill="#f3dc9f"/><circle cx="24" cy="10" r="2.2" fill="#f3dc9f"/><circle cx="34" cy="16" r="2.2" fill="#f3dc9f"/><path d="M13 26h22l-8.5 20h-5z" fill="#fff3cf" stroke="#d4a84b" stroke-width="1.6"/><path d="M19 33c3 2 7 2 10 0" fill="none" stroke="#e85d7e" stroke-width="2.2" stroke-linecap="round"/></svg>' },
+    heimat: { ort: "fuss", svg: '<svg viewBox="0 0 48 48"><rect x="31" y="8" width="5" height="9" fill="#9d2449"/><path d="M6 23 24 7l18 16" fill="none" stroke="#9d2449" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><path d="M11 21v21a2 2 0 0 0 2 2h22a2 2 0 0 0 2-2V21L24 10z" fill="#fff" stroke="#9d2449" stroke-width="2"/><path d="M24 38s-7-4.3-7-9a3.8 3.8 0 0 1 7-2 3.8 3.8 0 0 1 7 2c0 4.7-7 9-7 9z" fill="#e85d7e"/></svg>' },
+  };
+  const EIER_SCHLUESSEL = "toni-advent-gutscheine-" + KALENDER.jahr;
+  const eier = (KALENDER.eastereggs || []).filter((e) => EMBLEME[e.emblem]);
+  const eierKnoepfe = new Map();
+
+  function ladeGefunden() {
+    try {
+      const liste = JSON.parse(localStorage.getItem(EIER_SCHLUESSEL) || "[]");
+      return new Set(Array.isArray(liste) ? liste : []);
+    } catch (_) { return new Set(); }
+  }
+  const gefunden = ladeGefunden();
+  function speichereGefunden() {
+    try { localStorage.setItem(EIER_SCHLUESSEL, JSON.stringify([...gefunden])); } catch (_) { /* egal */ }
+  }
+
+  function eiSichtbar(ei, d) {
+    if (d.jahr > KALENDER.jahr) return true;
+    return d.jahr === KALENDER.jahr && d.monat === 12 && d.tag >= ei.ab;
+  }
+
+  const gutscheinDialog = document.getElementById("gutschein");
+  const sammlungDialog = document.getElementById("sammlung");
+  const sammlungKnopf = document.getElementById("sammlung-knopf");
+  const sammlungListe = document.getElementById("sammlung-liste");
+
+  function oeffne(dlg) {
+    if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
+  }
+  function schliesse(dlg) {
+    if (typeof dlg.close === "function") dlg.close(); else dlg.removeAttribute("open");
+  }
+  for (const dlg of [gutscheinDialog, sammlungDialog]) {
+    dlg.querySelector(".schliessen").addEventListener("click", () => schliesse(dlg));
+    dlg.addEventListener("click", (e) => { if (e.target === dlg) schliesse(dlg); });
+  }
+
+  function baueEier() {
+    const orte = { kopf: document.querySelector(".kopf"), fuss: document.querySelector(".fuss") };
+    for (const ei of eier) {
+      const knopf = document.createElement("button");
+      knopf.type = "button";
+      knopf.className = "ei ei-" + ei.emblem;
+      knopf.hidden = true;
+      knopf.setAttribute("aria-label", "Geheimnis");
+      knopf.innerHTML = EMBLEME[ei.emblem].svg;
+      knopf.addEventListener("click", () => findeEi(ei));
+      orte[EMBLEME[ei.emblem].ort].appendChild(knopf);
+      eierKnoepfe.set(ei.emblem, knopf);
+    }
+    sammlungKnopf.addEventListener("click", zeigeSammlung);
+  }
+
+  function aktualisiereEier(d) {
+    for (const ei of eier) {
+      eierKnoepfe.get(ei.emblem).hidden = !(zeitBereit && eiSichtbar(ei, d));
+    }
+    sammlungKnopf.hidden = !eier.some((ei) => gefunden.has(ei.emblem));
+  }
+
+  function findeEi(ei) {
+    if (!zeitBereit || !eiSichtbar(ei, berlinDatum(jetzt()))) return;
+    const neu = !gefunden.has(ei.emblem);
+    if (neu) {
+      gefunden.add(ei.emblem);
+      speichereGefunden();
+      sammlungKnopf.hidden = false;
+    }
+    zeigeGutschein(ei, neu);
+  }
+
+  function zeigeGutschein(ei, neu) {
+    document.getElementById("gutschein-gefunden").textContent =
+      neu ? "Du hast ein Easter Egg gefunden! 🎉" : "Dein Gutschein 🎟️";
+    document.getElementById("gutschein-emblem").innerHTML = EMBLEME[ei.emblem].svg;
+    document.getElementById("gutschein-titel").textContent = ei.titel;
+    document.getElementById("gutschein-text").textContent = ei.text;
+    oeffne(gutscheinDialog);
+    if (neu) konfettiRegen("konfetti");
+  }
+
+  function zeigeSammlung() {
+    sammlungListe.textContent = "";
+    for (const ei of eier) {
+      if (!gefunden.has(ei.emblem)) continue;
+      const eintrag = document.createElement("button");
+      eintrag.type = "button";
+      eintrag.className = "sammlung-eintrag";
+      eintrag.innerHTML = EMBLEME[ei.emblem].svg;
+      const name = document.createElement("span");
+      name.textContent = ei.titel;
+      eintrag.appendChild(name);
+      eintrag.addEventListener("click", () => {
+        schliesse(sammlungDialog);
+        zeigeGutschein(ei, false);
+      });
+      sammlungListe.appendChild(eintrag);
+    }
+    oeffne(sammlungDialog);
+  }
+
+  /* ------------------------------------------------------------
    * Start
    * ------------------------------------------------------------ */
   baueKalender();
+  baueEier();
   baueHerzen();
   aktualisiere();
 

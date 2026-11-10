@@ -18,6 +18,7 @@
     <h1 id="titel">Für Toni ♥️</h1>
     <p id="untertitel" class="untertitel"></p>
     <p id="status" class="status" aria-live="polite"></p>
+    <p><button id="sammlung-knopf" class="sammlung-knopf" type="button" hidden>🎟️ Meine Gutscheine</button></p>
   </header>
 
   <main>
@@ -51,6 +52,28 @@
         <span class="hinweis-icon" aria-hidden="true">🎁</span>
         <span id="dialog-hinweis-text"></span>
       </div>
+    </div>
+  </dialog>
+
+  <dialog id="gutschein" class="dialog gutschein-dialog" aria-labelledby="gutschein-titel">
+    <div class="dialog-inhalt">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <p id="gutschein-gefunden" class="gutschein-gefunden">Du hast ein Easter Egg gefunden! 🎉</p>
+      <div class="ticket">
+        <div id="gutschein-emblem" class="ticket-emblem" aria-hidden="true"></div>
+        <p class="ticket-label">Gutschein für</p>
+        <h2 id="gutschein-titel"></h2>
+        <p id="gutschein-text" class="ticket-text"></p>
+        <p class="ticket-fuss">Gültig für immer · Einlösbar bei mir ♥️</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="sammlung" class="dialog" aria-labelledby="sammlung-titel">
+    <div class="dialog-inhalt">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <h2 id="sammlung-titel">Deine Gutscheine</h2>
+      <div id="sammlung-liste" class="sammlung-liste"></div>
     </div>
   </dialog>
 
