@@ -1962,3 +1962,32 @@ html[data-abend] .heute-karte .status { background: none; border: 0; box-shadow:
 .sp-kuchen { left: 50%; bottom: 7%; z-index: 2; }
 .sp-kerze { transform-box: fill-box; transform-origin: 50% 100%; animation: sp-flamme 0.3s ease-in-out infinite alternate; }
 .sp-traeger { bottom: 7%; z-index: 3; }
+
+/* ---------- Feinschliff nach dem Seiten-Check ---------- */
+html, body { overflow-x: clip; }
+.kopf, main, .momente, .landschaft { overflow-x: clip; }
+
+@media (max-width: 480px) {
+  /* Briefzahl und Päckchen als kompakte Zeilen statt hoher Kästen */
+  .extras { grid-template-columns: 1fr; gap: 8px; margin-top: 14px; }
+  .extra {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    text-align: left;
+  }
+  .extra-icon { font-size: 1.3rem; }
+  .extra-label { font-size: 0.8rem; }
+  .extra-zahl { margin: 0; font-size: 2rem; }
+  #dialog .dialog-inhalt { padding: 34px 18px 20px; }
+  .dialog h2 { font-size: 2rem; margin-bottom: 10px; }
+  .dialog-text { font-size: 1rem; }
+  .sprachnachricht { margin-top: 12px; padding: 10px 12px; }
+  .wachssiegel { width: 44px; height: 44px; font-size: 1.25rem; top: 10px; left: 10px; }
+}
+@media (max-width: 380px) {
+  .titelfotos .polaroid span { font-size: 0.78rem; }
+}
+.fotostreifen .polaroid span { white-space: normal; text-overflow: clip; line-height: 1.15; min-height: 2.3em; display: flex; align-items: center; justify-content: center; }
