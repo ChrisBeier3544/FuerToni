@@ -41,6 +41,16 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
 - **Finale:** Sind alle 24 Türchen offen, fliegen alle Fotos zu einem Herz zusammen.
   Danach lässt es sich über „♥️ Unser Herz“ jederzeit wieder ansehen.
 
+## Feine Details
+
+- Geöffnete Türchen zeigen die aufgeklappte Papierseite, eine kleine Illustration und einen Stempel mit dem Datum.
+- Noch gesperrte Türchen haben einen Frostrand, die Zahlenanhänger hängen an einer Kordel und schaukeln.
+- Tannenzweige mit Beeren und schwingenden Kugeln oben in den Ecken, Washi-Tape an den Polaroids.
+- Rauch aus den Schornsteinen der Winterlandschaft.
+- Der Brief im Türchen hat Briefpapier-Look, ein Wachssiegel mit der Tageszahl und die Unterschrift
+  aus `unterschrift` in `inhalte.js`.
+- Beim Tippen auf die Seite steigen kleine Herzen auf.
+
 ## Persönliche Extras
 
 - **Zusammen-Zähler** unter der Statuszeile (`zusammenSeit` und `kennenSeit` in `inhalte.js`).

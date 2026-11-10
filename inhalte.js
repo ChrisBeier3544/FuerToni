@@ -26,6 +26,9 @@ const KALENDER = {
 
   titel: "Für Toni ♥️",
 
+  // Unterschrift unter jedem Türchen-Text
+  unterschrift: "Dein Chris ♥️",
+
   // Für den Zähler „seit X Tagen zusammen“ (Jahr-Monat-Tag)
   zusammenSeit: "2026-03-01",
   kennenSeit: "2025-12-21",

@@ -203,6 +203,7 @@
       const blatt = document.createElement("span");
       blatt.className = "tuer-blatt";
       blatt.innerHTML =
+        '<span class="frost"></span>' +
         '<span class="band-v"></span><span class="band-h"></span>' +
         '<span class="schleife">' + SCHLEIFE + "</span>";
       const anhaenger = document.createElement("span");
@@ -216,16 +217,34 @@
       schloss.textContent = "🔒";
       blatt.append(anhaenger, schloss);
 
-      knopf.append(innen, blatt);
+      const rueck = document.createElement("span");
+      rueck.className = "tuer-rueck";
+      rueck.setAttribute("aria-hidden", "true");
+      knopf.append(innen, rueck, blatt);
       knopf.addEventListener("click", (e) => klickAufTuer(n, e));
       el.kalender.appendChild(knopf);
       tueren.set(n, { knopf, innen, schloss });
     }
   }
 
+  // Kleine Illustrationen im geöffneten Türchen
+  const INNEN_ICONS = [
+    '<rect x="15" y="16" width="10" height="18" rx="2" fill="#fff6e0" stroke="#d4a84b" stroke-width="1"/><rect x="15" y="16" width="10" height="4" fill="#f7809b"/><path d="M20 6c3 4 3 7 0 9-3-2-3-5 0-9z" fill="#ffb648"/><path d="M20 10c1.4 2 1.4 3.4 0 4.4-1.4-1-1.4-2.4 0-4.4z" fill="#fff2b0"/><ellipse cx="20" cy="35" rx="9" ry="2.5" fill="#d4a84b"/>',
+    '<path d="M20 5l4.4 9.2 10 1.3-7.3 6.9 1.8 9.9L20 27.5l-8.9 4.8 1.8-9.9-7.3-6.9 10-1.3z" fill="#f3c84b" stroke="#c99a2e" stroke-width="1"/><circle cx="16.5" cy="16" r="1.6" fill="#fff" opacity=".7"/>',
+    '<path d="M10 16h18v10a8 8 0 0 1-8 8h-2a8 8 0 0 1-8-8z" fill="#9d2449"/><path d="M28 19h3a4 4 0 0 1 0 8h-3" fill="none" stroke="#9d2449" stroke-width="2.6"/><path d="M14 10c-2-3 2-4 0-7M19 10c-2-3 2-4 0-7M24 10c-2-3 2-4 0-7" fill="none" stroke="#fda4b8" stroke-width="1.6" stroke-linecap="round"/><path d="M19 21.5c-1.6-2.4-4.6-.6-3 1.6l3 2.9 3-2.9c1.6-2.2-1.4-4-3-1.6z" fill="#ffd0dc"/>',
+    '<g stroke="#5aa9dd" stroke-width="2.4" stroke-linecap="round"><path d="M20 5v30M7 12.5l26 15M7 27.5l26-15"/><path d="M16 8l4 3 4-3M16 32l4-3 4 3M8.5 17l4.4.6 1.2-4.2M31.5 23l-4.4-.6-1.2 4.2M8.5 23l4.4-.6 1.2 4.2M31.5 17l-4.4.6-1.2-4.2" fill="none" stroke-width="1.8"/></g>',
+    '<path d="M9 28C10 12 22 5 31 12l-6 7c-2-3-6-3-8 1z" fill="#d6304f"/><rect x="7" y="26" width="26" height="7" rx="3.5" fill="#fff" stroke="#f0c8d2"/><circle cx="31" cy="11" r="4" fill="#fff" stroke="#f0c8d2"/>',
+    '<rect x="9" y="17" width="22" height="17" rx="2" fill="#e85d7e"/><rect x="7" y="13" width="26" height="6" rx="1.5" fill="#f7809b"/><rect x="18" y="13" width="4" height="21" fill="#f3c84b"/><path d="M20 13c-5-7-11-3-6 0zM20 13c5-7 11-3 6 0z" fill="#f3c84b"/>',
+    '<path d="M20 4l7 10h-4l6 9h-4l6 9H9l6-9h-4l6-9h-4z" fill="#4a8a5c"/><rect x="17.5" y="32" width="5" height="5" fill="#8a5a3a"/><circle cx="16" cy="20" r="1.6" fill="#f3c84b"/><circle cx="24" cy="25" r="1.6" fill="#e85d7e"/><circle cx="18" cy="29" r="1.6" fill="#7cc4f0"/><path d="M20 2l1 2.2 2.4.3-1.8 1.6.5 2.4L20 7.3l-2.1 1.2.5-2.4-1.8-1.6 2.4-.3z" fill="#f3c84b"/>',
+    '<path d="M20 7c-6 0-9 5-9 11v6l-3 4h24l-3-4v-6c0-6-3-11-9-11z" fill="#f3c84b" stroke="#c99a2e" stroke-width="1"/><circle cx="20" cy="31" r="3" fill="#c99a2e"/><path d="M15 6c2 2 8 2 10 0" fill="none" stroke="#e85d7e" stroke-width="2.4" stroke-linecap="round"/>',
+    '<path d="M20 34S6 25 6 15.5A7.5 7.5 0 0 1 20 11a7.5 7.5 0 0 1 14 4.5C34 25 20 34 20 34z" fill="#b5763e"/><path d="M20 30S9.5 23.5 9.5 16A4.5 4.5 0 0 1 20 14.5 4.5 4.5 0 0 1 30.5 16C30.5 23.5 20 30 20 30z" fill="none" stroke="#fff" stroke-width="1.4" stroke-dasharray="2 2"/><path d="M16.5 22l2.5 2.5 5-5" fill="none" stroke="#f7809b" stroke-width="2"/>',
+    '<path d="M24 36V14a5 5 0 0 0-10 0" fill="none" stroke="#fff" stroke-width="7.5" stroke-linecap="round" opacity=".001"/><path d="M24 36V14a5 5 0 0 0-10 0" fill="none" stroke="#ffffff" stroke-width="5.5" stroke-linecap="round"/><path d="M24 36V14a5 5 0 0 0-10 0" fill="none" stroke="#e85d7e" stroke-width="5.5" stroke-linecap="round" stroke-dasharray="3 3"/>',
+    '<path d="M24 7a12 12 0 1 0 9 19A10 10 0 0 1 24 7z" fill="#f3c84b"/><path d="M10 9l.8 1.8 1.9.2-1.4 1.3.4 1.9-1.7-1-1.7 1 .4-1.9-1.4-1.3 1.9-.2z" fill="#e85d7e"/><circle cx="31" cy="11" r="1.4" fill="#e85d7e"/>',
+    '<path d="M20 33S7 25 7 16a7 7 0 0 1 13-3.6A7 7 0 0 1 33 16c0 9-13 17-13 17z" fill="#ff5c85"/><path d="M5 30L35 8" stroke="#f3c84b" stroke-width="2"/><path d="M35 8l-5 .5 2 3z" fill="#f3c84b"/><path d="M5 30l2.5-4M5 30l4 .2" stroke="#f3c84b" stroke-width="1.6"/>'
+  ];
   function fuelleInnenraum(n) {
     const t = tueren.get(n);
-    if (t.innen.querySelector("img, .innen-herz")) return;
+    if (t.innen.querySelector("img, .innen-deko")) return;
     const bild = inhalt(n).bild;
     if (bild) {
       const img = document.createElement("img");
@@ -239,10 +258,14 @@
     }
   }
   function fuelleHerz(container) {
-    const herz = document.createElement("span");
-    herz.className = "innen-herz";
-    herz.textContent = "♥️";
-    container.appendChild(herz);
+    const n = +container.parentElement.dataset.tag;
+    const deko = document.createElement("span");
+    deko.className = "innen-deko";
+    deko.innerHTML = '<svg viewBox="0 0 40 40" aria-hidden="true">' + INNEN_ICONS[(n - 1) % INNEN_ICONS.length] + "</svg>";
+    const stempel = document.createElement("span");
+    stempel.className = "innen-stempel";
+    stempel.textContent = "♥ " + n + ". Dez.";
+    container.append(deko, stempel);
   }
 
   function aktualisiere() {
@@ -333,6 +356,14 @@
     return spruch + " Türchen " + n + " öffnet sich erst am " + n + ". Dezember um 4 Uhr. Noch " + tage + (tage === 1 ? " Tag" : " Tage") + " ♥️";
   }
 
+  function schaukleAnhaenger(knopf) {
+    const a = knopf.querySelector(".anhaenger");
+    if (!a || bewegungReduziert) return;
+    a.classList.remove("schaukeln");
+    void a.offsetWidth;
+    a.classList.add("schaukeln");
+  }
+
   function klickAufTuer(n, e) {
     if (e && e.target.closest && e.target.closest(".ei-innen")) {
       const ei = eier.find((x) => x.versteck && x.versteck.hinter === n);
@@ -347,6 +378,7 @@
       t.knopf.classList.remove("wackeln");
       void t.knopf.offsetWidth; // Animation neu starten
       t.knopf.classList.add("wackeln");
+      schaukleAnhaenger(t.knopf);
       zeigeToast(gesperrtNachricht(n));
       return;
     }
@@ -380,6 +412,8 @@
     offenerTag = n;
     aktualisiereVersteckte();
     el.dialogTag.textContent = n + ". Dezember";
+    document.getElementById("dialog-siegel").textContent = String(n);
+    document.getElementById("dialog-unterschrift").textContent = KALENDER.unterschrift || "";
     el.dialogTitel.textContent = i.titel || "Türchen " + n;
     el.dialogText.textContent = i.text || "";
 
@@ -939,7 +973,13 @@
         const farbe = ["--haus-a", "--haus-b", "--haus-c"][k % 3];
         const oben = BODEN - hh;
         teile += '<rect style="fill:var(' + farbe + ')" x="' + x + '" y="' + oben + '" width="' + hw + '" height="' + hh + '"/>';
-        if (rnd() < 0.5) teile += '<rect style="fill:var(--dach)" x="' + (x + hw * 0.68) + '" y="' + (oben - dh * 0.9) + '" width="9" height="' + dh * 0.7 + '"/>';
+        if (rnd() < 0.5) {
+          const kx = x + hw * 0.68, ky = oben - dh * 0.9;
+          teile += '<rect style="fill:var(--dach)" x="' + kx + '" y="' + ky + '" width="9" height="' + dh * 0.7 + '"/>';
+          const verz = (rnd() * 3).toFixed(2);
+          teile += '<g class="rauch" transform="translate(' + (kx + 4.5).toFixed(1) + ' ' + (ky - 2).toFixed(1) + ')">' +
+            [0, 1, 2].map((i) => '<circle r="' + (3 + i) + '" style="animation-delay:-' + (+verz + i * 1.3).toFixed(2) + 's"/>').join("") + "</g>";
+        }
         teile += '<path style="fill:var(--dach)" d="M' + (x - 7) + ' ' + oben + ' L' + (x + hw / 2) + ' ' + (oben - dh) + ' L' + (x + hw + 7) + ' ' + oben + 'Z"/>';
         teile += '<polyline style="stroke:var(--schnee)" fill="none" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" points="' + (x - 7) + ',' + (oben - 1) + ' ' + (x + hw / 2) + ',' + (oben - dh - 1) + ' ' + (x + hw + 7) + ',' + (oben - 1) + '"/>';
         const spalten = Math.max(2, Math.floor(hw / 27)), reihen = Math.max(2, Math.floor((hh - 14) / 26));
@@ -1475,6 +1515,62 @@
   });
   window.adventkalender = { zeigeFinale, schneeSturm: () => schneeSturm(), starteLichtershow };
 
+  /* Tannenzweige mit Beeren und Kugeln in den oberen Ecken */
+  function baueZweige() {
+    const kopf = document.querySelector(".kopf");
+    if (!kopf) return;
+    const nadeln = (x1, y1, x2, y2, n) => {
+      let p = "";
+      for (let i = 1; i <= n; i++) {
+        const t = i / (n + 1), x = x1 + (x2 - x1) * t, y = y1 + (y2 - y1) * t;
+        const l = 9 + (i % 3) * 2;
+        p += "M" + x.toFixed(1) + " " + y.toFixed(1) + "l" + (-l * 0.5).toFixed(1) + " " + (l * 0.9).toFixed(1) +
+             "M" + x.toFixed(1) + " " + y.toFixed(1) + "l" + (l * 0.9).toFixed(1) + " " + (l * 0.35).toFixed(1);
+      }
+      return p;
+    };
+    const svg =
+      '<svg viewBox="0 0 140 110" aria-hidden="true">' +
+      '<path d="M-4 6 Q 50 18 112 12" fill="none" stroke="#6b4a3a" stroke-width="3" stroke-linecap="round"/>' +
+      '<path d="M10 8 Q 26 30 30 52" fill="none" stroke="#6b4a3a" stroke-width="2.2" stroke-linecap="round"/>' +
+      '<g class="nadeln" fill="none" stroke-linecap="round" stroke-width="2.4">' +
+      '<path stroke="#2f6a45" d="' + nadeln(-4, 6, 112, 12, 13) + '"/>' +
+      '<path stroke="#3f7f55" d="' + nadeln(10, 8, 30, 52, 6) + '"/>' +
+      '</g>' +
+      '<g class="beeren"><circle cx="44" cy="22" r="3.6" fill="#d6304f"/><circle cx="50" cy="19" r="3.2" fill="#e8455f"/><circle cx="47" cy="26.5" r="3" fill="#c2185b"/>' +
+      '<circle cx="86" cy="21" r="3.2" fill="#d6304f"/><circle cx="91" cy="24" r="2.8" fill="#e8455f"/></g>' +
+      '<g class="kugel kugel-a"><path d="M68 15v34" stroke="#d4a84b" stroke-width="1"/><rect x="64.5" y="46" width="7" height="5" rx="1" fill="#d4a84b"/><circle cx="68" cy="59" r="10" fill="#e85d7e"/><path d="M60 57q8 5 16 0" fill="none" stroke="#fff" stroke-width="1.6" opacity=".8"/><circle cx="64.5" cy="55" r="2.4" fill="#fff" opacity=".6"/></g>' +
+      '<g class="kugel kugel-b"><path d="M28 40v26" stroke="#d4a84b" stroke-width="1"/><rect x="25" y="63" width="6" height="4" rx="1" fill="#d4a84b"/><circle cx="28" cy="74" r="8" fill="#f3c84b"/><circle cx="25.5" cy="71" r="2" fill="#fff" opacity=".6"/></g>' +
+      "</svg>";
+    for (const seite of ["links", "rechts"]) {
+      const z = document.createElement("div");
+      z.className = "zweig zweig-" + seite;
+      z.innerHTML = svg;
+      kopf.appendChild(z);
+    }
+  }
+
+  /* Kleine Herzen, wo sie auf die Seite tippt */
+  function baueTippHerzen() {
+    if (bewegungReduziert) return;
+    document.addEventListener("pointerdown", (e) => {
+      if (e.target.closest && e.target.closest("#rubbel, .testleiste, audio, input, select")) return;
+      const anzahl = Math.random() < 0.5 ? 1 : 2;
+      for (let k = 0; k < anzahl; k++) {
+        const h = document.createElement("span");
+        h.className = "tipp-herz";
+        h.textContent = "♥";
+        h.style.left = e.clientX + (k ? 10 : -4) + "px";
+        h.style.top = e.clientY - 6 + "px";
+        h.style.setProperty("--dx", (Math.random() * 30 - 15).toFixed(0) + "px");
+        h.style.animationDelay = k * 0.12 + "s";
+        h.style.fontSize = (12 + Math.random() * 8).toFixed(0) + "px";
+        document.body.appendChild(h);
+        setTimeout(() => h.remove(), 1300);
+      }
+    }, { passive: true });
+  }
+
   /* Tipp: Seite als App auf den Homescreen legen */
   function zeigeAppTipp() {
     const tipp = document.getElementById("app-tipp");
@@ -1504,6 +1600,8 @@
   baueLandschaft();
   baueSterne();
   zeigeAppTipp();
+  baueZweige();
+  baueTippHerzen();
   baueEier();
   baueFotos();
   baueSchnee();
