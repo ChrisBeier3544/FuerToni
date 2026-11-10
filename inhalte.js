@@ -130,7 +130,7 @@ const KALENDER = {
     },
     17: {
       titel: "Viel Erfolg in Mathe 🍀",
-      text: "Heute ist deine Matheklausur und ich bin mir sicher, dass sie richtig gut klappen wird. Lass dich nicht stressen, du kannst das!\nIch drück dir ganz fest die Daumen, mein Schatz ♥️",
+      text: "Heute ist Mathe dran! Bleib ganz ruhig, du hast das drauf und es wird gut klappen.\nIch drück dir fest die Daumen, mein Schatz ♥️",
       briefzahl: 4,
       paeckchen: "",
       status: "Heute ist deine Matheklausur. Ich drück dir die Daumen 🍀",
