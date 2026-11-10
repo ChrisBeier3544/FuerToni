@@ -91,7 +91,7 @@ const KALENDER = {
     },
     11: {
       titel: "Viel Erfolg in Deutsch 🍀",
-      text: "Heute schreibst du deine Deutschklausur und ich weiß, dass sie richtig gut klappen wird. Du bist so klug und findest immer die richtigen Worte.\nIch drück dir ganz fest die Daumen, mein Schatz ♥️",
+      text: "Heute steht deine Deutschklausur an! Ich wünsche dir ganz viel Erfolg, du wirst das super machen.\nIch halte heute den ganzen Tag die Daumen für dich gedrückt ♥️",
       briefzahl: 16,
       paeckchen: "",
       status: "Heute ist deine Deutschklausur. Ich drück dir die Daumen 🍀",
@@ -104,7 +104,7 @@ const KALENDER = {
     },
     13: {
       titel: "Alles Gute, Henning 🎂",
-      text: "Heute hat dein Papa Geburtstag! 🥳\nDrück ihn ganz fest von mir und richte ihm meine herzlichsten Glückwünsche aus. Ohne ihn gäbe es dich nicht, und dafür bin ich ihm unendlich dankbar ♥️",
+      text: "Heute hat dein Papa Geburtstag! 🥳\nRichte ihm meine herzlichen Glückwünsche aus. Ich wünsche euch einen schönen Tag zusammen ♥️",
       briefzahl: 2,
       paeckchen: 77,
       konfetti: true,
