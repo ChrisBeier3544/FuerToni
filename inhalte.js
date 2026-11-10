@@ -70,8 +70,11 @@ const KALENDER = {
 
   /*
    * Versteckte Easter Eggs (Gutscheine)
-   *   emblem : welches kleine Bild (matcha, acai, ente, blumen, heimat)
-   *   ab     : ab welchem Dezembertag es auf der Seite auftaucht
+   *   emblem : welches kleine Bild (matcha, acai, capybara, ente, blumen, heimat)
+   *   ab     : ab welchem Dezembertag es auftauchen darf
+   *   versteck : { tuerchen: 5 }   = klein im geöffneten Türchen 5
+   *              { foto: "x.jpg" } = in der großen Ansicht dieses Fotos
+   *              { hinter: 10 }    = hinter Türchen 10, wenn es offen ist
    *   bild   : (optional) Foto auf dem Gutschein, aus bilder/
    *   art    : (optional) "foto" = kein Gutschein, nur ein lustiger Fund
    *   fundtext : (optional) eigene Überschrift beim Finden
@@ -79,7 +82,8 @@ const KALENDER = {
   eastereggs: [
     {
       emblem: "matcha",
-      ab: 1,
+      ab: 5,
+      versteck: { tuerchen: 5 },
       bild: "kaffeedate.jpg",
       titel: "Ein Iced Matcha Latte",
       text: "Einmal Iced Matcha Latte, ganz nach deinem Geschmack. Einzulösen, wann immer du Lust drauf hast ♥️",
@@ -87,12 +91,14 @@ const KALENDER = {
     {
       emblem: "acai",
       ab: 7,
+      versteck: { foto: "bucht.jpg" },
       titel: "Ein Acai Bowl Date",
       text: "Wir gehen zusammen Acai Bowls essen. Wo, das bestimmst ganz allein du ♥️",
     },
     {
       emblem: "capybara",
       ab: 10,
+      versteck: { hinter: 10 },
       art: "foto",
       bild: "capy-crew.jpg",
       fundtext: "Du hast die Capy Crew gefunden! 🎉",
@@ -101,7 +107,8 @@ const KALENDER = {
     },
     {
       emblem: "ente",
-      ab: 14,
+      ab: 16,
+      versteck: { tuerchen: 16 },
       bild: "masken.jpg",
       titel: "Eine Wellnessmassage",
       text: "Eine Massage im New Soul Studio Köln, ganz nach deinen Wünschen. Lehn dich zurück und lass dich so richtig verwöhnen ♥️",
@@ -109,6 +116,7 @@ const KALENDER = {
     {
       emblem: "blumen",
       ab: 19,
+      versteck: { foto: "abendspaziergang.jpg" },
       bild: "cafe.jpg",
       titel: "Ein Date deiner Wahl",
       text: "Du planst, ich bin dabei. Egal was du dir aussuchst, es geht auf mich ♥️",
@@ -116,6 +124,7 @@ const KALENDER = {
     {
       emblem: "heimat",
       ab: 24,
+      versteck: { tuerchen: 24 },
       titel: "Ein Dinner im Restaurant „Heimat“",
       text: "Ein schöner Abend für uns zwei im Restaurant Heimat. Du bestellst, worauf du Lust hast, und ich lade dich ein ♥️",
     },

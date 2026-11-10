@@ -532,6 +532,24 @@ main {
 .ei-ente   { top: 14px; left: 14px; animation-delay: -3s; }
 .ei-acai   { bottom: 34px; left: 16px; animation-delay: -1.5s; }
 .ei-blumen { bottom: 34px; right: 16px; animation-delay: -4.5s; }
+.ei-klein {
+  width: 30px;
+  height: 30px;
+  animation-duration: 11s;
+  filter: drop-shadow(0 2px 3px rgba(107, 21, 50, 0.25));
+}
+.ei-im-tuerchen { left: 12px; bottom: 10px; }
+.ei-im-foto { right: 8px; bottom: 8px; width: 28px; height: 28px; }
+.lightbox-figur { position: relative; }
+.ei-innen {
+  display: block;
+  width: 62%;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+.ei-innen[hidden] { display: none; }
+.ei-innen svg { display: block; width: 100%; height: auto; }
+.ei-innen:not([hidden]) ~ * { display: none; }
 .ei-capybara {
   top: -22px;
   right: calc(16px + 10%);

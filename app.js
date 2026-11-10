@@ -190,7 +190,6 @@
 
       const innen = document.createElement("span");
       innen.className = "tuer-innen";
-      innen.setAttribute("aria-hidden", "true");
 
       const blatt = document.createElement("span");
       blatt.className = "tuer-blatt";
@@ -203,7 +202,7 @@
       blatt.append(nummer, schloss);
 
       knopf.append(innen, blatt);
-      knopf.addEventListener("click", () => klickAufTuer(n));
+      knopf.addEventListener("click", (e) => klickAufTuer(n, e));
       el.kalender.appendChild(knopf);
       tueren.set(n, { knopf, innen, schloss });
     }
@@ -211,7 +210,7 @@
 
   function fuelleInnenraum(n) {
     const t = tueren.get(n);
-    if (t.innen.childElementCount) return;
+    if (t.innen.querySelector("img, .innen-herz")) return;
     const bild = inhalt(n).bild;
     if (bild) {
       const img = document.createElement("img");
@@ -298,7 +297,11 @@
     return spruch + " Türchen " + n + " öffnet sich erst am " + n + ". Dezember. Noch " + tage + " Tage ♥️";
   }
 
-  function klickAufTuer(n) {
+  function klickAufTuer(n, e) {
+    if (e && e.target.closest && e.target.closest(".ei-innen")) {
+      const ei = eier.find((x) => x.versteck && x.versteck.hinter === n);
+      if (ei) { findeEi(ei); return; }
+    }
     const t = tueren.get(n);
     if (!zeitBereit) return;
     const d = berlinDatum(jetzt());
@@ -330,6 +333,8 @@
     if (!istVerfuegbar(n, berlinDatum(jetzt()))) return;
 
     const i = inhalt(n);
+    offenerTag = n;
+    aktualisiereVersteckte();
     el.dialogTag.textContent = n + ". Dezember";
     el.dialogTitel.textContent = i.titel || "Türchen " + n;
     el.dialogText.textContent = i.text || "";
@@ -554,30 +559,58 @@
     dlg.addEventListener("click", (e) => { if (e.target === dlg) schliesse(dlg); });
   }
 
+  /* Verstecke:
+       { tuerchen: 5 }   klein im geöffneten Türchen 5
+       { foto: "x.jpg" } in der großen Fotoansicht dieses Fotos
+       { hinter: 10 }    hinter Türchen 10, sobald es offen ist
+     Nach dem Fund verschwindet das Easter Egg und ist nur noch
+     unter „Meine Gutscheine“ zu finden. */
+  let offenerTag = null;
+  let aktuellesFoto = null;
+
   function baueEier() {
-    const orte = {
-      kopf: document.querySelector(".kopf"),
-      kalender: document.querySelector("main"),
-      fuss: document.querySelector(".fuss"),
-    };
+    const dialogInhalt = el.dialog.querySelector(".dialog-inhalt");
+    const fotoFigur = document.querySelector(".lightbox-figur");
     for (const ei of eier) {
-      const knopf = document.createElement("button");
-      knopf.type = "button";
-      knopf.className = "ei ei-" + ei.emblem;
+      const v = ei.versteck || {};
+      let knopf;
+      if (v.hinter && tueren.has(v.hinter)) {
+        knopf = document.createElement("span");
+        knopf.className = "ei-innen";
+        tueren.get(v.hinter).innen.prepend(knopf);
+      } else if (v.tuerchen || v.foto) {
+        knopf = document.createElement("button");
+        knopf.type = "button";
+        knopf.className = "ei ei-klein " + (v.foto ? "ei-im-foto" : "ei-im-tuerchen");
+        knopf.setAttribute("aria-label", "Geheimnis");
+        knopf.addEventListener("click", (e) => { e.stopPropagation(); findeEi(ei); });
+        (v.foto ? fotoFigur : dialogInhalt).appendChild(knopf);
+      } else {
+        continue;
+      }
       knopf.hidden = true;
-      knopf.setAttribute("aria-label", "Geheimnis");
       knopf.innerHTML = EMBLEME[ei.emblem].svg;
-      knopf.addEventListener("click", () => findeEi(ei));
-      orte[EMBLEME[ei.emblem].ort].appendChild(knopf);
       eierKnoepfe.set(ei.emblem, knopf);
     }
     sammlungKnopf.addEventListener("click", zeigeSammlung);
   }
 
-  function aktualisiereEier(d) {
+  function aktualisiereVersteckte() {
+    const d = berlinDatum(jetzt());
     for (const ei of eier) {
-      eierKnoepfe.get(ei.emblem).hidden = !(zeitBereit && eiSichtbar(ei, d));
+      const knopf = eierKnoepfe.get(ei.emblem);
+      if (!knopf) continue;
+      const v = ei.versteck || {};
+      let da = zeitBereit && eiSichtbar(ei, d) && !gefunden.has(ei.emblem);
+      if (v.hinter) da = da && tueren.get(v.hinter).knopf.classList.contains("offen");
+      else if (v.tuerchen) da = da && offenerTag === v.tuerchen;
+      else if (v.foto) da = da && aktuellesFoto === v.foto;
+      knopf.hidden = !da;
     }
+  }
+
+  function aktualisiereEier() {
+    aktualisiereVersteckte();
     sammlungKnopf.hidden = !eier.some((ei) => gefunden.has(ei.emblem));
   }
 
@@ -588,6 +621,7 @@
       gefunden.add(ei.emblem);
       speichereGefunden();
       sammlungKnopf.hidden = false;
+      aktualisiereVersteckte();
     }
     zeigeGutschein(ei, neu);
   }
@@ -680,6 +714,8 @@
     lightboxBild.alt = f.text || "";
     lightboxText.textContent = f.text || "";
     lightboxText.hidden = !f.text;
+    aktuellesFoto = f.datei;
+    aktualisiereVersteckte();
     if (!lightbox.open) oeffne(lightbox);
   }
 

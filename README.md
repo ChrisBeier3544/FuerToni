@@ -26,30 +26,18 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
 
 ## Easter Eggs
 
-Sechs versteckte Funde (fünf Gutscheine und die Capy Crew), die nach und nach auf der Seite auftauchen
-(Einstellungen unter `eastereggs` in `inhalte.js`):
+Sechs versteckte Funde (fünf Gutscheine und die Capy Crew). Einstellungen unter
+`eastereggs` in `inhalte.js`. Nach dem Fund verschwindet das Easter Egg und ist nur
+noch über „🎟️ Meine Gutscheine“ zu finden.
 
-| Emblem       | Gutschein                  | Sichtbar ab | Ort              |
-|--------------|----------------------------|-------------|------------------|
-| Matcha Latte | Iced Matcha Latte          | 1.12.       | oben rechts      |
-| Acai Bowl    | Acai Bowl Date             | 7.12.       | unten links      |
-| Capybara     | Geheime Capy Party (Foto)  | 10.12.      | über dem Kalender|
-| Badeente     | Massage New Soul Studio    | 14.12.      | oben links       |
-| Blumen       | Date deiner Wahl           | 19.12.      | unten rechts     |
-| Häuschen     | Dinner im Restaurant Heimat| 24.12.      | unten Mitte      |
-
-Gefundene Gutscheine kann sie jederzeit über „🎟️ Meine Gutscheine“ wieder ansehen.
-Der Knopf erscheint erst, wenn der erste Gutschein gefunden wurde.
-
-## Fotos
-
-Die Fotos liegen in `bilder/` (große Ansicht) und `bilder/klein/` (Vorschau).
-Welche wo erscheinen, steht unter `fotos` in `inhalte.js`:
-
-- `titel`: die drei Polaroids oben unter der Überschrift
-- `galerie`: der Fotostreifen „Unsere Momente“ unter dem Kalender
-
-Ein Tipp auf ein Foto öffnet es groß. Dort kann man wischen oder die Pfeile benutzen.
+| Emblem       | Fund                        | Versteck                                  | Ab     |
+|--------------|-----------------------------|-------------------------------------------|--------|
+| Matcha Latte | Iced Matcha Latte           | klein im geöffneten Türchen 5             | 5.12.  |
+| Acai Bowl    | Acai Bowl Date              | große Ansicht vom Foto „Sommer am Meer“   | 7.12.  |
+| Capybara     | Geheime Capy Party (Foto)   | hinter Türchen 10, wenn es offen ist      | 10.12. |
+| Badeente     | Massage New Soul Studio     | klein im geöffneten Türchen 16            | 16.12. |
+| Blumen       | Date deiner Wahl            | große Ansicht vom Foto „Abendspaziergang“ | 19.12. |
+| Häuschen     | Dinner im Restaurant Heimat | klein im geöffneten Türchen 24            | 24.12. |
 
 ## Lokal ansehen und testen
 
