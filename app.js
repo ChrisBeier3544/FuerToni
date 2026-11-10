@@ -354,7 +354,8 @@
     if (typeof el.dialog.showModal === "function") el.dialog.showModal();
     else el.dialog.setAttribute("open", "");
 
-    if (i.konfetti) konfettiRegen();
+    if (i.geschenkregen) konfettiRegen("geschenke");
+    else if (i.konfetti) konfettiRegen("konfetti");
   }
 
   function schliesseDialog() {
@@ -386,9 +387,11 @@
     }
   }
 
-  /* Konfetti, das über die ganze Seite regnet (Geburtstage) */
+  /* Konfetti (Geburtstage) oder langsam fallende Geschenke (Heiligabend),
+     die über die ganze Seite regnen */
   let regenLaeuft = false;
-  function konfettiRegen() {
+  function konfettiRegen(art) {
+    const geschenke = art === "geschenke";
     if (regenLaeuft) return;
     regenLaeuft = true;
     const canvas = el.regen;
@@ -408,9 +411,24 @@
     if (!alsPopover) canvas.classList.add("aktiv");
 
     const farben = ["#e85d7e", "#f7809b", "#9d2449", "#d4a84b", "#f3dc9f", "#ffffff", "#7cc4f0", "#9be3b0"];
-    const anzahl = bewegungReduziert ? 60 : breite < 600 ? 140 : 220;
+    const anzahl = geschenke
+      ? (bewegungReduziert ? 12 : breite < 600 ? 22 : 34)
+      : (bewegungReduziert ? 60 : breite < 600 ? 140 : 220);
     const teile = [];
     for (let k = 0; k < anzahl; k++) {
+      if (geschenke) {
+        teile.push({
+          x: Math.random() * breite,
+          y: -50 - Math.random() * hoehe * 1.2,
+          groesse: 22 + Math.random() * 18,
+          vx: 0,
+          vy: 0.6 + Math.random() * 0.9,
+          dreh: -0.3 + Math.random() * 0.6,
+          vdreh: -0.008 + Math.random() * 0.016,
+          wackel: Math.random() * Math.PI * 2,
+        });
+        continue;
+      }
       teile.push({
         x: Math.random() * breite,
         y: -20 - Math.random() * hoehe * 0.8,
@@ -426,22 +444,31 @@
       });
     }
 
-    const dauer = 5000;
+    const dauer = geschenke ? 14000 : 5000;
+    const rand = geschenke ? 50 : 20;
     const start = performance.now();
     function schritt(t) {
       const vergangen = t - start;
       ctx.clearRect(0, 0, breite, hoehe);
       let sichtbar = 0;
       for (const p of teile) {
-        p.wackel += 0.05;
-        p.x += p.vx + Math.sin(p.wackel) * 0.8;
+        p.wackel += geschenke ? 0.02 : 0.05;
+        p.x += p.vx + Math.sin(p.wackel) * (geschenke ? 0.5 : 0.8);
         p.y += p.vy;
         p.dreh += p.vdreh;
-        if (p.y < hoehe + 20) sichtbar++;
-        if (vergangen < dauer - 1500 && p.y > hoehe + 20) p.y = -20; // nachrieseln
+        if (p.y < hoehe + rand) sichtbar++;
+        if (vergangen < dauer - 1500 && p.y > hoehe + rand) p.y = -rand; // nachrieseln
         ctx.save();
         ctx.translate(p.x, p.y);
         ctx.rotate(p.dreh);
+        if (geschenke) {
+          ctx.font = p.groesse + "px serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("🎁", 0, 0);
+          ctx.restore();
+          continue;
+        }
         ctx.fillStyle = p.farbe;
         if (p.rund) {
           ctx.beginPath();
@@ -452,7 +479,7 @@
         }
         ctx.restore();
       }
-      if (sichtbar > 0 && vergangen < dauer + 4000) {
+      if (sichtbar > 0 && vergangen < dauer + (geschenke ? 15000 : 4000)) {
         requestAnimationFrame(schritt);
       } else {
         ctx.clearRect(0, 0, breite, hoehe);

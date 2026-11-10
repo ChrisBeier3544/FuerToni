@@ -14,6 +14,7 @@ Alles, was hinter den Türchen steckt, steht in **`inhalte.js`**. Pro Tag:
 | `briefzahl` | Zahl für den Weihnachtsbrief                                 |
 | `paeckchen` | Nummer des Extra-Päckchens – oder `""`, wenn es keins gibt   |
 | `konfetti`  | `true` = Konfetti regnet über die Seite (z. B. Geburtstage)  |
+| `geschenkregen` | `true` = langsam fallende Geschenke 🎁 (Heiligabend)   |
 | `status`    | optional: eigener Text oben auf der Seite an diesem Tag      |
 | `bild`      | optional: Foto, z. B. `"bilder/tag01.jpg"`                   |
 | `hinweis`   | optional: zusätzlicher Hinweis-Kasten                        |

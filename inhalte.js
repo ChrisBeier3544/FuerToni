@@ -9,6 +9,7 @@
  *    briefzahl  : Zahl für den Weihnachtsbrief
  *    paeckchen  : Nummer des Extra-Päckchens (leer lassen "" = keins)
  *    konfetti   : true = Konfetti regnet über die Seite
+ *    geschenkregen : true = langsam fallende Geschenke 🎁
  *    status     : (optional) Text oben auf der Seite an diesem Tag
  *    bild       : (optional) Foto, z. B. "bilder/tag01.jpg"
  *    hinweis    : (optional) zusätzlicher Hinweis-Kasten
@@ -176,6 +177,7 @@ const KALENDER = {
       text: "Das letzte Türchen.\nDanke, dass du da bist, dass du genau so bist, wie du bist, und dass ich diesen Dezember mit dir erleben durfte.\nDu bist mein allerschönstes Geschenk, heute und jeden Tag.\nIch liebe dich ♥️",
       briefzahl: 24,
       paeckchen: 902,
+      geschenkregen: true,
     },
   },
 };
