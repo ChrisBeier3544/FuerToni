@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <base href="../">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Toni Adventskalender Test</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>♥️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#e85d7e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Für Toni">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+</head>
+<body>
+  <div id="intro" class="intro" hidden>
+    <div class="umschlag" id="umschlag" role="button" tabindex="0" aria-label="Brief öffnen">
+      <div class="umschlag-rueck"></div>
+      <div class="brief">
+        <p class="brief-anrede">Mein Schatz,</p>
+        <p class="brief-text">dein Adventskalender wartet auf dich</p>
+        <p class="brief-herz" aria-hidden="true">♥️</p>
+      </div>
+      <div class="umschlag-vorne"></div>
+      <div class="umschlag-klappe"></div>
+      <p class="umschlag-name">Für Toni</p>
+      <div class="siegel" aria-hidden="true"><span>♥</span></div>
+    </div>
+    <p class="intro-hinweis">Tippe auf das Siegel</p>
+  </div>
+
+  <div class="himmel" aria-hidden="true">
+    <div class="sonne"></div>
+    <div class="mond"></div>
+    <div class="sterne" id="sterne"></div>
+  </div>
+  <div class="herzen" aria-hidden="true"></div>
+
+  <header class="kopf">
+    <p id="gruss" class="gruss"></p>
+    <h1 id="titel">Für Toni ♥️</h1>
+    <p id="untertitel" class="untertitel"></p>
+    <div id="titelfotos" class="titelfotos"></div>
+    <p id="status" class="status" aria-live="polite"></p>
+    <p id="zusammen" class="zusammen"></p>
+    <p class="kopf-knoepfe">
+      <button id="sammlung-knopf" class="sammlung-knopf" type="button" hidden>🎟️ Meine Gutscheine</button>
+      <button id="finale-knopf" class="sammlung-knopf" type="button" hidden>♥️ Unser Herz</button>
+      <button id="rueckblick-knopf" class="sammlung-knopf" type="button" hidden>📖 Unser Dezember</button>
+    </p>
+  </header>
+
+  <main>
+    <div id="lichterkette" class="lichterkette" role="img" aria-label="Lichterkette"></div>
+    <div id="kalender" class="kalender" aria-label="Adventskalender mit 24 Türchen"></div>
+  </main>
+
+  <section id="momente" class="momente" aria-labelledby="momente-titel" hidden>
+    <h2 id="momente-titel">Unsere Momente</h2>
+    <div id="fotostreifen" class="fotostreifen"></div>
+  </section>
+
+  <div id="landschaft" class="landschaft" aria-hidden="true"></div>
+
+  <footer class="fuss">Mit ganz viel Liebe gemacht ♥️</footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <dialog id="dialog" class="dialog" aria-labelledby="dialog-titel">
+    <div class="dialog-inhalt">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <p class="dialog-tag" id="dialog-tag"></p>
+      <h2 id="dialog-titel"></h2>
+      <img id="dialog-bild" class="dialog-bild" alt="" hidden>
+      <div id="rubbel-bereich" class="rubbel-bereich">
+      <p id="dialog-text" class="dialog-text"></p>
+      <div class="extras">
+        <div id="dialog-brief" class="extra extra-brief" hidden>
+          <span class="extra-icon" aria-hidden="true">✉️</span>
+          <span class="extra-label">Zahl für deinen Weihnachtsbrief</span>
+          <span id="dialog-brief-zahl" class="extra-zahl"></span>
+        </div>
+        <div id="dialog-paeckchen" class="extra extra-paeckchen" hidden>
+          <span class="extra-icon" aria-hidden="true">🎁</span>
+          <span class="extra-label">Heute darfst du zusätzlich dieses Päckchen öffnen</span>
+          <span id="dialog-paeckchen-zahl" class="extra-zahl"></span>
+        </div>
+      </div>
+      <canvas id="rubbel" class="rubbel" hidden aria-label="Rubbelfeld: mit dem Finger freirubbeln"></canvas>
+      </div>
+      <div id="dialog-audio" class="sprachnachricht" hidden>
+        <p class="sprachnachricht-titel">🎙️ Eine Sprachnachricht von mir</p>
+        <audio id="dialog-audio-player" controls preload="metadata"></audio>
+      </div>
+      <div id="dialog-hinweis" class="hinweis" hidden>
+        <span class="hinweis-icon" aria-hidden="true">🎁</span>
+        <span id="dialog-hinweis-text"></span>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="gutschein" class="dialog gutschein-dialog" aria-labelledby="gutschein-titel">
+    <div class="dialog-inhalt">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <p id="gutschein-gefunden" class="gutschein-gefunden">Du hast ein Easter Egg gefunden! 🎉</p>
+      <div class="ticket">
+        <img id="gutschein-bild" class="ticket-bild" alt="" hidden>
+        <div id="gutschein-emblem" class="ticket-emblem" aria-hidden="true"></div>
+        <p class="ticket-label">Gutschein für</p>
+        <h2 id="gutschein-titel"></h2>
+        <p id="gutschein-text" class="ticket-text"></p>
+        <p class="ticket-fuss"><strong>Aktiv, sobald du mir einen Screenshot davon per WhatsApp geschickt hast 📸</strong><br>Gültig für immer · Einlösbar bei mir ♥️</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="sammlung" class="dialog" aria-labelledby="sammlung-titel">
+    <div class="dialog-inhalt">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <h2 id="sammlung-titel">Deine Gutscheine</h2>
+      <div id="sammlung-liste" class="sammlung-liste"></div>
+    </div>
+  </dialog>
+
+  <dialog id="quiz" class="dialog" aria-labelledby="quiz-frage">
+    <div class="dialog-inhalt">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <p class="dialog-tag">Du hast etwas entdeckt 🔍</p>
+      <p class="quiz-intro">Aber erst musst du dir das verdienen. Beantworte diese Frage:</p>
+      <h2 id="quiz-frage"></h2>
+      <div id="quiz-antworten" class="quiz-antworten"></div>
+      <p id="quiz-rueckmeldung" class="quiz-rueckmeldung" aria-live="polite"></p>
+    </div>
+  </dialog>
+
+  <dialog id="rueckblick" class="dialog" aria-labelledby="rueckblick-titel">
+    <div class="dialog-inhalt">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <h2 id="rueckblick-titel">Unser Dezember</h2>
+      <div id="rueckblick-liste" class="rueckblick-liste"></div>
+    </div>
+  </dialog>
+
+  <div id="app-tipp" class="app-tipp" hidden>
+    <span class="app-tipp-icon" aria-hidden="true">📲</span>
+    <p id="app-tipp-text"></p>
+    <button type="button" id="app-tipp-zu" aria-label="Tipp schließen">×</button>
+  </div>
+
+  <dialog id="lightbox" class="lightbox" aria-label="Foto">
+    <button class="schliessen" type="button" aria-label="Schließen">×</button>
+    <figure class="lightbox-figur">
+      <img id="lightbox-bild" alt="">
+      <figcaption id="lightbox-text"></figcaption>
+    </figure>
+    <button class="lightbox-pfeil zurueck" type="button" aria-label="Vorheriges Foto">‹</button>
+    <button class="lightbox-pfeil weiter" type="button" aria-label="Nächstes Foto">›</button>
+  </dialog>
+
+  <div id="finale" class="finale" hidden>
+    <div id="finale-herz" class="finale-herz"></div>
+    <div class="finale-text">
+      <p class="finale-titel">Frohe Weihnachten, Baby</p>
+      <p class="finale-unter">24 Türchen voller Liebe ♥️</p>
+    </div>
+    <button type="button" class="schliessen finale-zu" aria-label="Schließen">×</button>
+  </div>
+
+  <canvas id="konfetti-regen" class="konfetti-regen" popover="manual" aria-hidden="true"></canvas>
+
+  <script src="inhalte.js"></script>
+  <script src="vorschau-poyjy2er/app.js"></script>
+<style>
+  .testleiste {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+    padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    background: #2b0f1c; color: #ffe4ea;
+    font: 600 13px/1.3 "Nunito", system-ui, sans-serif;
+    box-shadow: 0 -6px 20px rgba(0,0,0,.25);
+  }
+  .testleiste b { color: #f3dc9f; margin-right: 4px; }
+  .testleiste select, .testleiste button {
+    font: inherit; border-radius: 999px; border: 1px solid #f7809b;
+    padding: 6px 12px; background: #4a1d2e; color: #fff; cursor: pointer;
+  }
+  .testleiste button:hover, .testleiste select:hover { background: #6b1532; }
+  .testleiste button:focus-visible, .testleiste select:focus-visible { outline: 2px solid #f3dc9f; outline-offset: 2px; }
+  .testleiste .zu { margin-left: auto; }
+  .testleiste input { accent-color: #f7809b; }
+  .testleiste.klein > :not(.zu):not(b) { display: none; }
+  body { padding-bottom: 120px; }
+  .toast { bottom: 110px; }
+</style>
+<div class="testleiste" id="testleiste" role="region" aria-label="Testleiste">
+  <b>🧪 Testversion</b>
+  <label for="test-datum">Tag:</label>
+  <select id="test-datum"></select>
+  <label for="test-zeit">Zeit:</label>
+  <select id="test-zeit">
+    <option value="morgen">🌅 Morgens (7:30)</option>
+    <option value="vormittag">🌤️ Vormittags (10:00)</option>
+    <option value="mittag" selected>☀️ Mittags (13:00)</option>
+    <option value="nachmittag">🍪 Nachmittags (15:00)</option>
+    <option value="abend">🕯️ Abends (19:00)</option>
+    <option value="nacht">🌙 Nachts (23:00)</option>
+  </select>
+  <button type="button" id="test-alle">Alle Türchen öffnen</button>
+  <button type="button" id="test-umschlag">Umschlag zeigen</button>
+  <button type="button" id="test-finale">Finale zeigen</button>
+  <button type="button" id="test-schuetteln">Schütteln ❄️</button>
+  <button type="button" id="test-lichter">Lichtershow</button>
+  <button type="button" id="test-reset">Alles zurücksetzen</button>
+  <button type="button" class="zu" id="test-zu" aria-label="Testleiste einklappen">▾</button>
+</div>
+<script>
+(function () {
+  var jahr = KALENDER.jahr;
+  var sel = document.getElementById("test-datum");
+  var optionen = [["", "Echtes Datum"], ["nov-25", "25. November (vor dem Start)"]];
+  var besonders = { 4: " 🎉 Joris", 6: " 🎅", 8: " 🍀 Bio", 11: " 🍀 Deutsch", 13: " 🎂 Papa", 17: " 🍀 Mathe", 24: " 🎄 Heiligabend" };
+  var eier = {};
+  (KALENDER.eastereggs || []).forEach(function (e) { eier[e.ab] = (eier[e.ab] || "") + " 🥚"; });
+  for (var t = 1; t <= 24; t++) {
+    optionen.push(["dez-" + (t < 10 ? "0" + t : t), t + ". Dezember" + (besonders[t] || "") + (eier[t] || "")]);
+  }
+  optionen.push(["dez-26", "26. Dezember (danach)"]);
+  optionen.forEach(function (o) {
+    var el = document.createElement("option"); el.value = o[0]; el.textContent = o[1]; sel.appendChild(el);
+  });
+  var zeitSel = document.getElementById("test-zeit");
+  var anker = location.hash.replace("#", "");
+  var zm = /-(morgen|vormittag|mittag|nachmittag|abend|nacht)$/.exec(anker);
+  if (zm) zeitSel.value = zm[1];
+  sel.value = anker.replace(/-(morgen|vormittag|mittag|nachmittag|abend|nacht)$/, "");
+  function gehe(wert) {
+    if (wert && zeitSel.value !== "mittag") wert += "-" + zeitSel.value;
+    location.hash = wert;
+    location.reload();
+  }
+  sel.addEventListener("change", function () { gehe(sel.value); });
+  zeitSel.addEventListener("change", function () { gehe(sel.value || "dez-01"); });
+  var schluessel = ["toni-advent-geoeffnet-" + jahr, "toni-advent-gutscheine-" + jahr, "toni-advent-finale-" + jahr, "toni-advent-gerubbelt-" + jahr, "toni-app-tipp"];
+  document.getElementById("test-umschlag").addEventListener("click", function () {
+    try { sessionStorage.removeItem("toni-intro"); } catch (e) {}
+    location.reload();
+  });
+  document.getElementById("test-schuetteln").addEventListener("click", function () {
+    if (window.adventkalender) window.adventkalender.schneeSturm();
+  });
+  document.getElementById("test-lichter").addEventListener("click", function () {
+    document.getElementById("lichterkette").scrollIntoView({ behavior: "smooth", block: "center" });
+    if (window.adventkalender) setTimeout(window.adventkalender.starteLichtershow, 500);
+  });
+  document.getElementById("test-finale").addEventListener("click", function () {
+    if (window.adventkalender) window.adventkalender.zeigeFinale();
+  });
+  document.getElementById("test-alle").addEventListener("click", function () {
+    try { localStorage.setItem(schluessel[0], JSON.stringify(Array.from({ length: 24 }, function (_, i) { return i + 1; }))); } catch (e) {}
+    gehe("dez-24");
+  });
+  document.getElementById("test-reset").addEventListener("click", function () {
+    try { schluessel.forEach(function (k) { localStorage.removeItem(k); }); sessionStorage.removeItem("toni-intro"); } catch (e) {}
+    gehe("");
+  });
+  var leiste = document.getElementById("testleiste");
+  document.getElementById("test-zu").addEventListener("click", function () {
+    leiste.classList.toggle("klein");
+    this.textContent = leiste.classList.contains("klein") ? "▴ Testleiste" : "▾";
+  });
+})();
+</script>
+
+</body>
+</html>

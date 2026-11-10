@@ -107,3 +107,9 @@ echten Website ignoriert.
 - Wer sich mit Webentwicklung auskennt, könnte die Texte in `inhalte.js` bzw. die
   Bilder im Ordner `bilder/` direkt aufrufen. Ist das Repository öffentlich, sind die
   Inhalte auch auf GitHub sichtbar. Für eine echte Sperre bräuchte man einen Server.
+
+## Testversion (vor dem 1. Dezember löschen!)
+
+Im Ordner `vorschau-poyjy2er/` liegt eine Testversion mit Testleiste, die alle Tage
+und Türchen freischaltet. Sie nutzt die Fotos und Inhalte der echten Seite mit.
+**Diesen Ordner vor dem 1. Dezember löschen**, sonst könnte Toni darüber alles vorab sehen.
