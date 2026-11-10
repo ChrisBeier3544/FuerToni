@@ -1022,7 +1022,7 @@ main {
 .finale-foto {
   position: absolute;
   left: 50%;
-  top: 46%;
+  top: var(--cy, 42%);
   width: var(--g);
   height: var(--g);
   margin: calc(var(--g) / -2) 0 0 calc(var(--g) / -2);
@@ -1035,9 +1035,9 @@ main {
 .finale-text {
   position: absolute;
   left: 50%;
-  top: 46%;
-  width: min(46vw, 300px);
-  transform: translate(-50%, -50%);
+  top: var(--text-oben, 80%);
+  width: min(92vw, 560px);
+  transform: translateX(-50%);
   text-align: center;
   color: #fff;
   opacity: 0;

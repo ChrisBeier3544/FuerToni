@@ -1,7 +1,8 @@
 # Toni-Adeventskalender ❤️
 
 Ein romantischer Online-Adventskalender mit 24 Türchen. Jedes Türchen lässt sich
-erst an seinem Tag öffnen (1. Türchen am 01.12., 2. am 02.12. usw., deutsche Zeit).
+erst an seinem Tag öffnen (1. Türchen am 01.12., 2. am 02.12. usw.), jeweils um
+4:00 Uhr nachts deutscher Zeit.
 
 ## Inhalte eintragen
 
@@ -36,7 +37,7 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
   morgens 6:00 bis 9:00 (Sonnenaufgang), vormittags 9:00 bis 12:00 (frisch und hell),
   mittags 12:00 bis 14:00 (am hellsten), nachmittags 14:00 bis 16:30 (goldene Stunde),
   abends 16:30 bis 22:00 (gemütlich dunkel), nachts 22:00 bis 6:00 (Mond und Sterne).
-  Lokal testen mit z. B. `&zeit=morgen`.
+  Lokal testen mit z. B. `&zeit=morgen` oder einer Uhrzeit wie `&zeit=03:59`.
 - **Finale:** Sind alle 24 Türchen offen, fliegen alle Fotos zu einem Herz zusammen.
   Danach lässt es sich über „♥️ Unser Herz“ jederzeit wieder ansehen.
 

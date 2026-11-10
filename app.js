@@ -54,9 +54,12 @@
     // Uhrzeit in UTC (deutsche Winterzeit = UTC + 1), z. B. &zeit=morgen
     const param = new URLSearchParams(location.search);
     const zeit = param.has("abend") ? "abend" : param.get("zeit");
-    const stunde = { morgen: 6.5, vormittag: 9, mittag: 12, nachmittag: 14, abend: 18, nacht: 22 }[zeit];
+    const uhr = /^(\d{1,2}):(\d{2})$/.exec(zeit || "");
+    const stunde = uhr
+      ? +uhr[1] - 1 + +uhr[2] / 60
+      : { morgen: 6.5, vormittag: 9, mittag: 12, nachmittag: 14, abend: 18, nacht: 22 }[zeit];
     const utc = stunde === undefined ? 11 : stunde;
-    return Date.UTC(+m[1], +m[2] - 1, +m[3], Math.floor(utc), (utc % 1) * 60, 0);
+    return Date.UTC(+m[1], +m[2] - 1, +m[3], 0, Math.round(utc * 60), 0);
   }
 
   async function holeServerzeit() {
@@ -118,7 +121,14 @@
     };
   }
 
-  // Ist Türchen n (1–24) zu diesem Zeitpunkt schon offen?
+  // Neue Türchen öffnen sich jeden Tag um 4:00 Uhr nachts (deutsche Zeit).
+  // Dafür zählt der „Kalendertag“ erst ab 4 Uhr als neuer Tag.
+  const FREISCHALT_STUNDE = 4;
+  function kalenderDatum() {
+    return berlinDatum(jetzt() - FREISCHALT_STUNDE * 3600000);
+  }
+
+  // Ist Türchen n (1 bis 24) an diesem Kalendertag schon offen?
   function istVerfuegbar(n, d) {
     if (d.jahr > KALENDER.jahr) return true;
     if (d.jahr < KALENDER.jahr) return false;
@@ -248,7 +258,8 @@
   }
 
   function aktualisiere() {
-    const d = berlinDatum(jetzt());
+    const d = kalenderDatum();
+    const echt = berlinDatum(jetzt());
     for (const [n, t] of tueren) {
       const frei = zeitBereit && istVerfuegbar(n, d);
       const istOffen = frei && geoeffnet.has(n);
@@ -267,15 +278,17 @@
       else label += ", kann geöffnet werden";
       t.knopf.setAttribute("aria-label", label);
     }
-    aktualisiereStatus(d);
+    aktualisiereStatus(d, echt);
     aktualisiereEier(d);
-    setzeTageszeit(d);
+    setzeTageszeit(echt);
     aktualisiereLichter(d);
     const fk = document.getElementById("finale-knopf");
     if (fk) fk.hidden = !(zeitBereit && alleOffen() && finaleGesehen());
   }
 
-  function aktualisiereStatus(d) {
+  function aktualisiereStatus(d, echt) {
+    // Zwischen Mitternacht und 4 Uhr ist das neue Türchen noch zu
+    const nachtFenster = echt && echt.tag !== d.tag;
     if (!zeitBereit) { el.status.textContent = "Einen Moment …"; return; }
 
     if (d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag > 24)) {
@@ -283,15 +296,16 @@
       return;
     }
     if (d.jahr === KALENDER.jahr && d.monat === 12) {
-      if (inhalt(d.tag).status) el.status.textContent = inhalt(d.tag).status;
+      if (nachtFenster && d.tag < 24 && geoeffnet.has(d.tag)) el.status.textContent = "Um 4 Uhr wartet Türchen " + (d.tag + 1) + " auf dich ♥️";
+      else if (inhalt(d.tag).status) el.status.textContent = inhalt(d.tag).status;
       else if (d.tag === 24) el.status.textContent = "Heute ist Heiligabend. Das letzte Türchen wartet auf dich ✨";
       else if (!geoeffnet.has(d.tag)) el.status.textContent = "Heute darfst du Türchen " + d.tag + " öffnen ✨";
-      else el.status.textContent = "Morgen wartet Türchen " + (d.tag + 1) + " auf dich ♥️";
+      else el.status.textContent = (nachtFenster ? "Um 4 Uhr wartet Türchen " : "Morgen wartet Türchen ") + (d.tag + 1) + " auf dich ♥️";
       return;
     }
     const tage = tageBis(1, d);
     el.status.textContent = tage === 1
-      ? "Morgen geht's los! ♥️"
+      ? (nachtFenster ? "Um 4 Uhr geht's los! ♥️" : "Morgen geht's los! ♥️")
       : "Noch " + tage + " Tage bis zum ersten Türchen ♥️";
   }
 
@@ -306,17 +320,19 @@
     toastTimer = setTimeout(() => el.toast.classList.remove("sichtbar"), 3200);
   }
 
-  function gesperrtNachricht(n, d) {
-    const tage = tageBis(n, d);
-    if (tage === 1) {
-      const rest = 86400 - (d.stunde * 3600 + d.minute * 60 + d.sekunde);
-      const std = Math.floor(rest / 3600);
-      const min = Math.floor((rest % 3600) / 60);
-      return "Nicht schummeln, " + KOSENAMEN[n % KOSENAMEN.length] + " 😘 Türchen " + n + " öffnet sich in " + std + " Std. " + min + " Min.";
-    }
+  function gesperrtNachricht(n) {
+    // Im Dezember gilt in Deutschland UTC + 1, 4:00 Uhr = 3:00 UTC
+    const freiAb = Date.UTC(KALENDER.jahr, 11, n, FREISCHALT_STUNDE - 1, 0, 0);
+    const rest = Math.max(0, freiAb - jetzt());
     const name = KOSENAMEN[n % KOSENAMEN.length];
+    if (rest < 86400000) {
+      const std = Math.floor(rest / 3600000);
+      const min = Math.floor((rest % 3600000) / 60000);
+      return "Nicht schummeln, " + name + " 😘 Türchen " + n + " öffnet sich in " + std + " Std. " + min + " Min.";
+    }
+    const tage = Math.floor(rest / 86400000);
     const spruch = ["Geduld, " + name + " ♥️", "Nicht schummeln, " + name + " 😘", "Die Capys bewachen dieses Türchen noch 🔒", "Na na na, " + name + " 🙈"][(n >> 2) % 4];
-    return spruch + " Türchen " + n + " öffnet sich erst am " + n + ". Dezember. Noch " + tage + " Tage ♥️";
+    return spruch + " Türchen " + n + " öffnet sich erst am " + n + ". Dezember um 4 Uhr. Noch " + tage + (tage === 1 ? " Tag" : " Tage") + " ♥️";
   }
 
   function klickAufTuer(n, e) {
@@ -326,13 +342,13 @@
     }
     const t = tueren.get(n);
     if (!zeitBereit) return;
-    const d = berlinDatum(jetzt());
+    const d = kalenderDatum();
 
     if (!istVerfuegbar(n, d)) {
       t.knopf.classList.remove("wackeln");
       void t.knopf.offsetWidth; // Animation neu starten
       t.knopf.classList.add("wackeln");
-      zeigeToast(gesperrtNachricht(n, d));
+      zeigeToast(gesperrtNachricht(n));
       return;
     }
 
@@ -352,7 +368,7 @@
 
   function zeigeInhalt(n) {
     // Sicherheitsnetz: Inhalt nur zeigen, wenn der Tag wirklich erreicht ist
-    if (!istVerfuegbar(n, berlinDatum(jetzt()))) return;
+    if (!istVerfuegbar(n, kalenderDatum())) return;
 
     const i = inhalt(n);
     // Der Inhalt fliegt aus dem Türchen heraus
@@ -858,7 +874,7 @@
   }
 
   function aktualisiereVersteckte() {
-    const d = berlinDatum(jetzt());
+    const d = kalenderDatum();
     for (const ei of eier) {
       const knopf = eierKnoepfe.get(ei.emblem);
       if (!knopf) continue;
@@ -877,7 +893,7 @@
   }
 
   function findeEi(ei) {
-    if (!zeitBereit || !eiSichtbar(ei, berlinDatum(jetzt()))) return;
+    if (!zeitBereit || !eiSichtbar(ei, kalenderDatum())) return;
     const neu = !gefunden.has(ei.emblem);
     if (neu) {
       gefunden.add(ei.emblem);
@@ -1004,7 +1020,7 @@
   const FINALE_SCHLUESSEL = "toni-advent-finale-" + KALENDER.jahr;
   function alleOffen() {
     for (let n = 1; n <= 24; n++) if (!geoeffnet.has(n)) return false;
-    return istVerfuegbar(24, berlinDatum(jetzt()));
+    return istVerfuegbar(24, kalenderDatum());
   }
   function finaleGesehen() {
     try { return localStorage.getItem(FINALE_SCHLUESSEL) === "1"; } catch (_) { return false; }
@@ -1017,10 +1033,16 @@
     finale.hidden = false;
     const fotos = fotoListe.slice();
     const N = fotos.length;
-    const S = Math.min(window.innerWidth, window.innerHeight * 0.92);
-    const g = Math.max(36, Math.min(84, S / 8));
-    const einheit = (S - g - 24) / 33;
+    // Herz und Text darunter passen zusammen auf den Bildschirm
+    const W = window.innerWidth, H = window.innerHeight;
+    const textH = 112;
+    const g = Math.max(36, Math.min(84, Math.min(W, H) / 8));
+    const einheit = Math.max(4, Math.min((W - g - 24) / 33, (H - textH - g - 56) / 29));
+    const herzH = 29 * einheit + g;
+    const cy = (H - herzH - textH) / 2 + herzH / 2;
     finale.style.setProperty("--g", g.toFixed(0) + "px");
+    finale.style.setProperty("--cy", cy.toFixed(0) + "px");
+    finale.style.setProperty("--text-oben", (cy + herzH / 2 + 14).toFixed(0) + "px");
     const weit = Math.max(window.innerWidth, window.innerHeight);
     fotos.forEach((f, i) => {
       const t = (i / N) * Math.PI * 2;
