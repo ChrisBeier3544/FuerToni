@@ -153,7 +153,7 @@ const KALENDER = {
     },
     4: {
       titel: "Happy Birthday, Joris 🎉",
-      text: "Heute hat dein Bruder Geburtstag! 🥳\nRichte ihm schon mal meine besten Glückwünsche aus. Mein kleines Präsent folgt zeitnah!\nIch wünsche euch einen wunderschönen Tag zusammen ♥️",
+      text: "Heute hat dein Bruder Geburtstag! 🥳\nRichte ihm schon mal meine besten Glückwünsche aus. Mein kleines Geschenk folgt zeitnah!\nIch wünsche euch einen wunderschönen Tag zusammen ♥️",
       briefzahl: 8,
       paeckchen: 2603,
       konfetti: true,
