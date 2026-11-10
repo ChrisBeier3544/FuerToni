@@ -205,10 +205,11 @@
     document.title = KALENDER.titel || "Adventskalender";
     el.untertitel.textContent = KALENDER.untertitel || "";
 
-    for (const n of gemischteTage()) {
+    gemischteTage().forEach((n, platz) => {
       const knopf = document.createElement("button");
       knopf.type = "button";
-      knopf.className = "tuer gesperrt" + (PAECKCHEN_FORM[n] ? " " + PAECKCHEN_FORM[n] : "");
+      // Geschenkpapier fest am Päckchen, nicht am Platz im Regal
+      knopf.className = "tuer gesperrt papier-" + ((platz % 4) + 1) + (PAECKCHEN_FORM[n] ? " " + PAECKCHEN_FORM[n] : "");
       knopf.dataset.tag = String(n);
 
       const innen = document.createElement("span");
@@ -238,7 +239,7 @@
       knopf.addEventListener("click", (e) => klickAufTuer(n, e));
       el.kalender.appendChild(knopf);
       tueren.set(n, { knopf, innen, schloss });
-    }
+    });
   }
 
   // Kleine Illustrationen im geöffneten Türchen
@@ -326,6 +327,10 @@
     // Zwischen Mitternacht und 4 Uhr ist das neue Türchen noch zu
     const nachtFenster = echt && echt.tag !== d.tag;
     if (!zeitBereit) { el.status.textContent = "Einen Moment …"; return; }
+    if (istGeburtstag()) {
+      el.status.textContent = "Alles Gute zum Geburtstag, Toni 🎂 In " + tageBis(1, d) + " Tagen öffnest du das erste Türchen";
+      return;
+    }
 
     if (d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag > 24)) {
       el.status.textContent = "Frohe Weihnachten, Maus 🎄♥️";
@@ -925,7 +930,8 @@
     const gruss = document.getElementById("gruss");
     // Kosenamen wechseln je nach Tag und Tageszeit
     const name = KOSENAMEN[(d.tag * 3 + index) % KOSENAMEN.length];
-    if (gruss) gruss.textContent = zeitBereit ? zeit.gruss.replace("{name}", name) : "";
+    if (gruss) gruss.textContent = zeitBereit ? (istGeburtstag() ? "Happy Birthday, " + name + " 🎂" : zeit.gruss.replace("{name}", name)) : "";
+    document.documentElement.toggleAttribute("data-geburtstag", zeitBereit && istGeburtstag());
   }
 
   function baueSterne() {
@@ -1055,7 +1061,8 @@
     fensterListe.forEach((f, i) => {
       teile += '<g class="fenster-capy haus" data-nr="' + i + '" data-haus="' + f.haus + '" transform="translate(' + f.x.toFixed(1) + ' ' + f.y.toFixed(1) + ')">' +
         '<rect class="fenster-hell" width="16" height="17" rx="2"/>' +
-        '<g clip-path="url(#fensterclip)"><g class="capy-kopf">' + FENSTER_CAPY + FENSTER_EXTRAS[i % FENSTER_EXTRAS.length] + "</g></g>" +
+        '<g clip-path="url(#fensterclip)"><g class="capy-kopf">' + FENSTER_CAPY + FENSTER_EXTRAS[i % FENSTER_EXTRAS.length] +
+        '<g class="geb-hut"><path d="M5 7.2 8 -1 11 7.2z" fill="' + ["#f3dc9f", "#fda4b8", "#9be3b0", "#7cc4f0"][i % 4] + '"/><circle cx="8" cy="-1" r="1.3" fill="#e85d7e"/></g>' + "</g></g>" +
         '<rect x="-1" y="15.5" width="18" height="2.5" rx="1" class="fenster-bank"/></g>';
     });
     teile += '<path transform="scale(' + sx + ' 1)" style="fill:var(--huegel-1)" d="M0 198 Q 300 182 600 196 T 1200 190 V230 H0Z"/>';
@@ -1137,6 +1144,7 @@
       anzahl = Math.max(1, Math.round(alle.length * 0.85 * (tag / 24) * (tag / 24 + 1) / 2));
       if (tag >= 24) anzahl = Math.round(alle.length * 0.85);
     }
+    if (zeitBereit && istGeburtstag()) anzahl = alle.length; // am Geburtstag feiern alle mit
     alle.forEach((g) => g.classList.toggle("da", +g.dataset.nr < anzahl));
   }
 
@@ -1164,6 +1172,7 @@
     { name: "krone", spruch: "Ich bin heute das Weihnachts-Capy 👑 Fast geschafft!" },
   ];
   function capyOutfit(d) {
+    if (istGeburtstag()) return { name: "krone", spruch: "Heute trage ich eine Krone, weil du Geburtstag hast 👑🎂" };
     if (d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag > 24)) return CAPY_OUTFITS[1];
     if (d.jahr !== KALENDER.jahr || d.monat !== 12) return null;
     return CAPY_OUTFITS[Math.floor((d.tag - 1) / 3)];
@@ -1744,6 +1753,9 @@
     zeigeFinale,
     schneeSturm: () => schneeSturm(),
     starteLichtershow,
+    konfetti: (art) => konfettiRegen(art || "konfetti"),
+    kalenderDatum: () => kalenderDatum(),
+    istGeburtstag: () => istGeburtstag(),
     intro: { bereit: () => zeitBereit, phase: () => introPhase(), datum: () => berlinDatum(jetzt()) },
   };
 

@@ -56,6 +56,24 @@ Vom 15. bis 25. November läuft auf dem Countdown-Bildschirm jeden Tag eine ande
 Feuerwerk, Schneeballschlacht, Polonaise, Plätzchenbacken und am Vorabend der Geburtstagskuchen.
 Sie startet beim Öffnen automatisch und lässt sich über „🐹 Capy-Special nochmal ansehen“ wiederholen.
 
+## Vorfreude vom 26. bis 30. November
+
+- **26.11. Geburtstagsmodus:** Ballons am Rand, alle Fenster-Capys mit Partyhut,
+  Gruß „Happy Birthday“, das Capy unten trägt eine Krone.
+- **Die Capy Crew baut den Kalender auf** (`aufbau.js`), jeweils etwa eine Minute,
+  direkt nach dem Schließen der Postkarte:
+  - Bis zum 26.11. ist das Regal leer (mit Schild).
+  - 27.11.: Die Capys tragen alle 24 Päckchen einzeln herein und bringen sie an.
+  - 28.11.: Schnee auf jedes Brett, Schleifen an jedes Päckchen, Lichterkette, Tannenzweige.
+  - 29.11.: Adventskranz und erste Kerze (`vorfreude.js`).
+  - 30.11.: Großputz: Spinnweben wegfegen, jedes Türchen blank wischen, Lichterkette und Zweige polieren.
+  Fertige Schritte werden gemerkt und nicht wiederholt.
+- **Adventskranz** ab dem 1. Advent (29.11.), am 6., 13. und 20.12. brennt je eine Kerze mehr.
+- **Postkarte:** Jeden Tag bringt ein Capy-Postbote eine Karte mit Foto (`postkarten` in `inhalte.js`).
+  Sie kommt einmal automatisch, danach über „📮 Heutige Postkarte“.
+- **Capy-Spiel** ab dem 26.11. (`spiel.js`): Schneeflocken, Herzen und Sterne fangen, Eiswürfeln
+  ausweichen. Mit Kombos, Leveln und gespeichertem Rekord.
+
 ## Kopfbereich
 
 Oben stehen Datum mit Wochentag, der Gruß zur Tageszeit, der Titel und ein Countdown

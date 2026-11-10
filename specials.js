@@ -10,6 +10,8 @@
 
   const api = window.adventkalender && window.adventkalender.intro;
   if (!api) return;
+  // capySeite und capyFront sind weiter unten definiert (Funktionsdeklarationen)
+  window.capyGrafik = { seite: (o) => capySeite(o), front: (o) => capyFront(o) };
   const intro = document.getElementById("intro");
   const ruhig = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -24,40 +26,92 @@
     tasse: '<rect x="68" y="30" width="11" height="12" rx="2.5" fill="#c2185b"/><path d="M79 33h2a3 3 0 0 1 0 6h-2" stroke="#c2185b" fill="none" stroke-width="2"/><rect x="69" y="31" width="9" height="2.5" fill="#7a1035"/>',
     matcha: '<rect x="69" y="25" width="9" height="15" rx="1.5" fill="#eef7e6" stroke="#4a7c3a"/><rect x="69.5" y="30" width="8" height="9.5" fill="#8fbf5a"/><path d="M75 25l3-9" stroke="#9d2449" stroke-width="1.4"/>',
   };
+  /* Verschiedene Capybaras: Fellfarbe und Accessoire */
+  const FELLE = [
+    { fell: "#b07a52", dunkel: "#9a6844", ohr: "#7a4e33" },   // klassisch
+    { fell: "#c99566", dunkel: "#b5804f", ohr: "#8a5a3a" },   // karamell
+    { fell: "#8a5a3a", dunkel: "#74492e", ohr: "#5a3820" },   // schoko
+    { fell: "#c47a45", dunkel: "#a8653a", ohr: "#7a4526" },   // rotbraun
+    { fell: "#a89080", dunkel: "#907868", ohr: "#6e5a4e" },   // graubraun
+  ];
+  const TYPEN = [
+    { f: 0, extra: "schleife", farbe: "#e85d7e" },
+    { f: 1, extra: "brille" },
+    { f: 2, extra: "muetze", farbe: "#7cc4f0" },
+    { f: 3, extra: "blume" },
+    { f: 4, extra: "schal", farbe: "#9be3b0" },
+    { f: 1, extra: "stirnband", farbe: "#b39ddb" },
+    { f: 2, extra: "sommersprossen" },
+    { f: 0, extra: "kopfhoerer", farbe: "#f3c84b" },
+    { f: 3, extra: "schal", farbe: "#e85d7e" },
+    { f: 4, extra: "schleife", farbe: "#f3c84b" },
+  ];
+  const typ = (n) => { const t = TYPEN[((n % TYPEN.length) + TYPEN.length) % TYPEN.length]; return Object.assign({}, FELLE[t.f], t); };
+  function frontExtra(t) {
+    const c = t.farbe || "#e85d7e";
+    switch (t.extra) {
+      case "schleife": return '<path d="M40 7 33 2v10zM40 7l7-5v10z" fill="' + c + '"/><circle cx="40" cy="7" r="2.2" fill="#fff" opacity=".7"/>';
+      case "brille": return '<g fill="rgba(255,255,255,.25)" stroke="#3a2418" stroke-width="1.4"><circle cx="23.5" cy="28.5" r="4.2"/><circle cx="32.5" cy="28.5" r="4.2"/></g><path d="M27.7 28.5h.6" stroke="#3a2418" stroke-width="1.4"/>';
+      case "muetze": return '<path d="M8 15a20 14 0 0 1 40 0z" fill="' + c + '"/><rect x="7" y="13" width="42" height="5" rx="2.5" fill="#fff"/><circle cx="28" cy="0" r="4" fill="#fff"/>';
+      case "blume": return '<g transform="translate(11 6)"><circle r="2.6" cx="0" cy="-3" fill="#fda4b8"/><circle r="2.6" cx="3" cy="0" fill="#fda4b8"/><circle r="2.6" cx="0" cy="3" fill="#fda4b8"/><circle r="2.6" cx="-3" cy="0" fill="#fda4b8"/><circle r="1.8" fill="#f3c84b"/></g>';
+      case "schal": return '<path d="M9 38q19 10 38 0v6q-19 9-38 0z" fill="' + c + '"/><rect x="37" y="40" width="5" height="10" rx="2" fill="' + c + '"/><path d="M12 41h32" stroke="#fff" stroke-width="1.2" stroke-dasharray="3 3"/>';
+      case "stirnband": return '<rect x="7" y="13" width="42" height="4.5" rx="2" fill="' + c + '"/><circle cx="44" cy="15" r="2.6" fill="#fff"/>';
+      case "sommersprossen": return '<g fill="#7a4526" opacity=".55"><circle cx="13" cy="29" r=".9"/><circle cx="15.5" cy="31" r=".9"/><circle cx="12" cy="31.5" r=".8"/><circle cx="43" cy="29" r=".9"/><circle cx="40.5" cy="31" r=".9"/><circle cx="44" cy="31.5" r=".8"/></g>';
+      case "kopfhoerer": return '<path d="M8 22a20 20 0 0 1 40 0" fill="none" stroke="#3a3a48" stroke-width="2.6"/><rect x="3" y="18" width="8" height="12" rx="3" fill="' + c + '"/><rect x="45" y="18" width="8" height="12" rx="3" fill="' + c + '"/>';
+      default: return "";
+    }
+  }
+  function seiteExtra(t) {
+    const c = t.farbe || "#e85d7e";
+    switch (t.extra) {
+      case "schleife": return '<path d="M56 10 50 5v10zM56 10l6-5v10z" fill="' + c + '"/>';
+      case "brille": return '<circle cx="62.5" cy="22" r="4" fill="rgba(255,255,255,.25)" stroke="#3a2418" stroke-width="1.3"/><path d="M66.5 22l5-1" stroke="#3a2418" stroke-width="1.3"/>';
+      case "muetze": return '<path d="M49 15a12 10 0 0 1 24 0z" fill="' + c + '"/><rect x="48" y="13" width="26" height="4.5" rx="2.2" fill="#fff"/><circle cx="61" cy="4" r="3.4" fill="#fff"/>';
+      case "blume": return '<g transform="translate(54 9)"><circle r="2.3" cx="0" cy="-2.6" fill="#fda4b8"/><circle r="2.3" cx="2.6" cy="0" fill="#fda4b8"/><circle r="2.3" cx="0" cy="2.6" fill="#fda4b8"/><circle r="2.3" cx="-2.6" cy="0" fill="#fda4b8"/><circle r="1.6" fill="#f3c84b"/></g>';
+      case "schal": return '<path d="M46 31q8 6 18 1v6q-10 5-18-1z" fill="' + c + '"/><rect x="49" y="34" width="6" height="13" rx="2" fill="' + c + '"/>';
+      case "stirnband": return '<rect x="48" y="14" width="24" height="4" rx="2" fill="' + c + '"/>';
+      case "sommersprossen": return '<g fill="#7a4526" opacity=".55"><circle cx="61" cy="27" r=".9"/><circle cx="64" cy="29" r=".9"/><circle cx="60" cy="30" r=".8"/></g>';
+      case "kopfhoerer": return '<path d="M50 20a11 11 0 0 1 22 0" fill="none" stroke="#3a3a48" stroke-width="2.4"/><rect x="51" y="17" width="7" height="10" rx="3" fill="' + c + '"/>';
+      default: return "";
+    }
+  }
   // Capybara von der Seite, schaut nach rechts
-  function capySeite(o) {
+  function capySeiteInhalt(o) {
     o = o || {};
+    const t = o.typ !== undefined ? typ(o.typ) : { fell: FELL, dunkel: DUNKEL, ohr: OHR };
     const beine = o.ohneBeine ? "" :
-      '<rect x="16" y="40" width="7" height="11" rx="3" fill="' + DUNKEL + '"/><rect x="26" y="40" width="7" height="11" rx="3" fill="#8a5a3a"/>' +
-      '<rect x="42" y="40" width="7" height="11" rx="3" fill="' + DUNKEL + '"/><rect x="51" y="40" width="7" height="11" rx="3" fill="#8a5a3a"/>';
-    return '<svg viewBox="0 -16 86 68" aria-hidden="true">' + beine +
-      (o.unten || "") +
-      '<ellipse cx="34" cy="31" rx="27" ry="16" fill="' + FELL + '"/>' +
-      '<rect x="48" y="12" width="24" height="24" rx="10" fill="' + FELL + '"/>' +
-      '<rect x="62" y="18" width="13" height="16" rx="6" fill="' + DUNKEL + '"/>' +
-      '<ellipse cx="55" cy="12" rx="3.5" ry="3" fill="' + OHR + '"/>' +
+      '<rect x="16" y="40" width="7" height="11" rx="3" fill="' + t.dunkel + '"/><rect x="26" y="40" width="7" height="11" rx="3" fill="' + t.ohr + '"/>' +
+      '<rect x="42" y="40" width="7" height="11" rx="3" fill="' + t.dunkel + '"/><rect x="51" y="40" width="7" height="11" rx="3" fill="' + t.ohr + '"/>';
+    return beine + (o.unten || "") +
+      '<ellipse cx="34" cy="31" rx="27" ry="16" fill="' + t.fell + '"/>' +
+      '<rect x="48" y="12" width="24" height="24" rx="10" fill="' + t.fell + '"/>' +
+      '<rect x="62" y="18" width="13" height="16" rx="6" fill="' + t.dunkel + '"/>' +
+      '<ellipse cx="55" cy="12" rx="3.5" ry="3" fill="' + t.ohr + '"/>' +
       '<path d="M60 22q2.5-2 5 0" fill="none" stroke="' + AUGE + '" stroke-width="1.8" stroke-linecap="round"/>' +
       '<ellipse cx="72" cy="23" rx="1.4" ry="1" fill="' + AUGE + '"/>' +
       '<circle cx="62" cy="28" r="2.4" fill="#f7809b" opacity=".55"/>' +
+      (o.typ !== undefined && !o.hut ? seiteExtra(t) : "") +
       (o.hut ? HUETE[o.hut](o.hutFarbe) : "") +
-      (o.halt ? HALTEN[o.halt] : "") +
-      "</svg>";
+      (o.halt ? HALTEN[o.halt] : "");
   }
-  // Capybara von vorne (Gesicht)
-  function capyFront(o) {
+  function capySeite(o) { return '<svg viewBox="0 -16 86 68" aria-hidden="true">' + capySeiteInhalt(o) + "</svg>"; }
+  // Capybara von vorne (Gesicht), Koordinaten 0..56 x -12..46
+  function capyFrontInhalt(o) {
     o = o || {};
-    return '<svg viewBox="0 -12 56 58" aria-hidden="true">' +
-      '<ellipse cx="14" cy="9" rx="5" ry="4" fill="' + OHR + '"/><ellipse cx="42" cy="9" rx="5" ry="4" fill="' + OHR + '"/>' +
-      '<rect x="7" y="6" width="42" height="36" rx="17" fill="' + FELL + '"/>' +
-      '<ellipse cx="28" cy="31" rx="13" ry="9.5" fill="' + DUNKEL + '"/>' +
+    const t = o.typ !== undefined ? typ(o.typ) : { fell: FELL, dunkel: DUNKEL, ohr: OHR };
+    return '<ellipse cx="14" cy="9" rx="5" ry="4" fill="' + t.ohr + '"/><ellipse cx="42" cy="9" rx="5" ry="4" fill="' + t.ohr + '"/>' +
+      '<rect x="7" y="6" width="42" height="36" rx="17" fill="' + t.fell + '"/>' +
+      '<ellipse cx="28" cy="31" rx="13" ry="9.5" fill="' + t.dunkel + '"/>' +
       '<ellipse cx="23.5" cy="28.5" rx="1.8" ry="1.1" fill="' + AUGE + '"/><ellipse cx="32.5" cy="28.5" rx="1.8" ry="1.1" fill="' + AUGE + '"/>' +
-      '<path d="M25 35q3 2 6 0" fill="none" stroke="' + AUGE + '" stroke-width="1.4" stroke-linecap="round"/>' +
+      (o.mund === "offen" ? '<ellipse cx="28" cy="35.5" rx="2.6" ry="2" fill="#6b1532"/>' : '<path d="M25 35q3 2 6 0" fill="none" stroke="' + AUGE + '" stroke-width="1.4" stroke-linecap="round"/>') +
       '<path d="M14 20q3-2.5 6 0M36 20q3-2.5 6 0" fill="none" stroke="' + AUGE + '" stroke-width="1.8" stroke-linecap="round"/>' +
       '<circle cx="14" cy="27" r="2.6" fill="#f7809b" opacity=".6"/><circle cx="42" cy="27" r="2.6" fill="#f7809b" opacity=".6"/>' +
+      (o.typ !== undefined && !o.yuzu && !o.handtuch ? frontExtra(t) : "") +
       (o.yuzu ? '<circle cx="28" cy="1" r="7" fill="#ffb020"/><circle cx="25.5" cy="-1.5" r="1.6" fill="#fff" opacity=".5"/><path d="M28 -6q3-4 7-2" stroke="#4a8a5c" stroke-width="2" fill="none"/>' : "") +
-      (o.helm ? '<path d="M7 18a21 21 0 0 1 42 0z" fill="#7cc4f0" opacity=".35"/>' : "") +
-      "</svg>";
+      (o.handtuch ? '<path d="M11 9q17-12 34 0l-3 6q-14-7-28 0z" fill="' + (o.handtuch === true ? "#fff" : o.handtuch) + '"/><path d="M15 6q13-6 26 0" stroke="rgba(0,0,0,.08)" fill="none"/>' : "") +
+      (o.helm ? '<path d="M7 18a21 21 0 0 1 42 0z" fill="#7cc4f0" opacity=".35"/>' : "");
   }
+  function capyFront(o) { return '<svg viewBox="0 -12 56 58" aria-hidden="true">' + capyFrontInhalt(o) + "</svg>"; }
 
   let W = 0, H = 0;
   function figur(html, cls, stil) {
@@ -100,18 +154,59 @@
 
   /* ---------- Die elf Szenen ---------- */
   const SZENEN = {
-    15: { titel: "Die Capy Crew geht auf Ballonfahrt 🎈", dauer: 12500, spiel() {
-      const farben = ["#e85d7e", "#f3c84b", "#7cc4f0", "#9be3b0", "#c2185b", "#fda4b8", "#b39ddb"];
-      for (let i = 0; i < 7; i++) {
-        const gr = zufall(70, 110);
-        const f = figur(
-          '<svg class="sp-ballon" viewBox="0 0 60 90"><path d="M30 60 Q26 75 30 90" stroke="#9d8a90" fill="none"/><ellipse cx="30" cy="30" rx="24" ry="29" fill="' + farben[i] + '"/><ellipse cx="22" cy="20" rx="6" ry="9" fill="#fff" opacity=".35"/><path d="M27 58h6l-3 5z" fill="' + farben[i] + '"/></svg>' + capyFront(),
-          "sp-ballonfahrer", { left: (i / 7) * 92 + zufall(-2, 4) + "%", bottom: "-260px", width: gr + "px" });
-        f.animate([{ transform: "translateY(0)" }, { transform: "translateY(-" + (H + 420) + "px)" }],
-          { duration: zufall(8000, 10500), delay: i * 420, easing: "ease-in-out", fill: "forwards" });
-        f.firstChild.animate([{ transform: "rotate(-6deg)" }, { transform: "rotate(6deg)" }],
-          { duration: 1600, direction: "alternate", iterations: Infinity, easing: "ease-in-out" });
-      }
+    15: { titel: "Die Capy Crew geht auf Ballonfahrt 🎈", dauer: 13000, spiel() {
+      const farben = ["#e85d7e", "#f3c84b", "#7cc4f0", "#9be3b0", "#b39ddb", "#fda4b8", "#ff8a65"];
+      const capyIn = (n, x, y, s) => '<g transform="translate(' + x + " " + y + ") scale(" + (s || 1) + ')">' + capyFrontInhalt({ typ: n }) + "</g>";
+      // 1. Luftballon-Strauß: die Schnüre enden in den Pfoten über dem Kopf
+      const strauss = (n) => {
+        const pfote = '<ellipse cx="54" cy="142" rx="4.5" ry="5.5" fill="' + typ(n).fell + '"/><ellipse cx="66" cy="142" rx="4.5" ry="5.5" fill="' + typ(n).fell + '"/>';
+        const ballons = [[38, 44, 0], [62, 30, 1], [86, 48, 2], [52, 70, 3], [76, 74, 4]].map(([x, y, k]) =>
+          '<path d="M' + x + " " + (y + 20) + " Q" + (x + 60) / 2 + " " + (y + 70) + " 60 140" + '" stroke="#9d8a90" stroke-width="1.2" fill="none"/>' +
+          '<ellipse cx="' + x + '" cy="' + y + '" rx="15" ry="19" fill="' + farben[(n + k) % farben.length] + '"/><ellipse cx="' + (x - 5) + '" cy="' + (y - 7) + '" rx="4" ry="6" fill="#fff" opacity=".4"/>' +
+          '<path d="M' + (x - 3) + " " + (y + 18) + "h6l-3 4z" + '" fill="' + farben[(n + k) % farben.length] + '"/>').join("");
+        return '<svg viewBox="0 0 120 200" aria-hidden="true">' + ballons + capyIn(n, 32, 146) + pfote + "</svg>";
+      };
+      // 2. Heißluftballon: Capy sitzt im Korb
+      const heissluft = (n) => {
+        const f1 = farben[n % farben.length], f2 = farben[(n + 3) % farben.length];
+        return '<svg viewBox="0 0 120 220" aria-hidden="true">' +
+          '<path d="M60 8C20 8 8 40 14 70c6 28 26 46 30 60h32c4-14 24-32 30-60C112 40 100 8 60 8z" fill="' + f1 + '"/>' +
+          '<path d="M60 8C44 8 36 40 40 70c3 28 10 46 12 60h16c2-14 9-32 12-60C84 40 76 8 60 8z" fill="' + f2 + '"/>' +
+          '<path d="M60 8C55 8 52 40 54 70c1 28 3 46 4 60h4c1-14 3-32 4-60C68 40 65 8 60 8z" fill="#fff" opacity=".7"/>' +
+          '<path d="M20 50h80M16 80h88" stroke="#fff" stroke-width="2" opacity=".5"/>' +
+          '<rect x="44" y="128" width="32" height="6" rx="2" fill="#8a5a3a"/>' +
+          '<path class="sp-brenner" d="M60 136c4 5 4 9 0 11c-4-2-4-6 0-11z" fill="#ffb648"/>' +
+          '<path d="M46 134 L40 176 M74 134 L80 176" stroke="#6b4a3a" stroke-width="1.5"/>' +
+          capyIn(n, 32, 150) +
+          '<rect x="36" y="176" width="48" height="30" rx="4" fill="#b5763e"/><path d="M36 184h48M36 192h48M36 200h48" stroke="#8a5a3a" stroke-width="1.4"/><rect x="34" y="173" width="52" height="6" rx="3" fill="#8a5a3a"/>' +
+          "</svg>";
+      };
+      // 3. Luftschiff mit Gondel und Banner
+      const luftschiff = (n) =>
+        '<svg viewBox="0 0 200 150" aria-hidden="true">' +
+        '<path d="M14 40l-12-18v40z" fill="#c2185b"/><path d="M18 46l-14 14 18-2z" fill="#c2185b"/>' +
+        '<ellipse cx="100" cy="44" rx="86" ry="32" fill="#fda4b8"/><ellipse cx="100" cy="44" rx="86" ry="10" fill="#fff" opacity=".35"/><ellipse cx="80" cy="30" rx="30" ry="7" fill="#fff" opacity=".4"/>' +
+        '<text x="104" y="52" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="22" fill="#9d2449">Capy Air ♥</text>' +
+        '<path d="M80 74 L82 96 M120 74 L118 96" stroke="#6b4a3a" stroke-width="1.5"/>' +
+        capyIn(n, 75, 80, 0.9) +
+        '<rect x="70" y="108" width="60" height="24" rx="8" fill="#9d2449"/><circle cx="88" cy="120" r="4" fill="#ffd36b"/><circle cx="112" cy="120" r="4" fill="#ffd36b"/>' +
+        '<g class="sp-propeller"><ellipse cx="190" cy="44" rx="3" ry="14" fill="#6b4a3a"/></g>' +
+        "</svg>";
+      const flieger = [
+        { art: strauss, gr: 92 }, { art: heissluft, gr: 112 }, { art: strauss, gr: 86 },
+        { art: heissluft, gr: 100 }, { art: strauss, gr: 96 }, { art: heissluft, gr: 106 },
+      ];
+      flieger.forEach((fl, i) => {
+        const gr = Math.min(fl.gr * 1.25, W * 0.36);
+        const f = figur(fl.art(i), "sp-ballonfahrer", { left: (i / flieger.length) * 88 + 2 + "%", bottom: "-280px", width: gr + "px" });
+        f.animate([{ transform: "translateY(0)" }, { transform: "translateY(-" + (H + 560) + "px)" }],
+          { duration: zufall(8500, 11000), delay: i * 520, easing: "ease-in-out", fill: "both" });
+        f.firstChild.animate([{ transform: "rotate(-5deg)" }, { transform: "rotate(5deg)" }], { duration: zufall(1500, 2200), direction: "alternate", iterations: Infinity, easing: "ease-in-out" });
+      });
+      // das Luftschiff zieht quer über den Himmel
+      const sb = Math.min(W * 0.55, 240);
+      const schiff = figur(luftschiff(7), "sp-luftschiff", { left: "0", top: "22%", width: sb + "px" });
+      schiff.animate([{ transform: "translate(" + -sb + "px, 40px)" }, { transform: "translate(" + (W + 20) + "px, -60px)" }], { duration: 11000, delay: 900, easing: "linear", fill: "both" });
     } },
 
     16: { titel: "Geheime Gartenparty der Capy Crew 🎉", dauer: 11500, spiel() {
@@ -163,20 +258,25 @@
       });
     } },
 
-    18: { titel: "Wellness-Tag im Capy-Onsen ♨️", dauer: 10500, spiel() {
+    18: { titel: "Wellness-Tag im Capy-Onsen ♨️", dauer: 12000, spiel() {
       const breite = Math.min(W * 0.95, 460);
       const quelle = figur('<div class="sp-becken"></div>', "sp-onsen", { width: breite + "px" });
       quelle.animate([{ opacity: 0, transform: "translate(-50%, 30px)" }, { opacity: 1, transform: "translate(-50%, 0)" }], { duration: 900, fill: "forwards" });
       const becken = quelle.firstChild;
-      for (let i = 0; i < 3; i++) {
+      const gaeste = [
+        { o: { typ: 1, yuzu: true }, x: 6 }, { o: { typ: 2, handtuch: "#fda4b8" }, x: 28 },
+        { o: { typ: 4, yuzu: true }, x: 52 }, { o: { typ: 3, handtuch: true }, x: 74 },
+      ].map((g, i) => {
         const c = document.createElement("div");
         c.className = "sp-badegast";
-        c.innerHTML = capyFront({ yuzu: true });
-        c.style.left = 12 + i * 29 + "%";
+        c.innerHTML = capyFront(g.o);
+        c.style.left = g.x + "%";
+        c.style.width = "22%";
         c.style.animationDelay = -i * 0.7 + "s";
         becken.appendChild(c);
-        c.animate([{ transform: "translateY(60%)" }, { transform: "translateY(0)" }], { duration: 1200, delay: 700 + i * 400, easing: "cubic-bezier(.3,1.4,.5,1)", fill: "backwards" });
-      }
+        c.animate([{ transform: "translateY(60%)" }, { transform: "translateY(0)" }], { duration: 1200, delay: 600 + i * 300, easing: "cubic-bezier(.3,1.4,.5,1)", fill: "backwards" });
+        return c;
+      });
       const wasser = document.createElement("div");
       wasser.className = "sp-wasser";
       becken.appendChild(wasser);
@@ -184,6 +284,34 @@
       ente.className = "sp-ente"; ente.textContent = "🐤";
       becken.appendChild(ente);
       for (let k = 0; k < 6; k++) dampf(becken, breite * (0.12 + k * 0.15), 10, 2);
+      // Wasserball, der zwischen den Capys hin und her fliegt
+      const ball = figur('<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#fff"/><path d="M20 2a18 18 0 0 1 0 36z" fill="#e85d7e"/><path d="M2 20a18 18 0 0 1 36 0z" fill="#7cc4f0" opacity=".85"/><circle cx="20" cy="20" r="18" fill="none" stroke="rgba(0,0,0,.1)"/><circle cx="13" cy="12" r="4" fill="#fff" opacity=".6"/></svg>', "sp-wasserball", { left: "0", top: "0" });
+      const mitte = (c) => { const r = c.getBoundingClientRect(), b = buehne.getBoundingClientRect(); return { x: r.left - b.left + r.width / 2, y: r.top - b.top + r.height * 0.1 }; };
+      const spritzer = (x, y, n) => partikel(x, y, ["💧"], n || 8, 60, ["#5aa9dd"]);
+      const folge = [0, 2, 1, 3, 0, 3, 1, 2];
+      let k = 0;
+      const wurf = () => {
+        if (k >= folge.length - 1) return;
+        const von = mitte(gaeste[folge[k]]), nach = mitte(gaeste[folge[k + 1]]);
+        const hoch = Math.min(von.y, nach.y) - Math.min(140, H * 0.22);
+        ball.animate([
+          { transform: "translate(" + (von.x - 16) + "px," + (von.y - 16) + "px) rotate(0)" },
+          { transform: "translate(" + ((von.x + nach.x) / 2 - 16) + "px," + (hoch - 16) + "px) rotate(200deg)" },
+          { transform: "translate(" + (nach.x - 16) + "px," + (nach.y - 16) + "px) rotate(400deg)" },
+        ], { duration: 950, easing: "linear", fill: "forwards" });
+        gaeste[folge[k]].animate([{ transform: "translateY(0)" }, { transform: "translateY(-14px)" }, { transform: "translateY(0)" }], { duration: 400 });
+        spaeter(940, () => { spritzer(nach.x, nach.y + 20, 7); gaeste[folge[k]].animate([{ transform: "translateY(0)" }, { transform: "translateY(10px)" }, { transform: "translateY(0)" }], { duration: 400 }); k++; spaeter(250, wurf); });
+      };
+      spaeter(2000, wurf);
+      // ein Capy taucht ab und kommt mit einer Fontäne wieder hoch
+      spaeter(7600, () => {
+        const c = gaeste[1];
+        c.animate([{ transform: "translateY(0)" }, { transform: "translateY(85%)" }, { transform: "translateY(85%)" }, { transform: "translateY(-10%)" }, { transform: "translateY(0)" }],
+          { duration: 2200, easing: "ease-in-out" });
+        spaeter(1500, () => { const m = mitte(c); partikel(m.x, m.y + 10, ["💧", "💦"], 16, 100, ["#5aa9dd"]); });
+      });
+      // alle spritzen sich zum Schluss gegenseitig nass
+      spaeter(10000, () => gaeste.forEach((c, i) => spaeter(i * 150, () => { const m = mitte(c); spritzer(m.x, m.y + 18, 10); })));
     } },
 
     19: { titel: "Großes Capy-Rodelrennen 🛷", dauer: 9500, spiel() {
@@ -202,27 +330,47 @@
       }
     } },
 
-    20: { titel: "Matcha-Bad für die Capy Crew 🍵", dauer: 10000, spiel() {
-      const gr = Math.min(W * 0.52, 230);
+    20: { titel: "Die Capy Crew trinkt den Matcha leer 🍵", dauer: 12500, spiel() {
+      const gr = Math.min(W * 0.78, 320);
+      const koepfe = [0, 1, 2].map((n, i) => {
+        const x = 18 + i * 74;
+        return '<g class="sp-trinker" data-i="' + i + '"><g transform="translate(' + x + ' 24) scale(1.05)">' + capyFrontInhalt({ typ: [5, 2, 8][i], mund: "offen" }) + "</g></g>" +
+          '<path d="M' + (x + 30) + " 62 L" + [92, 120, 148][i] + ' 272" stroke="' + ["#e85d7e", "#7cc4f0", "#f3c84b"][i] + '" stroke-width="7" stroke-linecap="round"/>';
+      }).join("");
       const becher = figur(
-        '<div class="sp-matcha-koepfe"></div>' +
-        '<svg viewBox="0 0 200 260"><path d="M120 10 L105 70" stroke="#9d2449" stroke-width="8" stroke-linecap="round"/><path d="M20 40 h160 l-16 205 a14 14 0 0 1-14 13 H50 a14 14 0 0 1-14-13z" fill="#eef7e6" opacity=".92" stroke="#4a7c3a" stroke-width="3"/>' +
-        '<path d="M26 90 h148 l-11 152 a10 10 0 0 1-10 9 H47 a10 10 0 0 1-10-9z" fill="#8fbf5a"/><path d="M26 90 q37 18 74 0 t74 0" fill="none" stroke="#f6fbef" stroke-width="7" stroke-linecap="round"/>' +
-        '<rect x="55" y="140" width="34" height="34" rx="8" fill="#fff" opacity=".6" transform="rotate(-12 72 157)"/><rect x="105" y="170" width="30" height="30" rx="8" fill="#fff" opacity=".6" transform="rotate(10 120 185)"/>' +
-        '<rect x="12" y="30" width="176" height="16" rx="8" fill="#4a7c3a"/></svg>',
+        '<svg viewBox="0 0 240 310" aria-hidden="true"><defs><clipPath id="sp-becher-innen"><path d="M30 90 h180 l-14 196 a10 10 0 0 1-10 9 H54 a10 10 0 0 1-10-9z"/></clipPath></defs>' +
+        koepfe +
+        '<path d="M22 74 h196 l-18 222 a14 14 0 0 1-14 13 H54 a14 14 0 0 1-14-13z" fill="#eef7e6" opacity=".85" stroke="#4a7c3a" stroke-width="3"/>' +
+        '<g clip-path="url(#sp-becher-innen)"><g class="sp-fuellung">' +
+        '<rect x="20" y="96" width="200" height="220" fill="#8fbf5a"/>' +
+        '<path d="M20 96 q25 12 50 0 t50 0 t50 0 t50 0 v8 H20z" fill="#a8d07a"/>' +
+        '<rect x="70" y="160" width="40" height="40" rx="9" fill="#fff" opacity=".55" transform="rotate(-12 90 180)"/><rect x="128" y="196" width="36" height="36" rx="9" fill="#fff" opacity=".55" transform="rotate(10 146 214)"/>' +
+        "</g></g>" +
+        '<rect x="14" y="64" width="212" height="18" rx="9" fill="#4a7c3a"/></svg>',
         "sp-matcha", { width: gr + "px" });
       becher.animate([{ transform: "translate(-50%, 110%)" }, { transform: "translate(-50%, 0)" }], { duration: 1300, easing: "cubic-bezier(.2,.9,.3,1.1)", fill: "forwards" });
-      const koepfe = becher.firstChild;
-      for (let i = 0; i < 3; i++) {
-        const k = document.createElement("div");
-        k.className = "sp-matcha-kopf";
-        k.innerHTML = capyFront();
-        k.style.left = 14 + i * 26 + "%";
-        koepfe.appendChild(k);
-        k.animate([{ transform: "translateY(90%)" }, { transform: "translateY(0)" }, { transform: "translateY(10%)" }, { transform: "translateY(0)" }],
-          { duration: 1600, delay: 1500 + i * 450, easing: "ease-out", fill: "backwards" });
-      }
-      for (const t of [3200, 5200, 7200]) spaeter(t, () => partikel(W / 2, H - gr * 1.15, ["♥", "🍵", "♥"], 7, 80, ["#4a8a5c", "#e85d7e"]));
+      const svg = becher.querySelector("svg");
+      const fuell = svg.querySelector(".sp-fuellung");
+      // Trinken: Füllstand sinkt über 8 Sekunden ganz nach unten
+      spaeter(1800, () => fuell.animate([{ transform: "translateY(0)" }, { transform: "translateY(205px)" }], { duration: 8000, easing: "ease-in", fill: "forwards" }));
+      svg.querySelectorAll(".sp-trinker").forEach((t, i) => {
+        spaeter(1800 + i * 200, () => t.animate([{ transform: "translateY(0)" }, { transform: "translateY(3px)" }, { transform: "translateY(0)" }], { duration: 420, iterations: 19 }));
+      });
+      // Bläschen beim Schlürfen
+      for (let k = 0; k < 14; k++) spaeter(2200 + k * 520, () => {
+        const r = becher.getBoundingClientRect(), b = buehne.getBoundingClientRect();
+        const x = r.left - b.left + r.width * zufall(0.3, 0.7), y = r.top - b.top + r.height * 0.4;
+        partikel(x, y, ["○"], 3, 22, ["#f6fbef"]);
+      });
+      spaeter(4800, () => { const b = figur("<span>Schlürf! 😋</span>", "sp-blase", { left: "50%", top: "18%" }); spaeter(1400, () => b.remove()); });
+      // Ende: leer, alle reiben sich zufrieden den Bauch
+      spaeter(10100, () => {
+        const b = figur("<span>Alle! Ausgetrunken 😋💚</span>", "sp-blase", { left: "50%", top: "18%" });
+        svg.querySelectorAll(".sp-trinker").forEach((t, i) => t.animate([{ transform: "rotate(0)" }, { transform: "rotate(" + (i % 2 ? 8 : -8) + "deg) translateY(-6px)" }, { transform: "rotate(0)" }], { duration: 600, iterations: 3 }));
+        const r = becher.getBoundingClientRect(), bb = buehne.getBoundingClientRect();
+        partikel(r.left - bb.left + r.width / 2, r.top - bb.top + r.height * 0.15, ["♥", "✨"], 12, 90, ["#4a8a5c", "#e85d7e"]);
+        spaeter(2000, () => b.remove());
+      });
     } },
 
     21: { titel: "Capy-Feuerwerk nur für dich 🎆", dauer: 11000, spiel() {
@@ -243,28 +391,61 @@
       });
     } },
 
-    22: { titel: "Schneeballschlacht! ❄️", dauer: 10000, spiel() {
+    22: { titel: "Große Schneeballschlacht! ❄️", dauer: 13000, spiel() {
       const gr = Math.min(W * 0.3, 140);
-      const links = figur(capySeite({ hut: "muetze" }), "sp-werfer", { left: "4%", width: gr + "px" });
-      const rechts = figur(capySeite(), "sp-werfer sp-gespiegelt", { right: "4%", width: gr + "px" });
+      const links = figur(capySeite({ typ: 2 }), "sp-werfer", { left: "4%", width: gr + "px" });
+      const rechts = figur(capySeite({ typ: 4 }), "sp-werfer sp-gespiegelt", { right: "4%", width: gr + "px" });
       [links, rechts].forEach((f, i) => f.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, delay: i * 200, fill: "both" }));
+      // kleine Schneeburgen als Deckung
+      ["4%", "auto"].forEach((l, i) => figur('<svg viewBox="0 0 120 40"><path d="M0 40 Q10 8 30 14 Q48 0 64 12 Q84 2 98 16 Q114 12 120 40z" fill="#fff"/><path d="M14 28 q20 -8 40 0" stroke="#dfe9f5" stroke-width="3" fill="none"/></svg>',
+        "sp-schneeburg", i ? { right: "1%", width: gr * 0.9 + "px" } : { left: "1%", width: gr * 0.9 + "px" }));
       const yBoden = H - gr * 0.62 - H * 0.08;
-      for (let w = 0; w < 7; w++) spaeter(900 + w * 1150, () => {
-        const vonLinks = w % 2 === 0;
+      const wuerfe = [
+        { von: "l", r: 9 }, { von: "r", r: 14 }, { von: "l", r: 11 }, { von: "r", r: 7 }, { von: "l", r: 17 },
+        { von: "r", r: 10 }, { von: "l", r: 13 }, { von: "r", r: 18 },
+      ];
+      const wirf = (w, i, letzter) => {
+        const vonLinks = w.von === "l";
         const x0 = vonLinks ? W * 0.04 + gr * 0.85 : W * 0.96 - gr * 0.85, x1 = vonLinks ? W * 0.96 - gr * 0.55 : W * 0.04 + gr * 0.55;
-        const ball = figur("", "sp-schneeball", { left: "0", top: "0" });
-        const hoch = yBoden - Math.min(H * 0.35, 260);
+        const ball = figur("", "sp-schneeball", { left: "0", top: "0", width: w.r * 2 + "px", height: w.r * 2 + "px", margin: -w.r + "px 0 0 " + -w.r + "px" });
+        const hoch = yBoden - Math.min(H * (letzter ? 0.42 : 0.3), letzter ? 300 : 230) - w.r;
+        const werfer = vonLinks ? links : rechts, ziel = vonLinks ? rechts : links;
+        werfer.firstChild.animate([{ transform: "rotate(0)" }, { transform: "rotate(-16deg)" }, { transform: "rotate(0)" }], { duration: 420 });
         ball.animate([
-          { transform: "translate(" + x0 + "px," + yBoden + "px)" },
-          { transform: "translate(" + (x0 + x1) / 2 + "px," + hoch + "px)" },
-          { transform: "translate(" + x1 + "px," + (yBoden + 10) + "px)" },
-        ], { duration: 950, easing: "linear", fill: "forwards" }).onfinish = () => {
+          { transform: "translate(" + x0 + "px," + yBoden + "px) rotate(0)" },
+          { transform: "translate(" + (x0 + x1) / 2 + "px," + hoch + "px) rotate(180deg)" },
+          { transform: "translate(" + x1 + "px," + (yBoden + 8) + "px) rotate(360deg)" },
+        ], { duration: letzter ? 1300 : 900 + w.r * 12, easing: "linear", fill: "forwards" }).onfinish = () => {
           ball.remove();
-          partikel(x1, yBoden + 14, ["●"], 9, 40, ["#fff"]);
-          (vonLinks ? rechts : links).firstChild.animate([{ transform: "rotate(0)" }, { transform: "rotate(-10deg)" }, { transform: "rotate(6deg)" }, { transform: "rotate(0)" }], { duration: 500 });
+          partikel(x1, yBoden + 12, ["●"], Math.round(w.r * 0.9), w.r * 3, ["#fff"]);
+          if (!letzter) {
+            ziel.firstChild.animate([{ transform: "rotate(0)" }, { transform: "rotate(-10deg)" }, { transform: "rotate(6deg)" }, { transform: "rotate(0)" }], { duration: 500 });
+            return;
+          }
+          // Der Riesen-Schneeball katapultiert das rechte Capy aus dem Bild
+          const b = figur("<span>Huiii! 💫</span>", "sp-blase", { left: Math.min(W - 70, W * 0.96 - gr * 0.5) + "px", bottom: gr * 1.4 + H * 0.08 + "px" });
+          spaeter(1200, () => b.remove());
+          rechts.animate([
+            { transform: "translate(0,0) rotate(0)" },
+            { transform: "translate(" + W * 0.25 + "px," + -H * 0.45 + "px) rotate(260deg)", offset: 0.5 },
+            { transform: "translate(" + W * 0.6 + "px," + -H * 0.9 + "px) rotate(620deg) scale(.6)" },
+          ], { duration: 1500, easing: "cubic-bezier(.2,.7,.4,1)", fill: "forwards" });
+          spaeter(400, () => partikel(W * 0.85, yBoden - H * 0.3, ["✨", "⭐"], 8, 40, ["#f3c84b"]));
+          // Das linke Capy hat gewonnen und tanzt
+          spaeter(1400, () => {
+            const sieg = figur("<span>Gewonnen! 🏆</span>", "sp-blase", { left: Math.max(70, W * 0.04 + gr * 0.5) + "px", bottom: gr * 1.35 + H * 0.08 + "px" });
+            links.firstChild.animate([
+              { transform: "translateY(0) rotate(0)" }, { transform: "translateY(-30px) rotate(-12deg)" }, { transform: "translateY(0) rotate(0)" },
+              { transform: "translateY(-30px) rotate(12deg)" }, { transform: "translateY(0) rotate(0)" },
+            ], { duration: 900, iterations: 3, easing: "ease-in-out" });
+            links.animate([{ transform: "translateX(0)" }, { transform: "translateX(" + W * 0.25 + "px)" }, { transform: "translateX(0)" }], { duration: 2700, easing: "ease-in-out" });
+            for (let k = 0; k < 4; k++) spaeter(k * 600, () => partikel(W * 0.2 + k * 20, yBoden - 30, ["♪", "🎉", "♫"], 6, 60, ["#9d2449", "#e85d7e"]));
+            spaeter(2600, () => sieg.remove());
+          });
         };
-        (vonLinks ? links : rechts).firstChild.animate([{ transform: "rotate(0)" }, { transform: "rotate(-14deg)" }, { transform: "rotate(0)" }], { duration: 400 });
-      });
+      };
+      wuerfe.forEach((w, i) => spaeter(900 + i * 1000, () => wirf(w, i, false)));
+      spaeter(900 + wuerfe.length * 1000 + 300, () => wirf({ von: "l", r: 34 }, 99, true));
     } },
 
     23: { titel: "Capy-Polonaise 🎶", dauer: 12500, spiel() {

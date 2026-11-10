@@ -37,6 +37,15 @@ const KALENDER = {
     briefText: "Ab dem 1. Dezember wartet hier jeden Tag eine kleine Überraschung auf dich",
   },
 
+  // Postkarten vom 26. bis 30. November (Monat-Tag)
+  postkarten: {
+    "11-26": { titel: "Happy Birthday, Toni! 🎂", text: "Heute ist dein Tag! Ich wünsche dir einen wunderschönen Geburtstag voller Lachen, Kuchen und Liebe ♥️", bild: "strand-lachen.jpg" },
+    "11-27": { titel: "Noch 4 Mal schlafen", text: "Dann öffnest du das erste Türchen. Die Capy Crew arbeitet schon ganz fleißig an deinem Kalender 🐹", bild: "capybara-tasse.jpg" },
+    "11-28": { titel: "Noch 3 Mal schlafen", text: "Hast du schon die Lichterkette gesehen? Die Capys haben sie heute extra für dich aufgehängt ✨", bild: "dom.jpg" },
+    "11-29": { titel: "Frohen 1. Advent 🕯️", text: "Heute brennt die erste Kerze. Ich wünsche dir einen gemütlichen Sonntag und denk ganz fest an dich ♥️", bild: "sofatag.jpg" },
+    "11-30": { titel: "Morgen geht es los!", text: "Nur noch einmal schlafen, dann öffnest du das erste Türchen. Ich freu mich so auf diesen Dezember mit dir ♥️", bild: "meeresluft.jpg" },
+  },
+
   // Unterschrift unter jedem Türchen-Text
   unterschrift: "Dein Chris ♥️",
 

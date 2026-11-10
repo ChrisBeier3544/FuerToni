@@ -63,11 +63,14 @@
         <button id="sammlung-knopf" class="sammlung-knopf" type="button" hidden>🎟️ Meine Gutscheine</button>
         <button id="finale-knopf" class="sammlung-knopf" type="button" hidden>♥️ Unser Herz</button>
         <button id="rueckblick-knopf" class="sammlung-knopf" type="button" hidden>📖 Unser Dezember</button>
+        <button id="postkarte-knopf" class="sammlung-knopf" type="button" hidden>📮 Heutige Postkarte</button>
+        <button id="spiel-knopf" class="sammlung-knopf" type="button" hidden>🎮 Capy-Spiel</button>
       </p>
     </section>
   </header>
 
   <main>
+    <div id="adventskranz" class="adventskranz" hidden></div>
     <div id="lichterkette" class="lichterkette" role="img" aria-label="Lichterkette"></div>
     <div id="kalender" class="kalender" aria-label="Adventskalender mit 24 Türchen"></div>
   </main>
@@ -200,6 +203,44 @@
     <button type="button" id="app-tipp-zu" aria-label="Tipp schließen">×</button>
   </div>
 
+  <dialog id="postkarte" class="dialog postkarte-dialog" aria-labelledby="postkarte-titel">
+    <div class="postkarte">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <img id="postkarte-bild" class="postkarte-bild" alt="">
+      <div class="postkarte-rechts">
+        <div class="briefmarke" aria-hidden="true"><span>🐹</span></div>
+        <div class="poststempel" id="postkarte-stempel" aria-hidden="true"></div>
+        <h2 id="postkarte-titel" class="postkarte-titel"></h2>
+        <p id="postkarte-text" class="postkarte-text"></p>
+        <p class="postkarte-gruss">Dein Chris ♥️</p>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog id="spiel" class="spiel-dialog" aria-label="Capy-Spiel">
+    <div class="spiel-rahmen">
+      <canvas id="spiel-leinwand" class="spiel-leinwand"></canvas>
+      <div class="spiel-anzeige" aria-live="polite">
+        <span id="spiel-punkte">0</span>
+        <span id="spiel-leben">♥️♥️♥️</span>
+      </div>
+      <button class="schliessen spiel-zu" type="button" aria-label="Spiel schließen">×</button>
+      <div id="spiel-menue" class="spiel-menue">
+        <h2 id="spiel-titel">Capy fängt Schneeflocken</h2>
+        <p id="spiel-text">Fang Schneeflocken und Herzen mit dem Capybara. Weich den Eiszapfen aus!</p>
+        <ul class="spiel-legende">
+          <li><span>❄️</span> 1 Punkt</li>
+          <li><span>♥️</span> 3 Punkte</li>
+          <li><span>⭐</span> 10 Punkte</li>
+          <li><span>🧊</span> kostet ein Leben</li>
+        </ul>
+        <p id="spiel-rekord" class="spiel-rekord"></p>
+        <button id="spiel-start" class="spiel-start" type="button">Los geht's</button>
+        <p class="spiel-steuerung">Mit dem Finger nach links und rechts wischen<br>oder die Pfeiltasten benutzen</p>
+      </div>
+    </div>
+  </dialog>
+
   <dialog id="lightbox" class="lightbox" aria-label="Foto">
     <button class="schliessen" type="button" aria-label="Schließen">×</button>
     <figure class="lightbox-figur">
@@ -224,5 +265,8 @@
   <script src="inhalte.js"></script>
   <script src="app.js"></script>
   <script src="specials.js"></script>
+  <script src="aufbau.js"></script>
+  <script src="vorfreude.js"></script>
+  <script src="spiel.js"></script>
 </body>
 </html>
