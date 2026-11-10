@@ -205,10 +205,11 @@
     document.title = KALENDER.titel || "Adventskalender";
     el.untertitel.textContent = KALENDER.untertitel || "";
 
-    for (const n of gemischteTage()) {
+    gemischteTage().forEach((n, platz) => {
       const knopf = document.createElement("button");
       knopf.type = "button";
-      knopf.className = "tuer gesperrt" + (PAECKCHEN_FORM[n] ? " " + PAECKCHEN_FORM[n] : "");
+      // Geschenkpapier fest am Päckchen, nicht am Platz im Regal
+      knopf.className = "tuer gesperrt papier-" + ((platz % 4) + 1) + (PAECKCHEN_FORM[n] ? " " + PAECKCHEN_FORM[n] : "");
       knopf.dataset.tag = String(n);
 
       const innen = document.createElement("span");
@@ -238,7 +239,7 @@
       knopf.addEventListener("click", (e) => klickAufTuer(n, e));
       el.kalender.appendChild(knopf);
       tueren.set(n, { knopf, innen, schloss });
-    }
+    });
   }
 
   // Kleine Illustrationen im geöffneten Türchen

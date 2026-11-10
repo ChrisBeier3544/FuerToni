@@ -49,7 +49,7 @@
   }
 
   /* ---------- Zustand je nach Datum ---------- */
-  const tueren = () => [...kal.querySelectorAll(".tuer")];
+  const tueren = () => [...kal.querySelectorAll(":scope > .tuer")];
   function zustand(d) {
     if (laeuft) return;
     const nov = d.jahr === JAHR && d.monat === 11;
@@ -165,11 +165,15 @@
       const paket = document.createElement("div");
       paket.className = "trage-paket";
       const kopie = t.cloneNode(true);
-      kopie.classList.remove("heute", "wackeln");
-      kopie.removeAttribute("data-tag");
+      kopie.classList.remove("wackeln");
+      kopie.classList.add("angebracht");
+      kopie.setAttribute("aria-hidden", "true");
+      kopie.tabIndex = -1;
       paket.appendChild(kopie);
-      const pb = Math.min(r.b, cb * (gross ? 1.7 : 1.05)), ph = pb * (r.h / r.b);
+      // Originalgröße, damit beim Ablegen nichts springt
+      const pb = r.b, ph = r.h;
       paket.style.width = pb + "px"; paket.style.height = ph + "px";
+      paket.style.left = "0px"; paket.style.top = "0px"; paket.style.transformOrigin = "0 0";
       kal.appendChild(paket);
       const laufzeit = 900;
       const paketBahn = (x) => [{ transform: "translate(" + (x + cb / 2 - pb / 2) + "px," + (y - ph + cb * 0.12) + "px) rotate(" + (vonLinks ? -4 : 4) + "deg)" }];
@@ -181,7 +185,7 @@
       await paket.animate([
         paketBahn(ziel)[0],
         { transform: "translate(" + (r.x + (r.b - pb) / 2) + "px," + (r.y - ph * 0.35) + "px) rotate(0deg)", offset: 0.55 },
-        { transform: "translate(" + r.x + "px," + r.y + "px) scale(" + r.b / pb + ")", },
+        { transform: "translate(" + r.x + "px," + r.y + "px) rotate(0deg)" },
       ], { duration: 600, easing: "ease-in-out", fill: "forwards" }).finished;
       paket.remove();
       t.classList.add("angebracht");
@@ -366,7 +370,7 @@
     });
     await warte(1800);
     // Türchen 1 glänzt extra
-    const t1 = kal.querySelector('.tuer[data-tag="1"]');
+    const t1 = kal.querySelector(':scope > .tuer[data-tag="1"]');
     if (t1) {
       zeigeBanner("Türchen 1 ist bereit. Morgen geht's los! ✨");
       t1.scrollIntoView({ behavior: ruhig ? "auto" : "smooth", block: "center" });

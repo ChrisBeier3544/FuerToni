@@ -295,23 +295,23 @@ main {
   overflow: hidden;
 }
 /* Geschenkpapier: vier Muster im Wechsel */
-.tuer:nth-child(4n+1) .tuer-blatt {
+.tuer.papier-1 .tuer-blatt {
   --band: #fff6e0;
   background:
     radial-gradient(circle, rgba(255, 255, 255, 0.55) 0 2px, transparent 2.6px) 0 0 / 14px 14px,
     linear-gradient(145deg, #f994ab, #ec6a8a);
 }
-.tuer:nth-child(4n+2) .tuer-blatt {
+.tuer.papier-2 .tuer-blatt {
   --band: var(--beere);
   background: repeating-linear-gradient(45deg, #fff 0 7px, #ffe1e8 7px 14px);
 }
-.tuer:nth-child(4n+3) .tuer-blatt {
+.tuer.papier-3 .tuer-blatt {
   --band: var(--gold);
   background:
     radial-gradient(circle, rgba(243, 220, 159, 0.75) 0 1.6px, transparent 2.1px) 0 0 / 12px 12px,
     linear-gradient(145deg, #b02c55, #8a1f42);
 }
-.tuer:nth-child(4n+4) .tuer-blatt {
+.tuer.papier-4 .tuer-blatt {
   --band: #e85d7e;
   background: repeating-linear-gradient(90deg, #fecdd6 0 9px, #fff0f3 9px 13px);
 }
@@ -2285,8 +2285,9 @@ html[data-geburtstag] .geb-ballons { display: block; }
 .kalender { position: relative; isolation: isolate; }
 /* Leeres Regal */
 .kalender.leer .tuer:not(.angebracht) { visibility: hidden; }
-.kalender.leer .tuer.angebracht { animation: einrasten 0.5s cubic-bezier(0.3, 1.6, 0.5, 1); }
-@keyframes einrasten { 0% { transform: translateY(-14px) scale(0.92); } 60% { transform: translateY(3px) scale(1.02); } 100% { transform: none; } }
+.kalender.leer .tuer.angebracht { animation: einrasten 0.35s ease-out; transform-origin: 50% 100%; }
+.trage-paket .tuer { animation: none !important; }
+@keyframes einrasten { 0% { transform: scale(1.03, 0.97); } 50% { transform: scale(0.99, 1.01); } 100% { transform: none; } }
 .regal-schild {
   position: absolute;
   left: 50%;
