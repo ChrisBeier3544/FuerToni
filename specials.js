@@ -10,6 +10,8 @@
 
   const api = window.adventkalender && window.adventkalender.intro;
   if (!api) return;
+  // capySeite und capyFront sind weiter unten definiert (Funktionsdeklarationen)
+  window.capyGrafik = { seite: (o) => capySeite(o), front: (o) => capyFront(o) };
   const intro = document.getElementById("intro");
   const ruhig = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
