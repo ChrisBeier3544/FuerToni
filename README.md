@@ -41,6 +41,14 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
 - **Finale:** Sind alle 24 Türchen offen, fliegen alle Fotos zu einem Herz zusammen.
   Danach lässt es sich über „♥️ Unser Herz“ jederzeit wieder ansehen.
 
+## Countdown bis zum Geburtstag
+
+Bis zum 26.11. um 0:00 Uhr ist der Umschlag verschlossen und zeigt einen Countdown.
+Von 0:00 bis 0:30 Uhr erscheinen Konfetti, ein Geburtstagsgruß und ein zweiter Countdown.
+Ab 0:30 Uhr lässt sich der Umschlag öffnen. Am Geburtstag steht im Brief ein eigener Gruß.
+Einstellungen: `countdownBis`, `briefAb` und `geburtstag` in `inhalte.js`.
+Lokal testen mit z. B. `?testdatum=2026-11-25&zeit=23:59`.
+
 ## Kopfbereich
 
 Oben stehen Datum mit Wochentag, der Gruß zur Tageszeit, der Titel und ein Countdown

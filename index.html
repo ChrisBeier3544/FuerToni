@@ -23,16 +23,21 @@
     <div class="umschlag" id="umschlag" role="button" tabindex="0" aria-label="Brief öffnen">
       <div class="umschlag-rueck"></div>
       <div class="brief">
-        <p class="brief-anrede">Mein Schatz,</p>
-        <p class="brief-text">dein Adventskalender wartet auf dich</p>
+        <p class="brief-anrede" id="brief-anrede">Mein Schatz,</p>
+        <p class="brief-text" id="brief-text">dein Adventskalender wartet auf dich</p>
         <p class="brief-herz" aria-hidden="true">♥️</p>
       </div>
       <div class="umschlag-vorne"></div>
       <div class="umschlag-klappe"></div>
       <p class="umschlag-name">Für Toni</p>
-      <div class="siegel" aria-hidden="true"><span>♥</span></div>
+      <div class="siegel" aria-hidden="true"><span>♥</span><span class="siegel-schloss">🔒</span></div>
     </div>
-    <p class="intro-hinweis">Tippe auf das Siegel</p>
+    <div id="intro-countdown" class="intro-countdown" hidden>
+      <p id="countdown-gruss" class="countdown-gruss" hidden></p>
+      <p id="countdown-titel" class="countdown-titel">Dein Brief öffnet sich in</p>
+      <div id="countdown-ziffern" class="countdown-ziffern" aria-live="off"></div>
+    </div>
+    <p class="intro-hinweis" id="intro-hinweis">Tippe auf das Siegel</p>
   </div>
 
   <div class="himmel" aria-hidden="true">

@@ -1241,28 +1241,122 @@
   }
 
   /* Umschlag zum Einstieg, einmal pro Besuch */
+  /* Zeitpunkt „2026-11-26T00:30“ in deutscher Zeit (im Winter UTC + 1) */
+  function berlinZeitpunkt(text) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(text || "");
+    if (!m) return null;
+    return Date.UTC(+m[1], +m[2] - 1, +m[3], +m[4] - 1, +m[5]);
+  }
+  const COUNTDOWN_BIS = berlinZeitpunkt(KALENDER.countdownBis);
+  const BRIEF_AB = berlinZeitpunkt(KALENDER.briefAb);
+  function introPhase() {
+    if (!zeitBereit) return "laden";
+    const t = jetzt();
+    if (COUNTDOWN_BIS !== null && t < COUNTDOWN_BIS) return "warten";
+    if (BRIEF_AB !== null && t < BRIEF_AB) return "geburtstag";
+    return "offen";
+  }
+  function istGeburtstag() {
+    const g = KALENDER.geburtstag;
+    const m = g && /^(\d{4})-(\d{2})-(\d{2})$/.exec(g.datum || "");
+    if (!m) return false;
+    const d = berlinDatum(jetzt());
+    return d.jahr === +m[1] && d.monat === +m[2] && d.tag === +m[3];
+  }
+
+  /* Umschlag zum Einstieg: vor dem Geburtstag mit Countdown verschlossen */
   function baueIntro() {
     const intro = document.getElementById("intro");
     if (!intro) return;
+    const umschlag = document.getElementById("umschlag");
+    const hinweis = document.getElementById("intro-hinweis");
+    const cd = document.getElementById("intro-countdown");
+    const cdGruss = document.getElementById("countdown-gruss");
+    const cdTitel = document.getElementById("countdown-titel");
+    const cdZiffern = document.getElementById("countdown-ziffern");
     let gesehen = false;
     try { gesehen = sessionStorage.getItem("toni-intro") === "1"; } catch (_) { /* egal */ }
-    if (gesehen) return;
-    intro.hidden = false;
-    document.documentElement.style.overflow = "hidden";
-    const umschlag = document.getElementById("umschlag");
-    let offen = false;
+    let offen = false, phase = null, konfettiGezeigt = false;
+
+    function zeigen() {
+      intro.hidden = false;
+      intro.classList.remove("weg", "geoeffnet");
+      document.documentElement.style.overflow = "hidden";
+    }
+    if (!gesehen) zeigen();
+
+    const zwei = (z) => String(z).padStart(2, "0");
+    function ziffern(ms, mitTagen) {
+      const s = Math.max(0, Math.floor(ms / 1000));
+      const teile = mitTagen
+        ? [[Math.floor(s / 86400), "Tage"], [Math.floor(s / 3600) % 24, "Std."], [Math.floor(s / 60) % 60, "Min."], [s % 60, "Sek."]]
+        : [[Math.floor(s / 60), "Min."], [s % 60, "Sek."]];
+      cdZiffern.innerHTML = teile.map(([z, l]) => '<span class="cd-feld"><b>' + zwei(z) + "</b><small>" + l + "</small></span>").join("");
+    }
+
+    function tick() {
+      const neu = introPhase();
+      if (neu !== "offen" && neu !== "laden" && intro.hidden) { offen = false; umschlag.classList.remove("offen", "klappe-hinten"); zeigen(); }
+      if (intro.hidden && neu === "offen") return;
+      if (neu !== phase) {
+        phase = neu;
+        umschlag.classList.toggle("verschlossen", phase !== "offen");
+        intro.dataset.phase = phase;
+        if (phase === "laden") { cd.hidden = true; hinweis.textContent = "Einen Moment …"; }
+        if (phase === "warten") {
+          cd.hidden = false; cdGruss.hidden = true;
+          cdTitel.textContent = "Dein Brief öffnet sich in";
+          hinweis.textContent = "Noch ein bisschen Geduld ♥️";
+        }
+        if (phase === "geburtstag") {
+          cd.hidden = false;
+          cdGruss.textContent = (KALENDER.geburtstag && KALENDER.geburtstag.gruss) || "Alles Gute zum Geburtstag! 🎂";
+          cdGruss.hidden = false;
+          cdTitel.textContent = "Dein Brief öffnet sich in";
+          hinweis.textContent = "Gleich ist es so weit ♥️";
+          if (!konfettiGezeigt) { konfettiGezeigt = true; konfettiRegen("konfetti"); }
+        }
+        if (phase === "offen") {
+          const gebTag = istGeburtstag() && KALENDER.geburtstag && KALENDER.geburtstag.gruss;
+          if (gebTag) { cdGruss.textContent = KALENDER.geburtstag.gruss; cdGruss.hidden = false; }
+          cd.hidden = !gebTag;
+          cdTitel.textContent = "";
+          cdZiffern.textContent = "";
+          hinweis.textContent = "Tippe auf das Siegel";
+          umschlag.classList.add("entsperrt");
+          setTimeout(() => umschlag.classList.remove("entsperrt"), 1200);
+        }
+      }
+      if (phase === "warten") ziffern(COUNTDOWN_BIS - jetzt(), true);
+      if (phase === "geburtstag") ziffern(BRIEF_AB - jetzt(), false);
+    }
+    setInterval(tick, 250);
+    tick();
+
     function oeffnen() {
       if (offen) return;
+      if (introPhase() !== "offen") {
+        umschlag.classList.remove("ruettelt");
+        void umschlag.offsetWidth;
+        umschlag.classList.add("ruettelt");
+        return;
+      }
       offen = true;
+      const geburtstag = istGeburtstag() && KALENDER.geburtstag;
+      if (geburtstag) {
+        document.getElementById("brief-anrede").textContent = KALENDER.geburtstag.briefAnrede || "Happy Birthday!";
+        document.getElementById("brief-text").textContent = KALENDER.geburtstag.briefText || "";
+      }
       umschlag.classList.add("offen");
       intro.classList.add("geoeffnet");
       const schnell = bewegungReduziert;
       setTimeout(() => umschlag.classList.add("klappe-hinten"), schnell ? 0 : 550);
+      if (geburtstag) setTimeout(() => konfettiRegen("konfetti"), schnell ? 0 : 1300);
       setTimeout(() => {
         intro.classList.add("weg");
         document.documentElement.style.overflow = "";
-      }, schnell ? 150 : 2400);
-      setTimeout(() => { intro.hidden = true; }, schnell ? 400 : 3200);
+      }, schnell ? 150 : (geburtstag ? 3600 : 2400));
+      setTimeout(() => { intro.hidden = true; }, schnell ? 400 : (geburtstag ? 4400 : 3200));
       try { sessionStorage.setItem("toni-intro", "1"); } catch (_) { /* egal */ }
     }
     umschlag.addEventListener("click", oeffnen);

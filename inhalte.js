@@ -26,6 +26,17 @@ const KALENDER = {
 
   titel: "Für Toni ♥️",
 
+  // Vor ihrem Geburtstag: Countdown bis zum Geburtstag, danach lässt sich der Brief öffnen
+  // (deutsche Zeit, Jahr-Monat-Tag T Stunde:Minute)
+  countdownBis: "2026-11-26T00:00",
+  briefAb: "2026-11-26T00:30",
+  geburtstag: {
+    datum: "2026-11-26",
+    gruss: "Alles Gute zum Geburtstag, Toni! 🎂",
+    briefAnrede: "Happy Birthday, mein Schatz!",
+    briefText: "Ab dem 1. Dezember wartet hier jeden Tag eine kleine Überraschung auf dich",
+  },
+
   // Unterschrift unter jedem Türchen-Text
   unterschrift: "Dein Chris ♥️",
 

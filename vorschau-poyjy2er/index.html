@@ -24,16 +24,21 @@
     <div class="umschlag" id="umschlag" role="button" tabindex="0" aria-label="Brief öffnen">
       <div class="umschlag-rueck"></div>
       <div class="brief">
-        <p class="brief-anrede">Mein Schatz,</p>
-        <p class="brief-text">dein Adventskalender wartet auf dich</p>
+        <p class="brief-anrede" id="brief-anrede">Mein Schatz,</p>
+        <p class="brief-text" id="brief-text">dein Adventskalender wartet auf dich</p>
         <p class="brief-herz" aria-hidden="true">♥️</p>
       </div>
       <div class="umschlag-vorne"></div>
       <div class="umschlag-klappe"></div>
       <p class="umschlag-name">Für Toni</p>
-      <div class="siegel" aria-hidden="true"><span>♥</span></div>
+      <div class="siegel" aria-hidden="true"><span>♥</span><span class="siegel-schloss">🔒</span></div>
     </div>
-    <p class="intro-hinweis">Tippe auf das Siegel</p>
+    <div id="intro-countdown" class="intro-countdown" hidden>
+      <p id="countdown-gruss" class="countdown-gruss" hidden></p>
+      <p id="countdown-titel" class="countdown-titel">Dein Brief öffnet sich in</p>
+      <div id="countdown-ziffern" class="countdown-ziffern" aria-live="off"></div>
+    </div>
+    <p class="intro-hinweis" id="intro-hinweis">Tippe auf das Siegel</p>
   </div>
 
   <div class="himmel" aria-hidden="true">
@@ -187,7 +192,7 @@
   <script src="vorschau-poyjy2er/app.js"></script>
 <style>
   .testleiste {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 50;
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
     display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
     padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
     background: #2b0f1c; color: #ffe4ea;
@@ -232,7 +237,13 @@
 (function () {
   var jahr = KALENDER.jahr;
   var sel = document.getElementById("test-datum");
-  var optionen = [["", "Echtes Datum"], ["nov-25", "25. November (vor dem Start)"]];
+  var optionen = [["", "Echtes Datum"],
+    ["nov-20", "20. November (Countdown zum Geburtstag)"],
+    ["nov-25-2359", "25. November 23:59 (Countdown läuft ab)"],
+    ["nov-26-0015", "26. November 0:15 🎂 Geburtstag, Brief noch zu"],
+    ["nov-26-0029", "26. November 0:29 (Brief öffnet sich gleich)"],
+    ["nov-26-0031", "26. November 0:31 🎂 Brief offen"],
+    ["nov-28", "28. November (vor dem ersten Türchen)"]];
   var besonders = { 4: " 🎉 Joris", 6: " 🎅", 8: " 🍀 Bio", 11: " 🍀 Deutsch", 13: " 🎂 Papa", 17: " 🍀 Mathe", 24: " 🎄 Heiligabend" };
   var eier = {};
   (KALENDER.eastereggs || []).forEach(function (e) { eier[e.ab] = (eier[e.ab] || "") + " 🥚"; });
@@ -247,9 +258,9 @@
   var anker = location.hash.replace("#", "");
   var zm = /-(morgen|vormittag|mittag|nachmittag|abend|nacht)$/.exec(anker);
   if (zm) zeitSel.value = zm[1];
-  sel.value = anker.replace(/-(morgen|vormittag|mittag|nachmittag|abend|nacht)$/, "");
+  sel.value = /-\d{4}$/.test(anker) ? anker : anker.replace(/-(morgen|vormittag|mittag|nachmittag|abend|nacht)$/, "");
   function gehe(wert) {
-    if (wert && zeitSel.value !== "mittag") wert += "-" + zeitSel.value;
+    if (wert && !/-\d{4}$/.test(wert) && zeitSel.value !== "mittag") wert += "-" + zeitSel.value;
     location.hash = wert;
     location.reload();
   }

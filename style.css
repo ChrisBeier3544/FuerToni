@@ -1731,3 +1731,64 @@ html[data-abend] .heute-karte .status { background: none; border: 0; box-shadow:
 @media (prefers-reduced-motion: reduce) {
   .fenster-capy.kurz .capy-kopf, .fenster-capy.geht .capy-kopf, .baum-wackel.wackelt, .baum-schnee.faellt, .baum-schnee.waechst { animation: none; }
 }
+
+
+/* =========================================================
+   Countdown bis zum Geburtstag
+   ========================================================= */
+.siegel-schloss {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  font-size: 1.15rem;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.umschlag.verschlossen .siegel-schloss { opacity: 1; transform: none; }
+.umschlag.entsperrt .siegel-schloss { animation: schloss-ab 1s ease-in forwards; }
+@keyframes schloss-ab {
+  0% { opacity: 1; transform: none; }
+  30% { transform: rotate(-20deg) scale(1.2); }
+  100% { opacity: 0; transform: translateY(60px) rotate(40deg); }
+}
+.umschlag.verschlossen { cursor: not-allowed; }
+.umschlag.ruettelt { animation: umschlag-rutteln 0.5s ease; }
+@keyframes umschlag-rutteln {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-4deg) translateX(-6px); }
+  40% { transform: rotate(4deg) translateX(6px); }
+  60% { transform: rotate(-2deg) translateX(-3px); }
+  80% { transform: rotate(2deg) translateX(3px); }
+}
+.intro-countdown { display: grid; gap: 8px; justify-items: center; text-align: center; }
+.intro-countdown[hidden] { display: none; }
+.countdown-gruss {
+  margin: 0;
+  font: 700 clamp(1.6rem, 7vw, 2.4rem)/1.15 "Dancing Script", cursive;
+  color: var(--beere);
+  animation: aufpoppen 0.6s ease;
+}
+.countdown-gruss[hidden] { display: none; }
+.countdown-titel { margin: 0; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--beere); opacity: 0.75; }
+.countdown-titel:empty { display: none; }
+.countdown-ziffern { display: flex; gap: 10px; justify-content: center; }
+.countdown-ziffern:empty { display: none; }
+.cd-feld {
+  display: grid;
+  min-width: 62px;
+  padding: 8px 6px 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(253, 164, 184, 0.8);
+  box-shadow: 0 6px 16px rgba(157, 36, 73, 0.15);
+}
+.cd-feld b { font: 700 1.9rem/1 "Nunito", sans-serif; color: var(--beere); font-variant-numeric: tabular-nums; }
+.cd-feld small { margin-top: 3px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); opacity: 0.65; }
+.intro[data-phase="geburtstag"] .cd-feld { background: linear-gradient(135deg, #fff8e6, var(--gold-hell)); border-color: var(--gold); }
+.intro[data-phase="warten"] .intro-hinweis, .intro[data-phase="geburtstag"] .intro-hinweis { animation: none; opacity: 0.8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .umschlag.ruettelt, .umschlag.entsperrt .siegel-schloss { animation: none; }
+}
