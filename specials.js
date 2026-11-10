@@ -360,14 +360,19 @@
     if (!s || laeuft) return;
     laeuft = true;
     knopf.hidden = true;
-    W = window.innerWidth; H = window.innerHeight;
-    buehne = document.createElement("div");
-    buehne.className = "special-buehne";
-    intro.appendChild(buehne);
+    const rahmen = document.createElement("div");
+    rahmen.className = "special-buehne";
+    intro.appendChild(rahmen);
     const titel = document.createElement("p");
     titel.className = "special-titel";
     titel.textContent = s.titel;
-    buehne.appendChild(titel);
+    rahmen.appendChild(titel);
+    // Die Szene spielt etwas über dem unteren Bildschirmrand
+    buehne = document.createElement("div");
+    buehne.className = "special-raum";
+    rahmen.appendChild(buehne);
+    W = buehne.offsetWidth || window.innerWidth;
+    H = buehne.offsetHeight || window.innerHeight;
     if (ruhig) {
       spaeter(4000, ende);
     } else {
@@ -375,7 +380,7 @@
       spaeter(s.dauer, ende);
     }
     function ende() {
-      const b = buehne;
+      const b = rahmen;
       b.classList.add("vorbei");
       setTimeout(() => b.remove(), 700);
       timer.forEach(clearTimeout); timer = [];

@@ -1798,6 +1798,11 @@ html[data-abend] .heute-karte .status { background: none; border: 0; box-shadow:
    Capybara-Specials vor dem Geburtstag
    ========================================================= */
 .special-buehne { position: fixed; inset: 0; z-index: 62; pointer-events: none; overflow: hidden; transition: opacity 0.7s ease; }
+.special-raum { position: absolute; left: 0; right: 0; top: 0; bottom: calc(16% + env(safe-area-inset-bottom, 0px)); }
+.special-raum .sp-garten::after, .special-raum .sp-hang::after { content: ""; position: absolute; left: 0; right: 0; top: calc(100% - 1px); height: 30vh; }
+.special-raum .sp-garten::after { background: #6fbf6b; }
+.special-raum .sp-hang::after { background: #fff; }
+.special-raum .sp-nacht { inset: 0 0 -30vh 0; }
 .special-buehne.vorbei { opacity: 0; }
 .special-titel {
   position: absolute;
