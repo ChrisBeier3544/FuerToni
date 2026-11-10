@@ -278,8 +278,8 @@ const KALENDER = {
     },
     18: {
       titel: "Lieblingsmomente",
-      text: "Meine liebsten Momente sind die, in denen wir einfach zusammen sind. Ohne Plan, ohne Stress, nur du und ich ♥️\nHeute Abend ist die Weihnachtsfeier der AXA. Ich wünsche dir ganz viel Spaß, genieß den Abend ✨",
-      status: "Heute Abend ist die Weihnachtsfeier der AXA. Viel Spaß 🎄✨",
+      text: "Meine liebsten Momente sind die, in denen wir einfach zusammen sind. Ohne Plan, ohne Stress, nur du und ich ♥️\nHeute Abend gehen wir zusammen auf die Weihnachtsfeier von AXA Decker. Ich freu mich so auf den Abend mit dir ✨",
+      status: "Heute Abend gehen wir zusammen zur Weihnachtsfeier von AXA Decker 🎄✨",
       briefzahl: 15,
       paeckchen: 78,
     },
@@ -291,8 +291,8 @@ const KALENDER = {
     },
     20: {
       titel: "Auf nach Amsterdam 🚲",
-      text: "Heute geht es mit Nova nach Amsterdam! Ich wünsche euch eine wunderschöne Zeit mit Grachten, Lichtern und ganz viel Spaß.\nUnd danach sind es nur noch ein paar Türchen bis Heiligabend ♥️",
-      status: "Heute geht es nach Amsterdam. Gute Reise 🇳🇱",
+      text: "Heute machst du mit Nova einen Tagestrip nach Amsterdam! Ich wünsche euch einen wunderschönen Tag mit Grachten, Lichtern und ganz viel Spaß.\nUnd danach sind es nur noch ein paar Türchen bis Heiligabend ♥️",
+      status: "Heute geht es mit Nova nach Amsterdam. Viel Spaß euch 🇳🇱",
       briefzahl: 20,
       paeckchen: 72,
     },
