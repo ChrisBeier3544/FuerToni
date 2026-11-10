@@ -282,7 +282,11 @@
     aktualisiereEier(d);
     setzeTageszeit(echt);
     const capy = document.querySelector(".capy-laeufer");
-    if (capy) capy.classList.toggle("mit-muetze", zeitBereit && (d.jahr > KALENDER.jahr || (d.monat === 12 && d.tag >= 10)));
+    if (capy) {
+      const outfit = zeitBereit ? capyOutfit(d) : null;
+      if (outfit) capy.dataset.outfit = outfit.name;
+      else delete capy.dataset.outfit;
+    }
     aktualisiereZusammen(echt);
     const rk = document.getElementById("rueckblick-knopf");
     if (rk) rk.hidden = !(zeitBereit && nachWeihnachten(d));
@@ -974,6 +978,24 @@
     "Ich bin nur wegen der Kekse hier 🍪",
     "Er hat dich soooo lieb, {name} ♥️",
   ];
+  /* Outfits: alle 3 Tage ein neues */
+  const CAPY_OUTFITS_SVG = '<g class="outfit outfit-strick"><path d="M49 15 Q60 -1 73 13 Z" fill="#7cc4f0"/><rect x="48" y="11" width="26" height="5" rx="2.5" fill="#e85d7e"/><rect x="52" y="11" width="3" height="5" fill="#fff"/><rect x="60" y="11" width="3" height="5" fill="#fff"/><rect x="68" y="11" width="3" height="5" fill="#fff"/><circle cx="60" cy="1" r="4.2" fill="#fff"/><path d="M46 30 q9 6 18 1 l1.5 5 q-10 5 -20 -1z" fill="#e85d7e"/><rect x="49" y="33" width="6" height="14" rx="2" fill="#e85d7e"/><rect x="49" y="37" width="6" height="2.5" fill="#fff"/><rect x="49" y="42" width="6" height="2.5" fill="#fff"/></g><g class="outfit outfit-nikolaus"><path d="M50 13 C54 -2 72 -4 76 6 L66 13z" fill="#d6304f"/><circle cx="77" cy="5" r="3.6" fill="#fff"/><rect x="47" y="10" width="24" height="5.5" rx="2.7" fill="#fff"/></g><g class="outfit outfit-lernen"><path d="M47 9 l15 -6.5 l15 6.5 l-15 6.5z" fill="#3a2418"/><rect x="54" y="10" width="16" height="5" rx="1" fill="#3a2418"/><path d="M62 9 L75 11 L75 19" fill="none" stroke="#f3c84b" stroke-width="1.2"/><rect x="73.6" y="18" width="3" height="5" rx="1" fill="#f3c84b"/><circle cx="71" cy="23" r="4.2" fill="rgba(255,255,255,.35)" stroke="#3a2418" stroke-width="1.4"/><path d="M66.8 22.5 L57 20.5" stroke="#3a2418" stroke-width="1.3"/></g><g class="outfit outfit-ohren"><path d="M53 14 Q60 -2 71 10" fill="none" stroke="#e85d7e" stroke-width="2.6" stroke-linecap="round"/><circle cx="55" cy="13" r="6" fill="#fda4b8"/><circle cx="52.5" cy="11" r="2.4" fill="#ffd0dc"/><circle cx="57" cy="15.5" r="2.2" fill="#ffd0dc"/></g><g class="outfit outfit-party"><path d="M54 13 L61 -11 L69 13z" fill="#f3dc9f"/><path d="M57.5 1 L65 1.5 M56 7 L67.5 7.5" stroke="#e85d7e" stroke-width="2.2"/><circle cx="61" cy="-11" r="3.4" fill="#e85d7e"/><path d="M54 13 Q61.5 16 69 13" fill="none" stroke="#fff" stroke-width="1"/><circle cx="45" cy="2" r="1.4" fill="#7cc4f0"/><rect x="74" y="-4" width="2.6" height="2.6" fill="#f3c84b" transform="rotate(20 75 -3)"/><circle cx="48" cy="-6" r="1.2" fill="#e85d7e"/></g><g class="outfit outfit-rentier"><g fill="none" stroke="#7a4e33" stroke-width="2.4" stroke-linecap="round"><path d="M54 11 L50 -2 M51.5 3 L45 0 M50.5 -1 L52 -8"/><path d="M60 11 L63 -3 M62 2 L68 -1 M63 -2 L61 -9"/></g><circle cx="76.5" cy="21.5" r="3" fill="#e53935"/><circle cx="75.6" cy="20.5" r="1" fill="#fff" opacity=".7"/></g><g class="outfit outfit-lichter"><path d="M9 27 Q20 39 34 38 T60 28" fill="none" stroke="#3f6b4f" stroke-width="1.4"/><ellipse class="capy-licht" cx="12" cy="31" rx="2.2" ry="3" fill="#ffd36b"/><ellipse class="capy-licht" cx="19" cy="36" rx="2.2" ry="3" fill="#ff4d7d"/><ellipse class="capy-licht" cx="27" cy="38.5" rx="2.2" ry="3" fill="#7cc4f0"/><ellipse class="capy-licht" cx="35" cy="38" rx="2.2" ry="3" fill="#ffd36b"/><ellipse class="capy-licht" cx="43" cy="35.5" rx="2.2" ry="3" fill="#ff4d7d"/><ellipse class="capy-licht" cx="51" cy="32" rx="2.2" ry="3" fill="#9be3b0"/><ellipse class="capy-licht" cx="58" cy="29" rx="2.2" ry="3" fill="#ffd36b"/></g><g class="outfit outfit-krone"><path d="M51 13 l1.5 -10 l4.5 5 l4 -8 l4 8 l4.5 -5 l1.5 10z" fill="#f3c84b" stroke="#c99a2e" stroke-width="1"/><circle cx="61" cy="9" r="1.8" fill="#e85d7e"/><circle cx="54.5" cy="10" r="1.2" fill="#7cc4f0"/><circle cx="67.5" cy="10" r="1.2" fill="#7cc4f0"/><path d="M30 20 L21 13 L22 25z" fill="#c2185b"/><path d="M30 20 L39 13 L38 25z" fill="#c2185b"/><circle cx="30" cy="20" r="3" fill="#e85d7e"/></g>';
+  const CAPY_OUTFITS = [
+    { name: "strick", spruch: "Brr, kalt draußen! Gut, dass ich Mütze und Schal habe 🧣" },
+    { name: "nikolaus", spruch: "Ho ho ho! Warst du auch brav, {name}? 🎅" },
+    { name: "lernen", spruch: "Heute im Lernmodus 🎓 Du schaffst das, {name}!" },
+    { name: "ohren", spruch: "Meine neuen Ohrenschützer sind soooo flauschig 🥰" },
+    { name: "party", spruch: "Partyzeit! 🥳 Die Capy Crew feiert mit" },
+    { name: "rentier", spruch: "Ich bin heute ein Rentier. Rudolph ist neidisch 🦌" },
+    { name: "lichter", spruch: "Ich leuchte heute extra für dich ✨" },
+    { name: "krone", spruch: "Ich bin heute das Weihnachts-Capy 👑 Fast geschafft!" },
+  ];
+  function capyOutfit(d) {
+    if (d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag > 24)) return CAPY_OUTFITS[1];
+    if (d.jahr !== KALENDER.jahr || d.monat !== 12) return null;
+    return CAPY_OUTFITS[Math.floor((d.tag - 1) / 3)];
+  }
+
   function baueCapyBegleiter(box) {
     const bahn = document.createElement("div");
     bahn.className = "capy-bahn";
@@ -983,8 +1005,7 @@
     capy.setAttribute("aria-label", "Capybara antippen");
     capy.innerHTML =
       '<span class="capy-blase" hidden></span>' +
-      '<svg class="capy-figur" viewBox="0 0 80 52" aria-hidden="true">' +
-      '<g class="capy-muetze"><path d="M54 9 C58 -2 72 -2 74 6 L64 12z" fill="#d6304f"/><circle cx="75" cy="5" r="3.5" fill="#fff"/><rect x="51" y="8" width="17" height="5" rx="2.5" fill="#fff"/></g>' +
+      '<svg class="capy-figur" viewBox="0 -14 82 66" aria-hidden="true">' +
       '<ellipse cx="34" cy="31" rx="27" ry="16" fill="#b07a52"/>' +
       '<rect x="48" y="12" width="24" height="24" rx="10" fill="#b07a52"/>' +
       '<rect x="62" y="18" width="13" height="16" rx="6" fill="#9a6844"/>' +
@@ -994,6 +1015,7 @@
       '<circle cx="62" cy="28" r="2.4" fill="#f7809b" opacity=".55"/>' +
       '<g class="capy-beine"><rect class="bein-a" x="16" y="40" width="7" height="11" rx="3" fill="#9a6844"/><rect class="bein-b" x="26" y="40" width="7" height="11" rx="3" fill="#8a5a3a"/>' +
       '<rect class="bein-b" x="42" y="40" width="7" height="11" rx="3" fill="#9a6844"/><rect class="bein-a" x="51" y="40" width="7" height="11" rx="3" fill="#8a5a3a"/></g>' +
+      CAPY_OUTFITS_SVG +
       '</svg>';
     bahn.appendChild(capy);
     box.appendChild(bahn);
@@ -1003,9 +1025,10 @@
       const d = kalenderDatum();
       const zeit = document.documentElement.getAttribute("data-tageszeit");
       const name = KOSENAMEN[(k + d.tag) % KOSENAMEN.length];
+      const outfit = capyOutfit(d);
       let text = CAPY_SPRUECHE[k % CAPY_SPRUECHE.length];
       if (zeit === "nacht") text = "Gähn … Ich geh gleich schlafen. Gute Nacht, {name} 🌙";
-      else if (capy.classList.contains("mit-muetze") && k % 3 === 2) text = "Gefällt dir meine Mütze? 🎅";
+      else if (outfit && k % 3 === 0) text = outfit.spruch;
       k++;
       blase.textContent = text.replace("{name}", name);
       blase.style.marginLeft = "0px";

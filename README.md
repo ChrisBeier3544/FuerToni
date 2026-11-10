@@ -49,7 +49,9 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
   `audio/tag13.m4a` und `audio/tag24.m4a` ab. Fehlt eine Datei, wird nichts angezeigt.
 - **Rubbelfeld** an Tag 6, 15 und 21 (`rubbeln: true`): Text und Zahlen liegen unter Gold.
 - **Capy-Begleiter** läuft durch die Winterlandschaft und sagt beim Antippen etwas Süßes.
-  Ab dem 10.12. trägt es eine Weihnachtsmütze.
+  Alle 3 Tage trägt es ein neues Outfit: Bommelmütze und Schal (1. bis 3.), Nikolausmütze (4. bis 6.),
+  Doktorhut und Brille (7. bis 9.), Ohrenschützer (10. bis 12.), Partyhut (13. bis 15.),
+  Rentiergeweih (16. bis 18.), Lichterkette (19. bis 21.), Krone und Schleife (22. bis 24.).
 - **Schneekugel:** Handy schütteln für ein Schneegestöber mit Herzen.
 - **Quiz vor den Easter Eggs** (`quiz` bei `eastereggs`). Leere Antwort = kein Quiz.
 - **Lichtershow** an Heiligabend, bevor Türchen 24 aufgeht.

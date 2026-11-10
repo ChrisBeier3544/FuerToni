@@ -985,7 +985,7 @@ main {
   height: clamp(130px, 24vw, 230px);
   overflow: hidden;
 }
-.landschaft svg { position: absolute; bottom: 0; left: 50%; height: 100%; width: auto; min-width: 100%; transform: translateX(-50%); }
+.landschaft > svg { position: absolute; bottom: 0; left: 50%; height: 100%; width: auto; min-width: 100%; transform: translateX(-50%); }
 .landschaft { --huegel-1: #ffffff; --huegel-2: #fbe3e9; --haus-a: #f2a7ba; --haus-b: #e98aa2; --haus-c: #fdd3dd; --dach: #9d2449; --fenster: #fff2c4; --baum: #3f6b4f; --schnee: #ffffff; }
 .landschaft .fenster { fill: var(--fenster); }
 .fuss { background: var(--schnee-boden, #ffffff); margin-top: -2px; }
@@ -1276,21 +1276,21 @@ html[data-abend] .zusammen.jubilaeum { color: var(--beere-dunkel); }
 @keyframes festblinken { 50% { background: #ff8fab; box-shadow: 0 0 10px 3px #ff8fab, 0 0 24px 8px rgba(255, 143, 171, 0.5); } }
 
 /* ---------- Capy-Begleiter ---------- */
-.capy-bahn { position: absolute; left: 0; right: 0; bottom: 4%; height: 0; }
+.capy-bahn { position: absolute; left: 0; right: 0; bottom: 9%; height: 0; }
 .capy-laeufer {
   position: absolute;
   bottom: 0;
-  left: -80px;
-  width: 64px;
+  left: -90px;
+  width: clamp(78px, 9vw, 96px);
   padding: 0;
   border: 0;
   background: none;
   cursor: pointer;
-  animation: capy-laufen 46s linear -9s infinite;
+  animation: capy-laufen 32s linear -6s infinite;
   -webkit-tap-highlight-color: transparent;
 }
 .capy-laeufer:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 10px; }
-.capy-figur { display: block; width: 100%; height: auto; animation: capy-richtung 46s steps(1, end) -9s infinite; filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.18)); }
+.capy-figur { display: block; width: 100%; height: auto; animation: capy-richtung 32s steps(1, end) -6s infinite; filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.18)); }
 .capy-laeufer.redet, .capy-laeufer.redet .capy-figur, .capy-laeufer.redet .bein-a, .capy-laeufer.redet .bein-b { animation-play-state: paused; }
 @keyframes capy-laufen {
   0% { left: -80px; }
@@ -1303,8 +1303,18 @@ html[data-abend] .zusammen.jubilaeum { color: var(--beere-dunkel); }
 .bein-a, .bein-b { transform-box: fill-box; transform-origin: 50% 0; animation: tapsen 0.5s ease-in-out infinite alternate; }
 .bein-b { animation-direction: alternate-reverse; }
 @keyframes tapsen { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
-.capy-muetze { display: none; }
-.mit-muetze .capy-muetze { display: inline; }
+.outfit { display: none; }
+.capy-laeufer[data-outfit="strick"] .outfit-strick { display: inline; }
+.capy-laeufer[data-outfit="nikolaus"] .outfit-nikolaus { display: inline; }
+.capy-laeufer[data-outfit="lernen"] .outfit-lernen { display: inline; }
+.capy-laeufer[data-outfit="ohren"] .outfit-ohren { display: inline; }
+.capy-laeufer[data-outfit="party"] .outfit-party { display: inline; }
+.capy-laeufer[data-outfit="rentier"] .outfit-rentier { display: inline; }
+.capy-laeufer[data-outfit="lichter"] .outfit-lichter { display: inline; }
+.capy-laeufer[data-outfit="krone"] .outfit-krone { display: inline; }
+.capy-licht { animation: capy-blinken 1.4s ease-in-out infinite; }
+.capy-licht:nth-child(even) { animation-delay: -0.7s; }
+@keyframes capy-blinken { 50% { opacity: 0.35; } }
 .capy-blase {
   position: absolute;
   bottom: calc(100% + 8px);
