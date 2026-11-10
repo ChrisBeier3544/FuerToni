@@ -189,8 +189,9 @@ const KALENDER = {
       status: "Heute hat Joris Geburtstag 🎉 Türchen 4 wartet auf dich!",
     },
     5: {
-      titel: "Kuschelwetter",
-      text: "Draußen wird es immer kälter, aber in deinen Armen ist es immer warm. Ich freu mich schon auf unseren nächsten Kuschelabend ♥️",
+      titel: "Heute ist Spieltag 🏀",
+      text: "Draußen wird es immer kälter, aber in deinen Armen ist es immer warm.\nUnd heute Abend um 19:30 Uhr stehst du in der Halle und feuerst mich an. Ich freu mich so, dass du dabei bist ♥️",
+      status: "Heute um 19:30 Uhr ist Basketball. Ich freu mich auf dich 🏀",
       briefzahl: 11,
       paeckchen: 48,
     },
@@ -277,7 +278,8 @@ const KALENDER = {
     },
     18: {
       titel: "Lieblingsmomente",
-      text: "Meine liebsten Momente sind die, in denen wir einfach zusammen sind. Ohne Plan, ohne Stress, nur du und ich ♥️",
+      text: "Meine liebsten Momente sind die, in denen wir einfach zusammen sind. Ohne Plan, ohne Stress, nur du und ich ♥️\nHeute Abend ist die Weihnachtsfeier der AXA. Ich wünsche dir ganz viel Spaß, genieß den Abend ✨",
+      status: "Heute Abend ist die Weihnachtsfeier der AXA. Viel Spaß 🎄✨",
       briefzahl: 15,
       paeckchen: 78,
     },
@@ -288,8 +290,9 @@ const KALENDER = {
       paeckchen: 100,
     },
     20: {
-      titel: "Noch fünf Türchen",
-      text: "Nur noch fünf Türchen bis Heiligabend. Ich freu mich so sehr auf die Weihnachtstage mit dir ♥️",
+      titel: "Auf nach Amsterdam 🚲",
+      text: "Heute geht es mit Nova nach Amsterdam! Ich wünsche euch eine wunderschöne Zeit mit Grachten, Lichtern und ganz viel Spaß.\nUnd danach sind es nur noch ein paar Türchen bis Heiligabend ♥️",
+      status: "Heute geht es nach Amsterdam. Gute Reise 🇳🇱",
       briefzahl: 20,
       paeckchen: 72,
     },
@@ -302,7 +305,8 @@ const KALENDER = {
     },
     22: {
       titel: "Danke",
-      text: "Danke, dass du immer für mich da bist, mich zum Lachen bringst und mich so nimmst, wie ich bin. Ich bin so froh, dass ich dich habe ♥️",
+      text: "Danke, dass du immer für mich da bist, mich zum Lachen bringst und mich so nimmst, wie ich bin. Ich bin so froh, dass ich dich habe ♥️\nHeute bist du mit Marla verabredet. Habt einen wunderschönen Tag zusammen und grüß sie lieb von mir!",
+      status: "Heute bist du mit Marla verabredet. Viel Spaß euch 👯‍♀️",
       briefzahl: 22,
       paeckchen: 44,
     },
