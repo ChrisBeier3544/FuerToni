@@ -35,12 +35,26 @@
       <h2 id="dialog-titel"></h2>
       <img id="dialog-bild" class="dialog-bild" alt="" hidden>
       <p id="dialog-text" class="dialog-text"></p>
+      <div class="extras">
+        <div id="dialog-brief" class="extra extra-brief" hidden>
+          <span class="extra-icon" aria-hidden="true">✉️</span>
+          <span class="extra-label">Zahl für deinen Weihnachtsbrief</span>
+          <span id="dialog-brief-zahl" class="extra-zahl"></span>
+        </div>
+        <div id="dialog-paeckchen" class="extra extra-paeckchen" hidden>
+          <span class="extra-icon" aria-hidden="true">🎁</span>
+          <span class="extra-label">Heute darfst du zusätzlich dieses Päckchen öffnen</span>
+          <span id="dialog-paeckchen-zahl" class="extra-zahl"></span>
+        </div>
+      </div>
       <div id="dialog-hinweis" class="hinweis" hidden>
         <span class="hinweis-icon" aria-hidden="true">🎁</span>
         <span id="dialog-hinweis-text"></span>
       </div>
     </div>
   </dialog>
+
+  <canvas id="konfetti-regen" class="konfetti-regen" popover="manual" aria-hidden="true"></canvas>
 
   <script src="inhalte.js"></script>
   <script src="app.js"></script>

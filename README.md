@@ -7,12 +7,16 @@ erst an seinem Tag öffnen (1. Türchen am 01.12., 2. am 02.12. usw., deutsche Z
 
 Alles, was hinter den Türchen steckt, steht in **`inhalte.js`**. Pro Tag:
 
-| Feld      | Bedeutung                                                     |
-|-----------|---------------------------------------------------------------|
-| `titel`   | Überschrift im geöffneten Türchen                             |
-| `text`    | Deine Nachricht (neue Zeile mit `\n`)                         |
-| `bild`    | Pfad zu einem Foto, z. B. `"bilder/tag01.jpg"` – oder `""`    |
-| `hinweis` | Hinweis aufs echte Türchen – oder `""` für keinen Hinweis     |
+| Feld        | Bedeutung                                                    |
+|-------------|--------------------------------------------------------------|
+| `titel`     | Überschrift im geöffneten Türchen                            |
+| `text`      | Deine Nachricht (neue Zeile mit `\n`)                        |
+| `briefzahl` | Zahl für den Weihnachtsbrief                                 |
+| `paeckchen` | Nummer des Extra-Päckchens – oder `""`, wenn es keins gibt   |
+| `konfetti`  | `true` = Konfetti regnet über die Seite (z. B. Geburtstage)  |
+| `status`    | optional: eigener Text oben auf der Seite an diesem Tag      |
+| `bild`      | optional: Foto, z. B. `"bilder/tag01.jpg"`                   |
+| `hinweis`   | optional: zusätzlicher Hinweis-Kasten                        |
 
 Fotos legst du in den Ordner **`bilder/`**. Tipp: Fotos vorher auf ca. 1200 px
 Breite verkleinern, dann lädt die Seite auf dem Handy schneller.

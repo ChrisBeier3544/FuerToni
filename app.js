@@ -18,6 +18,11 @@
     dialogText: document.getElementById("dialog-text"),
     dialogHinweis: document.getElementById("dialog-hinweis"),
     dialogHinweisText: document.getElementById("dialog-hinweis-text"),
+    dialogBrief: document.getElementById("dialog-brief"),
+    dialogBriefZahl: document.getElementById("dialog-brief-zahl"),
+    dialogPaeckchen: document.getElementById("dialog-paeckchen"),
+    dialogPaeckchenZahl: document.getElementById("dialog-paeckchen-zahl"),
+    regen: document.getElementById("konfetti-regen"),
   };
 
   /* ------------------------------------------------------------
@@ -257,7 +262,8 @@
       return;
     }
     if (d.jahr === KALENDER.jahr && d.monat === 12) {
-      if (d.tag === 24) el.status.textContent = "Heute ist Heiligabend – das letzte Türchen wartet ✨";
+      if (inhalt(d.tag).status) el.status.textContent = inhalt(d.tag).status;
+      else if (d.tag === 24) el.status.textContent = "Heute ist Heiligabend – das letzte Türchen wartet ✨";
       else if (!geoeffnet.has(d.tag)) el.status.textContent = "Heute darfst du Türchen " + d.tag + " öffnen ✨";
       else el.status.textContent = "Morgen wartet Türchen " + (d.tag + 1) + " auf dich 💕";
       return;
@@ -336,11 +342,19 @@
       el.dialogBild.removeAttribute("src");
     }
 
+    const hat = (w) => w !== undefined && w !== null && w !== "";
+    el.dialogBrief.hidden = !hat(i.briefzahl);
+    el.dialogBriefZahl.textContent = hat(i.briefzahl) ? String(i.briefzahl) : "";
+    el.dialogPaeckchen.hidden = !hat(i.paeckchen);
+    el.dialogPaeckchenZahl.textContent = hat(i.paeckchen) ? "Nr. " + i.paeckchen : "";
+
     el.dialogHinweis.hidden = !i.hinweis;
     el.dialogHinweisText.textContent = i.hinweis || "";
 
     if (typeof el.dialog.showModal === "function") el.dialog.showModal();
     else el.dialog.setAttribute("open", "");
+
+    if (i.konfetti) konfettiRegen();
   }
 
   function schliesseDialog() {
@@ -370,6 +384,84 @@
       document.body.appendChild(s);
       setTimeout(() => s.remove(), 1200);
     }
+  }
+
+  /* Konfetti, das über die ganze Seite regnet (Geburtstage) */
+  let regenLaeuft = false;
+  function konfettiRegen() {
+    if (regenLaeuft) return;
+    regenLaeuft = true;
+    const canvas = el.regen;
+    const ctx = canvas.getContext("2d");
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const breite = window.innerWidth;
+    const hoehe = window.innerHeight;
+    canvas.width = breite * dpr;
+    canvas.height = hoehe * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    // Über den geöffneten Dialog legen (Top-Layer), sonst einfach über die Seite
+    let alsPopover = false;
+    if (typeof canvas.showPopover === "function") {
+      try { canvas.showPopover(); alsPopover = true; } catch (_) { /* ignorieren */ }
+    }
+    if (!alsPopover) canvas.classList.add("aktiv");
+
+    const farben = ["#e85d7e", "#f7809b", "#9d2449", "#d4a84b", "#f3dc9f", "#ffffff", "#7cc4f0", "#9be3b0"];
+    const anzahl = bewegungReduziert ? 60 : breite < 600 ? 140 : 220;
+    const teile = [];
+    for (let k = 0; k < anzahl; k++) {
+      teile.push({
+        x: Math.random() * breite,
+        y: -20 - Math.random() * hoehe * 0.8,
+        w: 6 + Math.random() * 6,
+        h: 8 + Math.random() * 8,
+        vx: -1.5 + Math.random() * 3,
+        vy: 2 + Math.random() * 3,
+        dreh: Math.random() * Math.PI,
+        vdreh: -0.15 + Math.random() * 0.3,
+        wackel: Math.random() * Math.PI * 2,
+        farbe: farben[k % farben.length],
+        rund: Math.random() < 0.3,
+      });
+    }
+
+    const dauer = 5000;
+    const start = performance.now();
+    function schritt(t) {
+      const vergangen = t - start;
+      ctx.clearRect(0, 0, breite, hoehe);
+      let sichtbar = 0;
+      for (const p of teile) {
+        p.wackel += 0.05;
+        p.x += p.vx + Math.sin(p.wackel) * 0.8;
+        p.y += p.vy;
+        p.dreh += p.vdreh;
+        if (p.y < hoehe + 20) sichtbar++;
+        if (vergangen < dauer - 1500 && p.y > hoehe + 20) p.y = -20; // nachrieseln
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.dreh);
+        ctx.fillStyle = p.farbe;
+        if (p.rund) {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.w / 2, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h * Math.abs(Math.cos(p.wackel)));
+        }
+        ctx.restore();
+      }
+      if (sichtbar > 0 && vergangen < dauer + 4000) {
+        requestAnimationFrame(schritt);
+      } else {
+        ctx.clearRect(0, 0, breite, hoehe);
+        if (alsPopover) { try { canvas.hidePopover(); } catch (_) { /* ignorieren */ } }
+        canvas.classList.remove("aktiv");
+        regenLaeuft = false;
+      }
+    }
+    requestAnimationFrame(schritt);
   }
 
   function baueHerzen() {
