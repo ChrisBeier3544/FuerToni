@@ -335,7 +335,7 @@
       const koepfe = [0, 1, 2].map((n, i) => {
         const x = 18 + i * 74;
         return '<g class="sp-trinker" data-i="' + i + '"><g transform="translate(' + x + ' 24) scale(1.05)">' + capyFrontInhalt({ typ: [5, 2, 8][i], mund: "offen" }) + "</g></g>" +
-          '<path d="M' + (x + 30) + " 62 L" + (x + 40 + (i - 1) * 6) + ' 270" stroke="' + ["#e85d7e", "#7cc4f0", "#f3c84b"][i] + '" stroke-width="7" stroke-linecap="round"/>';
+          '<path d="M' + (x + 30) + " 62 L" + [92, 120, 148][i] + ' 272" stroke="' + ["#e85d7e", "#7cc4f0", "#f3c84b"][i] + '" stroke-width="7" stroke-linecap="round"/>';
       }).join("");
       const becher = figur(
         '<svg viewBox="0 0 240 310" aria-hidden="true"><defs><clipPath id="sp-becher-innen"><path d="M30 90 h180 l-14 196 a10 10 0 0 1-10 9 H54 a10 10 0 0 1-10-9z"/></clipPath></defs>' +
