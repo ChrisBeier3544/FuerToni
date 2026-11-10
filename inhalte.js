@@ -174,7 +174,7 @@ const KALENDER = {
     },
     24: {
       titel: "Frohe Weihnachten, mein Schatz 🎄",
-      text: "Das letzte Türchen.\nDanke, dass du da bist, dass du genau so bist, wie du bist, und dass ich diesen Dezember mit dir erleben durfte.\nDu bist mein allerschönstes Geschenk, heute und jeden Tag.\nAuch wenn wir heute nicht zusammen sind, bin ich in Gedanken ganz bei dir. Und morgen sehen wir uns endlich wieder ♥️\nIch liebe dich ♥️",
+      text: "Das letzte Türchen.\nDanke, dass du da bist, dass du genau so bist, wie du bist, und dass ich diesen Dezember mit dir erleben durfte.\nDu bist mein allerschönstes Geschenk, heute und jeden Tag.\nAuch wenn wir heute nicht zusammen sind, bin ich in Gedanken ganz bei dir. Und morgen sehen wir uns endlich wieder.\nIch liebe dich ♥️",
       briefzahl: 24,
       paeckchen: 902,
       geschenkregen: true,
