@@ -34,7 +34,7 @@ Sechs versteckte Funde (fünf Gutscheine und die Capy Crew), die nach und nach a
 | Matcha Latte | Iced Matcha Latte          | 1.12.       | oben rechts      |
 | Acai Bowl    | Acai Bowl Date             | 7.12.       | unten links      |
 | Capybara     | Geheime Capy Party (Foto)  | 10.12.      | über dem Kalender|
-| Badeente     | Wellnessabend              | 14.12.      | oben links       |
+| Badeente     | Massage New Soul Studio    | 14.12.      | oben links       |
 | Blumen       | Date deiner Wahl           | 19.12.      | unten rechts     |
 | Häuschen     | Dinner im Restaurant Heimat| 24.12.      | unten Mitte      |
 

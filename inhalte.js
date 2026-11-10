@@ -103,8 +103,8 @@ const KALENDER = {
       emblem: "ente",
       ab: 14,
       bild: "masken.jpg",
-      titel: "Ein Wellnessabend",
-      text: "Ein ganzer Abend nur für dich: Badewanne, Gesichtsmaske und ganz viel Verwöhnprogramm ♥️",
+      titel: "Eine Wellnessmassage",
+      text: "Eine Massage im New Soul Studio Köln, ganz nach deinen Wünschen. Lehn dich zurück und lass dich so richtig verwöhnen ♥️",
     },
     {
       emblem: "blumen",
