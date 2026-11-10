@@ -117,7 +117,7 @@ const KALENDER = {
       emblem: "heimat",
       ab: 24,
       titel: "Ein Dinner im Restaurant „Heimat“",
-      text: "Ein schöner Abend für uns zwei im Heimat. Ich freu mich jetzt schon darauf ♥️",
+      text: "Ein schöner Abend für uns zwei im Restaurant Heimat. Du bestellst, worauf du Lust hast, und ich lade dich ein ♥️",
     },
   ],
 
