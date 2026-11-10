@@ -982,7 +982,7 @@ main {
   position: relative;
   z-index: 1;
   margin-top: 30px;
-  height: clamp(130px, 24vw, 230px);
+  height: clamp(175px, 26vw, 250px);
   overflow: hidden;
 }
 .landschaft > svg { position: absolute; bottom: 0; left: 50%; height: 100%; width: auto; min-width: 100%; transform: translateX(-50%); }
@@ -1280,17 +1280,17 @@ html[data-abend] .zusammen.jubilaeum { color: var(--beere-dunkel); }
 .capy-laeufer {
   position: absolute;
   bottom: 0;
-  left: -90px;
+  left: 0;
+  transform: translateX(-120px);
   width: clamp(78px, 9vw, 96px);
   padding: 0;
   border: 0;
   background: none;
   cursor: pointer;
-  animation: capy-laufen 32s linear -6s infinite;
   -webkit-tap-highlight-color: transparent;
 }
 .capy-laeufer:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 10px; }
-.capy-figur { display: block; width: 100%; height: auto; animation: capy-richtung 32s steps(1, end) -6s infinite; filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.18)); }
+.capy-figur { display: block; width: 100%; height: auto; filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.18)); }
 .capy-laeufer.redet, .capy-laeufer.redet .capy-figur, .capy-laeufer.redet .bein-a, .capy-laeufer.redet .bein-b { animation-play-state: paused; }
 @keyframes capy-laufen {
   0% { left: -80px; }
@@ -1369,6 +1369,14 @@ html[data-abend] .zusammen.jubilaeum { color: var(--beere-dunkel); }
 .app-tipp button { border: 0; background: var(--rose-100); color: var(--beere); width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; flex: none; }
 
 @media (prefers-reduced-motion: reduce) {
-  .capy-laeufer { animation: none; left: 12%; }
+  .capy-laeufer { transform: translateX(12vw); }
   .capy-figur, .bein-a, .bein-b { animation: none; }
 }
+
+/* ---------- Capybaras in den Fenstern ---------- */
+.fenster-capy { display: none; }
+.fenster-capy.da { display: inline; }
+.fenster-hell { fill: #fff2c4; }
+.fenster-bank { fill: var(--schnee); }
+html[data-abend] .fenster-hell { fill: #ffd36b; }
+html[data-abend] .fenster-capy { filter: drop-shadow(0 0 5px rgba(255, 211, 107, 0.85)); }

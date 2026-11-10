@@ -281,6 +281,7 @@
     aktualisiereStatus(d, echt);
     aktualisiereEier(d);
     setzeTageszeit(echt);
+    aktualisiereFensterCapys(d);
     const capy = document.querySelector(".capy-laeufer");
     if (capy) {
       const outfit = zeitBereit ? capyOutfit(d) : null;
@@ -929,8 +930,12 @@
     const box = document.getElementById("landschaft");
     if (!box) return;
     const rnd = zufall(77);
-    const B = 1200, BODEN = 196;
-    let teile = '<path style="fill:var(--huegel-2)" d="M0 150 Q 150 112 330 140 T 660 128 T 960 140 T 1200 126 V230 H0Z"/>';
+    // Breite passend zum Bildschirm, damit alle Häuser zu sehen sind
+    const verh = (box.offsetWidth || window.innerWidth) / (box.offsetHeight || 200);
+    const B = Math.round(Math.max(520, Math.min(1400, verh * 230))), BODEN = 196;
+    const fensterListe = [];
+    const sx = (B / 1200).toFixed(4);
+    let teile = '<path transform="scale(' + sx + ' 1)" style="fill:var(--huegel-2)" d="M0 120 Q 150 82 330 110 T 660 98 T 960 110 T 1200 96 V230 H0Z"/>';
     let x = 14;
     let k = 0;
     while (x < B - 40) {
@@ -942,29 +947,67 @@
           '<path style="fill:var(--schnee)" d="M' + bx + ' ' + (BODEN - bh) + ' l-6 ' + (bh * 0.2) + ' q6 -3 12 0z"/>';
         x += 46;
       } else {
-        const hw = 58 + rnd() * 54, hh = 46 + rnd() * 50, dh = 22 + rnd() * 16;
+        const hw = 60 + rnd() * 46, hh = 72 + rnd() * 62, dh = 22 + rnd() * 16;
         const farbe = ["--haus-a", "--haus-b", "--haus-c"][k % 3];
         const oben = BODEN - hh;
         teile += '<rect style="fill:var(' + farbe + ')" x="' + x + '" y="' + oben + '" width="' + hw + '" height="' + hh + '"/>';
         if (rnd() < 0.5) teile += '<rect style="fill:var(--dach)" x="' + (x + hw * 0.68) + '" y="' + (oben - dh * 0.9) + '" width="9" height="' + dh * 0.7 + '"/>';
         teile += '<path style="fill:var(--dach)" d="M' + (x - 7) + ' ' + oben + ' L' + (x + hw / 2) + ' ' + (oben - dh) + ' L' + (x + hw + 7) + ' ' + oben + 'Z"/>';
         teile += '<polyline style="stroke:var(--schnee)" fill="none" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" points="' + (x - 7) + ',' + (oben - 1) + ' ' + (x + hw / 2) + ',' + (oben - dh - 1) + ' ' + (x + hw + 7) + ',' + (oben - 1) + '"/>';
-        const spalten = Math.max(2, Math.floor(hw / 26)), reihen = Math.max(1, Math.floor((hh - 22) / 24));
+        const spalten = Math.max(2, Math.floor(hw / 27)), reihen = Math.max(2, Math.floor((hh - 14) / 26));
         for (let r = 0; r < reihen; r++) {
           for (let sp = 0; sp < spalten; sp++) {
-            if (rnd() < 0.25) continue;
-            const fx = x + (hw / spalten) * (sp + 0.5) - 6, fy = oben + 10 + r * 24;
+            if (rnd() < 0.12) continue;
+            const fx = x + (hw / spalten) * (sp + 0.5) - 8, fy = oben + 9 + r * 26;
             const gruppe = rnd() < 0.35 ? "f1" : "f2";
-            teile += '<rect class="fenster ' + gruppe + '" x="' + fx.toFixed(1) + '" y="' + fy.toFixed(1) + '" width="12" height="13" rx="2"/>';
+            teile += '<rect class="fenster ' + gruppe + '" x="' + fx.toFixed(1) + '" y="' + fy.toFixed(1) + '" width="16" height="17" rx="2"/>';
+            fensterListe.push({ x: fx, y: fy, rang: Math.abs(fx + 8 - B / 2) / (B / 2) + rnd() * 0.55 });
           }
         }
-        x += hw + 18 + rnd() * 26;
+        x += hw + 14 + rnd() * 18;
       }
       k++;
     }
-    teile += '<path style="fill:var(--huegel-1)" d="M0 198 Q 300 182 600 196 T 1200 190 V230 H0Z"/>';
+    // Capybaras in den Fenstern: die mittleren (auch auf dem Handy sichtbaren) zuerst
+    fensterListe.sort((a, b) => a.rang - b.rang);
+    fensterListe.forEach((f, i) => {
+      teile += '<g class="fenster-capy" data-nr="' + i + '" transform="translate(' + f.x.toFixed(1) + ' ' + f.y.toFixed(1) + ')">' +
+        '<rect class="fenster-hell" width="16" height="17" rx="2"/>' +
+        FENSTER_CAPY + FENSTER_EXTRAS[i % FENSTER_EXTRAS.length] +
+        '<rect x="-1" y="15.5" width="18" height="2.5" rx="1" class="fenster-bank"/></g>';
+    });
+    teile += '<path transform="scale(' + sx + ' 1)" style="fill:var(--huegel-1)" d="M0 198 Q 300 182 600 196 T 1200 190 V230 H0Z"/>';
     box.innerHTML = '<svg viewBox="0 0 ' + B + ' 230" preserveAspectRatio="xMidYMax slice">' + teile + '</svg>';
     baueCapyBegleiter(box);
+  }
+
+  /* Kleine Capybaras, die aus den Fenstern schauen */
+  const FENSTER_CAPY =
+    '<circle cx="3.6" cy="7.2" r="1.7" fill="#7a4e33"/><circle cx="12.4" cy="7.2" r="1.7" fill="#7a4e33"/>' +
+    '<ellipse cx="8" cy="11.6" rx="6.2" ry="5.2" fill="#b07a52"/>' +
+    '<ellipse cx="8" cy="13.4" rx="3.6" ry="2.5" fill="#9a6844"/>' +
+    '<path d="M4.6 10q1-.9 2 0M9.4 10q1-.9 2 0" fill="none" stroke="#3a2418" stroke-width=".8" stroke-linecap="round"/>' +
+    '<circle cx="4" cy="12.6" r="1" fill="#f7809b" opacity=".6"/><circle cx="12" cy="12.6" r="1" fill="#f7809b" opacity=".6"/>';
+  const FENSTER_EXTRAS = [
+    "",
+    '<path d="M3.5 7.5C5 2 11.5 1.5 13 5.5L10 7.5z" fill="#d6304f"/><rect x="2.6" y="6.4" width="9" height="2.2" rx="1.1" fill="#fff"/><circle cx="13.4" cy="5" r="1.4" fill="#fff"/>',
+    '<path d="M8 6.6 4.6 4.6v4zM8 6.6l3.4-2v4z" fill="#e85d7e"/><circle cx="8" cy="6.6" r="1.1" fill="#c2185b"/>',
+    '<circle cx="5.6" cy="10.2" r="1.9" fill="none" stroke="#3a2418" stroke-width=".7"/><circle cx="10.4" cy="10.2" r="1.9" fill="none" stroke="#3a2418" stroke-width=".7"/><path d="M7.5 10.2h1" stroke="#3a2418" stroke-width=".7"/>',
+    '<path d="M4.4 7.4l.8-3.6 1.6 1.8 1.2-2.6 1.2 2.6 1.6-1.8.8 3.6z" fill="#f3c84b" stroke="#c99a2e" stroke-width=".4"/>',
+    '<path d="M2.6 15.2q5.4 2.6 10.8 0v1.8H2.6z" fill="#7cc4f0"/><rect x="10" y="15" width="2" height="2" fill="#fff"/>',
+    '<path d="M3 9Q3 3.4 8 3.4T13 9" fill="none" stroke="#e85d7e" stroke-width="1.1"/><circle cx="2.6" cy="9.6" r="1.8" fill="#fda4b8"/><circle cx="13.4" cy="9.6" r="1.8" fill="#fda4b8"/>',
+    '<rect x="11" y="11.5" width="3.6" height="4.6" rx=".8" fill="#eef7e6" stroke="#4a7c3a" stroke-width=".5"/><rect x="11.3" y="13" width="3" height="2.8" fill="#8fbf5a"/><path d="M13.2 11.5l.8-2" stroke="#9d2449" stroke-width=".6"/>',
+  ];
+  function aktualisiereFensterCapys(d) {
+    const alle = document.querySelectorAll(".fenster-capy");
+    if (!alle.length) return;
+    let anzahl = 0;
+    if (zeitBereit && (d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12))) {
+      const tag = d.jahr > KALENDER.jahr ? 24 : Math.min(d.tag, 24);
+      anzahl = Math.max(1, Math.round(alle.length * 0.85 * (tag / 24) * (tag / 24 + 1) / 2));
+      if (tag >= 24) anzahl = Math.round(alle.length * 0.85);
+    }
+    alle.forEach((g) => g.classList.toggle("da", +g.dataset.nr < anzahl));
   }
 
   /* Ein kleines Capybara spaziert durch die Winterlandschaft */
@@ -1019,6 +1062,26 @@
       '</svg>';
     bahn.appendChild(capy);
     box.appendChild(bahn);
+    if (!bewegungReduziert && capy.animate) {
+      const figur = capy.querySelector(".capy-figur");
+      let richtung = 1, lauf = null;
+      function runde() {
+        const breite = bahn.offsetWidth || window.innerWidth;
+        const capyBreite = capy.offsetWidth || 80;
+        const von = richtung > 0 ? -capyBreite - 10 : breite + 10;
+        const bis = richtung > 0 ? breite + 10 : -capyBreite - 10;
+        // gemütliches Tempo: etwa 45 Pixel pro Sekunde, mindestens 9 Sekunden
+        const dauer = Math.max(9000, Math.min(26000, (breite + capyBreite) / 45 * 1000));
+        figur.style.transform = richtung > 0 ? "scaleX(1)" : "scaleX(-1)";
+        lauf = capy.animate([{ transform: "translateX(" + von + "px)" }, { transform: "translateX(" + bis + "px)" }], { duration: dauer, easing: "linear", fill: "forwards" });
+        capy.laufAnimation = lauf;
+        lauf.onfinish = () => {
+          richtung = -richtung;
+          setTimeout(runde, 7000);
+        };
+      }
+      runde();
+    }
     const blase = capy.querySelector(".capy-blase");
     let k = 0, timer;
     capy.addEventListener("click", () => {
@@ -1039,8 +1102,13 @@
       if (r.right > window.innerWidth - rand) blase.style.marginLeft = (window.innerWidth - rand - r.right) + "px";
       else if (r.left < rand) blase.style.marginLeft = (rand - r.left) + "px";
       capy.classList.add("redet");
+      if (capy.laufAnimation) capy.laufAnimation.pause();
       clearTimeout(timer);
-      timer = setTimeout(() => { blase.hidden = true; capy.classList.remove("redet"); }, 3800);
+      timer = setTimeout(() => {
+        blase.hidden = true;
+        capy.classList.remove("redet");
+        if (capy.laufAnimation) capy.laufAnimation.play();
+      }, 3800);
     });
   }
 
