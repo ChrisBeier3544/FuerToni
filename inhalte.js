@@ -101,7 +101,7 @@ const KALENDER = {
     },
     {
       emblem: "acai",
-      quiz: { frage: "Wo war unser erster gemeinsamer Urlaub?", richtig: "", falsch: ["", ""] },
+      quiz: { frage: "Wo war unser erster gemeinsamer Urlaub?", richtig: "Noordwijk aan Zee", falsch: ["Sant Elm", "Renesse"] },
       ab: 7,
       versteck: { seite: "titelfotos" },
       titel: "Ein Acai Bowl Date",
@@ -120,7 +120,7 @@ const KALENDER = {
     },
     {
       emblem: "ente",
-      quiz: { frage: "Wo hatten wir unser erstes Date?", richtig: "", falsch: ["", ""] },
+      quiz: { frage: "Wo hatten wir unser erstes Date?", richtig: "Café in Köln", falsch: ["Restaurant Heimat", "Cologne Sky"] },
       ab: 16,
       versteck: { tuerchen: 16 },
       bild: "masken.jpg",
@@ -129,7 +129,7 @@ const KALENDER = {
     },
     {
       emblem: "blumen",
-      quiz: { frage: "Was habe ich als Allererstes zu dir gesagt?", richtig: "", falsch: ["", ""] },
+      quiz: { frage: "Was habe ich dir als Erstes geschrieben?", richtig: "Niemals breche ich das Versprechen 🫶🏻", falsch: ["Du bist wunderschön 🥰", "Danke für diesen schönen Abend ♥️"] },
       ab: 19,
       versteck: { seite: "fuss" },
       bild: "cafe.jpg",
@@ -280,8 +280,8 @@ const KALENDER = {
       paeckchen: 72,
     },
     21: {
-      titel: "Der kürzeste Tag ☀️",
-      text: "Heute ist der kürzeste Tag des Jahres. Aber mit dir an meiner Seite fühlt sich jeder Tag hell und warm an ♥️",
+      titel: "Ein Jahr wir ♥️",
+      text: "Heute ist der kürzeste Tag des Jahres und gleichzeitig mein liebster: Genau heute vor einem Jahr habe ich dich kennengelernt ♥️",
       briefzahl: 21,
       paeckchen: 925,
       rubbeln: true,
