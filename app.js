@@ -605,24 +605,28 @@
        abends      16:30 bis 22:00
        nachts      22:00 bis  6:00 */
   const TAGESZEITEN = [
-    { name: "nacht", bis: 6 * 60, gruss: "Schlaf schön, mein Schatz 🌙" },
-    { name: "morgen", bis: 9 * 60, gruss: "Guten Morgen, mein Schatz ☀️" },
-    { name: "vormittag", bis: 12 * 60, gruss: "Einen schönen Vormittag, mein Schatz 🌤️" },
-    { name: "mittag", bis: 14 * 60, gruss: "Schöne Mittagspause, mein Schatz ☕" },
-    { name: "nachmittag", bis: 16 * 60 + 30, gruss: "Einen gemütlichen Nachmittag, mein Schatz 🍪" },
-    { name: "abend", bis: 22 * 60, gruss: "Guten Abend, mein Schatz 🕯️" },
-    { name: "nacht", bis: 24 * 60, gruss: "Schlaf schön, mein Schatz 🌙" },
+    { name: "nacht", bis: 6 * 60, gruss: "Schlaf schön, {name} 🌙" },
+    { name: "morgen", bis: 9 * 60, gruss: "Guten Morgen, {name} ☀️" },
+    { name: "vormittag", bis: 12 * 60, gruss: "Einen schönen Vormittag, {name} 🌤️" },
+    { name: "mittag", bis: 14 * 60, gruss: "Schöne Mittagspause, {name} ☕" },
+    { name: "nachmittag", bis: 16 * 60 + 30, gruss: "Einen gemütlichen Nachmittag, {name} 🍪" },
+    { name: "abend", bis: 22 * 60, gruss: "Guten Abend, {name} 🕯️" },
+    { name: "nacht", bis: 24 * 60, gruss: "Schlaf schön, {name} 🌙" },
   ];
+  const KOSENAMEN = ["mein Schatz", "Maus", "Toni", "Baby"];
   function setzeTageszeit(d) {
     const minuten = d.stunde * 60 + d.minute;
-    const zeit = TAGESZEITEN.find((t) => minuten < t.bis) || TAGESZEITEN[0];
+    const index = TAGESZEITEN.findIndex((t) => minuten < t.bis);
+    const zeit = TAGESZEITEN[index] || TAGESZEITEN[0];
     const html = document.documentElement;
     if (html.getAttribute("data-tageszeit") !== zeit.name) {
       html.setAttribute("data-tageszeit", zeit.name);
       html.toggleAttribute("data-abend", zeit.name === "abend" || zeit.name === "nacht");
     }
     const gruss = document.getElementById("gruss");
-    if (gruss) gruss.textContent = zeitBereit ? zeit.gruss : "";
+    // Kosenamen wechseln je nach Tag und Tageszeit
+    const name = KOSENAMEN[(d.tag * 3 + index) % KOSENAMEN.length];
+    if (gruss) gruss.textContent = zeitBereit ? zeit.gruss.replace("{name}", name) : "";
   }
 
   function baueSterne() {
