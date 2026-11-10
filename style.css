@@ -582,6 +582,24 @@ main {
 .ticket::before { left: -13px; }
 .ticket::after  { right: -13px; }
 .ticket-emblem { width: 64px; height: 64px; margin: 0 auto 6px; }
+.ticket-bild {
+  display: block;
+  width: 78%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  margin: 0 auto 12px;
+  border: 6px solid #fff;
+  box-shadow: 0 6px 16px rgba(107, 21, 50, 0.2);
+  transform: rotate(-2deg);
+}
+.ticket-bild[hidden] { display: none; }
+.ticket-bild:not([hidden]) + .ticket-emblem {
+  width: 46px;
+  height: 46px;
+  margin-top: -34px;
+  position: relative;
+  z-index: 1;
+}
 .ticket-emblem svg { width: 100%; height: 100%; }
 .ticket-label {
   margin: 0;

@@ -591,6 +591,12 @@
     document.getElementById("gutschein-gefunden").textContent =
       neu ? "Du hast ein Easter Egg gefunden! 🎉" : "Dein Gutschein 🎟️";
     document.getElementById("gutschein-emblem").innerHTML = EMBLEME[ei.emblem].svg;
+    const bild = document.getElementById("gutschein-bild");
+    bild.hidden = !ei.bild;
+    if (ei.bild) {
+      bild.src = "bilder/klein/" + ei.bild;
+      bild.onerror = () => { bild.hidden = true; };
+    }
     document.getElementById("gutschein-titel").textContent = ei.titel;
     document.getElementById("gutschein-text").textContent = ei.text;
     oeffne(gutscheinDialog);

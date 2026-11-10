@@ -41,18 +41,31 @@ const KALENDER = {
     ],
     galerie: [
       { datei: "sonnenuntergang.jpg", text: "Mein liebstes Motiv" },
+      { datei: "strand-lachen.jpg", text: "Lachflash am Strand", fokus: "50% 70%" },
       { datei: "palma.jpg", text: "Palma" },
-      { datei: "partnerlook.jpg", text: "Partnerlook" },
       { datei: "sofa.jpg", text: "Festhalten" },
+      { datei: "dom.jpg", text: "Am Dom", fokus: "50% 85%" },
+      { datei: "partnerlook.jpg", text: "Partnerlook" },
+      { datei: "meeresluft.jpg", text: "Meeresluft", fokus: "50% 30%" },
+      { datei: "schlafmuetze.jpg", text: "Schlafmütze" },
       { datei: "bucht.jpg", text: "Sommer am Meer" },
-      { datei: "caps.jpg", text: "Caps im Partnerlook" },
+      { datei: "capybara-tasse.jpg", text: "Unser Capybara", fokus: "50% 45%" },
       { datei: "gondel.jpg", text: "Ganz oben" },
+      { datei: "tanzen.jpg", text: "Tanzen", fokus: "40% 35%" },
+      { datei: "caps.jpg", text: "Caps im Partnerlook" },
+      { datei: "picknick.jpg", text: "Sommerpicknick", fokus: "55% 35%" },
+      { datei: "kopfueber.jpg", text: "Kopfüber" },
       { datei: "bahn.jpg", text: "Heimweg" },
+      { datei: "augenpads.jpg", text: "Beautyabend", fokus: "40% 30%" },
       { datei: "palma-kuesschen.jpg", text: "Küsschen in Palma" },
+      { datei: "wald.jpg", text: "Waldspaziergang", fokus: "50% 60%" },
+      { datei: "sofatag.jpg", text: "Sofatag" },
       { datei: "muetzen.jpg", text: "Mützenmodels" },
+      { datei: "gemuetlich.jpg", text: "Gemütlich" },
       { datei: "abendspaziergang.jpg", text: "Abendspaziergang" },
       { datei: "gondel-abend.jpg", text: "Gondelfahrt" },
       { datei: "capybaras.jpg", text: "Capybara Kuschelparty" },
+      { datei: "capy-crew.jpg", text: "Capy Crew Party" },
     ],
   },
 
@@ -60,11 +73,13 @@ const KALENDER = {
    * Versteckte Easter Eggs (Gutscheine)
    *   emblem : welches kleine Bild (matcha, acai, ente, blumen, heimat)
    *   ab     : ab welchem Dezembertag es auf der Seite auftaucht
+   *   bild   : (optional) Foto auf dem Gutschein, aus bilder/
    */
   eastereggs: [
     {
       emblem: "matcha",
       ab: 1,
+      bild: "kaffeedate.jpg",
       titel: "Ein Iced Matcha Latte",
       text: "Einmal Iced Matcha Latte, ganz nach deinem Geschmack. Einzulösen, wann immer du Lust drauf hast ♥️",
     },
@@ -77,12 +92,14 @@ const KALENDER = {
     {
       emblem: "ente",
       ab: 14,
+      bild: "masken.jpg",
       titel: "Ein Wellnessabend",
       text: "Ein ganzer Abend nur für dich: Badewanne, Gesichtsmaske und ganz viel Verwöhnprogramm ♥️",
     },
     {
       emblem: "blumen",
       ab: 19,
+      bild: "cafe.jpg",
       titel: "Ein Date deiner Wahl",
       text: "Du planst, ich bin dabei. Egal was du dir aussuchst, es geht auf mich ♥️",
     },
