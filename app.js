@@ -227,7 +227,7 @@
   function fuelleHerz(container) {
     const herz = document.createElement("span");
     herz.className = "innen-herz";
-    herz.textContent = "❤️";
+    herz.textContent = "♥️";
     container.appendChild(herz);
   }
 
@@ -258,20 +258,20 @@
     if (!zeitBereit) { el.status.textContent = "Einen Moment …"; return; }
 
     if (d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag > 24)) {
-      el.status.textContent = "Frohe Weihnachten, mein Schatz 🎄❤️";
+      el.status.textContent = "Frohe Weihnachten, mein Schatz 🎄♥️";
       return;
     }
     if (d.jahr === KALENDER.jahr && d.monat === 12) {
       if (inhalt(d.tag).status) el.status.textContent = inhalt(d.tag).status;
-      else if (d.tag === 24) el.status.textContent = "Heute ist Heiligabend – das letzte Türchen wartet ✨";
+      else if (d.tag === 24) el.status.textContent = "Heute ist Heiligabend. Das letzte Türchen wartet auf dich ✨";
       else if (!geoeffnet.has(d.tag)) el.status.textContent = "Heute darfst du Türchen " + d.tag + " öffnen ✨";
-      else el.status.textContent = "Morgen wartet Türchen " + (d.tag + 1) + " auf dich 💕";
+      else el.status.textContent = "Morgen wartet Türchen " + (d.tag + 1) + " auf dich ♥️";
       return;
     }
     const tage = tageBis(1, d);
     el.status.textContent = tage === 1
-      ? "Morgen geht's los! 💕"
-      : "Noch " + tage + " Tage bis zum ersten Türchen 💕";
+      ? "Morgen geht's los! ♥️"
+      : "Noch " + tage + " Tage bis zum ersten Türchen ♥️";
   }
 
   /* ------------------------------------------------------------
@@ -293,8 +293,8 @@
       const min = Math.floor((rest % 3600) / 60);
       return "Nicht schummeln 😘 Türchen " + n + " öffnet sich in " + std + " Std. " + min + " Min.";
     }
-    const spruch = ["Geduld, mein Schatz 💕", "Nicht schummeln 😘", "Noch nicht! ❤️", "Na na na 🙈"][n % 4];
-    return spruch + " Türchen " + n + " öffnet sich erst am " + n + ". Dezember – noch " + tage + " Tage.";
+    const spruch = ["Geduld, mein Schatz ♥️", "Nicht schummeln 😘", "Noch nicht! ♥️", "Na na na 🙈"][n % 4];
+    return spruch + " Türchen " + n + " öffnet sich erst am " + n + ". Dezember. Noch " + tage + " Tage ♥️";
   }
 
   function klickAufTuer(n) {
@@ -370,7 +370,7 @@
     const r = ziel.getBoundingClientRect();
     const x = r.left + r.width / 2;
     const y = r.top + r.height / 2;
-    const zeichen = ["❤️", "💕", "💖", "✨", "💗"];
+    const zeichen = ["♥️", "♥️", "✨", "♥️", "✨"];
     for (let k = 0; k < 14; k++) {
       const s = document.createElement("span");
       s.className = "konfetti";
