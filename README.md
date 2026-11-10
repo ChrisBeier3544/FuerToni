@@ -62,6 +62,13 @@ Oben stehen Datum mit Wochentag, der Gruß zur Tageszeit, der Titel und ein Coun
 („Noch 9 Überraschungen bis Weihnachten“). Darunter die Polaroids und die Karte „Dein Tag“
 mit Statuszeile, Zähler und den Knöpfen für Gutscheine, Foto-Herz und Rückblick.
 
+## Kalender-Regal
+
+Die 24 Päckchen stehen auf einem Holzregal mit verschneiten Brettern. Türchen 1 und 24 sind groß,
+6, 13 und 21 breit, 4, 17 und 20 hoch (`PAECKCHEN_FORM` in `app.js`). Das heutige Türchen trägt
+das Band „Heute ✨“, und nach dem Umschlag scrollt die Seite dorthin. Unter dem Fotostreifen zeigt
+ein Balken, wie weit man gewischt hat. In der Fußzeile kuscheln zwei Capybaras unter einer Laterne.
+
 ## Feine Details
 
 - Geöffnete Türchen zeigen die aufgeklappte Papierseite, eine kleine Illustration und einen Stempel mit dem Datum.

@@ -186,6 +186,8 @@
    * Aufbau
    * ------------------------------------------------------------ */
   const tueren = new Map();
+  // Ein paar Päckchen sind größer, breiter oder höher (wie bei einem echten Kalender)
+  const PAECKCHEN_FORM = { 24: "gross", 1: "gross", 6: "breit", 13: "breit", 21: "breit", 4: "hoch", 17: "hoch", 20: "hoch" };
   const SCHLEIFE =
     '<svg viewBox="0 0 60 40" fill="currentColor" aria-hidden="true">' +
     '<path d="M30 20C21 6 6 3 4 12s12 14 26 8z"/><path d="M30 20c9-14 24-17 26-8s-12 14-26 8z"/>' +
@@ -206,7 +208,7 @@
     for (const n of gemischteTage()) {
       const knopf = document.createElement("button");
       knopf.type = "button";
-      knopf.className = "tuer gesperrt";
+      knopf.className = "tuer gesperrt" + (PAECKCHEN_FORM[n] ? " " + PAECKCHEN_FORM[n] : "");
       knopf.dataset.tag = String(n);
 
       const innen = document.createElement("span");
@@ -1356,13 +1358,27 @@
         intro.classList.add("weg");
         document.documentElement.style.overflow = "";
       }, schnell ? 150 : (geburtstag ? 3600 : 2400));
-      setTimeout(() => { intro.hidden = true; }, schnell ? 400 : (geburtstag ? 4400 : 3200));
+      setTimeout(() => { intro.hidden = true; zeigeHeutigesTuerchen(); }, schnell ? 400 : (geburtstag ? 4400 : 3200));
       try { sessionStorage.setItem("toni-intro", "1"); } catch (_) { /* egal */ }
     }
     umschlag.addEventListener("click", oeffnen);
     umschlag.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); oeffnen(); }
     });
+  }
+
+  /* Nach dem Umschlag sanft zum heutigen Türchen scrollen */
+  let heuteGezeigt = false;
+  function zeigeHeutigesTuerchen() {
+    if (heuteGezeigt || !zeitBereit) return;
+    const d = kalenderDatum();
+    if (d.jahr !== KALENDER.jahr || d.monat !== 12 || d.tag > 24) return;
+    const t = tueren.get(d.tag);
+    if (!t) return;
+    heuteGezeigt = true;
+    const r = t.knopf.getBoundingClientRect();
+    if (r.top > 80 && r.bottom < window.innerHeight - 40) return;
+    setTimeout(() => t.knopf.scrollIntoView({ behavior: bewegungReduziert ? "auto" : "smooth", block: "center" }), 300);
   }
 
   /* ------------------------------------------------------------
@@ -1608,6 +1624,23 @@
       }
     }
     document.getElementById("momente").hidden = !(fotos.galerie && fotos.galerie.length);
+    // Wisch-Hinweis und Fortschritt unter dem Fotostreifen
+    const streifen = document.getElementById("fotostreifen");
+    const leiste = document.getElementById("streifen-fortschritt");
+    const hinweis = document.getElementById("wisch-hinweis");
+    if (streifen && leiste) {
+      const balken = leiste.firstElementChild;
+      const neu = () => {
+        const max = streifen.scrollWidth - streifen.clientWidth;
+        const anteil = max > 0 ? streifen.clientWidth / streifen.scrollWidth : 1;
+        balken.style.width = (anteil * 100).toFixed(1) + "%";
+        balken.style.marginLeft = (max > 0 ? (streifen.scrollLeft / streifen.scrollWidth) * 100 : 0).toFixed(1) + "%";
+        leiste.hidden = max <= 0;
+      };
+      streifen.addEventListener("scroll", () => { neu(); if (streifen.scrollLeft > 30 && hinweis) hinweis.classList.add("gesehen"); }, { passive: true });
+      window.addEventListener("resize", neu);
+      setTimeout(neu, 300);
+    }
   }
 
   function zeigeFoto(index) {
@@ -1809,6 +1842,7 @@
   synchronisiereZeit().then(() => {
     zeitBereit = true;
     aktualisiere();
+    if (document.getElementById("intro").hidden && window.scrollY < 40) setTimeout(zeigeHeutigesTuerchen, 900);
     const k = kalenderDatum();
     if (k.jahr === KALENDER.jahr && k.monat === 12 && k.tag === 24 && !geoeffnet.has(24)) setTimeout(starteLichtershow, 600);
   });
