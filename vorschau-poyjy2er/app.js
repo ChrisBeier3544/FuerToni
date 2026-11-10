@@ -1697,7 +1697,12 @@
   el.dialog.addEventListener("close", () => {
     if (alleOffen() && !finaleGesehen()) setTimeout(zeigeFinale, 450);
   });
-  window.adventkalender = { zeigeFinale, schneeSturm: () => schneeSturm(), starteLichtershow };
+  window.adventkalender = {
+    zeigeFinale,
+    schneeSturm: () => schneeSturm(),
+    starteLichtershow,
+    intro: { bereit: () => zeitBereit, phase: () => introPhase(), datum: () => berlinDatum(jetzt()) },
+  };
 
   /* Tannenzweige mit Beeren und Kugeln in den oberen Ecken */
   function baueZweige() {

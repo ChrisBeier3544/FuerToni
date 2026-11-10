@@ -1792,3 +1792,168 @@ html[data-abend] .heute-karte .status { background: none; border: 0; box-shadow:
 @media (prefers-reduced-motion: reduce) {
   .umschlag.ruettelt, .umschlag.entsperrt .siegel-schloss { animation: none; }
 }
+
+
+/* =========================================================
+   Capybara-Specials vor dem Geburtstag
+   ========================================================= */
+.special-buehne { position: fixed; inset: 0; z-index: 62; pointer-events: none; overflow: hidden; transition: opacity 0.7s ease; }
+.special-buehne.vorbei { opacity: 0; }
+.special-titel {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 5;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  padding: 8px 16px;
+  translate: -50% 0;
+  width: max-content;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--beere);
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-align: center;
+  box-shadow: 0 8px 22px rgba(157, 36, 73, 0.2);
+  animation: aufpoppen 0.5s ease both;
+}
+.special-knopf {
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #fff8e6, var(--gold-hell));
+  color: var(--beere-dunkel);
+  font: 700 0.9rem "Nunito", sans-serif;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(157, 36, 73, 0.15);
+}
+.special-knopf[hidden] { display: none; }
+.sp-figur { position: absolute; }
+.sp-figur > svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sp-gespiegelt > svg { transform: scaleX(-1); }
+.sp-partikel { position: absolute; z-index: 4; font-size: 1.2rem; font-weight: 700; }
+.sp-dampf {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  filter: blur(2px);
+  animation: sp-dampf 2.2s ease-out infinite;
+}
+@keyframes sp-dampf { 0% { transform: translate(0, 0) scale(0.5); opacity: 0; } 20% { opacity: 0.9; } 100% { transform: translate(8px, -50px) scale(2); opacity: 0; } }
+.sp-blase {
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--beere-dunkel);
+  font-weight: 800;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+  animation: aufpoppen 0.3s ease;
+}
+
+/* Ballonfahrt */
+.sp-ballonfahrer { display: grid; justify-items: center; }
+.sp-ballonfahrer .sp-ballon { width: 78%; margin-bottom: -6px; transform-origin: 50% 100%; }
+.sp-ballonfahrer > svg:last-child { width: 62%; }
+.sp-ballon-frei { bottom: -120px; }
+
+/* Gartenparty */
+.sp-garten { left: 0; right: 0; bottom: 0; height: 34%; }
+.sp-garten > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sp-blumen { position: absolute; left: 0; right: 0; top: 34%; display: flex; justify-content: space-around; font-size: 1.4rem; }
+.sp-lampions { left: 0; right: 0; top: 64px; height: 70px; }
+.sp-lampions > svg { width: 100%; height: 100%; }
+.sp-discohalter { left: 50%; top: 0; width: 2px; height: 120px; background: #9d8a90; }
+.sp-disco {
+  position: absolute;
+  left: 50%;
+  bottom: -46px;
+  width: 52px;
+  height: 52px;
+  margin-left: -26px;
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.5) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0 2px, transparent 2px 9px),
+    radial-gradient(circle at 35% 30%, #fff, #b9c3d6 45%, #7d879a);
+  box-shadow: 0 0 30px 6px rgba(255, 214, 255, 0.6);
+  animation: sp-disco 1.2s linear infinite;
+}
+@keyframes sp-disco { to { filter: hue-rotate(360deg); } }
+.sp-taenzer { z-index: 2; }
+
+/* Glühweinstand */
+.sp-stand { left: 50%; bottom: 0; transform: translateX(-50%); }
+.sp-prost { bottom: 6%; z-index: 2; }
+
+/* Onsen */
+.sp-onsen { left: 50%; bottom: 4%; height: 150px; transform: translateX(-50%); }
+.sp-becken {
+  position: absolute;
+  inset: 0;
+  border-radius: 50% / 40%;
+  background: radial-gradient(ellipse at 50% 70%, #9fd8f2, #5aa9dd);
+  box-shadow: 0 0 0 10px #a9a2a8, 0 0 0 16px #8c858b, 0 14px 30px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+.sp-badegast { position: absolute; bottom: 18%; width: 26%; animation: sp-wippen 2.4s ease-in-out infinite; }
+.sp-badegast svg { width: 100%; height: auto; display: block; }
+@keyframes sp-wippen { 50% { translate: 0 6px; } }
+.sp-wasser { position: absolute; left: 0; right: 0; bottom: 0; height: 46%; background: linear-gradient(180deg, rgba(122, 196, 236, 0.85), rgba(90, 169, 221, 0.95)); border-top: 3px solid rgba(255, 255, 255, 0.6); }
+.sp-ente { position: absolute; right: 10%; bottom: 36%; font-size: 1.6rem; animation: sp-wippen 1.8s ease-in-out infinite; }
+
+/* Rodeln */
+.sp-hang { left: 0; right: 0; bottom: 0; height: 100%; }
+.sp-hang > svg { width: 100%; height: 100%; }
+.sp-rodler { left: 0; top: 0; transform-origin: 50% 80%; z-index: 2; }
+
+/* Matcha-Bad */
+.sp-matcha { left: 50%; bottom: -10px; }
+.sp-matcha-koepfe { position: absolute; left: 14%; right: 14%; top: 8%; height: 27%; z-index: 2; overflow: hidden; }
+.sp-matcha-kopf { position: absolute; bottom: 0; width: 28%; }
+.sp-matcha-kopf svg { width: 100%; height: auto; display: block; }
+.sp-matcha > svg { position: relative; z-index: 1; }
+
+/* Feuerwerk */
+.sp-nacht { inset: 0; background: radial-gradient(circle at 50% 30%, rgba(40, 20, 70, 0.75), rgba(15, 8, 30, 0.88)); }
+.sp-rakete { left: 50%; bottom: -10px; z-index: 2; }
+.sp-raketen-capy { position: absolute; left: 30%; top: 26%; width: 40%; }
+.sp-raketen-capy svg { width: 100%; display: block; }
+.sp-flamme { position: absolute; left: 35%; bottom: -26px; width: 30%; height: 34px; border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%; background: radial-gradient(circle at 50% 30%, #fff2b0, #ffb648 50%, #e8455f); animation: sp-flamme 0.15s linear infinite alternate; }
+@keyframes sp-flamme { to { transform: scaleY(1.25); } }
+.sp-fallschirm { left: 50%; top: 18%; display: grid; justify-items: center; z-index: 3; }
+.sp-fallschirm .sp-schirmtuch { width: 100%; margin-bottom: -10px; }
+.sp-fallschirm > svg:last-child { width: 55%; }
+
+/* Schneeballschlacht */
+.sp-werfer { bottom: 8%; z-index: 2; }
+.sp-schneeball { width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #dfe9f5); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); z-index: 3; }
+
+/* Polonaise */
+.sp-polonaise { left: 0; top: 0; }
+
+/* Plätzchen */
+.sp-blech { left: 50%; bottom: 10%; transform: translateX(-50%); z-index: 2; }
+.sp-baecker { left: 4%; bottom: 9%; z-index: 2; }
+.sp-keks { width: 34px; z-index: 3; }
+
+/* Vorabend */
+.sp-banner {
+  left: 50%;
+  top: calc(70px + env(safe-area-inset-top, 0px));
+  padding: 10px 26px;
+  transform-origin: 50% 50%;
+  background: linear-gradient(135deg, #e85d7e, #c2185b);
+  color: #fff;
+  font: 700 clamp(1.3rem, 6vw, 2rem)/1.1 "Dancing Script", cursive;
+  white-space: nowrap;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(157, 36, 73, 0.35);
+  z-index: 4;
+}
+.sp-kuchen { left: 50%; bottom: 7%; z-index: 2; }
+.sp-kerze { transform-box: fill-box; transform-origin: 50% 100%; animation: sp-flamme 0.3s ease-in-out infinite alternate; }
+.sp-traeger { bottom: 7%; z-index: 3; }

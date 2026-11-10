@@ -49,6 +49,13 @@ Ab 0:30 Uhr lässt sich der Umschlag öffnen. Am Geburtstag steht im Brief ein e
 Einstellungen: `countdownBis`, `briefAb` und `geburtstag` in `inhalte.js`.
 Lokal testen mit z. B. `?testdatum=2026-11-25&zeit=23:59`.
 
+## Capybara-Specials vor dem Geburtstag
+
+Vom 15. bis 25. November läuft auf dem Countdown-Bildschirm jeden Tag eine andere Capybara-Szene
+(`specials.js`): Ballonfahrt, Gartenparty, Glühweinstand, Onsen, Rodelrennen, Matcha-Bad,
+Feuerwerk, Schneeballschlacht, Polonaise, Plätzchenbacken und am Vorabend der Geburtstagskuchen.
+Sie startet beim Öffnen automatisch und lässt sich über „🐹 Capy-Special nochmal ansehen“ wiederholen.
+
 ## Kopfbereich
 
 Oben stehen Datum mit Wochentag, der Gruß zur Tageszeit, der Titel und ein Countdown
