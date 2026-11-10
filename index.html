@@ -12,6 +12,22 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="intro" class="intro" hidden>
+    <div class="umschlag" id="umschlag" role="button" tabindex="0" aria-label="Brief öffnen">
+      <div class="umschlag-rueck"></div>
+      <div class="brief">
+        <p class="brief-anrede">Mein Schatz,</p>
+        <p class="brief-text">dein Adventskalender wartet auf dich</p>
+        <p class="brief-herz" aria-hidden="true">♥️</p>
+      </div>
+      <div class="umschlag-vorne"></div>
+      <div class="umschlag-klappe"></div>
+      <p class="umschlag-name">Für Toni</p>
+      <div class="siegel" aria-hidden="true"><span>♥</span></div>
+    </div>
+    <p class="intro-hinweis">Tippe auf das Siegel</p>
+  </div>
+
   <div class="herzen" aria-hidden="true"></div>
 
   <header class="kopf">
@@ -19,10 +35,14 @@
     <p id="untertitel" class="untertitel"></p>
     <div id="titelfotos" class="titelfotos"></div>
     <p id="status" class="status" aria-live="polite"></p>
-    <p><button id="sammlung-knopf" class="sammlung-knopf" type="button" hidden>🎟️ Meine Gutscheine</button></p>
+    <p class="kopf-knoepfe">
+      <button id="sammlung-knopf" class="sammlung-knopf" type="button" hidden>🎟️ Meine Gutscheine</button>
+      <button id="finale-knopf" class="sammlung-knopf" type="button" hidden>♥️ Unser Herz</button>
+    </p>
   </header>
 
   <main>
+    <div id="lichterkette" class="lichterkette" role="img" aria-label="Lichterkette"></div>
     <div id="kalender" class="kalender" aria-label="Adventskalender mit 24 Türchen"></div>
   </main>
 
@@ -30,6 +50,8 @@
     <h2 id="momente-titel">Unsere Momente</h2>
     <div id="fotostreifen" class="fotostreifen"></div>
   </section>
+
+  <div id="landschaft" class="landschaft" aria-hidden="true"></div>
 
   <footer class="fuss">Mit ganz viel Liebe gemacht ♥️</footer>
 
@@ -93,6 +115,15 @@
     <button class="lightbox-pfeil zurueck" type="button" aria-label="Vorheriges Foto">‹</button>
     <button class="lightbox-pfeil weiter" type="button" aria-label="Nächstes Foto">›</button>
   </dialog>
+
+  <div id="finale" class="finale" hidden>
+    <div id="finale-herz" class="finale-herz"></div>
+    <div class="finale-text">
+      <p class="finale-titel">Frohe Weihnachten, mein Schatz</p>
+      <p class="finale-unter">24 Türchen voller Liebe ♥️</p>
+    </div>
+    <button type="button" class="schliessen finale-zu" aria-label="Schließen">×</button>
+  </div>
 
   <canvas id="konfetti-regen" class="konfetti-regen" popover="manual" aria-hidden="true"></canvas>
 

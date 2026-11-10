@@ -51,8 +51,9 @@
     const wert = new URLSearchParams(location.search).get("testdatum");
     const m = wert && /^(\d{4})-(\d{2})-(\d{2})$/.exec(wert);
     if (!m) return null;
-    // 11:00 UTC = 12:00 Uhr deutsche Winterzeit
-    return Date.UTC(+m[1], +m[2] - 1, +m[3], 11, 0, 0);
+    // 11:00 UTC = 12:00 Uhr deutsche Winterzeit, mit &abend 19:00 Uhr
+    const abend = new URLSearchParams(location.search).has("abend");
+    return Date.UTC(+m[1], +m[2] - 1, +m[3], abend ? 18 : 11, 0, 0);
   }
 
   async function holeServerzeit() {
@@ -172,6 +173,13 @@
    * Aufbau
    * ------------------------------------------------------------ */
   const tueren = new Map();
+  const SCHLEIFE =
+    '<svg viewBox="0 0 60 40" fill="currentColor" aria-hidden="true">' +
+    '<path d="M30 20C21 6 6 3 4 12s12 14 26 8z"/><path d="M30 20c9-14 24-17 26-8s-12 14-26 8z"/>' +
+    '<path d="M26.5 22 19 38l6-2 3 4.5 2-18z"/><path d="M33.5 22 41 38l-6-2-3 4.5-2-18z"/>' +
+    '<path d="M30 20C23 10 12 7 9 12" fill="none" stroke="rgba(0,0,0,.15)" stroke-width="1.5"/>' +
+    '<path d="M30 20c7-10 18-13 21-8" fill="none" stroke="rgba(0,0,0,.15)" stroke-width="1.5"/>' +
+    '<circle cx="30" cy="20" r="5.5"/><circle cx="30" cy="20" r="5.5" fill="rgba(0,0,0,.12)"/></svg>';
 
   function inhalt(n) {
     return (KALENDER.tage && KALENDER.tage[n]) || {};
@@ -193,13 +201,19 @@
 
       const blatt = document.createElement("span");
       blatt.className = "tuer-blatt";
+      blatt.innerHTML =
+        '<span class="band-v"></span><span class="band-h"></span>' +
+        '<span class="schleife">' + SCHLEIFE + "</span>";
+      const anhaenger = document.createElement("span");
+      anhaenger.className = "anhaenger";
       const nummer = document.createElement("span");
       nummer.className = "nummer";
       nummer.textContent = String(n);
+      anhaenger.appendChild(nummer);
       const schloss = document.createElement("span");
       schloss.className = "schloss";
       schloss.textContent = "🔒";
-      blatt.append(nummer, schloss);
+      blatt.append(anhaenger, schloss);
 
       knopf.append(innen, blatt);
       knopf.addEventListener("click", (e) => klickAufTuer(n, e));
@@ -252,6 +266,10 @@
     }
     aktualisiereStatus(d);
     aktualisiereEier(d);
+    setzeAbend(d);
+    aktualisiereLichter(d);
+    const fk = document.getElementById("finale-knopf");
+    if (fk) fk.hidden = !(zeitBereit && alleOffen() && finaleGesehen());
   }
 
   function aktualisiereStatus(d) {
@@ -333,6 +351,13 @@
     if (!istVerfuegbar(n, berlinDatum(jetzt()))) return;
 
     const i = inhalt(n);
+    // Der Inhalt fliegt aus dem Türchen heraus
+    const r = tueren.get(n).knopf.getBoundingClientRect();
+    const breite = Math.min(520, window.innerWidth - 32);
+    el.dialog.style.setProperty("--von-x", (r.left + r.width / 2 - window.innerWidth / 2).toFixed(0) + "px");
+    el.dialog.style.setProperty("--von-y", (r.top + r.height / 2 - window.innerHeight / 2).toFixed(0) + "px");
+    el.dialog.style.setProperty("--von-s", (r.width / breite).toFixed(3));
+    el.dialog.classList.add("aus-tuer");
     offenerTag = n;
     aktualisiereVersteckte();
     el.dialogTag.textContent = n + ". Dezember";
@@ -497,19 +522,199 @@
     requestAnimationFrame(schritt);
   }
 
-  function baueHerzen() {
+  /* Schnee mit einzelnen Herzen, weht beim Scrollen und Neigen mit */
+  function baueSchnee() {
     if (bewegungReduziert) return;
     const box = document.querySelector(".herzen");
-    const anzahl = window.innerWidth < 600 ? 10 : 18;
-    for (let k = 0; k < anzahl; k++) {
-      const s = document.createElement("span");
-      s.textContent = k % 3 === 0 ? "♡" : "♥";
-      s.style.left = Math.random() * 100 + "%";
-      s.style.fontSize = 10 + Math.random() * 18 + "px";
-      s.style.animationDuration = 12 + Math.random() * 14 + "s";
-      s.style.animationDelay = -Math.random() * 20 + "s";
-      box.appendChild(s);
+    const c = document.createElement("canvas");
+    box.appendChild(c);
+    const ctx = c.getContext("2d");
+    let w = 0, h = 0;
+    function groesse() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth; h = window.innerHeight;
+      c.width = w * dpr; c.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
+    groesse();
+    window.addEventListener("resize", groesse);
+    function neueFlocke(start) {
+      const herz = Math.random() < 0.14;
+      return {
+        x: Math.random() * w,
+        y: start ? Math.random() * h : -12,
+        r: herz ? 5 + Math.random() * 5 : 1.1 + Math.random() * 2.4,
+        vy: herz ? 0.3 + Math.random() * 0.35 : 0.35 + Math.random() * 0.85,
+        phase: Math.random() * 6.28,
+        herz,
+      };
+    }
+    const flocken = [];
+    const anzahl = w < 600 ? 55 : 95;
+    for (let k = 0; k < anzahl; k++) flocken.push(neueFlocke(true));
+    let wind = 0, neigung = 0, letztesY = window.scrollY;
+    window.addEventListener("scroll", () => {
+      const dy = window.scrollY - letztesY;
+      letztesY = window.scrollY;
+      wind = Math.max(-5, Math.min(5, wind + dy * 0.04));
+    }, { passive: true });
+    window.addEventListener("deviceorientation", (e) => {
+      if (typeof e.gamma === "number") neigung = Math.max(-1.6, Math.min(1.6, e.gamma / 22));
+    });
+    ctx.textAlign = "center";
+    function schritt() {
+      ctx.clearRect(0, 0, w, h);
+      const abend = document.documentElement.hasAttribute("data-abend");
+      wind *= 0.94;
+      for (const f of flocken) {
+        f.phase += 0.012;
+        f.x += Math.sin(f.phase) * 0.35 + (neigung + wind * 0.5) * (f.herz ? 0.6 : 1);
+        f.y += f.vy - wind * 0.15 * (f.herz ? 0.5 : 1);
+        if (f.y > h + 14 || f.y < -40) Object.assign(f, neueFlocke(false));
+        if (f.x > w + 14) f.x = -14;
+        if (f.x < -14) f.x = w + 14;
+        if (f.herz) {
+          ctx.fillStyle = abend ? "rgba(255, 143, 171, 0.6)" : "rgba(232, 93, 126, 0.38)";
+          ctx.font = Math.round(f.r * 2.4) + "px serif";
+          ctx.fillText("♥", f.x, f.y);
+        } else {
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.r, 0, 6.2832);
+          ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
+          ctx.fill();
+          if (!abend) {
+            ctx.strokeStyle = "rgba(157, 36, 73, 0.16)";
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(schritt);
+    }
+    requestAnimationFrame(schritt);
+  }
+
+  /* Abendmodus: ab 17 Uhr bis 6 Uhr morgens (deutsche Zeit) */
+  function setzeAbend(d) {
+    document.documentElement.toggleAttribute("data-abend", d.stunde >= 17 || d.stunde < 6);
+  }
+
+  /* Lichterkette: für jedes geöffnete Türchen leuchtet ein Birnchen */
+  const LICHTFARBEN = ["#ffd36b", "#ff8fab", "#ff4d7d", "#fff0c2"];
+  const birnen = new Map();
+  let lichterBereit = false;
+  function kettenY(x) {
+    const f = (x * 4) % 1;
+    return 5 + 24 * Math.sin(Math.PI * f);
+  }
+  function baueLichterkette() {
+    const box = document.getElementById("lichterkette");
+    if (!box) return;
+    let pfad = "";
+    for (let i = 0; i <= 240; i++) {
+      const x = i / 240;
+      pfad += (i ? "L" : "M") + (x * 1000).toFixed(1) + " " + kettenY(x).toFixed(2);
+    }
+    box.innerHTML = '<svg viewBox="0 0 1000 46" preserveAspectRatio="none" aria-hidden="true"><path vector-effect="non-scaling-stroke" d="' + pfad + '"/></svg>';
+    for (let n = 1; n <= 24; n++) {
+      const x = (n - 0.5) / 24;
+      const b = document.createElement("span");
+      b.className = "birne";
+      b.style.left = (x * 100).toFixed(3) + "%";
+      b.style.top = (kettenY(x) + 3).toFixed(1) + "px";
+      b.style.rotate = ((n % 3) - 1) * 7 + "deg";
+      b.style.animationDelay = -(n * 0.37).toFixed(2) + "s";
+      b.style.setProperty("--licht", LICHTFARBEN[n % LICHTFARBEN.length]);
+      box.appendChild(b);
+      birnen.set(n, b);
+    }
+  }
+  function aktualisiereLichter(d) {
+    let an = 0;
+    for (const [n, b] of birnen) {
+      const leuchtet = zeitBereit && istVerfuegbar(n, d) && geoeffnet.has(n);
+      if (leuchtet) an++;
+      if (leuchtet && !b.classList.contains("an") && lichterBereit && !bewegungReduziert) {
+        b.classList.add("neu");
+        setTimeout(() => b.classList.remove("neu"), 1300);
+      }
+      b.classList.toggle("an", leuchtet);
+    }
+    const box = document.getElementById("lichterkette");
+    if (box) box.setAttribute("aria-label", "Lichterkette: " + an + " von 24 Lichtern leuchten");
+    if (zeitBereit) lichterBereit = true;
+  }
+
+  /* Winterlandschaft mit verschneiten Häusern */
+  function baueLandschaft() {
+    const box = document.getElementById("landschaft");
+    if (!box) return;
+    const rnd = zufall(77);
+    const B = 1200, BODEN = 196;
+    let teile = '<path style="fill:var(--huegel-2)" d="M0 150 Q 150 112 330 140 T 660 128 T 960 140 T 1200 126 V230 H0Z"/>';
+    let x = 14;
+    let k = 0;
+    while (x < B - 40) {
+      if (k % 4 === 2) {
+        const bh = 38 + rnd() * 26, bx = x + 16;
+        teile += '<g style="fill:var(--baum)">' +
+          '<path d="M' + bx + ' ' + (BODEN - bh) + ' l-16 ' + (bh * 0.55) + ' h32z"/>' +
+          '<path d="M' + bx + ' ' + (BODEN - bh * 0.7) + ' l-20 ' + (bh * 0.7) + ' h40z"/></g>' +
+          '<path style="fill:var(--schnee)" d="M' + bx + ' ' + (BODEN - bh) + ' l-6 ' + (bh * 0.2) + ' q6 -3 12 0z"/>';
+        x += 46;
+      } else {
+        const hw = 58 + rnd() * 54, hh = 46 + rnd() * 50, dh = 22 + rnd() * 16;
+        const farbe = ["--haus-a", "--haus-b", "--haus-c"][k % 3];
+        const oben = BODEN - hh;
+        teile += '<rect style="fill:var(' + farbe + ')" x="' + x + '" y="' + oben + '" width="' + hw + '" height="' + hh + '"/>';
+        if (rnd() < 0.5) teile += '<rect style="fill:var(--dach)" x="' + (x + hw * 0.68) + '" y="' + (oben - dh * 0.9) + '" width="9" height="' + dh * 0.7 + '"/>';
+        teile += '<path style="fill:var(--dach)" d="M' + (x - 7) + ' ' + oben + ' L' + (x + hw / 2) + ' ' + (oben - dh) + ' L' + (x + hw + 7) + ' ' + oben + 'Z"/>';
+        teile += '<polyline style="stroke:var(--schnee)" fill="none" stroke-width="6" stroke-linejoin="round" stroke-linecap="round" points="' + (x - 7) + ',' + (oben - 1) + ' ' + (x + hw / 2) + ',' + (oben - dh - 1) + ' ' + (x + hw + 7) + ',' + (oben - 1) + '"/>';
+        const spalten = Math.max(2, Math.floor(hw / 26)), reihen = Math.max(1, Math.floor((hh - 22) / 24));
+        for (let r = 0; r < reihen; r++) {
+          for (let sp = 0; sp < spalten; sp++) {
+            if (rnd() < 0.25) continue;
+            const fx = x + (hw / spalten) * (sp + 0.5) - 6, fy = oben + 10 + r * 24;
+            teile += '<rect class="fenster" x="' + fx.toFixed(1) + '" y="' + fy.toFixed(1) + '" width="12" height="13" rx="2"/>';
+          }
+        }
+        x += hw + 18 + rnd() * 26;
+      }
+      k++;
+    }
+    teile += '<path style="fill:var(--huegel-1)" d="M0 198 Q 300 182 600 196 T 1200 190 V230 H0Z"/>';
+    box.innerHTML = '<svg viewBox="0 0 ' + B + ' 230" preserveAspectRatio="xMidYMax slice">' + teile + '</svg>';
+  }
+
+  /* Umschlag zum Einstieg, einmal pro Besuch */
+  function baueIntro() {
+    const intro = document.getElementById("intro");
+    if (!intro) return;
+    let gesehen = false;
+    try { gesehen = sessionStorage.getItem("toni-intro") === "1"; } catch (_) { /* egal */ }
+    if (gesehen) return;
+    intro.hidden = false;
+    document.documentElement.style.overflow = "hidden";
+    const umschlag = document.getElementById("umschlag");
+    let offen = false;
+    function oeffnen() {
+      if (offen) return;
+      offen = true;
+      umschlag.classList.add("offen");
+      intro.classList.add("geoeffnet");
+      const schnell = bewegungReduziert;
+      setTimeout(() => umschlag.classList.add("klappe-hinten"), schnell ? 0 : 550);
+      setTimeout(() => {
+        intro.classList.add("weg");
+        document.documentElement.style.overflow = "";
+      }, schnell ? 150 : 2400);
+      setTimeout(() => { intro.hidden = true; }, schnell ? 400 : 3200);
+      try { sessionStorage.setItem("toni-intro", "1"); } catch (_) { /* egal */ }
+    }
+    umschlag.addEventListener("click", oeffnen);
+    umschlag.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); oeffnen(); }
+    });
   }
 
   /* ------------------------------------------------------------
@@ -746,12 +951,79 @@
   });
 
   /* ------------------------------------------------------------
+   * Finale: Wenn alle 24 Türchen offen sind, werden die Fotos zum Herz
+   * ------------------------------------------------------------ */
+  const FINALE_SCHLUESSEL = "toni-advent-finale-" + KALENDER.jahr;
+  function alleOffen() {
+    for (let n = 1; n <= 24; n++) if (!geoeffnet.has(n)) return false;
+    return istVerfuegbar(24, berlinDatum(jetzt()));
+  }
+  function finaleGesehen() {
+    try { return localStorage.getItem(FINALE_SCHLUESSEL) === "1"; } catch (_) { return false; }
+  }
+  const finale = document.getElementById("finale");
+  function zeigeFinale() {
+    const herz = document.getElementById("finale-herz");
+    herz.textContent = "";
+    finale.classList.remove("fertig");
+    finale.hidden = false;
+    const fotos = fotoListe.slice();
+    const N = fotos.length;
+    const S = Math.min(window.innerWidth, window.innerHeight * 0.92);
+    const g = Math.max(36, Math.min(84, S / 8));
+    const einheit = (S - g - 24) / 33;
+    finale.style.setProperty("--g", g.toFixed(0) + "px");
+    const weit = Math.max(window.innerWidth, window.innerHeight);
+    fotos.forEach((f, i) => {
+      const t = (i / N) * Math.PI * 2;
+      const x = 16 * Math.pow(Math.sin(t), 3) * einheit;
+      const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * einheit - 2.5 * einheit;
+      const karte = document.createElement("div");
+      karte.className = "finale-foto";
+      const img = new Image();
+      img.src = "bilder/klein/" + f.datei;
+      img.alt = "";
+      if (f.fokus) img.style.objectPosition = f.fokus;
+      karte.appendChild(img);
+      herz.appendChild(karte);
+      const winkel = Math.random() * Math.PI * 2;
+      const dreh = Math.random() * 24 - 12;
+      karte.animate([
+        { transform: "translate(" + (Math.cos(winkel) * weit).toFixed(0) + "px," + (Math.sin(winkel) * weit).toFixed(0) + "px) rotate(" + dreh * 8 + "deg) scale(.4)", opacity: 0 },
+        { transform: "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + dreh + "deg) scale(1)", opacity: 1 },
+      ], {
+        duration: bewegungReduziert ? 1 : 1500,
+        delay: bewegungReduziert ? 0 : i * 75,
+        easing: "cubic-bezier(.2,.8,.2,1)",
+        fill: "forwards",
+      });
+    });
+    setTimeout(() => {
+      finale.classList.add("fertig");
+      konfettiRegen("konfetti");
+    }, bewegungReduziert ? 50 : N * 75 + 1300);
+    try { localStorage.setItem(FINALE_SCHLUESSEL, "1"); } catch (_) { /* egal */ }
+    const fk = document.getElementById("finale-knopf");
+    if (fk) fk.hidden = false;
+  }
+  finale.querySelector(".finale-zu").addEventListener("click", () => { finale.hidden = true; });
+  finale.addEventListener("click", (e) => { if (finale.classList.contains("fertig") && e.target !== finale.querySelector(".finale-zu")) finale.hidden = true; });
+  document.getElementById("finale-knopf").addEventListener("click", zeigeFinale);
+  el.dialog.addEventListener("close", () => {
+    if (alleOffen() && !finaleGesehen()) setTimeout(zeigeFinale, 450);
+  });
+  window.adventkalender = { zeigeFinale };
+
+  /* ------------------------------------------------------------
    * Start
    * ------------------------------------------------------------ */
+  baueIntro();
   baueKalender();
+  baueLichterkette();
+  baueLandschaft();
   baueEier();
   baueFotos();
-  baueHerzen();
+  baueSchnee();
   aktualisiere();
 
   synchronisiereZeit().then(() => {

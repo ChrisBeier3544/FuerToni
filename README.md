@@ -24,6 +24,18 @@ Breite verkleinern, dann lädt die Seite auf dem Handy schneller.
 
 Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertitel.
 
+## Effekte
+
+- **Umschlag zum Einstieg:** Beim ersten Besuch pro Sitzung öffnet sie einen versiegelten Brief.
+- **Türchen als Päckchen:** Geschenkpapier, Band, Schleife und Anhänger mit der Zahl.
+- **Türchen wird zum Brief:** Der Inhalt fliegt aus dem Türchen in die Mitte.
+- **Lichterkette:** Für jedes geöffnete Türchen leuchtet ein Birnchen mehr.
+- **Schnee und Herzen:** weht beim Scrollen und Neigen des Handys mit.
+- **Winterlandschaft** mit leuchtenden Fenstern unten auf der Seite.
+- **Abendmodus:** von 17 bis 6 Uhr nachtblau und gemütlich (lokal testen mit `&abend`).
+- **Finale:** Sind alle 24 Türchen offen, fliegen alle Fotos zu einem Herz zusammen.
+  Danach lässt es sich über „♥️ Unser Herz“ jederzeit wieder ansehen.
+
 ## Easter Eggs
 
 Sechs versteckte Funde (fünf Gutscheine und die Capy Crew). Einstellungen unter
@@ -49,6 +61,7 @@ Dann im Browser öffnen:
 
 - `http://localhost:8000/` – zeigt den Kalender mit dem echten Datum
 - `http://localhost:8000/?testdatum=2026-12-05` – tut so, als wäre der 5. Dezember
+- `http://localhost:8000/?testdatum=2026-12-05&abend` – dasselbe um 19 Uhr
 
 Der Parameter `?testdatum=` funktioniert **nur lokal** (localhost) und wird auf der
 echten Website ignoriert.
