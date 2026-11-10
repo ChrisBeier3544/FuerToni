@@ -51,9 +51,12 @@
     const wert = new URLSearchParams(location.search).get("testdatum");
     const m = wert && /^(\d{4})-(\d{2})-(\d{2})$/.exec(wert);
     if (!m) return null;
-    // 11:00 UTC = 12:00 Uhr deutsche Winterzeit, mit &abend 19:00 Uhr
-    const abend = new URLSearchParams(location.search).has("abend");
-    return Date.UTC(+m[1], +m[2] - 1, +m[3], abend ? 18 : 11, 0, 0);
+    // Uhrzeit in UTC (deutsche Winterzeit = UTC + 1), z. B. &zeit=morgen
+    const param = new URLSearchParams(location.search);
+    const zeit = param.has("abend") ? "abend" : param.get("zeit");
+    const stunde = { morgen: 6.5, vormittag: 9, mittag: 12, nachmittag: 14, abend: 18, nacht: 22 }[zeit];
+    const utc = stunde === undefined ? 11 : stunde;
+    return Date.UTC(+m[1], +m[2] - 1, +m[3], Math.floor(utc), (utc % 1) * 60, 0);
   }
 
   async function holeServerzeit() {
@@ -266,7 +269,7 @@
     }
     aktualisiereStatus(d);
     aktualisiereEier(d);
-    setzeAbend(d);
+    setzeTageszeit(d);
     aktualisiereLichter(d);
     const fk = document.getElementById("finale-knopf");
     if (fk) fk.hidden = !(zeitBereit && alleOffen() && finaleGesehen());
@@ -594,9 +597,48 @@
     requestAnimationFrame(schritt);
   }
 
-  /* Abendmodus: ab 17 Uhr bis 6 Uhr morgens (deutsche Zeit) */
-  function setzeAbend(d) {
-    document.documentElement.toggleAttribute("data-abend", d.stunde >= 17 || d.stunde < 6);
+  /* Tageszeiten (deutsche Zeit):
+       morgens      6:00 bis  9:00
+       vormittags   9:00 bis 12:00
+       mittags     12:00 bis 14:00
+       nachmittags 14:00 bis 16:30 (im Dezember geht dann die Sonne unter)
+       abends      16:30 bis 22:00
+       nachts      22:00 bis  6:00 */
+  const TAGESZEITEN = [
+    { name: "nacht", bis: 6 * 60, gruss: "Schlaf schön, mein Schatz 🌙" },
+    { name: "morgen", bis: 9 * 60, gruss: "Guten Morgen, mein Schatz ☀️" },
+    { name: "vormittag", bis: 12 * 60, gruss: "Einen schönen Vormittag, mein Schatz 🌤️" },
+    { name: "mittag", bis: 14 * 60, gruss: "Schöne Mittagspause, mein Schatz ☕" },
+    { name: "nachmittag", bis: 16 * 60 + 30, gruss: "Einen gemütlichen Nachmittag, mein Schatz 🍪" },
+    { name: "abend", bis: 22 * 60, gruss: "Guten Abend, mein Schatz 🕯️" },
+    { name: "nacht", bis: 24 * 60, gruss: "Schlaf schön, mein Schatz 🌙" },
+  ];
+  function setzeTageszeit(d) {
+    const minuten = d.stunde * 60 + d.minute;
+    const zeit = TAGESZEITEN.find((t) => minuten < t.bis) || TAGESZEITEN[0];
+    const html = document.documentElement;
+    if (html.getAttribute("data-tageszeit") !== zeit.name) {
+      html.setAttribute("data-tageszeit", zeit.name);
+      html.toggleAttribute("data-abend", zeit.name === "abend" || zeit.name === "nacht");
+    }
+    const gruss = document.getElementById("gruss");
+    if (gruss) gruss.textContent = zeitBereit ? zeit.gruss : "";
+  }
+
+  function baueSterne() {
+    const box = document.getElementById("sterne");
+    if (!box) return;
+    const rnd = zufall(1224);
+    for (let k = 0; k < 70; k++) {
+      const s = document.createElement("span");
+      s.style.left = (rnd() * 100).toFixed(2) + "%";
+      s.style.top = (rnd() * 62).toFixed(2) + "%";
+      const g = 1 + rnd() * 2.2;
+      s.style.width = s.style.height = g.toFixed(1) + "px";
+      s.style.animationDelay = -(rnd() * 4).toFixed(2) + "s";
+      s.style.animationDuration = (2.5 + rnd() * 3).toFixed(2) + "s";
+      box.appendChild(s);
+    }
   }
 
   /* Lichterkette: für jedes geöffnete Türchen leuchtet ein Birnchen */
@@ -675,7 +717,8 @@
           for (let sp = 0; sp < spalten; sp++) {
             if (rnd() < 0.25) continue;
             const fx = x + (hw / spalten) * (sp + 0.5) - 6, fy = oben + 10 + r * 24;
-            teile += '<rect class="fenster" x="' + fx.toFixed(1) + '" y="' + fy.toFixed(1) + '" width="12" height="13" rx="2"/>';
+            const gruppe = rnd() < 0.35 ? "f1" : "f2";
+            teile += '<rect class="fenster ' + gruppe + '" x="' + fx.toFixed(1) + '" y="' + fy.toFixed(1) + '" width="12" height="13" rx="2"/>';
           }
         }
         x += hw + 18 + rnd() * 26;
@@ -1021,6 +1064,7 @@
   baueKalender();
   baueLichterkette();
   baueLandschaft();
+  baueSterne();
   baueEier();
   baueFotos();
   baueSchnee();

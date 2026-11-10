@@ -1048,7 +1048,91 @@ main {
 .finale-unter { margin: 8px 0 0; font-weight: 700; color: var(--gold-hell); }
 .finale-zu { position: fixed; top: 14px; right: 14px; z-index: 2; }
 
-/* ---------- Abendmodus (ab 17 Uhr) ---------- */
+/* ---------- Tageszeiten ---------- */
+.gruss {
+  margin: 0 0 4px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  color: var(--rose-500);
+  min-height: 1.3em;
+}
+.himmel { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.sonne {
+  position: absolute;
+  width: clamp(160px, 40vw, 300px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 246, 214, 0.95) 0 22%, rgba(255, 214, 150, 0.45) 45%, transparent 70%);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition: left 2s ease, top 2s ease, opacity 2s ease, filter 2s ease;
+  left: 50%;
+  top: -10%;
+}
+.mond {
+  position: absolute;
+  right: 12%;
+  top: 9%;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  box-shadow: 12px -5px 0 0 #fdf1cc;
+  filter: drop-shadow(0 0 14px rgba(253, 241, 204, 0.55));
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+.sterne { position: absolute; inset: 0; opacity: 0; transition: opacity 2s ease; }
+.sterne span {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  animation: funkeln 4s ease-in-out infinite;
+}
+@keyframes funkeln { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+/* Morgens: Sonnenaufgang */
+html[data-tageszeit="morgen"] body {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 190, 140, 0.55), transparent 45%),
+    linear-gradient(180deg, #ffd8c4 0%, #ffe6e2 42%, #ffd6df 100%);
+  background-attachment: fixed;
+}
+html[data-tageszeit="morgen"] .sonne { opacity: 0.9; left: 10%; top: 24%; filter: hue-rotate(-12deg) saturate(1.4); }
+html[data-tageszeit="morgen"] .landschaft { --huegel-2: #ffd9cc; }
+html[data-tageszeit="morgen"] .gruss { color: #d9653f; }
+
+/* Vormittags: frisch und klar */
+html[data-tageszeit="vormittag"] body {
+  background:
+    radial-gradient(circle at 86% 6%, rgba(255, 255, 255, 0.95), transparent 40%),
+    linear-gradient(180deg, #e4efff 0%, #fff3f6 46%, #ffe1e8 100%);
+  background-attachment: fixed;
+}
+html[data-tageszeit="vormittag"] .sonne { opacity: 0.85; left: 86%; top: 7%; }
+html[data-tageszeit="vormittag"] .landschaft { --huegel-2: #e6eefb; --fenster: #eef5ff; }
+html[data-tageszeit="vormittag"] .gruss { color: #5b7fb8; }
+
+/* Mittags: am hellsten, Standard-Rosa */
+html[data-tageszeit="mittag"] .sonne { opacity: 0.75; left: 50%; top: -4%; }
+html[data-tageszeit="mittag"] .landschaft { --fenster: #fff7ec; }
+
+/* Nachmittags: goldene Stunde */
+html[data-tageszeit="nachmittag"] body {
+  background:
+    radial-gradient(circle at 92% 22%, rgba(255, 190, 110, 0.5), transparent 45%),
+    linear-gradient(175deg, #ffe7cf 0%, #ffd4cf 48%, #f7b6c6 100%);
+  background-attachment: fixed;
+}
+html[data-tageszeit="nachmittag"] .sonne { opacity: 0.9; left: 92%; top: 26%; filter: hue-rotate(-18deg) saturate(1.6); }
+html[data-tageszeit="nachmittag"] .landschaft { --huegel-2: #ffd8c2; }
+html[data-tageszeit="nachmittag"] .gruss { color: #c4572f; }
+
+/* Morgens gehen die ersten Lichter an */
+html[data-tageszeit="morgen"] .landschaft .f1 { fill: #ffd36b; filter: drop-shadow(0 0 4px rgba(255, 211, 107, 0.8)); }
+
+/* ---------- Abendmodus (ab 16:30 Uhr) ---------- */
 html[data-abend] body {
   background:
     radial-gradient(circle at 20% 8%, rgba(255, 214, 140, 0.12), transparent 40%),
@@ -1072,4 +1156,30 @@ html[data-abend] .tuer-blatt { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), inset
 @media (prefers-reduced-motion: reduce) {
   .umschlag, .intro-hinweis, .birne.an, .birne.neu { animation: none; }
   .dialog.aus-tuer[open], .dialog.aus-tuer[open] .dialog-inhalt > * { animation: none; }
+}
+
+/* Abends: Sterne leicht, Mond tief */
+html[data-tageszeit="abend"] .sterne { opacity: 0.45; }
+html[data-tageszeit="abend"] .mond { opacity: 0.5; right: 5%; top: 2.5%; }
+html[data-abend] .gruss { color: #ffb3c6; }
+
+/* Nachts: Nachtblau, Mond, Sterne, nur wenige Fenster hell */
+html[data-tageszeit="nacht"] body {
+  background:
+    radial-gradient(circle at 82% 8%, rgba(200, 210, 255, 0.14), transparent 32%),
+    linear-gradient(180deg, #0c1030 0%, #160f2e 55%, #1c0b24 100%);
+  background-attachment: fixed;
+}
+html[data-tageszeit="nacht"] .sterne { opacity: 1; }
+html[data-tageszeit="nacht"] .mond { opacity: 1; }
+html[data-tageszeit="nacht"] .gruss { color: #c9d2ff; }
+html[data-tageszeit="nacht"] .kopf h1 { color: #e6dcff; text-shadow: 0 0 24px rgba(180, 190, 255, 0.4); }
+html[data-tageszeit="nacht"] .landschaft { --huegel-1: #dcdcee; --huegel-2: #a9a7cc; --haus-a: #2f2446; --haus-b: #261c3b; --haus-c: #3a2c55; --dach: #160f2a; --fenster: #3b3254; --baum: #1d3328; --schnee: #e4e4f4; }
+html[data-tageszeit="nacht"] .landschaft .fenster { filter: none; }
+html[data-tageszeit="nacht"] .landschaft .f1 { fill: #ffd36b; filter: drop-shadow(0 0 5px rgba(255, 211, 107, 0.9)); }
+html[data-tageszeit="nacht"] { --schnee-boden: #dcdcee; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sterne span { animation: none; opacity: 0.7; }
+  .sonne, .mond, .sterne { transition: none; }
 }

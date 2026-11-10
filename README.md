@@ -32,7 +32,11 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
 - **Lichterkette:** Für jedes geöffnete Türchen leuchtet ein Birnchen mehr.
 - **Schnee und Herzen:** weht beim Scrollen und Neigen des Handys mit.
 - **Winterlandschaft** mit leuchtenden Fenstern unten auf der Seite.
-- **Abendmodus:** von 17 bis 6 Uhr nachtblau und gemütlich (lokal testen mit `&abend`).
+- **Tageszeiten** (deutsche Zeit) mit eigener Optik und Gruß über dem Titel:
+  morgens 6:00 bis 9:00 (Sonnenaufgang), vormittags 9:00 bis 12:00 (frisch und hell),
+  mittags 12:00 bis 14:00 (am hellsten), nachmittags 14:00 bis 16:30 (goldene Stunde),
+  abends 16:30 bis 22:00 (gemütlich dunkel), nachts 22:00 bis 6:00 (Mond und Sterne).
+  Lokal testen mit z. B. `&zeit=morgen`.
 - **Finale:** Sind alle 24 Türchen offen, fliegen alle Fotos zu einem Herz zusammen.
   Danach lässt es sich über „♥️ Unser Herz“ jederzeit wieder ansehen.
 
@@ -61,7 +65,7 @@ Dann im Browser öffnen:
 
 - `http://localhost:8000/` – zeigt den Kalender mit dem echten Datum
 - `http://localhost:8000/?testdatum=2026-12-05` – tut so, als wäre der 5. Dezember
-- `http://localhost:8000/?testdatum=2026-12-05&abend` – dasselbe um 19 Uhr
+- `http://localhost:8000/?testdatum=2026-12-05&zeit=nacht` – dasselbe nachts (auch morgen, vormittag, mittag, nachmittag, abend)
 
 Der Parameter `?testdatum=` funktioniert **nur lokal** (localhost) und wird auf der
 echten Website ignoriert.
