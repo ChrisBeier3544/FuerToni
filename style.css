@@ -1,0 +1,1964 @@
+:root {
+  --rose-50: #fff5f7;
+  --rose-100: #ffe4ea;
+  --rose-200: #fecdd6;
+  --rose-300: #fda4b8;
+  --rose-400: #f7809b;
+  --rose-500: #e85d7e;
+  --beere: #9d2449;
+  --beere-dunkel: #6b1532;
+  --gold: #d4a84b;
+  --gold-hell: #f3dc9f;
+  --text: #4a1d2e;
+  --schatten: 0 6px 18px rgba(157, 36, 73, 0.18);
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; }
+
+body {
+  min-height: 100vh;
+  font-family: "Nunito", system-ui, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(255, 255, 255, 0.8), transparent 40%),
+    radial-gradient(circle at 85% 90%, rgba(253, 164, 184, 0.45), transparent 45%),
+    linear-gradient(160deg, var(--rose-50), var(--rose-100) 50%, var(--rose-200));
+  background-attachment: fixed;
+  overflow-x: hidden;
+}
+
+/* ---------- schwebende Herzen im Hintergrund ---------- */
+.herzen {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+.herzen span {
+  position: absolute;
+  bottom: -40px;
+  color: var(--rose-400);
+  opacity: 0;
+  animation: aufsteigen linear infinite;
+}
+@keyframes aufsteigen {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.55; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(-110vh) rotate(25deg); opacity: 0; }
+}
+
+/* ---------- Kopfbereich ---------- */
+.kopf {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 40px 16px 12px;
+}
+.kopf h1 {
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(2.6rem, 9vw, 4.5rem);
+  color: var(--beere);
+  margin: 0;
+  line-height: 1.1;
+  text-shadow: 0 2px 0 rgba(255, 255, 255, 0.8);
+}
+.untertitel {
+  margin: 8px 0 0;
+  font-size: 1.05rem;
+  opacity: 0.85;
+}
+.status {
+  display: inline-block;
+  margin: 16px 0 0;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: var(--schatten);
+  font-weight: 700;
+  color: var(--beere);
+  min-height: 1.2em;
+}
+.status:empty { display: none; }
+
+/* ---------- Fotos ---------- */
+.polaroid {
+  display: block;
+  padding: 7px 7px 0;
+  border: 0;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(107, 21, 50, 0.2);
+  cursor: zoom-in;
+  font: inherit;
+  color: var(--text);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.polaroid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  background: var(--rose-100);
+}
+.polaroid span {
+  display: block;
+  padding: 6px 2px 8px;
+  font-family: "Dancing Script", cursive;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--beere);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.polaroid:hover { transform: rotate(0deg) scale(1.04) !important; z-index: 3; }
+.polaroid:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+
+.titelfotos {
+  --w: clamp(100px, 29vw, 150px);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 22px auto 4px;
+}
+.titelfotos:empty { display: none; }
+.titelfotos .polaroid span { font-size: clamp(0.8rem, 3.2vw, 1.05rem); }
+.titelfotos .polaroid {
+  position: relative;
+  z-index: 1;
+  width: var(--w);
+  margin: 0 -10px;
+}
+.titelfotos .polaroid:nth-child(1) { transform: rotate(-7deg) translateY(6px); }
+.titelfotos .polaroid:nth-child(2) { transform: rotate(2deg); z-index: 2; }
+.titelfotos .polaroid:nth-child(3) { transform: rotate(8deg) translateY(8px); }
+
+.momente {
+  position: relative;
+  z-index: 1;
+  margin: 28px auto 0;
+  max-width: 1100px;
+}
+.momente[hidden] { display: none; }
+.momente h2 {
+  margin: 0;
+  padding: 0 16px;
+  text-align: center;
+  font-family: "Dancing Script", cursive;
+  font-size: 2.2rem;
+  color: var(--beere);
+}
+.fotostreifen {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 18px 16px 26px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rose-300) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+.fotostreifen .polaroid {
+  flex: none;
+  width: clamp(140px, 42vw, 190px);
+  scroll-snap-align: center;
+}
+.fotostreifen .polaroid:nth-child(4n+1) { transform: rotate(-3deg); }
+.fotostreifen .polaroid:nth-child(4n+2) { transform: rotate(2deg) translateY(6px); }
+.fotostreifen .polaroid:nth-child(4n+3) { transform: rotate(-1.5deg) translateY(2px); }
+.fotostreifen .polaroid:nth-child(4n+4) { transform: rotate(3deg) translateY(8px); }
+
+.lightbox {
+  width: 100vw;
+  height: 100vh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: hidden;
+}
+.lightbox[open] { display: grid; place-items: center; }
+.lightbox::backdrop { background: rgba(40, 8, 20, 0.88); }
+.lightbox-figur {
+  margin: 0;
+  padding: 10px 10px 0;
+  max-width: calc(100vw - 32px);
+  background: #fff;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  animation: aufpoppen 0.35s ease;
+}
+.lightbox-figur img {
+  display: block;
+  max-width: calc(100vw - 52px);
+  max-height: calc(100vh - 150px);
+  width: auto;
+  height: auto;
+}
+.lightbox-figur figcaption {
+  padding: 8px 4px 12px;
+  text-align: center;
+  font-family: "Dancing Script", cursive;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--beere);
+}
+.lightbox .schliessen { position: fixed; top: 14px; right: 14px; z-index: 2; }
+.lightbox-pfeil {
+  position: fixed;
+  top: 50%;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.85);
+  color: var(--beere);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lightbox-pfeil.zurueck { left: 10px; }
+.lightbox-pfeil.weiter { right: 10px; }
+
+/* ---------- Kalender-Raster ---------- */
+main {
+  position: relative;
+  z-index: 1;
+  padding: 16px;
+}
+.kalender {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+@media (min-width: 560px) { .kalender { grid-template-columns: repeat(4, 1fr); gap: 16px; } }
+@media (min-width: 860px) { .kalender { grid-template-columns: repeat(6, 1fr); gap: 18px; } }
+
+/* ---------- Türchen ---------- */
+.tuer {
+  position: relative;
+  aspect-ratio: 1 / 1.1;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1500px;
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+.tuer:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; border-radius: 14px; }
+
+/* Rückseite / Innenraum hinter dem Türchen */
+.tuer-innen {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background:
+    radial-gradient(circle, rgba(232, 93, 126, 0.12) 0 1.2px, transparent 1.6px) 0 0 / 10px 10px,
+    linear-gradient(160deg, #fff4f6, #ffd9e2);
+  box-shadow: inset 0 6px 14px rgba(107, 21, 50, 0.28), inset 0 0 0 3px rgba(255, 255, 255, 0.6);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+.tuer-innen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.85;
+}
+.tuer-innen .innen-herz {
+  font-size: 2rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+/* Das aufklappbare Türblatt */
+.tuer-blatt {
+  --band: var(--gold);
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  transform-origin: left center;
+  transition: transform 0.9s cubic-bezier(0.3, 1.3, 0.5, 1);
+  backface-visibility: hidden;
+  box-shadow: var(--schatten), inset 0 -8px 14px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+/* Geschenkpapier: vier Muster im Wechsel */
+.tuer:nth-child(4n+1) .tuer-blatt {
+  --band: #fff6e0;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.55) 0 2px, transparent 2.6px) 0 0 / 14px 14px,
+    linear-gradient(145deg, #f994ab, #ec6a8a);
+}
+.tuer:nth-child(4n+2) .tuer-blatt {
+  --band: var(--beere);
+  background: repeating-linear-gradient(45deg, #fff 0 7px, #ffe1e8 7px 14px);
+}
+.tuer:nth-child(4n+3) .tuer-blatt {
+  --band: var(--gold);
+  background:
+    radial-gradient(circle, rgba(243, 220, 159, 0.75) 0 1.6px, transparent 2.1px) 0 0 / 12px 12px,
+    linear-gradient(145deg, #b02c55, #8a1f42);
+}
+.tuer:nth-child(4n+4) .tuer-blatt {
+  --band: #e85d7e;
+  background: repeating-linear-gradient(90deg, #fecdd6 0 9px, #fff0f3 9px 13px);
+}
+.tuer[data-tag="24"] .tuer-blatt {
+  --band: #c2185b;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.6) 0 1.5px, transparent 2px) 0 0 / 11px 11px,
+    linear-gradient(145deg, #f6dd9b, #d4a84b);
+}
+
+.band-v, .band-h {
+  position: absolute;
+  background: var(--band);
+}
+.band-v {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 15%;
+  transform: translateX(-50%);
+  box-shadow: inset 3px 0 3px -2px rgba(0, 0, 0, 0.18), inset -3px 0 3px -2px rgba(0, 0, 0, 0.18);
+}
+.band-h {
+  left: 0;
+  right: 0;
+  top: 34%;
+  height: 13%;
+  transform: translateY(-50%);
+  box-shadow: inset 0 3px 3px -2px rgba(0, 0, 0, 0.18), inset 0 -3px 3px -2px rgba(0, 0, 0, 0.18);
+}
+.schleife {
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  width: 58%;
+  transform: translate(-50%, -56%);
+  color: var(--band);
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.22));
+}
+.schleife svg { display: block; width: 100%; height: auto; }
+.anhaenger {
+  position: absolute;
+  left: 50%;
+  top: 57%;
+  min-width: 48%;
+  padding: 1px 8px 0;
+  transform: translateX(-50%) rotate(-6deg);
+  border-radius: 6px;
+  background: #fffdf8;
+  box-shadow: 0 3px 7px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+.anhaenger::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 1.5px;
+  height: 12px;
+  background: var(--band);
+}
+
+.nummer {
+  font-family: "Dancing Script", cursive;
+  font-weight: 700;
+  font-size: clamp(1.5rem, 5.6vw, 2.1rem);
+  line-height: 1.2;
+  color: var(--beere);
+}
+
+.schloss {
+  position: absolute;
+  bottom: 5px;
+  left: 7px;
+  font-size: 0.72rem;
+  opacity: 0.7;
+}
+
+/* Zustände */
+.tuer.gesperrt .tuer-blatt { filter: saturate(0.85); }
+.tuer.gesperrt:hover .tuer-blatt { transform: rotateY(-6deg); }
+
+.tuer.verfuegbar:not(.offen):hover .tuer-blatt { transform: rotateY(-18deg); }
+
+.tuer.heute:not(.offen) .tuer-blatt {
+  animation: leuchten 2.2s ease-in-out infinite;
+}
+@keyframes leuchten {
+  0%, 100% { box-shadow: var(--schatten), 0 0 0 0 rgba(212, 168, 75, 0.0); }
+  50%      { box-shadow: var(--schatten), 0 0 0 6px rgba(212, 168, 75, 0.55); }
+}
+
+.tuer.offen .tuer-blatt { transform: rotateY(-94deg); }
+
+.tuer.wackeln { animation: wackeln 0.45s ease; }
+@keyframes wackeln {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px) rotate(-2deg); }
+  40% { transform: translateX(6px) rotate(2deg); }
+  60% { transform: translateX(-4px) rotate(-1deg); }
+  80% { transform: translateX(4px) rotate(1deg); }
+}
+
+/* ---------- Hinweis-Toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  z-index: 20;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  transform: translate(-50%, calc(100% + 40px));
+  visibility: hidden;
+  padding: 12px 20px;
+  border-radius: 14px;
+  background: var(--beere);
+  color: #fff;
+  font-weight: 600;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(107, 21, 50, 0.35);
+  transition: transform 0.35s ease, visibility 0s linear 0.35s;
+}
+.toast.sichtbar { transform: translate(-50%, 0); visibility: visible; transition-delay: 0s; }
+
+/* ---------- Dialog mit Inhalt ---------- */
+.dialog {
+  border: 0;
+  padding: 0;
+  width: min(520px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  border-radius: 22px;
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 25px 60px rgba(107, 21, 50, 0.35);
+}
+.dialog::backdrop {
+  background: rgba(107, 21, 50, 0.45);
+  backdrop-filter: blur(3px);
+}
+.dialog[open] { animation: aufpoppen 0.4s cubic-bezier(0.3, 1.4, 0.5, 1); }
+@keyframes aufpoppen {
+  from { transform: scale(0.85); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.dialog-inhalt {
+  position: relative;
+  padding: 32px 24px 26px;
+  text-align: center;
+  background:
+    radial-gradient(circle at top, var(--rose-100), transparent 60%);
+}
+.schliessen {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--rose-100);
+  color: var(--beere);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.schliessen:hover { background: var(--rose-200); }
+.dialog-tag {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--rose-500);
+}
+.dialog h2 {
+  font-family: "Dancing Script", cursive;
+  font-size: 2.3rem;
+  color: var(--beere);
+  margin: 4px 0 14px;
+  line-height: 1.15;
+}
+.dialog-bild {
+  display: block;
+  width: 100%;
+  max-height: 50vh;
+  object-fit: cover;
+  border-radius: 14px;
+  margin: 0 0 16px;
+  box-shadow: var(--schatten);
+}
+.dialog-text {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+.extras {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+}
+.extra {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 14px 12px;
+  border-radius: 16px;
+  text-align: center;
+}
+.extra[hidden] { display: none; }
+.extra-brief {
+  background: linear-gradient(135deg, var(--rose-50), var(--rose-100));
+  border: 1px solid var(--rose-300);
+}
+.extra-paeckchen {
+  background: linear-gradient(135deg, #fff8e6, var(--gold-hell));
+  border: 1px solid var(--gold);
+}
+.extra-icon { font-size: 1.5rem; }
+.extra-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+  opacity: 0.85;
+}
+.extra-zahl {
+  margin-top: 4px;
+  font-family: "Dancing Script", cursive;
+  font-size: 2.6rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--beere);
+}
+
+/* ---------- Easter Eggs ---------- */
+.ei {
+  position: absolute;
+  z-index: 2;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  filter: drop-shadow(0 3px 4px rgba(107, 21, 50, 0.25));
+  transition: transform 0.2s ease;
+  animation: ei-wackeln 7s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+.ei[hidden] { display: none; }
+.ei svg { width: 100%; height: 100%; display: block; }
+.ei:hover { transform: scale(1.15) rotate(-6deg); }
+.ei:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 10px; }
+@keyframes ei-wackeln {
+  0%, 88%, 100% { rotate: 0deg; }
+  91% { rotate: -12deg; }
+  94% { rotate: 10deg; }
+  97% { rotate: -6deg; }
+}
+.ei-matcha { top: 14px; right: 14px; }
+.ei-ente   { top: 14px; left: 14px; animation-delay: -3s; }
+.ei-acai   { bottom: 34px; left: 16px; animation-delay: -1.5s; }
+.ei-blumen { bottom: 34px; right: 16px; animation-delay: -4.5s; }
+.ei-klein {
+  width: 30px;
+  height: 30px;
+  animation-duration: 11s;
+  filter: drop-shadow(0 2px 3px rgba(107, 21, 50, 0.25));
+}
+.ei-im-tuerchen { left: 12px; bottom: 10px; }
+.ei-seite-titelfotos {
+  z-index: 0;
+  bottom: -10px;
+  right: calc(50% - var(--w) * 1.5 + 2px);
+  rotate: 14deg;
+  animation: none;
+}
+.ei-seite-fuss { right: 16px; bottom: 32px; width: 26px; height: 26px; }
+.ei-im-foto { right: 8px; bottom: 8px; width: 28px; height: 28px; }
+.lightbox-figur { position: relative; }
+.ei-innen {
+  display: block;
+  width: 62%;
+  cursor: pointer;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+}
+.ei-innen[hidden] { display: none; }
+.ei-innen svg { display: block; width: 100%; height: auto; }
+.ei-innen:not([hidden]) ~ * { display: none; }
+.ei-capybara {
+  top: -22px;
+  right: calc(16px + 10%);
+  width: 50px;
+  height: 42px;
+  z-index: 4;
+  animation: capy-gucken 6s ease-in-out infinite;
+}
+@media (min-width: 860px) { .ei-capybara { right: max(40px, calc(50% - 400px)); } }
+@keyframes capy-gucken {
+  0%, 70%, 100% { translate: 0 0; }
+  78%, 90% { translate: 0 -6px; }
+}
+.ei-heimat { top: 0; left: 50%; margin-left: -21px; animation-delay: -6s; }
+@media (min-width: 860px) {
+  .ei-matcha { right: calc(50% - 440px); }
+  .ei-ente   { left: calc(50% - 440px); }
+  .ei-acai   { left: calc(50% - 440px); }
+  .ei-blumen { right: calc(50% - 440px); }
+}
+
+.sammlung-knopf {
+  margin-top: 4px;
+  padding: 7px 16px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff8e6, var(--gold-hell));
+  color: var(--beere-dunkel);
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  box-shadow: var(--schatten);
+}
+.sammlung-knopf[hidden] { display: none; }
+
+.gutschein-gefunden {
+  margin: 0 0 14px;
+  font-weight: 700;
+  color: var(--rose-500);
+}
+.ticket {
+  position: relative;
+  padding: 22px 18px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fffaf0, var(--gold-hell));
+  border: 2px dashed var(--gold);
+  box-shadow: inset 0 0 0 6px rgba(255, 255, 255, 0.6);
+}
+.ticket::before, .ticket::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px dashed var(--gold);
+}
+.ticket::before { left: -13px; }
+.ticket::after  { right: -13px; }
+.ticket-emblem { width: 64px; height: 64px; margin: 0 auto 6px; }
+.ticket-bild {
+  display: block;
+  width: 78%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  margin: 0 auto 12px;
+  border: 6px solid #fff;
+  box-shadow: 0 6px 16px rgba(107, 21, 50, 0.2);
+  transform: rotate(-2deg);
+}
+.ticket-bild[hidden] { display: none; }
+.ticket-label[hidden], .ticket-fuss[hidden] { display: none; }
+.ticket-foto .ticket-bild { width: 100%; transform: rotate(-1deg); }
+.ticket-bild:not([hidden]) + .ticket-emblem {
+  width: 46px;
+  height: 46px;
+  margin-top: -34px;
+  position: relative;
+  z-index: 1;
+}
+.ticket-emblem svg { width: 100%; height: 100%; }
+.ticket-label {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--beere);
+  opacity: 0.75;
+}
+.ticket h2 { margin: 2px 0 10px; }
+.ticket-text { margin: 0; line-height: 1.55; }
+.ticket-fuss strong { display: block; margin-bottom: 4px; color: var(--beere); }
+.ticket-fuss {
+  margin: 14px 0 0;
+  padding-top: 10px;
+  border-top: 1px dashed var(--gold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.sammlung-liste { display: grid; gap: 10px; margin-top: 6px; }
+.sammlung-eintrag {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px dashed var(--gold);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fffaf0, var(--gold-hell));
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.sammlung-eintrag svg { width: 36px; height: 36px; flex: none; }
+
+/* ---------- Konfetti-Regen (Geburtstage) ---------- */
+.konfetti-regen {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+  z-index: 40;
+  overflow: hidden;
+}
+.konfetti-regen:not(:popover-open):not(.aktiv) { display: none; }
+
+.hinweis {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fff8e6, var(--gold-hell));
+  border: 1px solid var(--gold);
+  text-align: left;
+  font-weight: 600;
+}
+.hinweis[hidden] { display: none; }
+.hinweis-icon { font-size: 1.6rem; }
+
+/* ---------- Herz-Konfetti beim Öffnen ---------- */
+.konfetti {
+  position: fixed;
+  z-index: 30;
+  pointer-events: none;
+  font-size: 1.2rem;
+  animation: platzen 1.1s ease-out forwards;
+}
+@keyframes platzen {
+  from { transform: translate(0, 0) scale(0.6); opacity: 1; }
+  to   { transform: translate(var(--dx), var(--dy)) scale(1.1); opacity: 0; }
+}
+
+.fuss {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 24px 16px 40px;
+  font-family: "Dancing Script", cursive;
+  font-size: 1.3rem;
+  color: var(--beere);
+  opacity: 0.8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .herzen { display: none; }
+  .ei { animation: none; }
+  .tuer-blatt { transition-duration: 0.01s; }
+  .tuer.heute:not(.offen) .tuer-blatt,
+  .tuer.wackeln,
+  .dialog[open],
+  .konfetti { animation: none; }
+  .konfetti { display: none; }
+}
+
+/* =========================================================
+   Wow-Effekte
+   ========================================================= */
+.kopf-knoepfe { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 8px 0 0; }
+.kopf-knoepfe:not(:has(button:not([hidden]))) { display: none; }
+
+/* ---------- Briefumschlag zum Einstieg ---------- */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 26px;
+  padding: 16px;
+  background:
+    radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.9), transparent 55%),
+    linear-gradient(160deg, var(--rose-50), var(--rose-200));
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.intro[hidden] { display: none; }
+.intro.weg { opacity: 0; transform: scale(1.08); pointer-events: none; }
+.umschlag {
+  position: relative;
+  width: min(86vw, 420px);
+  aspect-ratio: 3 / 2;
+  perspective: 1400px;
+  cursor: pointer;
+  animation: schweben 3.2s ease-in-out infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+.umschlag:focus-visible { outline: 3px solid var(--gold); outline-offset: 8px; border-radius: 12px; }
+@keyframes schweben {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-8px) rotate(1deg); }
+}
+.umschlag.offen { animation: none; }
+.umschlag-rueck {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background: #e98aa2;
+  box-shadow: 0 24px 50px rgba(107, 21, 50, 0.3);
+}
+.brief {
+  position: absolute;
+  left: 6%;
+  right: 6%;
+  top: 6%;
+  height: 88%;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(transparent 0 23px, rgba(232, 93, 126, 0.12) 23px 24px),
+    #fffaf3;
+  text-align: center;
+  transition: transform 1s cubic-bezier(0.3, 1.2, 0.4, 1) 0.45s;
+}
+.brief-anrede, .brief-text { margin: 0; font-family: "Dancing Script", cursive; color: var(--beere); }
+.brief-anrede { font-size: clamp(1.4rem, 6vw, 1.9rem); font-weight: 700; }
+.brief-text { font-size: clamp(1.05rem, 4.4vw, 1.35rem); }
+.brief-herz { margin: 4px 0 0; font-size: 1.4rem; }
+.umschlag-vorne {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 10px;
+  background: linear-gradient(170deg, #f6b3c4, #ef9bb0);
+  clip-path: polygon(0 0, 50% 56%, 100% 0, 100% 100%, 0 100%);
+}
+.umschlag-klappe {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 60%;
+  z-index: 3;
+  border-radius: 10px 10px 0 0;
+  background: linear-gradient(180deg, #f9c6d3, #f2a7ba);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  transform-origin: top center;
+  transition: transform 0.6s ease-in;
+}
+.umschlag-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 9%;
+  z-index: 3;
+  margin: 0;
+  text-align: center;
+  font-family: "Dancing Script", cursive;
+  font-weight: 700;
+  font-size: clamp(1.6rem, 7vw, 2.3rem);
+  color: var(--beere-dunkel);
+}
+.siegel {
+  position: absolute;
+  left: 50%;
+  top: 60%;
+  z-index: 4;
+  width: clamp(54px, 16vw, 70px);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 35% 30%, #d8436b, #9d2449 60%, #6b1532);
+  box-shadow: 0 4px 10px rgba(107, 21, 50, 0.45), inset 0 -3px 6px rgba(0, 0, 0, 0.25);
+  color: #ffd6e0;
+  font-size: clamp(1.5rem, 6vw, 2rem);
+}
+.siegel::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255, 214, 224, 0.45);
+}
+.umschlag.offen .siegel { animation: siegel-bricht 0.55s ease-in forwards; }
+@keyframes siegel-bricht {
+  0% { transform: translate(-50%, -50%) scale(1); }
+  30% { transform: translate(-50%, -50%) scale(1.18) rotate(-8deg); }
+  100% { transform: translate(-50%, 40%) scale(0.6) rotate(25deg); opacity: 0; }
+}
+.umschlag.offen .umschlag-klappe { transform: rotateX(180deg); transition-delay: 0.25s; }
+.umschlag.klappe-hinten .umschlag-klappe { z-index: 0; }
+.umschlag.offen .brief { transform: translateY(-58%); }
+.intro-hinweis {
+  margin: 0;
+  font-weight: 700;
+  color: var(--beere);
+  animation: pulsieren 1.8s ease-in-out infinite;
+}
+@keyframes pulsieren { 50% { opacity: 0.45; } }
+.intro.geoeffnet .intro-hinweis { visibility: hidden; }
+
+/* ---------- Schnee und Herzen ---------- */
+.herzen canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* ---------- Lichterkette ---------- */
+.lichterkette {
+  position: relative;
+  max-width: 960px;
+  height: 46px;
+  margin: 0 auto 10px;
+}
+.lichterkette svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.lichterkette path { fill: none; stroke: #6b4a3a; stroke-width: 1.6; }
+.birne {
+  position: absolute;
+  width: 10px;
+  height: 14px;
+  margin-left: -5px;
+  border-radius: 50% 50% 50% 50% / 40% 40% 60% 60%;
+  background: #e6d6dc;
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.08);
+  transform-origin: 50% -3px;
+  transition: background 0.4s, box-shadow 0.4s;
+}
+.birne::before {
+  content: "";
+  position: absolute;
+  left: 1.5px;
+  top: -4px;
+  width: 6px;
+  height: 5px;
+  border-radius: 1px;
+  background: #6b4a3a;
+}
+.birne.an { background: var(--licht); box-shadow: 0 0 8px 2px var(--licht), 0 0 18px 4px color-mix(in srgb, var(--licht) 45%, transparent); animation: flackern 3.5s ease-in-out infinite; }
+.birne.neu { animation: aufleuchten 1.2s ease-out, flackern 3.5s ease-in-out 1.2s infinite; }
+@keyframes flackern { 0%, 100% { opacity: 1; } 50% { opacity: 0.82; } }
+@keyframes aufleuchten {
+  0% { transform: scale(1); filter: brightness(1); }
+  30% { transform: scale(1.8); filter: brightness(1.8); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
+/* ---------- Winterlandschaft ---------- */
+.landschaft {
+  position: relative;
+  z-index: 1;
+  margin-top: 30px;
+  height: clamp(175px, 26vw, 250px);
+  overflow: hidden;
+}
+.landschaft > svg { position: absolute; bottom: 0; left: 50%; height: 100%; width: auto; min-width: 100%; transform: translateX(-50%); }
+.landschaft { --huegel-1: #ffffff; --huegel-2: #fbe3e9; --haus-a: #f2a7ba; --haus-b: #e98aa2; --haus-c: #fdd3dd; --dach: #9d2449; --fenster: #fff2c4; --baum: #3f6b4f; --schnee: #ffffff; }
+.landschaft .fenster { fill: var(--fenster); }
+.fuss { background: var(--schnee-boden, #ffffff); margin-top: -2px; }
+
+/* ---------- Türchen wird zum Brief ---------- */
+.dialog.aus-tuer[open] { animation: aus-tuer 0.7s cubic-bezier(0.2, 0.9, 0.25, 1.05); }
+@keyframes aus-tuer {
+  from { transform: translate(var(--von-x, 0), var(--von-y, 0)) scale(var(--von-s, 0.2)) rotate(-4deg); opacity: 0.4; border-radius: 10px; }
+  to { transform: none; opacity: 1; }
+}
+.dialog.aus-tuer[open] .dialog-inhalt > * { animation: entfalten 0.5s ease both; }
+.dialog.aus-tuer[open] .dialog-inhalt > :nth-child(2) { animation-delay: 0.35s; }
+.dialog.aus-tuer[open] .dialog-inhalt > :nth-child(3) { animation-delay: 0.45s; }
+.dialog.aus-tuer[open] .dialog-inhalt > :nth-child(4) { animation-delay: 0.55s; }
+.dialog.aus-tuer[open] .dialog-inhalt > :nth-child(5) { animation-delay: 0.65s; }
+.dialog.aus-tuer[open] .dialog-inhalt > :nth-child(n+6) { animation-delay: 0.75s; }
+@keyframes entfalten {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- Finale: Fotos werden zum Herz ---------- */
+.finale {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 45%, rgb(140, 30, 66), rgb(40, 8, 20) 72%);
+  animation: einblenden 0.6s ease;
+}
+.finale[hidden] { display: none; }
+@keyframes einblenden { from { opacity: 0; } }
+.finale-herz { position: absolute; inset: 0; }
+.finale-foto {
+  position: absolute;
+  left: 50%;
+  top: var(--cy, 42%);
+  width: var(--g);
+  height: var(--g);
+  margin: calc(var(--g) / -2) 0 0 calc(var(--g) / -2);
+  padding: 3px 3px 9px;
+  background: #fff;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+}
+.finale-foto img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.finale-text {
+  position: absolute;
+  left: 50%;
+  top: var(--text-oben, 80%);
+  width: min(92vw, 560px);
+  transform: translateX(-50%);
+  text-align: center;
+  color: #fff;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+.finale.fertig .finale-text { opacity: 1; }
+.finale-titel { margin: 0; font-family: "Dancing Script", cursive; font-weight: 700; font-size: clamp(1.25rem, 5vw, 2.4rem); line-height: 1.15; text-shadow: 0 3px 12px rgba(0, 0, 0, 0.5); }
+.finale-unter { margin: 8px 0 0; font-weight: 700; color: var(--gold-hell); }
+.finale-zu { position: fixed; top: 14px; right: 14px; z-index: 2; }
+
+/* ---------- Tageszeiten ---------- */
+.gruss {
+  margin: 0 0 4px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  color: var(--rose-500);
+  min-height: 1.3em;
+}
+.himmel { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.sonne {
+  position: absolute;
+  width: clamp(160px, 40vw, 300px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 246, 214, 0.95) 0 22%, rgba(255, 214, 150, 0.45) 45%, transparent 70%);
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  transition: left 2s ease, top 2s ease, opacity 2s ease, filter 2s ease;
+  left: 50%;
+  top: -10%;
+}
+.mond {
+  position: absolute;
+  right: 12%;
+  top: 9%;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  box-shadow: 12px -5px 0 0 #fdf1cc;
+  filter: drop-shadow(0 0 14px rgba(253, 241, 204, 0.55));
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+.sterne { position: absolute; inset: 0; opacity: 0; transition: opacity 2s ease; }
+.sterne span {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+  animation: funkeln 4s ease-in-out infinite;
+}
+@keyframes funkeln { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+
+/* Morgens: Sonnenaufgang */
+html[data-tageszeit="morgen"] body {
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 190, 140, 0.55), transparent 45%),
+    linear-gradient(180deg, #ffd8c4 0%, #ffe6e2 42%, #ffd6df 100%);
+  background-attachment: fixed;
+}
+html[data-tageszeit="morgen"] .sonne { opacity: 0.9; left: 10%; top: 24%; filter: hue-rotate(-12deg) saturate(1.4); }
+html[data-tageszeit="morgen"] .landschaft { --huegel-2: #ffd9cc; }
+html[data-tageszeit="morgen"] .gruss { color: #d9653f; }
+
+/* Vormittags: frisch und klar */
+html[data-tageszeit="vormittag"] body {
+  background:
+    radial-gradient(circle at 86% 6%, rgba(255, 255, 255, 0.95), transparent 40%),
+    linear-gradient(180deg, #e4efff 0%, #fff3f6 46%, #ffe1e8 100%);
+  background-attachment: fixed;
+}
+html[data-tageszeit="vormittag"] .sonne { opacity: 0.85; left: 86%; top: 7%; }
+html[data-tageszeit="vormittag"] .landschaft { --huegel-2: #e6eefb; --fenster: #eef5ff; }
+html[data-tageszeit="vormittag"] .gruss { color: #5b7fb8; }
+
+/* Mittags: am hellsten, Standard-Rosa */
+html[data-tageszeit="mittag"] .sonne { opacity: 0.75; left: 50%; top: -4%; }
+html[data-tageszeit="mittag"] .landschaft { --fenster: #fff7ec; }
+
+/* Nachmittags: goldene Stunde */
+html[data-tageszeit="nachmittag"] body {
+  background:
+    radial-gradient(circle at 92% 22%, rgba(255, 190, 110, 0.5), transparent 45%),
+    linear-gradient(175deg, #ffe7cf 0%, #ffd4cf 48%, #f7b6c6 100%);
+  background-attachment: fixed;
+}
+html[data-tageszeit="nachmittag"] .sonne { opacity: 0.9; left: 92%; top: 26%; filter: hue-rotate(-18deg) saturate(1.6); }
+html[data-tageszeit="nachmittag"] .landschaft { --huegel-2: #ffd8c2; }
+html[data-tageszeit="nachmittag"] .gruss { color: #c4572f; }
+
+/* Morgens gehen die ersten Lichter an */
+html[data-tageszeit="morgen"] .landschaft .f1 { fill: #ffd36b; filter: drop-shadow(0 0 4px rgba(255, 211, 107, 0.8)); }
+
+/* ---------- Abendmodus (ab 16:30 Uhr) ---------- */
+html[data-abend] body {
+  background:
+    radial-gradient(circle at 20% 8%, rgba(255, 214, 140, 0.12), transparent 40%),
+    radial-gradient(circle at 80% 90%, rgba(232, 93, 126, 0.18), transparent 45%),
+    linear-gradient(170deg, #2b1030, #1c0b24 55%, #12081a);
+  background-attachment: fixed;
+  color: #ffe4ea;
+}
+html[data-abend] .kopf h1 { color: #ffd0dc; text-shadow: 0 0 24px rgba(255, 143, 171, 0.45); }
+html[data-abend] .untertitel { color: #ffe4ea; opacity: 0.85; }
+html[data-abend] .momente h2 { color: #ffd0dc; }
+html[data-abend] .status { background: rgba(255, 255, 255, 0.12); color: #ffe4ea; box-shadow: none; border: 1px solid rgba(255, 214, 224, 0.25); }
+html[data-abend] .lichterkette path { stroke: #c9a58f; }
+html[data-abend] .birne { background: #4a3542; }
+html[data-abend] .birne.an { box-shadow: 0 0 10px 3px var(--licht), 0 0 26px 8px color-mix(in srgb, var(--licht) 55%, transparent); }
+html[data-abend] .landschaft { --huegel-1: #e9e4f2; --huegel-2: #c9bfd9; --haus-a: #5a2a4a; --haus-b: #4a1f3d; --haus-c: #6e3558; --dach: #2b0f24; --fenster: #ffd36b; --baum: #24402f; --schnee: #f3eef8; }
+html[data-abend] .landschaft .fenster { filter: drop-shadow(0 0 6px rgba(255, 211, 107, 0.9)); }
+html[data-abend] { --schnee-boden: #e9e4f2; }
+html[data-abend] .tuer-blatt { box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), inset 0 -8px 14px rgba(0, 0, 0, 0.12); }
+
+@media (prefers-reduced-motion: reduce) {
+  .umschlag, .intro-hinweis, .birne.an, .birne.neu { animation: none; }
+  .dialog.aus-tuer[open], .dialog.aus-tuer[open] .dialog-inhalt > * { animation: none; }
+}
+
+/* Abends: Sterne leicht, Mond tief */
+html[data-tageszeit="abend"] .sterne { opacity: 0.45; }
+html[data-tageszeit="abend"] .mond { opacity: 0.5; right: 5%; top: 2.5%; }
+html[data-abend] .gruss { color: #ffb3c6; }
+
+/* Nachts: Nachtblau, Mond, Sterne, nur wenige Fenster hell */
+html[data-tageszeit="nacht"] body {
+  background:
+    radial-gradient(circle at 82% 8%, rgba(200, 210, 255, 0.14), transparent 32%),
+    linear-gradient(180deg, #0c1030 0%, #160f2e 55%, #1c0b24 100%);
+  background-attachment: fixed;
+}
+html[data-tageszeit="nacht"] .sterne { opacity: 1; }
+html[data-tageszeit="nacht"] .mond { opacity: 1; }
+html[data-tageszeit="nacht"] .gruss { color: #c9d2ff; }
+html[data-tageszeit="nacht"] .kopf h1 { color: #e6dcff; text-shadow: 0 0 24px rgba(180, 190, 255, 0.4); }
+html[data-tageszeit="nacht"] .landschaft { --huegel-1: #dcdcee; --huegel-2: #a9a7cc; --haus-a: #2f2446; --haus-b: #261c3b; --haus-c: #3a2c55; --dach: #160f2a; --fenster: #3b3254; --baum: #1d3328; --schnee: #e4e4f4; }
+html[data-tageszeit="nacht"] .landschaft .fenster { filter: none; }
+html[data-tageszeit="nacht"] .landschaft .f1 { fill: #ffd36b; filter: drop-shadow(0 0 5px rgba(255, 211, 107, 0.9)); }
+html[data-tageszeit="nacht"] { --schnee-boden: #dcdcee; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sterne span { animation: none; opacity: 0.7; }
+  .sonne, .mond, .sterne { transition: none; }
+}
+
+/* =========================================================
+   Besondere Extras
+   ========================================================= */
+
+/* ---------- Zusammen-Zähler ---------- */
+.zusammen {
+  margin: 10px 0 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--beere);
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+.zusammen:empty { display: none; }
+.zusammen.jubilaeum {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff8e6, var(--gold-hell));
+  border: 1px solid var(--gold);
+  opacity: 1;
+  animation: leuchten 2.4s ease-in-out infinite;
+}
+html[data-abend] .zusammen { color: #ffd0dc; }
+html[data-abend] .zusammen.jubilaeum { color: var(--beere-dunkel); }
+
+/* ---------- Rubbelfeld ---------- */
+.rubbel-bereich { position: relative; }
+.rubbel-bereich.rubbelt { user-select: none; -webkit-user-select: none; }
+.rubbel {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 16px;
+  touch-action: none;
+  cursor: grab;
+  box-shadow: 0 4px 14px rgba(107, 21, 50, 0.2);
+  transition: opacity 0.7s ease;
+}
+.rubbel.weg { opacity: 0; pointer-events: none; }
+
+/* ---------- Sprachnachricht ---------- */
+.sprachnachricht {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--rose-50), var(--rose-100));
+  border: 1px solid var(--rose-300);
+}
+.sprachnachricht[hidden] { display: none; }
+.sprachnachricht-titel { margin: 0 0 8px; font-weight: 700; color: var(--beere); }
+.sprachnachricht audio { width: 100%; }
+
+/* ---------- Quiz ---------- */
+.quiz-intro { margin: 4px 0 6px; opacity: 0.85; }
+.quiz-antworten { display: grid; gap: 10px; margin-top: 6px; }
+.quiz-antwort {
+  padding: 12px 16px;
+  border: 2px solid var(--rose-300);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.quiz-antwort:hover:not(:disabled) { background: var(--rose-50); transform: translateY(-1px); }
+.quiz-antwort:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.quiz-antwort.richtig { background: #e7f6ea; border-color: #4caf6a; color: #1f5b30; }
+.quiz-antwort.falsch { background: #fdecef; border-color: #e85d7e; opacity: 0.6; animation: wackeln 0.45s ease; }
+.quiz-antwort:disabled { cursor: default; }
+.quiz-rueckmeldung { min-height: 1.4em; margin: 12px 0 0; font-weight: 700; color: var(--beere); }
+
+/* ---------- Rückblick ---------- */
+.rueckblick-liste { display: grid; gap: 12px; margin-top: 6px; text-align: left; }
+.rueckblick-eintrag {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--rose-50);
+  border: 1px solid var(--rose-200);
+}
+.rueckblick-tag { margin: 0; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rose-500); }
+.rueckblick-eintrag h3 { margin: 2px 0 6px; font-family: "Dancing Script", cursive; font-size: 1.45rem; color: var(--beere); }
+.rueckblick-text { margin: 0; line-height: 1.5; white-space: pre-line; }
+
+/* ---------- Lichtershow an Heiligabend ---------- */
+.birne.show { background: #ffd36b; box-shadow: 0 0 10px 3px #ffd36b, 0 0 24px 8px rgba(255, 211, 107, 0.5); }
+.lichterkette.blinken .birne.show { animation: festblinken 0.5s steps(2, jump-none) 4; }
+@keyframes festblinken { 50% { background: #ff8fab; box-shadow: 0 0 10px 3px #ff8fab, 0 0 24px 8px rgba(255, 143, 171, 0.5); } }
+
+/* ---------- Capy-Begleiter ---------- */
+.capy-bahn { position: absolute; left: 0; right: 0; bottom: 9%; height: 0; }
+.capy-laeufer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-120px);
+  width: clamp(78px, 9vw, 96px);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.capy-laeufer:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 10px; }
+.capy-figur { display: block; width: 100%; height: auto; filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.18)); }
+.capy-laeufer.redet, .capy-laeufer.redet .capy-figur, .capy-laeufer.redet .bein-a, .capy-laeufer.redet .bein-b { animation-play-state: paused; }
+@keyframes capy-laufen {
+  0% { left: -80px; }
+  48% { left: calc(100% + 20px); }
+  50% { left: calc(100% + 20px); }
+  98% { left: -80px; }
+  100% { left: -80px; }
+}
+@keyframes capy-richtung { 0% { transform: scaleX(1); } 49% { transform: scaleX(-1); } }
+.bein-a, .bein-b { transform-box: fill-box; transform-origin: 50% 0; animation: tapsen 0.5s ease-in-out infinite alternate; }
+.bein-b { animation-direction: alternate-reverse; }
+@keyframes tapsen { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+.outfit { display: none; }
+.capy-laeufer[data-outfit="strick"] .outfit-strick { display: inline; }
+.capy-laeufer[data-outfit="nikolaus"] .outfit-nikolaus { display: inline; }
+.capy-laeufer[data-outfit="lernen"] .outfit-lernen { display: inline; }
+.capy-laeufer[data-outfit="ohren"] .outfit-ohren { display: inline; }
+.capy-laeufer[data-outfit="party"] .outfit-party { display: inline; }
+.capy-laeufer[data-outfit="rentier"] .outfit-rentier { display: inline; }
+.capy-laeufer[data-outfit="lichter"] .outfit-lichter { display: inline; }
+.capy-laeufer[data-outfit="krone"] .outfit-krone { display: inline; }
+.capy-licht { animation: capy-blinken 1.4s ease-in-out infinite; }
+.capy-licht:nth-child(even) { animation-delay: -0.7s; }
+@keyframes capy-blinken { 50% { opacity: 0.35; } }
+.capy-blase {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 3;
+  width: max-content;
+  max-width: min(220px, 70vw);
+  padding: 8px 12px;
+  transform: translateX(-50%);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--beere-dunkel);
+  font: 700 0.82rem/1.35 "Nunito", sans-serif;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(107, 21, 50, 0.22);
+  animation: aufpoppen 0.3s ease;
+}
+.capy-blase::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -7px;
+  border: 7px solid transparent;
+  border-top-color: #fff;
+}
+.capy-blase[hidden] { display: none; }
+.landschaft { overflow: visible; }
+.landschaft > svg { overflow: hidden; }
+
+/* ---------- App-Tipp ---------- */
+.app-tipp {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left, 0px));
+  right: max(16px, env(safe-area-inset-right, 0px));
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(107, 21, 50, 0.25);
+  font-size: 0.88rem;
+  animation: aufpoppen 0.4s ease;
+}
+.app-tipp[hidden] { display: none; }
+.app-tipp p { margin: 0; flex: 1; min-width: 0; }
+.app-tipp-icon { font-size: 1.5rem; }
+.app-tipp button { border: 0; background: var(--rose-100); color: var(--beere); width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; flex: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .capy-laeufer { transform: translateX(12vw); }
+  .capy-figur, .bein-a, .bein-b { animation: none; }
+}
+
+/* ---------- Capybaras in den Fenstern ---------- */
+.fenster-capy { display: none; }
+.fenster-capy.da { display: inline; }
+.fenster-hell { fill: #fff2c4; }
+.fenster-bank { fill: var(--schnee); }
+html[data-abend] .fenster-hell { fill: #ffd36b; }
+html[data-abend] .fenster-capy { filter: drop-shadow(0 0 5px rgba(255, 211, 107, 0.85)); }
+
+
+/* =========================================================
+   Feine Details
+   ========================================================= */
+
+/* ---------- Geöffnete Türchen ---------- */
+.innen-deko { width: 54%; display: block; filter: drop-shadow(0 3px 3px rgba(107, 21, 50, 0.25)); animation: deko-rein 0.6s ease 0.4s both; }
+.innen-deko svg { display: block; width: 100%; height: auto; }
+.innen-stempel {
+  position: absolute;
+  left: 50%;
+  bottom: 7px;
+  translate: -50% 0;
+  white-space: nowrap;
+  padding: 1px 6px;
+  border: 1.5px solid rgba(157, 36, 73, 0.55);
+  border-radius: 6px;
+  color: rgba(157, 36, 73, 0.7);
+  font: 700 0.62rem/1.4 "Nunito", sans-serif;
+  transform: rotate(-8deg);
+}
+@keyframes deko-rein { from { opacity: 0; transform: scale(0.6) rotate(-10deg); } }
+
+/* Innenseite des aufgeklappten Türchens */
+.tuer-rueck {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 9px, rgba(232, 93, 126, 0.12) 9px 10px),
+    #fffaf3;
+  box-shadow: inset 0 0 0 1px rgba(157, 36, 73, 0.12);
+  transform-origin: left center;
+  transform: rotateY(0deg) translateX(50%) rotateY(180deg) translateX(-50%);
+  backface-visibility: hidden;
+  transition: transform 0.9s cubic-bezier(0.3, 1.3, 0.5, 1);
+  pointer-events: none;
+}
+.tuer.offen .tuer-rueck { transform: rotateY(-94deg) translateX(50%) rotateY(180deg) translateX(-50%); }
+
+/* ---------- Frost auf gesperrten Türchen ---------- */
+.frost {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.2s ease;
+  background:
+    radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.75), transparent 24%),
+    radial-gradient(circle at 100% 0, rgba(255, 255, 255, 0.55), transparent 18%),
+    radial-gradient(circle at 0 100%, rgba(255, 255, 255, 0.6), transparent 20%),
+    radial-gradient(circle at 100% 100%, rgba(255, 255, 255, 0.75), transparent 25%);
+  box-shadow: inset 0 0 6px 1px rgba(255, 255, 255, 0.8);
+}
+.frost::before, .frost::after {
+  content: "❄";
+  position: absolute;
+  color: #fff;
+  font-size: 0.85rem;
+  text-shadow: 0 0 4px rgba(124, 196, 240, 0.9);
+}
+.frost::before { left: 5px; top: 3px; }
+.frost::after { right: 6px; bottom: 3px; font-size: 0.7rem; }
+.tuer.gesperrt .frost { opacity: 1; }
+
+/* ---------- Anhänger mit Kordel ---------- */
+.anhaenger { transform-origin: 50% -12px; }
+.anhaenger::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: var(--rose-200);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+.anhaenger::after { width: 2px; height: 16px; bottom: calc(100% - 6px); margin-left: -1px; border-radius: 1px; background: repeating-linear-gradient(180deg, var(--band) 0 2px, rgba(255, 255, 255, 0.5) 2px 3px); }
+.anhaenger .nummer { display: block; padding-top: 5px; }
+.anhaenger.schaukeln { animation: schaukeln 1.1s ease-out; }
+.tuer.verfuegbar:not(.offen):hover .anhaenger { animation: schaukeln 1.1s ease-out; }
+@keyframes schaukeln {
+  0% { transform: translateX(-50%) rotate(-6deg); }
+  20% { transform: translateX(-50%) rotate(12deg); }
+  45% { transform: translateX(-50%) rotate(-14deg); }
+  70% { transform: translateX(-50%) rotate(4deg); }
+  100% { transform: translateX(-50%) rotate(-6deg); }
+}
+
+/* ---------- Tannenzweige in den Ecken ---------- */
+.kopf { padding-top: 58px; }
+.zweig {
+  position: absolute;
+  top: -6px;
+  width: clamp(110px, 26vw, 190px);
+  pointer-events: none;
+  z-index: 0;
+}
+.zweig svg { display: block; width: 100%; height: auto; overflow: visible; }
+.zweig-links { left: -8px; }
+.zweig-rechts { right: -8px; transform: scaleX(-1); }
+.kugel { transform-box: fill-box; transform-origin: 50% 0; animation: kugel-schwingen 4.5s ease-in-out infinite; }
+.kugel-b { animation-duration: 5.6s; animation-delay: -2s; }
+@keyframes kugel-schwingen { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+.kopf > :not(.zweig) { position: relative; z-index: 1; }
+html[data-abend] .zweig .nadeln path { filter: brightness(0.8); }
+
+/* ---------- Washi-Tape an den Polaroids ---------- */
+.polaroid { position: relative; }
+.polaroid::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -9px;
+  width: 46%;
+  height: 18px;
+  transform: translateX(-50%) rotate(-3deg);
+  background: repeating-linear-gradient(45deg, rgba(247, 128, 155, 0.55) 0 5px, rgba(255, 255, 255, 0.55) 5px 10px);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  opacity: 0.9;
+  pointer-events: none;
+}
+.polaroid:nth-child(3n+2)::before {
+  background: radial-gradient(circle, rgba(212, 168, 75, 0.7) 0 1.6px, transparent 2px) 0 0 / 7px 7px, rgba(255, 246, 214, 0.75);
+  transform: translateX(-40%) rotate(4deg);
+}
+.polaroid:nth-child(3n+3)::before {
+  background: repeating-linear-gradient(90deg, rgba(124, 196, 240, 0.5) 0 4px, rgba(255, 255, 255, 0.6) 4px 8px);
+  transform: translateX(-58%) rotate(-6deg);
+}
+
+/* ---------- Rauch aus den Schornsteinen ---------- */
+.rauch circle { fill: rgba(120, 92, 110, 0.32); transform-box: fill-box; transform-origin: center; animation: rauch 4s ease-out infinite; opacity: 0; }
+@keyframes rauch {
+  0% { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  15% { opacity: 0.8; }
+  100% { transform: translate(10px, -34px) scale(1.8); opacity: 0; }
+}
+html[data-tageszeit="nacht"] .rauch circle, html[data-abend] .rauch circle { fill: rgba(230, 220, 240, 0.55); }
+
+/* ---------- Brief im geöffneten Türchen ---------- */
+#dialog .dialog-inhalt {
+  background:
+    radial-gradient(circle at top, var(--rose-100), transparent 60%),
+    radial-gradient(circle, rgba(157, 36, 73, 0.035) 0 1px, transparent 1.3px) 0 0 / 6px 6px,
+    #fffaf6;
+  padding-top: 40px;
+}
+#dialog .dialog-inhalt::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 10px;
+  height: 8px;
+  background: radial-gradient(circle, var(--rose-200) 0 2.6px, transparent 3px) 0 0 / 11px 8px repeat-x;
+  opacity: 0.9;
+}
+#dialog .dialog-text {
+  padding: 2px 6px;
+  background: repeating-linear-gradient(180deg, transparent 0 calc(1.6em - 1px), rgba(232, 93, 126, 0.16) calc(1.6em - 1px) 1.6em);
+  background-position: 0 -2px;
+}
+.wachssiegel {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 48% 52% 46% 54% / 52% 46% 54% 48%;
+  background: radial-gradient(circle at 35% 30%, #e0476d, #a3203f 58%, #6b1532);
+  box-shadow: 0 3px 8px rgba(107, 21, 50, 0.45), inset 0 -3px 5px rgba(0, 0, 0, 0.28), inset 0 2px 3px rgba(255, 255, 255, 0.25);
+  color: #ffd6e0;
+  font: 700 1.45rem/1 "Dancing Script", cursive;
+  transform: rotate(-12deg);
+  z-index: 2;
+}
+.wachssiegel::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(255, 214, 224, 0.5);
+}
+.wachssiegel:empty { display: none; }
+.unterschrift {
+  margin: 12px 8px 0 auto;
+  width: max-content;
+  font: 700 1.5rem/1 "Dancing Script", cursive;
+  color: var(--beere);
+  transform: rotate(-3deg);
+}
+.unterschrift:empty { display: none; }
+
+/* ---------- Herzen beim Tippen ---------- */
+.tipp-herz {
+  position: fixed;
+  z-index: 70;
+  pointer-events: none;
+  color: var(--rose-500);
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.8);
+  transform: translate(-50%, -50%);
+  animation: tipp-herz 1.1s ease-out forwards;
+}
+@keyframes tipp-herz {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), -60px) scale(1.15); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kugel, .rauch circle, .innen-deko, .anhaenger.schaukeln { animation: none; }
+  .rauch circle { opacity: 0.5; }
+  .tuer-rueck { transition: none; }
+}
+
+
+/* =========================================================
+   Briefkopf und Heute-Karte
+   ========================================================= */
+.briefkopf { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.datum {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--beere);
+  opacity: 0.6;
+  min-height: 1.2em;
+}
+.briefkopf .gruss { margin: 0 0 2px; font-size: 1rem; }
+.briefkopf h1 { margin: 2px 0 0; }
+.briefkopf .untertitel { margin: 4px 0 0; font-size: 0.98rem; }
+.briefkopf .untertitel::before, .briefkopf .untertitel::after { content: " ✦ "; color: var(--gold); font-size: 0.8em; }
+
+.heute-karte {
+  position: relative;
+  max-width: 440px;
+  margin: 34px auto 0;
+  padding: 16px 18px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(253, 164, 184, 0.7);
+  box-shadow: 0 10px 26px rgba(157, 36, 73, 0.12);
+  backdrop-filter: blur(4px);
+  display: grid;
+  gap: 12px;
+  text-align: center;
+}
+.heute-label {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  margin: 0;
+  padding: 3px 14px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--gold-hell), var(--gold));
+  color: var(--beere-dunkel);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  box-shadow: 0 3px 8px rgba(157, 36, 73, 0.18);
+}
+.heute-karte .status {
+  display: block;
+  margin: 4px 0 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+.heute-karte .zusammen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px dashed rgba(232, 93, 126, 0.35);
+  opacity: 1;
+}
+.heute-karte .zusammen:empty { display: none; }
+.zaehler-kachel { margin: 0; display: grid; gap: 1px; padding: 0 6px; }
+.zaehler-kachel + .zaehler-kachel { border-left: 1px dashed rgba(232, 93, 126, 0.35); }
+.zaehler-zahl { font: 700 2rem/1 "Dancing Script", cursive; color: var(--beere); font-variant-numeric: tabular-nums; }
+.zaehler-text { font-size: 0.76rem; font-weight: 700; color: var(--text); opacity: 0.7; }
+.heute-karte .zusammen.jubilaeum {
+  display: block;
+  grid-template-columns: none;
+  padding: 10px 12px;
+  border: 1px solid var(--gold);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fff8e6, var(--gold-hell));
+  color: var(--beere-dunkel);
+  font-weight: 800;
+}
+.heute-karte .kopf-knoepfe { margin: 0; padding-top: 12px; border-top: 1px dashed rgba(232, 93, 126, 0.35); }
+.heute-karte .sammlung-knopf { box-shadow: none; }
+
+html[data-abend] .heute-karte { background: rgba(40, 14, 40, 0.55); border-color: rgba(255, 179, 198, 0.3); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+html[data-abend] .heute-karte .status { color: #ffe4ea; }
+html[data-abend] .zaehler-zahl { color: #ffb3c6; }
+html[data-abend] .zaehler-text { color: #ffe4ea; }
+html[data-abend] .datum { color: #ffd0dc; }
+html[data-abend] .heute-karte .zusammen.jubilaeum { color: var(--beere-dunkel); }
+html[data-abend] .heute-karte .status { background: none; border: 0; box-shadow: none; }
+
+
+/* ---------- Häuser antippen: Capybaras schauen kurz raus ---------- */
+.landschaft .haus, .landschaft .baum { cursor: pointer; }
+.fenster-capy.kurz { display: inline; }
+.fenster-capy.kurz .capy-kopf { animation: capy-gucken-rein 0.5s cubic-bezier(0.3, 1.5, 0.5, 1) both; }
+.fenster-capy.geht .capy-kopf { animation: capy-gucken-raus 0.4s ease-in both; }
+.capy-kopf { transform-box: view-box; }
+@keyframes capy-gucken-rein { from { transform: translateY(12px); } to { transform: translateY(0); } }
+@keyframes capy-gucken-raus { from { transform: translateY(0); } to { transform: translateY(13px); } }
+
+/* ---------- Bäume schütteln ---------- */
+.baum-wackel { transform-box: fill-box; transform-origin: 50% 100%; }
+.baum-wackel.wackelt { animation: baum-wackeln 0.7s ease-out; }
+@keyframes baum-wackeln {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-6deg); }
+  45% { transform: rotate(5deg); }
+  70% { transform: rotate(-2.5deg); }
+}
+.baum-schnee { transform-box: fill-box; transform-origin: 50% 100%; }
+.baum-schnee.faellt { animation: schnee-faellt 1s ease-in forwards; }
+.baum-schnee.weg { opacity: 0; }
+.baum-schnee.waechst { animation: schnee-waechst 1.6s ease-out; }
+@keyframes schnee-faellt {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(var(--seite, 4px), 40px) rotate(25deg) scale(0.6); opacity: 0; }
+}
+@keyframes schnee-waechst { from { opacity: 0; transform: scale(0.3, 0.2); } to { opacity: 1; transform: none; } }
+.baum-schnee:nth-of-type(2n) { --seite: -6px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fenster-capy.kurz .capy-kopf, .fenster-capy.geht .capy-kopf, .baum-wackel.wackelt, .baum-schnee.faellt, .baum-schnee.waechst { animation: none; }
+}
+
+
+/* =========================================================
+   Countdown bis zum Geburtstag
+   ========================================================= */
+.siegel-schloss {
+  position: absolute;
+  right: -6px;
+  bottom: -6px;
+  font-size: 1.15rem;
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+.umschlag.verschlossen .siegel-schloss { opacity: 1; transform: none; }
+.umschlag.entsperrt .siegel-schloss { animation: schloss-ab 1s ease-in forwards; }
+@keyframes schloss-ab {
+  0% { opacity: 1; transform: none; }
+  30% { transform: rotate(-20deg) scale(1.2); }
+  100% { opacity: 0; transform: translateY(60px) rotate(40deg); }
+}
+.umschlag.verschlossen { cursor: not-allowed; }
+.umschlag.ruettelt { animation: umschlag-rutteln 0.5s ease; }
+@keyframes umschlag-rutteln {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(-4deg) translateX(-6px); }
+  40% { transform: rotate(4deg) translateX(6px); }
+  60% { transform: rotate(-2deg) translateX(-3px); }
+  80% { transform: rotate(2deg) translateX(3px); }
+}
+.intro-countdown { display: grid; gap: 8px; justify-items: center; text-align: center; }
+.intro-countdown[hidden] { display: none; }
+.countdown-gruss {
+  margin: 0;
+  font: 700 clamp(1.6rem, 7vw, 2.4rem)/1.15 "Dancing Script", cursive;
+  color: var(--beere);
+  animation: aufpoppen 0.6s ease;
+}
+.countdown-gruss[hidden] { display: none; }
+.countdown-titel { margin: 0; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--beere); opacity: 0.75; }
+.countdown-titel:empty { display: none; }
+.countdown-ziffern { display: flex; gap: 10px; justify-content: center; }
+.countdown-ziffern:empty { display: none; }
+.cd-feld {
+  display: grid;
+  min-width: 62px;
+  padding: 8px 6px 6px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(253, 164, 184, 0.8);
+  box-shadow: 0 6px 16px rgba(157, 36, 73, 0.15);
+}
+.cd-feld b { font: 700 1.9rem/1 "Nunito", sans-serif; color: var(--beere); font-variant-numeric: tabular-nums; }
+.cd-feld small { margin-top: 3px; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); opacity: 0.65; }
+.intro[data-phase="geburtstag"] .cd-feld { background: linear-gradient(135deg, #fff8e6, var(--gold-hell)); border-color: var(--gold); }
+.intro[data-phase="warten"] .intro-hinweis, .intro[data-phase="geburtstag"] .intro-hinweis { animation: none; opacity: 0.8; }
+
+@media (prefers-reduced-motion: reduce) {
+  .umschlag.ruettelt, .umschlag.entsperrt .siegel-schloss { animation: none; }
+}
+
+
+/* =========================================================
+   Capybara-Specials vor dem Geburtstag
+   ========================================================= */
+.special-buehne { position: fixed; inset: 0; z-index: 62; pointer-events: none; overflow: hidden; transition: opacity 0.7s ease; }
+.special-raum { position: absolute; left: 0; right: 0; top: 0; bottom: calc(16% + env(safe-area-inset-bottom, 0px)); }
+.special-raum .sp-garten::after, .special-raum .sp-hang::after { content: ""; position: absolute; left: 0; right: 0; top: calc(100% - 1px); height: 30vh; }
+.special-raum .sp-garten::after { background: #6fbf6b; }
+.special-raum .sp-hang::after { background: #fff; }
+.special-raum .sp-nacht { inset: 0 0 -30vh 0; }
+.special-buehne.vorbei { opacity: 0; }
+.special-titel {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 5;
+  max-width: calc(100% - 32px);
+  margin: 0;
+  padding: 8px 16px;
+  translate: -50% 0;
+  width: max-content;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--beere);
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-align: center;
+  box-shadow: 0 8px 22px rgba(157, 36, 73, 0.2);
+  animation: aufpoppen 0.5s ease both;
+}
+.special-knopf {
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #fff8e6, var(--gold-hell));
+  color: var(--beere-dunkel);
+  font: 700 0.9rem "Nunito", sans-serif;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(157, 36, 73, 0.15);
+}
+.special-knopf[hidden] { display: none; }
+.sp-figur { position: absolute; }
+.sp-figur > svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sp-gespiegelt > svg { transform: scaleX(-1); }
+.sp-partikel { position: absolute; z-index: 4; font-size: 1.2rem; font-weight: 700; }
+.sp-dampf {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  filter: blur(2px);
+  animation: sp-dampf 2.2s ease-out infinite;
+}
+@keyframes sp-dampf { 0% { transform: translate(0, 0) scale(0.5); opacity: 0; } 20% { opacity: 0.9; } 100% { transform: translate(8px, -50px) scale(2); opacity: 0; } }
+.sp-blase {
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: #fff;
+  color: var(--beere-dunkel);
+  font-weight: 800;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+  animation: aufpoppen 0.3s ease;
+}
+
+/* Ballonfahrt */
+.sp-ballonfahrer { display: grid; justify-items: center; }
+.sp-ballonfahrer .sp-ballon { width: 78%; margin-bottom: -6px; transform-origin: 50% 100%; }
+.sp-ballonfahrer > svg:last-child { width: 62%; }
+.sp-ballon-frei { bottom: -120px; }
+
+/* Gartenparty */
+.sp-garten { left: 0; right: 0; bottom: 0; height: 34%; }
+.sp-garten > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sp-blumen { position: absolute; left: 0; right: 0; top: 34%; display: flex; justify-content: space-around; font-size: 1.4rem; }
+.sp-lampions { left: 0; right: 0; top: 64px; height: 70px; }
+.sp-lampions > svg { width: 100%; height: 100%; }
+.sp-discohalter { left: 50%; top: 0; width: 2px; height: 120px; background: #9d8a90; }
+.sp-disco {
+  position: absolute;
+  left: 50%;
+  bottom: -46px;
+  width: 52px;
+  height: 52px;
+  margin-left: -26px;
+  border-radius: 50%;
+  background:
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.5) 0 2px, transparent 2px 9px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.5) 0 2px, transparent 2px 9px),
+    radial-gradient(circle at 35% 30%, #fff, #b9c3d6 45%, #7d879a);
+  box-shadow: 0 0 30px 6px rgba(255, 214, 255, 0.6);
+  animation: sp-disco 1.2s linear infinite;
+}
+@keyframes sp-disco { to { filter: hue-rotate(360deg); } }
+.sp-taenzer { z-index: 2; }
+
+/* Glühweinstand */
+.sp-stand { left: 50%; bottom: 0; transform: translateX(-50%); }
+.sp-prost { bottom: 6%; z-index: 2; }
+
+/* Onsen */
+.sp-onsen { left: 50%; bottom: 4%; height: 150px; transform: translateX(-50%); }
+.sp-becken {
+  position: absolute;
+  inset: 0;
+  border-radius: 50% / 40%;
+  background: radial-gradient(ellipse at 50% 70%, #9fd8f2, #5aa9dd);
+  box-shadow: 0 0 0 10px #a9a2a8, 0 0 0 16px #8c858b, 0 14px 30px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+.sp-badegast { position: absolute; bottom: 18%; width: 26%; animation: sp-wippen 2.4s ease-in-out infinite; }
+.sp-badegast svg { width: 100%; height: auto; display: block; }
+@keyframes sp-wippen { 50% { translate: 0 6px; } }
+.sp-wasser { position: absolute; left: 0; right: 0; bottom: 0; height: 46%; background: linear-gradient(180deg, rgba(122, 196, 236, 0.85), rgba(90, 169, 221, 0.95)); border-top: 3px solid rgba(255, 255, 255, 0.6); }
+.sp-ente { position: absolute; right: 10%; bottom: 36%; font-size: 1.6rem; animation: sp-wippen 1.8s ease-in-out infinite; }
+
+/* Rodeln */
+.sp-hang { left: 0; right: 0; bottom: 0; height: 100%; }
+.sp-hang > svg { width: 100%; height: 100%; }
+.sp-rodler { left: 0; top: 0; transform-origin: 50% 80%; z-index: 2; }
+
+/* Matcha-Bad */
+.sp-matcha { left: 50%; bottom: -10px; }
+.sp-matcha-koepfe { position: absolute; left: 14%; right: 14%; top: 8%; height: 27%; z-index: 2; overflow: hidden; }
+.sp-matcha-kopf { position: absolute; bottom: 0; width: 28%; }
+.sp-matcha-kopf svg { width: 100%; height: auto; display: block; }
+.sp-matcha > svg { position: relative; z-index: 1; }
+
+/* Feuerwerk */
+.sp-nacht { inset: 0; background: radial-gradient(circle at 50% 30%, rgba(40, 20, 70, 0.75), rgba(15, 8, 30, 0.88)); }
+.sp-rakete { left: 50%; bottom: -10px; z-index: 2; }
+.sp-raketen-capy { position: absolute; left: 30%; top: 26%; width: 40%; }
+.sp-raketen-capy svg { width: 100%; display: block; }
+.sp-flamme { position: absolute; left: 35%; bottom: -26px; width: 30%; height: 34px; border-radius: 50% 50% 50% 50% / 30% 30% 70% 70%; background: radial-gradient(circle at 50% 30%, #fff2b0, #ffb648 50%, #e8455f); animation: sp-flamme 0.15s linear infinite alternate; }
+@keyframes sp-flamme { to { transform: scaleY(1.25); } }
+.sp-fallschirm { left: 50%; top: 18%; display: grid; justify-items: center; z-index: 3; }
+.sp-fallschirm .sp-schirmtuch { width: 100%; margin-bottom: -10px; }
+.sp-fallschirm > svg:last-child { width: 55%; }
+
+/* Schneeballschlacht */
+.sp-werfer { bottom: 8%; z-index: 2; }
+.sp-schneeball { width: 18px; height: 18px; margin: -9px 0 0 -9px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #dfe9f5); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); z-index: 3; }
+
+/* Polonaise */
+.sp-polonaise { left: 0; top: 0; }
+
+/* Plätzchen */
+.sp-blech { left: 50%; bottom: 10%; transform: translateX(-50%); z-index: 2; }
+.sp-baecker { left: 4%; bottom: 9%; z-index: 2; }
+.sp-keks { width: 34px; z-index: 3; }
+
+/* Vorabend */
+.sp-banner {
+  left: 50%;
+  top: calc(70px + env(safe-area-inset-top, 0px));
+  padding: 10px 26px;
+  transform-origin: 50% 50%;
+  background: linear-gradient(135deg, #e85d7e, #c2185b);
+  color: #fff;
+  font: 700 clamp(1.3rem, 6vw, 2rem)/1.1 "Dancing Script", cursive;
+  white-space: nowrap;
+  border-radius: 8px;
+  box-shadow: 0 8px 20px rgba(157, 36, 73, 0.35);
+  z-index: 4;
+}
+.sp-kuchen { left: 50%; bottom: 7%; z-index: 2; }
+.sp-kerze { transform-box: fill-box; transform-origin: 50% 100%; animation: sp-flamme 0.3s ease-in-out infinite alternate; }
+.sp-traeger { bottom: 7%; z-index: 3; }
