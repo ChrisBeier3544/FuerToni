@@ -75,6 +75,8 @@ const KALENDER = {
    *   versteck : { tuerchen: 5 }   = klein im geöffneten Türchen 5
    *              { foto: "x.jpg" } = in der großen Ansicht dieses Fotos
    *              { hinter: 10 }    = hinter Türchen 10, wenn es offen ist
+   *              { seite: "titelfotos" } = hinter den Polaroids oben
+   *              { seite: "fuss" }       = unten neben der Fußzeile
    *   bild   : (optional) Foto auf dem Gutschein, aus bilder/
    *   art    : (optional) "foto" = kein Gutschein, nur ein lustiger Fund
    *   fundtext : (optional) eigene Überschrift beim Finden
@@ -91,7 +93,7 @@ const KALENDER = {
     {
       emblem: "acai",
       ab: 7,
-      versteck: { foto: "bucht.jpg" },
+      versteck: { seite: "titelfotos" },
       titel: "Ein Acai Bowl Date",
       text: "Wir gehen zusammen Acai Bowls essen. Wo, das bestimmst ganz allein du ♥️",
     },
@@ -116,7 +118,7 @@ const KALENDER = {
     {
       emblem: "blumen",
       ab: 19,
-      versteck: { foto: "abendspaziergang.jpg" },
+      versteck: { seite: "fuss" },
       bild: "cafe.jpg",
       titel: "Ein Date deiner Wahl",
       text: "Du planst, ich bin dabei. Egal was du dir aussuchst, es geht auf mich ♥️",

@@ -33,10 +33,10 @@ noch über „🎟️ Meine Gutscheine“ zu finden.
 | Emblem       | Fund                        | Versteck                                  | Ab     |
 |--------------|-----------------------------|-------------------------------------------|--------|
 | Matcha Latte | Iced Matcha Latte           | klein im geöffneten Türchen 5             | 5.12.  |
-| Acai Bowl    | Acai Bowl Date              | große Ansicht vom Foto „Sommer am Meer“   | 7.12.  |
+| Acai Bowl    | Acai Bowl Date              | hinter den Polaroids oben (lugt hervor)   | 7.12.  |
 | Capybara     | Geheime Capy Party (Foto)   | hinter Türchen 10, wenn es offen ist      | 10.12. |
 | Badeente     | Massage New Soul Studio     | klein im geöffneten Türchen 16            | 16.12. |
-| Blumen       | Date deiner Wahl            | große Ansicht vom Foto „Abendspaziergang“ | 19.12. |
+| Blumen       | Date deiner Wahl            | klein unten neben der Fußzeile            | 19.12. |
 | Häuschen     | Dinner im Restaurant Heimat | klein im geöffneten Türchen 24            | 24.12. |
 
 ## Lokal ansehen und testen

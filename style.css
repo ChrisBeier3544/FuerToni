@@ -120,6 +120,8 @@ body {
 .polaroid:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
 
 .titelfotos {
+  --w: clamp(100px, 29vw, 150px);
+  position: relative;
   display: flex;
   justify-content: center;
   margin: 22px auto 4px;
@@ -128,11 +130,12 @@ body {
 .titelfotos .polaroid span { font-size: clamp(0.8rem, 3.2vw, 1.05rem); }
 .titelfotos .polaroid {
   position: relative;
-  width: clamp(100px, 29vw, 150px);
+  z-index: 1;
+  width: var(--w);
   margin: 0 -10px;
 }
 .titelfotos .polaroid:nth-child(1) { transform: rotate(-7deg) translateY(6px); }
-.titelfotos .polaroid:nth-child(2) { transform: rotate(2deg); z-index: 1; }
+.titelfotos .polaroid:nth-child(2) { transform: rotate(2deg); z-index: 2; }
 .titelfotos .polaroid:nth-child(3) { transform: rotate(8deg) translateY(8px); }
 
 .momente {
@@ -503,7 +506,6 @@ main {
 }
 
 /* ---------- Easter Eggs ---------- */
-.fuss { padding-top: 60px !important; }
 .ei {
   position: absolute;
   z-index: 2;
@@ -539,6 +541,14 @@ main {
   filter: drop-shadow(0 2px 3px rgba(107, 21, 50, 0.25));
 }
 .ei-im-tuerchen { left: 12px; bottom: 10px; }
+.ei-seite-titelfotos {
+  z-index: 0;
+  bottom: -10px;
+  right: calc(50% - var(--w) * 1.5 + 2px);
+  rotate: 14deg;
+  animation: none;
+}
+.ei-seite-fuss { right: 16px; bottom: 32px; width: 26px; height: 26px; }
 .ei-im-foto { right: 8px; bottom: 8px; width: 28px; height: 28px; }
 .lightbox-figur { position: relative; }
 .ei-innen {

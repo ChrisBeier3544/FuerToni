@@ -578,6 +578,15 @@
         knopf = document.createElement("span");
         knopf.className = "ei-innen";
         tueren.get(v.hinter).innen.prepend(knopf);
+      } else if (v.seite) {
+        const ort = { titelfotos: "#titelfotos", fuss: ".fuss" }[v.seite];
+        if (!ort || !document.querySelector(ort)) continue;
+        knopf = document.createElement("button");
+        knopf.type = "button";
+        knopf.className = "ei ei-klein ei-seite-" + v.seite;
+        knopf.setAttribute("aria-label", "Geheimnis");
+        knopf.addEventListener("click", () => findeEi(ei));
+        document.querySelector(ort).appendChild(knopf);
       } else if (v.tuerchen || v.foto) {
         knopf = document.createElement("button");
         knopf.type = "button";
