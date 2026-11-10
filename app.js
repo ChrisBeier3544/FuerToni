@@ -281,6 +281,11 @@
     aktualisiereStatus(d, echt);
     aktualisiereEier(d);
     setzeTageszeit(echt);
+    const capy = document.querySelector(".capy-laeufer");
+    if (capy) capy.classList.toggle("mit-muetze", zeitBereit && (d.jahr > KALENDER.jahr || (d.monat === 12 && d.tag >= 10)));
+    aktualisiereZusammen(echt);
+    const rk = document.getElementById("rueckblick-knopf");
+    if (rk) rk.hidden = !(zeitBereit && nachWeihnachten(d));
     aktualisiereLichter(d);
     const fk = document.getElementById("finale-knopf");
     if (fk) fk.hidden = !(zeitBereit && alleOffen() && finaleGesehen());
@@ -343,6 +348,7 @@
     const t = tueren.get(n);
     if (!zeitBereit) return;
     const d = kalenderDatum();
+    if (n === 24 && lichtershow) { zeigeToast("Einen Moment, die Lichter gehen an ✨"); return; }
 
     if (!istVerfuegbar(n, d)) {
       t.knopf.classList.remove("wackeln");
@@ -402,14 +408,100 @@
     el.dialogHinweis.hidden = !i.hinweis;
     el.dialogHinweisText.textContent = i.hinweis || "";
 
+    // Sprachnachricht: nur zeigen, wenn die Datei wirklich da ist
+    const audioBox = document.getElementById("dialog-audio");
+    const player = document.getElementById("dialog-audio-player");
+    player.pause();
+    audioBox.hidden = true;
+    if (i.audio) {
+      player.onloadedmetadata = () => { audioBox.hidden = false; };
+      player.onerror = () => { audioBox.hidden = true; };
+      player.src = i.audio;
+      player.load();
+    } else {
+      player.removeAttribute("src");
+    }
+
     if (typeof el.dialog.showModal === "function") el.dialog.showModal();
     else el.dialog.setAttribute("open", "");
+    starteRubbeln(n, !!i.rubbeln);
 
     if (i.geschenkregen) konfettiRegen("geschenke");
     else if (i.konfetti) konfettiRegen("konfetti");
   }
 
+  /* Rubbelfeld: goldene Schicht über Text und Zahlen */
+  const RUBBEL_SCHLUESSEL = "toni-advent-gerubbelt-" + KALENDER.jahr;
+  function gerubbelt() {
+    try { return new Set(JSON.parse(localStorage.getItem(RUBBEL_SCHLUESSEL) || "[]")); } catch (_) { return new Set(); }
+  }
+  function starteRubbeln(n, aktiv) {
+    const c = document.getElementById("rubbel");
+    const bereich = document.getElementById("rubbel-bereich");
+    c.hidden = true;
+    c.classList.remove("weg");
+    bereich.classList.remove("rubbelt");
+    c.onpointerdown = c.onpointermove = c.onpointerup = null;
+    if (!aktiv || gerubbelt().has(n)) return;
+    const breite = bereich.offsetWidth, hoehe = bereich.offsetHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    c.width = breite * dpr; c.height = hoehe * dpr;
+    c.style.width = breite + "px"; c.style.height = hoehe + "px";
+    const ctx = c.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const verlauf = ctx.createLinearGradient(0, 0, breite, hoehe);
+    verlauf.addColorStop(0, "#e9c46a"); verlauf.addColorStop(0.5, "#b8862f"); verlauf.addColorStop(1, "#e0b453");
+    ctx.fillStyle = verlauf;
+    ctx.beginPath(); ctx.roundRect(0, 0, breite, hoehe, 16); ctx.fill();
+    const rnd = zufall(n * 31);
+    for (let k = 0; k < 90; k++) {
+      ctx.fillStyle = rnd() < 0.5 ? "rgba(255,255,255,.55)" : "rgba(157,36,73,.18)";
+      ctx.beginPath(); ctx.arc(rnd() * breite, rnd() * hoehe, 1 + rnd() * 2, 0, 6.3); ctx.fill();
+    }
+    ctx.textAlign = "center";
+    ctx.shadowColor = "rgba(255, 240, 200, 0.8)";
+    ctx.shadowBlur = 6;
+    ctx.fillStyle = "#4a0f24";
+    ctx.font = '700 30px "Dancing Script", cursive';
+    ctx.fillText("Hier freirubbeln ✨", breite / 2, hoehe / 2 - 4);
+    ctx.font = '700 14px "Nunito", sans-serif';
+    ctx.fillText("mit dem Finger über das Gold wischen", breite / 2, hoehe / 2 + 22);
+    ctx.shadowBlur = 0;
+    bereich.classList.add("rubbelt");
+    c.hidden = false;
+    ctx.globalCompositeOperation = "destination-out";
+    let malt = false, letzte = null, zuege = 0;
+    function kratze(x, y) {
+      ctx.lineWidth = 46; ctx.lineCap = "round";
+      ctx.beginPath();
+      ctx.moveTo(letzte ? letzte.x : x, letzte ? letzte.y : y);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+      letzte = { x, y };
+      if (++zuege % 12 === 0) pruefe();
+    }
+    function pruefe() {
+      const daten = ctx.getImageData(0, 0, c.width, c.height).data;
+      let frei = 0, alle = 0;
+      for (let k = 3; k < daten.length; k += 4 * 37) { alle++; if (daten[k] < 40) frei++; }
+      if (frei / alle > 0.55) fertig();
+    }
+    function fertig() {
+      c.onpointerdown = c.onpointermove = c.onpointerup = null;
+      c.classList.add("weg");
+      bereich.classList.remove("rubbelt");
+      setTimeout(() => { c.hidden = true; }, 700);
+      const g = gerubbelt(); g.add(n);
+      try { localStorage.setItem(RUBBEL_SCHLUESSEL, JSON.stringify([...g])); } catch (_) { /* egal */ }
+      herzKonfetti(bereich);
+    }
+    c.onpointerdown = (e) => { malt = true; letzte = null; c.setPointerCapture(e.pointerId); kratze(e.offsetX, e.offsetY); };
+    c.onpointermove = (e) => { if (malt) kratze(e.offsetX, e.offsetY); };
+    c.onpointerup = () => { malt = false; letzte = null; pruefe(); };
+  }
+
   function schliesseDialog() {
+    document.getElementById("dialog-audio-player").pause();
     if (typeof el.dialog.close === "function") el.dialog.close();
     else el.dialog.removeAttribute("open");
   }
@@ -573,6 +665,22 @@
     const anzahl = w < 600 ? 55 : 95;
     for (let k = 0; k < anzahl; k++) flocken.push(neueFlocke(true));
     let wind = 0, neigung = 0, letztesY = window.scrollY;
+    // Schneekugel: kräftiges Gestöber mit vielen Extraflocken
+    schneeSturm = function () {
+      const richtung = Math.random() < 0.5 ? -1 : 1;
+      wind = 5 * richtung;
+      for (let k = 0; k < (w < 600 ? 110 : 180); k++) {
+        const f = neueFlocke(true);
+        f.extra = true;
+        f.herz = Math.random() < 0.3;
+        f.r = f.herz ? 5 + Math.random() * 6 : 1.4 + Math.random() * 2.8;
+        f.vy = 0.8 + Math.random() * 2.2;
+        f.y = Math.random() * h * 0.6 - h * 0.2;
+        flocken.push(f);
+      }
+      let boeen = 0;
+      const t = setInterval(() => { wind = 5 * (boeen % 2 ? -richtung : richtung); if (++boeen > 6) clearInterval(t); }, 380);
+    };
     window.addEventListener("scroll", () => {
       const dy = window.scrollY - letztesY;
       letztesY = window.scrollY;
@@ -590,7 +698,10 @@
         f.phase += 0.012;
         f.x += Math.sin(f.phase) * 0.35 + (neigung + wind * 0.5) * (f.herz ? 0.6 : 1);
         f.y += f.vy - wind * 0.15 * (f.herz ? 0.5 : 1);
-        if (f.y > h + 14 || f.y < -40) Object.assign(f, neueFlocke(false));
+        if (f.y > h + 14 || f.y < -40) {
+          if (f.extra) { f.weg = true; continue; }
+          Object.assign(f, neueFlocke(false));
+        }
         if (f.x > w + 14) f.x = -14;
         if (f.x < -14) f.x = w + 14;
         if (f.herz) {
@@ -609,10 +720,111 @@
           }
         }
       }
+      for (let k = flocken.length - 1; k >= 0; k--) if (flocken[k].weg) flocken.splice(k, 1);
       requestAnimationFrame(schritt);
     }
     requestAnimationFrame(schritt);
   }
+  let schneeSturm = function () {};
+
+  /* Schütteln erkennen (Handy wie eine Schneekugel) */
+  let bewegungErlaubt = false;
+  function erlaubeBewegung() {
+    if (bewegungErlaubt) return;
+    bewegungErlaubt = true;
+    try {
+      if (window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === "function") DeviceMotionEvent.requestPermission().catch(() => {});
+      if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission === "function") DeviceOrientationEvent.requestPermission().catch(() => {});
+    } catch (_) { /* egal */ }
+  }
+  document.addEventListener("click", erlaubeBewegung, { once: true, capture: true });
+  let letztesSchuetteln = 0, letzteBeschl = null;
+  window.addEventListener("devicemotion", (e) => {
+    const a = e.accelerationIncludingGravity;
+    if (!a || a.x === null) return;
+    if (letzteBeschl) {
+      const delta = Math.abs(a.x - letzteBeschl.x) + Math.abs(a.y - letzteBeschl.y) + Math.abs(a.z - letzteBeschl.z);
+      const jetztMs = Date.now();
+      if (delta > 32 && jetztMs - letztesSchuetteln > 1800) {
+        letztesSchuetteln = jetztMs;
+        schneeSturm();
+      }
+    }
+    letzteBeschl = { x: a.x, y: a.y, z: a.z };
+  });
+
+  /* Wie lange wir schon zusammen sind */
+  function tageSeit(iso, d) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || "");
+    if (!m) return null;
+    return Math.round((Date.UTC(d.jahr, d.monat - 1, d.tag) - Date.UTC(+m[1], +m[2] - 1, +m[3])) / 86400000);
+  }
+  function aktualisiereZusammen(d) {
+    const box = document.getElementById("zusammen");
+    if (!box) return;
+    if (!zeitBereit) { box.textContent = ""; return; }
+    const zusammen = tageSeit(KALENDER.zusammenSeit, d);
+    const kennen = tageSeit(KALENDER.kennenSeit, d);
+    if (kennen !== null && kennen > 0 && kennen % 365 === 0) {
+      const jahre = kennen / 365;
+      box.textContent = "Heute vor " + (jahre === 1 ? "genau einem Jahr" : jahre + " Jahren") + " haben wir uns kennengelernt ♥️";
+      box.classList.add("jubilaeum");
+      return;
+    }
+    box.classList.remove("jubilaeum");
+    const teile = [];
+    if (zusammen !== null && zusammen >= 0) teile.push("♥️ " + zusammen + " Tage zusammen");
+    if (kennen !== null && kennen >= 0) teile.push(kennen + " Tage, seit wir uns kennen");
+    box.textContent = teile.join(" · ");
+  }
+
+  function nachWeihnachten(d) {
+    return d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag > 24);
+  }
+
+  /* Rückblick: alle 24 Türchen zum Nachlesen */
+  const rueckblick = document.getElementById("rueckblick");
+  rueckblick.querySelector(".schliessen").addEventListener("click", () => schliesse(rueckblick));
+  rueckblick.addEventListener("click", (e) => { if (e.target === rueckblick) schliesse(rueckblick); });
+  document.getElementById("rueckblick-knopf").addEventListener("click", () => {
+    const liste = document.getElementById("rueckblick-liste");
+    liste.textContent = "";
+    for (let n = 1; n <= 24; n++) {
+      const i = inhalt(n);
+      const eintrag = document.createElement("article");
+      eintrag.className = "rueckblick-eintrag";
+      const kopf = document.createElement("p");
+      kopf.className = "rueckblick-tag";
+      kopf.textContent = n + ". Dezember";
+      const t = document.createElement("h3");
+      t.textContent = i.titel || "Türchen " + n;
+      const p = document.createElement("p");
+      p.className = "rueckblick-text";
+      p.textContent = i.text || "";
+      eintrag.append(kopf, t, p);
+      liste.appendChild(eintrag);
+    }
+    oeffne(rueckblick);
+  });
+
+  /* Heiligabend: Lichtershow, bevor Türchen 24 aufgeht */
+  let lichtershow = false;
+  function starteLichtershow() {
+    if (lichtershow || bewegungReduziert || !birnen.size) return;
+    lichtershow = true;
+    document.getElementById("lichterkette").classList.add("fest");
+    const liste = [...birnen.values()];
+    liste.forEach((b, k) => setTimeout(() => b.classList.add("show"), k * 70));
+    setTimeout(() => document.getElementById("lichterkette").classList.add("blinken"), liste.length * 70 + 200);
+    setTimeout(() => {
+      const box = document.getElementById("lichterkette");
+      box.classList.remove("fest", "blinken");
+      liste.forEach((b) => b.classList.remove("show"));
+      lichtershow = false;
+      lichtershowFertig = true;
+    }, liste.length * 70 + 2400);
+  }
+  let lichtershowFertig = false;
 
   /* Tageszeiten (deutsche Zeit):
        morgens      6:00 bis  9:00
@@ -748,6 +960,65 @@
     }
     teile += '<path style="fill:var(--huegel-1)" d="M0 198 Q 300 182 600 196 T 1200 190 V230 H0Z"/>';
     box.innerHTML = '<svg viewBox="0 0 ' + B + ' 230" preserveAspectRatio="xMidYMax slice">' + teile + '</svg>';
+    baueCapyBegleiter(box);
+  }
+
+  /* Ein kleines Capybara spaziert durch die Winterlandschaft */
+  const CAPY_SPRUECHE = [
+    "Hallo {name}! Die Capy Crew hat dich lieb ♥️",
+    "Psst, auf dieser Seite sind Geheimnisse versteckt 🤫",
+    "Ein Capy sagt: Du bist toll ♥️",
+    "Kuscheln ist mein Lieblingssport 🥰",
+    "Hast du heute schon dein Türchen geöffnet?",
+    "Schüttel mal dein Handy, {name} ❄️",
+    "Ich bin nur wegen der Kekse hier 🍪",
+    "Er hat dich soooo lieb, {name} ♥️",
+  ];
+  function baueCapyBegleiter(box) {
+    const bahn = document.createElement("div");
+    bahn.className = "capy-bahn";
+    const capy = document.createElement("button");
+    capy.type = "button";
+    capy.className = "capy-laeufer";
+    capy.setAttribute("aria-label", "Capybara antippen");
+    capy.innerHTML =
+      '<span class="capy-blase" hidden></span>' +
+      '<svg class="capy-figur" viewBox="0 0 80 52" aria-hidden="true">' +
+      '<g class="capy-muetze"><path d="M54 9 C58 -2 72 -2 74 6 L64 12z" fill="#d6304f"/><circle cx="75" cy="5" r="3.5" fill="#fff"/><rect x="51" y="8" width="17" height="5" rx="2.5" fill="#fff"/></g>' +
+      '<ellipse cx="34" cy="31" rx="27" ry="16" fill="#b07a52"/>' +
+      '<rect x="48" y="12" width="24" height="24" rx="10" fill="#b07a52"/>' +
+      '<rect x="62" y="18" width="13" height="16" rx="6" fill="#9a6844"/>' +
+      '<ellipse cx="55" cy="12" rx="3.5" ry="3" fill="#7a4e33"/>' +
+      '<path d="M60 22q2.5-2 5 0" fill="none" stroke="#3a2418" stroke-width="1.8" stroke-linecap="round"/>' +
+      '<ellipse cx="72" cy="23" rx="1.4" ry="1" fill="#3a2418"/>' +
+      '<circle cx="62" cy="28" r="2.4" fill="#f7809b" opacity=".55"/>' +
+      '<g class="capy-beine"><rect class="bein-a" x="16" y="40" width="7" height="11" rx="3" fill="#9a6844"/><rect class="bein-b" x="26" y="40" width="7" height="11" rx="3" fill="#8a5a3a"/>' +
+      '<rect class="bein-b" x="42" y="40" width="7" height="11" rx="3" fill="#9a6844"/><rect class="bein-a" x="51" y="40" width="7" height="11" rx="3" fill="#8a5a3a"/></g>' +
+      '</svg>';
+    bahn.appendChild(capy);
+    box.appendChild(bahn);
+    const blase = capy.querySelector(".capy-blase");
+    let k = 0, timer;
+    capy.addEventListener("click", () => {
+      const d = kalenderDatum();
+      const zeit = document.documentElement.getAttribute("data-tageszeit");
+      const name = KOSENAMEN[(k + d.tag) % KOSENAMEN.length];
+      let text = CAPY_SPRUECHE[k % CAPY_SPRUECHE.length];
+      if (zeit === "nacht") text = "Gähn … Ich geh gleich schlafen. Gute Nacht, {name} 🌙";
+      else if (capy.classList.contains("mit-muetze") && k % 3 === 2) text = "Gefällt dir meine Mütze? 🎅";
+      k++;
+      blase.textContent = text.replace("{name}", name);
+      blase.style.marginLeft = "0px";
+      blase.hidden = false;
+      // Sprechblase im sichtbaren Bereich halten
+      const r = blase.getBoundingClientRect();
+      const rand = 12;
+      if (r.right > window.innerWidth - rand) blase.style.marginLeft = (window.innerWidth - rand - r.right) + "px";
+      else if (r.left < rand) blase.style.marginLeft = (rand - r.left) + "px";
+      capy.classList.add("redet");
+      clearTimeout(timer);
+      timer = setTimeout(() => { blase.hidden = true; capy.classList.remove("redet"); }, 3800);
+    });
   }
 
   /* Umschlag zum Einstieg, einmal pro Besuch */
@@ -892,9 +1163,13 @@
     sammlungKnopf.hidden = !eier.some((ei) => gefunden.has(ei.emblem));
   }
 
-  function findeEi(ei) {
+  function findeEi(ei, quizGeschafft) {
     if (!zeitBereit || !eiSichtbar(ei, kalenderDatum())) return;
     const neu = !gefunden.has(ei.emblem);
+    if (neu && !quizGeschafft && ei.quiz && ei.quiz.richtig) {
+      zeigeQuiz(ei);
+      return;
+    }
     if (neu) {
       gefunden.add(ei.emblem);
       speichereGefunden();
@@ -902,6 +1177,43 @@
       aktualisiereVersteckte();
     }
     zeigeGutschein(ei, neu);
+  }
+
+  const quizDialog = document.getElementById("quiz");
+  quizDialog.querySelector(".schliessen").addEventListener("click", () => schliesse(quizDialog));
+  function zeigeQuiz(ei) {
+    const q = ei.quiz;
+    document.getElementById("quiz-frage").textContent = q.frage;
+    const rueck = document.getElementById("quiz-rueckmeldung");
+    rueck.textContent = "";
+    const box = document.getElementById("quiz-antworten");
+    box.textContent = "";
+    const antworten = [q.richtig].concat((q.falsch || []).filter(Boolean));
+    for (let k = antworten.length - 1; k > 0; k--) {
+      const j = Math.floor(Math.random() * (k + 1));
+      [antworten[k], antworten[j]] = [antworten[j], antworten[k]];
+    }
+    const name = KOSENAMEN[Math.floor(Math.random() * KOSENAMEN.length)];
+    for (const a of antworten) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "quiz-antwort";
+      b.textContent = a;
+      b.addEventListener("click", () => {
+        if (a === q.richtig) {
+          b.classList.add("richtig");
+          rueck.textContent = "Richtig, " + name + "! ♥️";
+          box.querySelectorAll("button").forEach((x) => { x.disabled = true; });
+          setTimeout(() => { schliesse(quizDialog); findeEi(ei, true); }, 900);
+        } else {
+          b.classList.remove("falsch"); void b.offsetWidth; b.classList.add("falsch");
+          b.disabled = true;
+          rueck.textContent = "Fast! Versuch's nochmal 😘";
+        }
+      });
+      box.appendChild(b);
+    }
+    oeffne(quizDialog);
   }
 
   function zeigeGutschein(ei, neu) {
@@ -1082,7 +1394,27 @@
   el.dialog.addEventListener("close", () => {
     if (alleOffen() && !finaleGesehen()) setTimeout(zeigeFinale, 450);
   });
-  window.adventkalender = { zeigeFinale };
+  window.adventkalender = { zeigeFinale, schneeSturm: () => schneeSturm(), starteLichtershow };
+
+  /* Tipp: Seite als App auf den Homescreen legen */
+  function zeigeAppTipp() {
+    const tipp = document.getElementById("app-tipp");
+    if (!tipp) return;
+    const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+    const handy = /iphone|ipad|android/i.test(navigator.userAgent);
+    let weg = false;
+    try { weg = localStorage.getItem("toni-app-tipp") === "1"; } catch (_) { /* egal */ }
+    if (standalone || !handy || weg) return;
+    const ios = /iphone|ipad/i.test(navigator.userAgent);
+    document.getElementById("app-tipp-text").textContent = ios
+      ? "Leg mich als App auf deinen Homescreen: unten auf Teilen tippen, dann „Zum Home-Bildschirm“."
+      : "Leg mich als App auf deinen Homescreen: oben im Menü ⋮ auf „Zum Startbildschirm hinzufügen“.";
+    setTimeout(() => { tipp.hidden = false; }, 4000);
+    document.getElementById("app-tipp-zu").addEventListener("click", () => {
+      tipp.hidden = true;
+      try { localStorage.setItem("toni-app-tipp", "1"); } catch (_) { /* egal */ }
+    });
+  }
 
   /* ------------------------------------------------------------
    * Start
@@ -1092,6 +1424,7 @@
   baueLichterkette();
   baueLandschaft();
   baueSterne();
+  zeigeAppTipp();
   baueEier();
   baueFotos();
   baueSchnee();
@@ -1100,6 +1433,8 @@
   synchronisiereZeit().then(() => {
     zeitBereit = true;
     aktualisiere();
+    const k = kalenderDatum();
+    if (k.jahr === KALENDER.jahr && k.monat === 12 && k.tag === 24 && !geoeffnet.has(24)) setTimeout(starteLichtershow, 600);
   });
 
   // Regelmäßig prüfen, damit um Mitternacht das neue Türchen aufgeht

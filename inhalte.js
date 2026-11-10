@@ -10,6 +10,8 @@
  *    paeckchen  : Nummer des Extra-Päckchens (leer lassen "" = keins)
  *    konfetti   : true = Konfetti regnet über die Seite
  *    geschenkregen : true = langsam fallende Geschenke 🎁
+ *    rubbeln    : true = Text und Zahlen erst freirubbeln
+ *    audio      : (optional) Sprachnachricht, z. B. "audio/tag01.m4a"
  *    status     : (optional) Text oben auf der Seite an diesem Tag
  *    bild       : (optional) Foto, z. B. "bilder/tag01.jpg"
  *    hinweis    : (optional) zusätzlicher Hinweis-Kasten
@@ -23,6 +25,10 @@ const KALENDER = {
   jahr: 2026,
 
   titel: "Für Toni ♥️",
+
+  // Für den Zähler „seit X Tagen zusammen“ (Jahr-Monat-Tag)
+  zusammenSeit: "2026-03-01",
+  kennenSeit: "2025-12-21",
   untertitel: "24 kleine Überraschungen bis Weihnachten",
 
   /*
@@ -80,10 +86,13 @@ const KALENDER = {
    *   bild   : (optional) Foto auf dem Gutschein, aus bilder/
    *   art    : (optional) "foto" = kein Gutschein, nur ein lustiger Fund
    *   fundtext : (optional) eigene Überschrift beim Finden
+   *   quiz   : (optional) Frage, die sie vorher richtig beantworten muss.
+   *            Bleibt „richtig“ leer (""), wird die Frage übersprungen.
    */
   eastereggs: [
     {
       emblem: "matcha",
+      quiz: { frage: "Wann haben wir uns kennengelernt?", richtig: "21. Dezember 2025", falsch: ["14. Februar 2026", "1. März 2026"] },
       ab: 5,
       versteck: { tuerchen: 5 },
       bild: "kaffeedate.jpg",
@@ -92,6 +101,7 @@ const KALENDER = {
     },
     {
       emblem: "acai",
+      quiz: { frage: "Wo war unser erster gemeinsamer Urlaub?", richtig: "", falsch: ["", ""] },
       ab: 7,
       versteck: { seite: "titelfotos" },
       titel: "Ein Acai Bowl Date",
@@ -99,6 +109,7 @@ const KALENDER = {
     },
     {
       emblem: "capybara",
+      quiz: { frage: "Was ist unser Lieblingstier?", richtig: "Capybara", falsch: ["Faultier", "Otter"] },
       ab: 10,
       versteck: { hinter: 10 },
       art: "foto",
@@ -109,6 +120,7 @@ const KALENDER = {
     },
     {
       emblem: "ente",
+      quiz: { frage: "Wo hatten wir unser erstes Date?", richtig: "", falsch: ["", ""] },
       ab: 16,
       versteck: { tuerchen: 16 },
       bild: "masken.jpg",
@@ -117,6 +129,7 @@ const KALENDER = {
     },
     {
       emblem: "blumen",
+      quiz: { frage: "Was habe ich als Allererstes zu dir gesagt?", richtig: "", falsch: ["", ""] },
       ab: 19,
       versteck: { seite: "fuss" },
       bild: "cafe.jpg",
@@ -125,6 +138,7 @@ const KALENDER = {
     },
     {
       emblem: "heimat",
+      quiz: { frage: "An welchem Tag sind wir zusammengekommen?", richtig: "1. März 2026", falsch: ["21. Dezember 2025", "14. Februar 2026"] },
       ab: 24,
       versteck: { tuerchen: 24 },
       titel: "Ein Dinner im Restaurant „Heimat“",
@@ -138,6 +152,7 @@ const KALENDER = {
       text: "Guten Morgen, Maus ♥️\nHeute öffnest du das erste Türchen. Ab jetzt wartet jeden Morgen eine kleine Überraschung auf dich, weil du mir so unendlich viel bedeutest.",
       briefzahl: 14,
       paeckchen: "",
+      audio: "audio/tag01.m4a",
     },
     2: {
       titel: "Mein Lieblingsmensch",
@@ -170,6 +185,7 @@ const KALENDER = {
       text: "Heute bringt der Nikolaus allen etwas Schönes. Mein schönstes Geschenk habe ich aber schon längst bekommen, und das bist du.\nIch liebe dich, Baby ♥️",
       briefzahl: 1,
       paeckchen: 500,
+      rubbeln: true,
       status: "Frohen Nikolaus, Toni 🎅",
     },
     7: {
@@ -215,6 +231,7 @@ const KALENDER = {
       text: "Heute hat dein Papa Geburtstag! 🥳\nRichte ihm meine herzlichen Glückwünsche aus. Ich wünsche euch einen schönen Tag zusammen ♥️",
       briefzahl: 2,
       paeckchen: 77,
+      audio: "audio/tag13.m4a",
       konfetti: true,
       status: "Heute hat dein Papa Geburtstag 🎂 Türchen 13 wartet auf dich!",
     },
@@ -229,6 +246,7 @@ const KALENDER = {
       text: "Wenn ich an dich denke, muss ich lächeln. Also lächle ich ziemlich oft 😊♥️",
       briefzahl: 7,
       paeckchen: 33,
+      rubbeln: true,
     },
     16: {
       titel: "Herzklopfen",
@@ -266,6 +284,7 @@ const KALENDER = {
       text: "Heute ist der kürzeste Tag des Jahres. Aber mit dir an meiner Seite fühlt sich jeder Tag hell und warm an ♥️",
       briefzahl: 21,
       paeckchen: 925,
+      rubbeln: true,
     },
     22: {
       titel: "Danke",
@@ -284,6 +303,7 @@ const KALENDER = {
       text: "Das letzte Türchen.\nDanke, dass du da bist, dass du genau so bist, wie du bist, und dass ich diesen Dezember mit dir erleben durfte.\nDu bist mein allerschönstes Geschenk, heute und jeden Tag.\nAuch wenn wir heute nicht zusammen sind, bin ich in Gedanken ganz bei dir. Und morgen sehen wir uns endlich wieder.\nIch liebe dich ♥️",
       briefzahl: 24,
       paeckchen: 902,
+      audio: "audio/tag24.m4a",
       geschenkregen: true,
     },
   },

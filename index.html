@@ -10,6 +10,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#e85d7e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Für Toni">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body>
   <div id="intro" class="intro" hidden>
@@ -41,9 +48,11 @@
     <p id="untertitel" class="untertitel"></p>
     <div id="titelfotos" class="titelfotos"></div>
     <p id="status" class="status" aria-live="polite"></p>
+    <p id="zusammen" class="zusammen"></p>
     <p class="kopf-knoepfe">
       <button id="sammlung-knopf" class="sammlung-knopf" type="button" hidden>🎟️ Meine Gutscheine</button>
       <button id="finale-knopf" class="sammlung-knopf" type="button" hidden>♥️ Unser Herz</button>
+      <button id="rueckblick-knopf" class="sammlung-knopf" type="button" hidden>📖 Unser Dezember</button>
     </p>
   </header>
 
@@ -69,6 +78,7 @@
       <p class="dialog-tag" id="dialog-tag"></p>
       <h2 id="dialog-titel"></h2>
       <img id="dialog-bild" class="dialog-bild" alt="" hidden>
+      <div id="rubbel-bereich" class="rubbel-bereich">
       <p id="dialog-text" class="dialog-text"></p>
       <div class="extras">
         <div id="dialog-brief" class="extra extra-brief" hidden>
@@ -81,6 +91,12 @@
           <span class="extra-label">Heute darfst du zusätzlich dieses Päckchen öffnen</span>
           <span id="dialog-paeckchen-zahl" class="extra-zahl"></span>
         </div>
+      </div>
+      <canvas id="rubbel" class="rubbel" hidden aria-label="Rubbelfeld: mit dem Finger freirubbeln"></canvas>
+      </div>
+      <div id="dialog-audio" class="sprachnachricht" hidden>
+        <p class="sprachnachricht-titel">🎙️ Eine Sprachnachricht von mir</p>
+        <audio id="dialog-audio-player" controls preload="metadata"></audio>
       </div>
       <div id="dialog-hinweis" class="hinweis" hidden>
         <span class="hinweis-icon" aria-hidden="true">🎁</span>
@@ -111,6 +127,31 @@
       <div id="sammlung-liste" class="sammlung-liste"></div>
     </div>
   </dialog>
+
+  <dialog id="quiz" class="dialog" aria-labelledby="quiz-frage">
+    <div class="dialog-inhalt">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <p class="dialog-tag">Du hast etwas entdeckt 🔍</p>
+      <p class="quiz-intro">Aber erst musst du dir das verdienen. Beantworte diese Frage:</p>
+      <h2 id="quiz-frage"></h2>
+      <div id="quiz-antworten" class="quiz-antworten"></div>
+      <p id="quiz-rueckmeldung" class="quiz-rueckmeldung" aria-live="polite"></p>
+    </div>
+  </dialog>
+
+  <dialog id="rueckblick" class="dialog" aria-labelledby="rueckblick-titel">
+    <div class="dialog-inhalt">
+      <button class="schliessen" type="button" aria-label="Schließen">×</button>
+      <h2 id="rueckblick-titel">Unser Dezember</h2>
+      <div id="rueckblick-liste" class="rueckblick-liste"></div>
+    </div>
+  </dialog>
+
+  <div id="app-tipp" class="app-tipp" hidden>
+    <span class="app-tipp-icon" aria-hidden="true">📲</span>
+    <p id="app-tipp-text"></p>
+    <button type="button" id="app-tipp-zu" aria-label="Tipp schließen">×</button>
+  </div>
 
   <dialog id="lightbox" class="lightbox" aria-label="Foto">
     <button class="schliessen" type="button" aria-label="Schließen">×</button>

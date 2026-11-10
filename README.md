@@ -41,6 +41,21 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
 - **Finale:** Sind alle 24 Türchen offen, fliegen alle Fotos zu einem Herz zusammen.
   Danach lässt es sich über „♥️ Unser Herz“ jederzeit wieder ansehen.
 
+## Persönliche Extras
+
+- **Zusammen-Zähler** unter der Statuszeile (`zusammenSeit` und `kennenSeit` in `inhalte.js`).
+  Am 21.12. erscheint stattdessen: „Heute vor genau einem Jahr haben wir uns kennengelernt“.
+- **Sprachnachrichten** an Tag 1, 13 und 24: Lege die Dateien als `audio/tag01.m4a`,
+  `audio/tag13.m4a` und `audio/tag24.m4a` ab. Fehlt eine Datei, wird nichts angezeigt.
+- **Rubbelfeld** an Tag 6, 15 und 21 (`rubbeln: true`): Text und Zahlen liegen unter Gold.
+- **Capy-Begleiter** läuft durch die Winterlandschaft und sagt beim Antippen etwas Süßes.
+  Ab dem 10.12. trägt es eine Weihnachtsmütze.
+- **Schneekugel:** Handy schütteln für ein Schneegestöber mit Herzen.
+- **Quiz vor den Easter Eggs** (`quiz` bei `eastereggs`). Leere Antwort = kein Quiz.
+- **Lichtershow** an Heiligabend, bevor Türchen 24 aufgeht.
+- **Rückblick** ab dem 25.12.: „📖 Unser Dezember“ mit allen 24 Türchen zum Nachlesen.
+- **Als App:** Manifest und Capybara-Icon, damit sie die Seite auf den Homescreen legen kann.
+
 ## Easter Eggs
 
 Sechs versteckte Funde (fünf Gutscheine und die Capy Crew). Einstellungen unter

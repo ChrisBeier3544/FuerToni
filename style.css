@@ -1183,3 +1183,182 @@ html[data-tageszeit="nacht"] { --schnee-boden: #dcdcee; }
   .sterne span { animation: none; opacity: 0.7; }
   .sonne, .mond, .sterne { transition: none; }
 }
+
+/* =========================================================
+   Besondere Extras
+   ========================================================= */
+
+/* ---------- Zusammen-Zähler ---------- */
+.zusammen {
+  margin: 10px 0 0;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--beere);
+  opacity: 0.8;
+  font-variant-numeric: tabular-nums;
+}
+.zusammen:empty { display: none; }
+.zusammen.jubilaeum {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff8e6, var(--gold-hell));
+  border: 1px solid var(--gold);
+  opacity: 1;
+  animation: leuchten 2.4s ease-in-out infinite;
+}
+html[data-abend] .zusammen { color: #ffd0dc; }
+html[data-abend] .zusammen.jubilaeum { color: var(--beere-dunkel); }
+
+/* ---------- Rubbelfeld ---------- */
+.rubbel-bereich { position: relative; }
+.rubbel-bereich.rubbelt { user-select: none; -webkit-user-select: none; }
+.rubbel {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 16px;
+  touch-action: none;
+  cursor: grab;
+  box-shadow: 0 4px 14px rgba(107, 21, 50, 0.2);
+  transition: opacity 0.7s ease;
+}
+.rubbel.weg { opacity: 0; pointer-events: none; }
+
+/* ---------- Sprachnachricht ---------- */
+.sprachnachricht {
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--rose-50), var(--rose-100));
+  border: 1px solid var(--rose-300);
+}
+.sprachnachricht[hidden] { display: none; }
+.sprachnachricht-titel { margin: 0 0 8px; font-weight: 700; color: var(--beere); }
+.sprachnachricht audio { width: 100%; }
+
+/* ---------- Quiz ---------- */
+.quiz-intro { margin: 4px 0 6px; opacity: 0.85; }
+.quiz-antworten { display: grid; gap: 10px; margin-top: 6px; }
+.quiz-antwort {
+  padding: 12px 16px;
+  border: 2px solid var(--rose-300);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.quiz-antwort:hover:not(:disabled) { background: var(--rose-50); transform: translateY(-1px); }
+.quiz-antwort:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.quiz-antwort.richtig { background: #e7f6ea; border-color: #4caf6a; color: #1f5b30; }
+.quiz-antwort.falsch { background: #fdecef; border-color: #e85d7e; opacity: 0.6; animation: wackeln 0.45s ease; }
+.quiz-antwort:disabled { cursor: default; }
+.quiz-rueckmeldung { min-height: 1.4em; margin: 12px 0 0; font-weight: 700; color: var(--beere); }
+
+/* ---------- Rückblick ---------- */
+.rueckblick-liste { display: grid; gap: 12px; margin-top: 6px; text-align: left; }
+.rueckblick-eintrag {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--rose-50);
+  border: 1px solid var(--rose-200);
+}
+.rueckblick-tag { margin: 0; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--rose-500); }
+.rueckblick-eintrag h3 { margin: 2px 0 6px; font-family: "Dancing Script", cursive; font-size: 1.45rem; color: var(--beere); }
+.rueckblick-text { margin: 0; line-height: 1.5; white-space: pre-line; }
+
+/* ---------- Lichtershow an Heiligabend ---------- */
+.birne.show { background: #ffd36b; box-shadow: 0 0 10px 3px #ffd36b, 0 0 24px 8px rgba(255, 211, 107, 0.5); }
+.lichterkette.blinken .birne.show { animation: festblinken 0.5s steps(2, jump-none) 4; }
+@keyframes festblinken { 50% { background: #ff8fab; box-shadow: 0 0 10px 3px #ff8fab, 0 0 24px 8px rgba(255, 143, 171, 0.5); } }
+
+/* ---------- Capy-Begleiter ---------- */
+.capy-bahn { position: absolute; left: 0; right: 0; bottom: 4%; height: 0; }
+.capy-laeufer {
+  position: absolute;
+  bottom: 0;
+  left: -80px;
+  width: 64px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  animation: capy-laufen 46s linear -9s infinite;
+  -webkit-tap-highlight-color: transparent;
+}
+.capy-laeufer:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 10px; }
+.capy-figur { display: block; width: 100%; height: auto; animation: capy-richtung 46s steps(1, end) -9s infinite; filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.18)); }
+.capy-laeufer.redet, .capy-laeufer.redet .capy-figur, .capy-laeufer.redet .bein-a, .capy-laeufer.redet .bein-b { animation-play-state: paused; }
+@keyframes capy-laufen {
+  0% { left: -80px; }
+  48% { left: calc(100% + 20px); }
+  50% { left: calc(100% + 20px); }
+  98% { left: -80px; }
+  100% { left: -80px; }
+}
+@keyframes capy-richtung { 0% { transform: scaleX(1); } 49% { transform: scaleX(-1); } }
+.bein-a, .bein-b { transform-box: fill-box; transform-origin: 50% 0; animation: tapsen 0.5s ease-in-out infinite alternate; }
+.bein-b { animation-direction: alternate-reverse; }
+@keyframes tapsen { from { transform: rotate(-14deg); } to { transform: rotate(14deg); } }
+.capy-muetze { display: none; }
+.mit-muetze .capy-muetze { display: inline; }
+.capy-blase {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 3;
+  width: max-content;
+  max-width: min(220px, 70vw);
+  padding: 8px 12px;
+  transform: translateX(-50%);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--beere-dunkel);
+  font: 700 0.82rem/1.35 "Nunito", sans-serif;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(107, 21, 50, 0.22);
+  animation: aufpoppen 0.3s ease;
+}
+.capy-blase::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -7px;
+  border: 7px solid transparent;
+  border-top-color: #fff;
+}
+.capy-blase[hidden] { display: none; }
+.landschaft { overflow: visible; }
+.landschaft > svg { overflow: hidden; }
+
+/* ---------- App-Tipp ---------- */
+.app-tipp {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left, 0px));
+  right: max(16px, env(safe-area-inset-right, 0px));
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  z-index: 45;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(107, 21, 50, 0.25);
+  font-size: 0.88rem;
+  animation: aufpoppen 0.4s ease;
+}
+.app-tipp[hidden] { display: none; }
+.app-tipp p { margin: 0; flex: 1; min-width: 0; }
+.app-tipp-icon { font-size: 1.5rem; }
+.app-tipp button { border: 0; background: var(--rose-100); color: var(--beere); width: 32px; height: 32px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; flex: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .capy-laeufer { animation: none; left: 12%; }
+  .capy-figur, .bein-a, .bein-b { animation: none; }
+}
