@@ -2371,3 +2371,14 @@ html[data-staubig] .spinnwebe { display: block; }
 .bau-banner small { display: block; font-weight: 700; opacity: 0.7; font-variant-numeric: tabular-nums; }
 .lichterkette.poliert { animation: polieren 1.6s ease-in-out 2; }
 @keyframes polieren { 50% { filter: brightness(1.6) drop-shadow(0 0 10px #ffd36b); } }
+.sp-luftschiff { z-index: 2; }
+.sp-propeller { transform-box: fill-box; transform-origin: center; animation: propeller 0.25s linear infinite; }
+@keyframes propeller { 50% { transform: scaleY(0.15); } }
+.sp-brenner { transform-box: fill-box; transform-origin: 50% 100%; animation: sp-flamme 0.2s ease-in-out infinite alternate; }
+.sp-wasserball { width: 32px; z-index: 4; }
+.sp-schneeburg { bottom: 6%; z-index: 1; height: auto; }
+.sp-werfer { z-index: 2; }
+.sp-trinker { transform-box: fill-box; transform-origin: 50% 100%; }
+.sp-badegast svg { overflow: visible; }
+
+.sp-onsen .sp-badegast { bottom: 30%; }
