@@ -195,3 +195,12 @@ echten Website ignoriert.
 Im Ordner `vorschau-poyjy2er/` liegt eine Testversion mit Testleiste, die alle Tage
 und Türchen freischaltet. Sie nutzt die Fotos und Inhalte der echten Seite mit.
 **Diesen Ordner vor dem 1. Dezember löschen**, sonst könnte Toni darüber alles vorab sehen.
+
+## Kleine Überraschungen zum Antippen (interaktiv.js)
+
+- **Kerzen am Adventskranz:** brennende Kerze antippen, sie wird ausgepustet, Rauch steigt als Herz auf, nach gut 2 Sekunden geht sie wieder an.
+- **Lichterkette:** antippen, eine Lichtwelle in Rosa und Gold läuft von der Stelle aus über die Kette, danach flackert ein Birnchen kurz mit Wackelkontakt.
+- **Polaroids oben:** gedrückt halten, das Foto wird dunkel und entwickelt sich neu wie ein Sofortbild. Kurz tippen öffnet es wie bisher.
+- **Kugeln an den Tannenzweigen:** antippen, die Kugel schwingt, ein Glöckchen klingt (nur mit Ton), Glitzer fällt herunter.
+- **Capy Paar in der Fußzeile:** antippen, ein Mistelzweig senkt sich, Bussi mit Herzchen, danach schauen beide verlegen zur Seite.
+- **Mond:** antippen, Regen aus 26 Sternschnuppen. **Sonne:** antippen, sie setzt kurz eine Sonnenbrille auf und strahlt.
