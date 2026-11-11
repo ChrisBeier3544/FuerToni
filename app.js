@@ -891,7 +891,8 @@
     const kennen = tageSeit(KALENDER.kennenSeit, d);
     if (kennen !== null && kennen > 0 && kennen % 365 === 0) {
       const jahre = kennen / 365;
-      box.textContent = "Heute vor " + (jahre === 1 ? "genau einem Jahr" : jahre + " Jahren") + " haben wir uns kennengelernt ♥️";
+      // Der Satz steht schon oben in „Dein Tag“, hier die Zahlen dazu
+      box.textContent = (jahre === 1 ? "1 Jahr" : jahre + " Jahre") + " · " + kennen.toLocaleString("de-DE") + " Tage, seit wir uns kennen · " + (zusammen !== null && zusammen >= 0 ? zusammen.toLocaleString("de-DE") + " Tage zusammen ♥️" : "♥️");
       box.classList.add("jubilaeum");
       return;
     }
