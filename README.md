@@ -64,7 +64,13 @@ Am Tag vor dem ersten Easter Egg gibt es zusätzlich einen Hinweis auf die verst
 10 Sekunden nach dem Sprechen fliegt es auf einer von 10 Routen aus dem Bild und landet auf einem
 von 5 Plätzen (Kalender: Karte, Polaroid, Lichterkette, Adventskranz bzw. „Unsere Momente“, Regal;
 Countdown: Countdown, Umschlag links und rechts, Siegel, Hinweistext). Am 26.11., 21.12. und 24.12.
-kommt ein Rotkehlchen-Weibchen mit Schleife dazu.
+kommt ein Rotkehlchen-Weibchen mit Schleife dazu, setzt sich direkt neben das Männchen und folgt ihm.
+Erster Abflug 10 Sekunden nach dem Gruß, danach jeweils 15 Sekunden nach der Landung.
+
+## Herz im Titel
+
+`herz.js`: Antippen des ♥️ in „Für Toni“ lässt es in viele kleine Herzen zerspringen. Sie fliegen
+7 Sekunden über den Bildschirm und setzen sich dann Stück für Stück wieder zum Herz zusammen.
 Das heutige Türchen wird nicht mehr angescrollt und hat nur eine feine goldene Umrandung.
 
 ## Himmel

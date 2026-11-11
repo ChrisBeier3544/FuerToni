@@ -117,9 +117,11 @@
     return v;
   }
 
+  // p ist in Bildschirmkoordinaten; gesetzt wird in Seitenkoordinaten, damit der Vogel beim Scrollen still sitzt
   function setzePosition(v, p) {
     v.pos = p;
-    v.el.style.transform = "translate(" + (p.x - GROESSE / 2).toFixed(1) + "px," + (p.y - GROESSE).toFixed(1) + "px)";
+    v.seite = { x: p.x + window.scrollX, y: p.y + window.scrollY };
+    v.el.style.transform = "translate(" + (v.seite.x - GROESSE / 2).toFixed(1) + "px," + (v.seite.y - GROESSE).toFixed(1) + "px)";
     v.el.querySelector("svg").style.transform = v.blick < 0 ? "scaleX(-1)" : "";
   }
 
@@ -133,20 +135,30 @@
   }
   function zeigeBlase(v, satz) {
     if (v.zustand !== "sitzt") return;
+    // die Blase des anderen Vogels ausblenden, damit sie sich nicht überlappen
+    voegel.forEach((a) => { if (a !== v) { a.blase.hidden = true; a.el.classList.remove("redet"); } });
     v.blase.textContent = satz;
-    v.blase.classList.toggle("unten", v.pos && v.pos.y < 130);
-    v.blase.style.right = "10px"; v.blase.style.left = "auto";
+    v.blase.classList.toggle("unten", v.pos && v.pos.y < 140);
+    v.blase.style.left = "0px"; v.blase.style.right = "auto";
     v.blase.hidden = false;
     v.el.classList.add("redet");
-    const r = v.blase.getBoundingClientRect();
-    if (r.left < 12) v.blase.style.right = 10 - (12 - r.left) + "px";
+    // Blase so legen, dass die Spitze genau auf den Kopf zeigt, und im Bild halten
+    const breite = v.blase.offsetWidth, kopf = GROESSE / 2, rand = 10;
+    const vogelLinks = v.pos.x - GROESSE / 2;
+    let links = kopf + 22 - breite;
+    if (vogelLinks + links < rand) links = rand - vogelLinks;
+    if (vogelLinks + links + breite > W() - rand) links = W() - rand - breite - vogelLinks;
+    v.blase.style.left = links.toFixed(0) + "px";
+    v.blase.style.setProperty("--spitze", Math.max(8, Math.min(breite - 22, kopf - links - 7)).toFixed(0) + "px");
   }
 
   // 10 Sekunden nach dem Sprechen (oder Landen) geht es los
+  // 10 Sekunden nach dem ersten Gruß, nach jeder weiteren Landung 15 Sekunden.
+  // Das Weibchen fliegt nie allein los, es folgt dem Männchen.
   function planeAbflug(v) {
     clearTimeout(v.flugTimer);
-    if (ruhig) return;
-    v.flugTimer = setTimeout(() => fliegeWeg(v), 10000);
+    if (ruhig || v.partner) return;
+    v.flugTimer = setTimeout(() => fliegeWeg(v), v.gelandet ? 15000 : 10000);
   }
 
   function animiere(v, punkte, dauer, zielFn) {
@@ -173,14 +185,32 @@
     v.zustand = "fliegt";
     v.el.classList.add("fliegt");
     const route = ROUTEN[Math.floor(Math.random() * ROUTEN.length)](v.pos);
+    const folger = voegel.find((a) => a.partner === v && a.zustand === "sitzt");
+    if (folger) setTimeout(() => fliegeWeg(folger), 700);
     await animiere(v, route, 2400 + Math.random() * 900);
     if (v.zustand !== "fliegt") return;
     v.el.hidden = true;
-    await new Promise((r) => setTimeout(r, 2500 + Math.random() * 3000));
+    if (v.partner) {
+      // warten, bis das Männchen seinen neuen Platz ausgesucht hat
+      while (!v.partner.ziel && v.partner.zustand !== "sitzt") await new Promise((r) => setTimeout(r, 200));
+      await new Promise((r) => setTimeout(r, 600));
+    } else {
+      await new Promise((r) => setTimeout(r, 2500 + Math.random() * 3000));
+    }
     lande(v, false);
   }
 
+  // Das Weibchen sitzt direkt neben dem Männchen
+  function sitzpunkt(v, k, name) {
+    const f = plaetze(k)[name];
+    const p = f && f();
+    if (!p) return null;
+    if (!v.partner) return p;
+    const rechts = p.x + 50 < W() - 20;
+    return { x: p.x + (rechts ? 46 : -46), y: p.y };
+  }
   function freierPlatz(v, k) {
+    if (v.partner) return v.partner.ziel || v.partner.platz;
     const liste = Object.keys(plaetze(k)).filter((name) => name !== v.platz && !voegel.some((a) => a !== v && a.platz === name && a.kontext === k) && plaetze(k)[name]());
     if (!liste.length) return null;
     return liste[Math.floor(Math.random() * liste.length)];
@@ -188,14 +218,15 @@
 
   async function lande(v, sofort) {
     const k = kontext();
-    if (!k) { v.zustand = "weg"; v.el.hidden = true; v.platz = null; setTimeout(() => lande(v, sofort), 1000); return; }
-    const name = sofort ? (voegel.indexOf(v) === 0 ? ERSTER_PLATZ[k] : freierPlatz(v, k)) : freierPlatz(v, k);
-    const zielFn = name && plaetze(k)[name];
-    if (!zielFn || !zielFn()) { setTimeout(() => lande(v, sofort), 1500); return; }
+    if (!k) { v.zustand = "weg"; v.el.hidden = true; v.platz = null; await new Promise((r) => setTimeout(r, 1000)); return lande(v, sofort); }
+    const name = sofort ? (v.partner ? freierPlatz(v, k) : ERSTER_PLATZ[k]) : freierPlatz(v, k);
+    const zielFn = name && (() => sitzpunkt(v, k, name));
+    if (!zielFn || !zielFn()) { await new Promise((r) => setTimeout(r, 1500)); return lande(v, sofort); }
+    v.ziel = name;
     v.platz = name; v.kontext = k;
     v.el.classList.toggle("im-countdown", k === "countdown");
     if (sofort || ruhig) {
-      v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.el.hidden = false;
+      v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.el.hidden = false; v.ziel = null;
       setzePosition(v, zielFn());
       return;
     }
@@ -206,8 +237,9 @@
     v.zustand = "fliegt"; v.el.classList.add("fliegt"); v.el.hidden = false;
     await animiere(v, [start, mitte, { x: z.x + (vonLinks ? -30 : 30), y: z.y - 30 }, z], 2600, zielFn);
     if (v.zustand !== "fliegt") return;
-    v.zustand = "sitzt"; v.el.classList.remove("fliegt");
+    v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.ziel = null;
     v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
+    v.gelandet = (v.gelandet || 0) + 1;
     planeAbflug(v);
   }
 
@@ -216,9 +248,14 @@
     for (const v of voegel) {
       if (v.zustand !== "sitzt") continue;
       const k = kontext();
+      if (k !== v.kontext && v.partner) { v.zustand = "weg"; v.el.hidden = true; v.platz = null; v.blase.hidden = true; setTimeout(() => lande(v, false), 1800); continue; }
       if (k !== v.kontext) { v.zustand = "weg"; v.el.hidden = true; clearTimeout(v.flugTimer); v.timer.forEach(clearTimeout); v.blase.hidden = true; v.platz = null; lande(v, true).then(() => { if (v === voegel[0] || v.weiblich) setTimeout(() => sprich(v), 2000); }); continue; }
-      const p = plaetze(k)[v.platz] && plaetze(k)[v.platz]();
-      if (p) setzePosition(v, p);
+      // nur nachführen, wenn sich der Platz auf der Seite wirklich verschoben hat
+      const p = sitzpunkt(v, k, v.platz);
+      if (p && v.seite) {
+        const dx = p.x + window.scrollX - v.seite.x, dy = p.y + window.scrollY - v.seite.y;
+        if (Math.abs(dx) > 1.5 || Math.abs(dy) > 1.5) setzePosition(v, p);
+      }
     }
     requestAnimationFrame(festhalten);
   }
@@ -256,7 +293,8 @@
     lande(maennchen, true).then(() => setTimeout(() => sprich(maennchen), 2000));
     if (zuZweit()) {
       weibchen = erstelleVogel(true, saetzeWeibchen);
-      setTimeout(() => lande(weibchen, false).then(() => setTimeout(() => { if (weibchen.zustand === "sitzt") sprich(weibchen); }, 900)), 4500);
+      weibchen.partner = maennchen;
+      setTimeout(() => lande(weibchen, false).then(() => setTimeout(() => { if (weibchen.zustand === "sitzt") sprich(weibchen); }, 5200)), 3800);
     }
     requestAnimationFrame(festhalten);
   }, 250);

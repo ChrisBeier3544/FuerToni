@@ -201,7 +201,21 @@
   }
 
   function baueKalender() {
-    el.titel.textContent = KALENDER.titel || "Adventskalender";
+    // Das Herz im Titel bekommt ein eigenes Element, damit man es antippen kann
+    const titelText = KALENDER.titel || "Adventskalender";
+    const herzStelle = titelText.lastIndexOf("♥");
+    el.titel.textContent = "";
+    if (herzStelle >= 0) {
+      el.titel.append(titelText.slice(0, herzStelle));
+      const herz = document.createElement("button");
+      herz.type = "button";
+      herz.className = "titel-herz";
+      herz.setAttribute("aria-label", "Herz antippen");
+      herz.textContent = titelText.slice(herzStelle).trim();
+      el.titel.appendChild(herz);
+    } else {
+      el.titel.textContent = titelText;
+    }
     document.title = KALENDER.titel || "Adventskalender";
     el.untertitel.textContent = KALENDER.untertitel || "";
 
