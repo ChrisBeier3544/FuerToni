@@ -3045,3 +3045,16 @@ html:has(.special-buehne) .vogel-ebene { visibility: hidden; }
 /* Solange der Brief verschlossen ist, ist hinter ihm nichts zu sehen, auch nicht beim Herauszoomen */
 html:has(#intro:not([hidden]):not(.weg)) body > *:not(#intro):not(.vogel-ebene):not(.testleiste):not(script):not(dialog) { visibility: hidden !important; }
 html:has(#intro:not([hidden]):not(.weg)), html:has(#intro:not([hidden]):not(.weg)) body { overflow: hidden; background: linear-gradient(160deg, var(--rose-50), var(--rose-200)) fixed; }
+
+/* Munkelvogel fragt nach seiner Partnerin (vor dem Geburtstag) */
+.vogel .vogel-blase.mit-wahl { pointer-events: auto; cursor: default; }
+.vogel-wahlen { display: flex; gap: 8px; margin-top: 8px; }
+.vogel-wahl {
+  flex: 1; padding: 6px 12px; border-radius: 999px; text-align: center; cursor: pointer; font-weight: 800;
+  border: 1px solid var(--rose-300); background: #fff; color: var(--beere);
+  -webkit-tap-highlight-color: transparent;
+}
+.vogel-wahl.ja { border: 0; color: #fff; background: linear-gradient(145deg, #f7809b, var(--beere)); box-shadow: 0 4px 10px rgba(157, 36, 73, 0.25); }
+.vogel-wahl:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+/* Die zehn Freunde der Munkelvogeline */
+.vogel.gast { width: 42px; pointer-events: none; cursor: default; }
