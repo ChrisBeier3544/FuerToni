@@ -13,6 +13,7 @@
  *    rubbeln    : true = Text und Zahlen erst freirubbeln
  *    audio      : (optional) Sprachnachricht, z. B. "audio/tag01.m4a"
  *    status     : (optional) Text oben auf der Seite an diesem Tag
+ *    statusOffen: (optional) Text oben, nachdem das Türchen geöffnet wurde
  *    bild       : (optional) Foto, z. B. "bilder/tag01.jpg"
  *    hinweis    : (optional) zusätzlicher Hinweis-Kasten
  *
@@ -41,7 +42,7 @@ const KALENDER = {
   postkarten: {
     "11-26": { titel: "Happy Birthday, Toni! 🎂", text: "Heute ist dein Tag! Ich wünsche dir einen wunderschönen Geburtstag voller Lachen, Kuchen und Liebe ♥️", bild: "strand-lachen.jpg" },
     "11-27": { titel: "Noch 4 Mal schlafen", text: "Dann öffnest du das erste Türchen. Die Capy Crew arbeitet schon ganz fleißig an deinem Kalender 🐹", bild: "capybara-tasse.jpg" },
-    "11-28": { titel: "Noch 3 Mal schlafen", text: "Hast du schon die Lichterkette gesehen? Die Capys haben sie heute extra für dich aufgehängt ✨", bild: "dom.jpg" },
+    "11-28": { titel: "Noch 3 Mal schlafen", text: "Heute wird geschmückt! Gleich bringen die Capys Schnee, Schleifen und die Lichterkette an. Schau ihnen ruhig zu ✨", bild: "dom.jpg" },
     "11-29": { titel: "Frohen 1. Advent 🕯️", text: "Heute brennt die erste Kerze. Ich wünsche dir einen gemütlichen Sonntag und denk ganz fest an dich ♥️", bild: "sofatag.jpg" },
     "11-30": { titel: "Morgen geht es los!", text: "Nur noch einmal schlafen, dann öffnest du das erste Türchen. Ich freu mich so auf diesen Dezember mit dir ♥️", bild: "meeresluft.jpg" },
   },
@@ -196,6 +197,7 @@ const KALENDER = {
       paeckchen: 2603,
       konfetti: true,
       status: "Heute hat Joris Geburtstag 🎉 Türchen 4 wartet auf dich!",
+      statusOffen: "Heute hat Joris Geburtstag 🎉 Feiert schön!",
     },
     5: {
       titel: "Heute ist Spieltag 🏀",
@@ -258,6 +260,7 @@ const KALENDER = {
       audio: "audio/tag13.m4a",
       konfetti: true,
       status: "Heute hat dein Papa Geburtstag 🎂 Türchen 13 wartet auf dich!",
+      statusOffen: "Heute hat dein Papa Geburtstag 🎂 Feiert schön!",
     },
     14: {
       titel: "Alles an dir",
@@ -286,8 +289,8 @@ const KALENDER = {
       status: "Heute ist deine Matheklausur. Ich drück dir die Daumen 🍀",
     },
     18: {
-      titel: "Lieblingsmomente",
-      text: "Meine liebsten Momente sind die, in denen wir einfach zusammen sind. Ohne Plan, ohne Stress, nur du und ich ♥️\nHeute Abend gehen wir zusammen auf die Weihnachtsfeier von AXA Decker. Ich freu mich so auf den Abend mit dir ✨",
+      titel: "Unser Abend 🎄",
+      text: "Heute Abend gehen wir zusammen auf die Weihnachtsfeier von AXA Decker. Ich freu mich so darauf, mit dir zu feiern und den Abend zu genießen ✨\nMit dir an meiner Seite wird jeder Abend zu einem Lieblingsmoment ♥️",
       status: "Heute Abend gehen wir zusammen zur Weihnachtsfeier von AXA Decker 🎄✨",
       briefzahl: 15,
       paeckchen: 78,
@@ -307,6 +310,7 @@ const KALENDER = {
     },
     21: {
       titel: "Ein Jahr wir ♥️",
+      status: "Heute vor einem Jahr haben wir uns kennengelernt ♥️",
       text: "Heute ist der kürzeste Tag des Jahres und gleichzeitig mein liebster: Genau heute vor einem Jahr habe ich dich kennengelernt ♥️",
       briefzahl: 21,
       paeckchen: 925,

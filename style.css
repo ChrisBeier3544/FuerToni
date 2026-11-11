@@ -2493,3 +2493,8 @@ html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
 }
 .h2-schnuppe::after { content: ""; position: absolute; right: -2px; top: -2px; width: 6px; height: 6px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.8); }
 @media (prefers-reduced-motion: reduce) { .h2-strahlen, .h2-wolke { animation: none; } .h2-wolke { left: 10%; } }
+
+/* Mond am Handy: klein und zwischen Zweig und Datum, nicht neben dem Titel */
+@media (max-width: 600px) {
+  .himmel > .himmel2 .h2-mond { width: 34px; top: 10px !important; right: auto !important; left: calc(50% + 44px); }
+}
