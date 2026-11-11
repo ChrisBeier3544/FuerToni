@@ -56,7 +56,15 @@
     regal: () => { const e = document.getElementById("kalender"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width * 0.22, y: r.top + 2 }; },
   };
   const PLAETZE_COUNTDOWN = {
-    countdown: () => { const e = document.getElementById("countdown-ziffern"); if (!sichtbar(e) || !e.textContent) return null; const r = e.getBoundingClientRect(); return { x: r.right - 22, y: r.top + 1 }; },
+    countdown: () => {
+      const e = document.getElementById("countdown-ziffern"); if (!sichtbar(e) || !e.textContent) return null;
+      const r = e.getBoundingClientRect();
+      // am liebsten rechts neben den Ziffern, damit nichts von der Schrift verdeckt wird
+      if (r.right + 24 + GROESSE / 2 < W() - 8) return { x: r.right + 24, y: r.bottom - 4 };
+      const t = document.getElementById("countdown-titel"), tr = t && t.getBoundingClientRect();
+      if (!tr || !tr.width || r.right - 22 - GROESSE / 2 > tr.right + 4) return { x: r.right - 22, y: r.top + 1 };
+      return null;
+    },
     umschlagLinks: () => { const e = document.getElementById("umschlag"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + 34, y: r.top + 3 }; },
     umschlagRechts: () => { const e = document.getElementById("umschlag"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.right - 34, y: r.top + 3 }; },
     siegel: () => { const e = document.querySelector("#umschlag .siegel"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + 4 }; },
@@ -135,6 +143,9 @@
   }
   function zeigeBlase(v, satz) {
     if (v.zustand !== "sitzt") return;
+    // nur sprechen, wenn der Vogel gerade zu sehen ist
+    const sicht = v.el.getBoundingClientRect();
+    if (sicht.bottom < 20 || sicht.top > window.innerHeight - 20) { v.blase.hidden = true; return; }
     // die Blase des anderen Vogels ausblenden, damit sie sich nicht überlappen
     voegel.forEach((a) => { if (a !== v) { a.blase.hidden = true; a.el.classList.remove("redet"); } });
     v.blase.textContent = satz;
@@ -151,33 +162,62 @@
     if (vogelLinks + links + breite > W() - rand) links = W() - rand - breite - vogelLinks;
     v.blase.style.left = links.toFixed(0) + "px";
     v.blase.style.setProperty("--spitze", Math.max(8, Math.min(breite - 22, kopf - links - 7)).toFixed(0) + "px");
-    // Gesichter auf den Fotos nie verdecken: sonst die Blase seitlich neben den Vogel legen
-    v.blase.style.maxWidth = "";
-    if (verdecktFoto(v.blase)) {
-      v.blase.classList.remove("unten");
+    // Gesichter und wichtige Schrift nie verdecken: oben, seitlich oder unten probieren
+    // und die erste Lage nehmen, die nichts verdeckt (sonst die mit der kleinsten Überdeckung)
+    const andere = voegel.find((a) => a !== v && a.zustand === "sitzt" && a.pos && Math.abs(a.pos.x - v.pos.x) < 80);
+    const platzLinks = vogelLinks - 4 - rand, platzRechts = W() - rand - (vogelLinks + GROESSE + 4);
+    const lege = (art) => {
+      v.blase.classList.remove("seitlich", "rechts-vom-vogel", "unten");
+      v.blase.style.maxWidth = "";
+      if (art === "oben" || art === "unten") {
+        v.blase.classList.toggle("unten", art === "unten");
+        v.blase.style.left = links.toFixed(0) + "px";
+        return;
+      }
+      const linksDavon = art === "links";
+      const platz = linksDavon ? platzLinks : platzRechts;
       v.blase.classList.add("seitlich");
-      // Seite wählen: weg vom Partner, sonst dorthin, wo mehr Platz ist
-      const andere = voegel.find((a) => a !== v && a.zustand === "sitzt" && a.pos && Math.abs(a.pos.x - v.pos.x) < 80);
-      const platzLinks = vogelLinks - 4 - rand, platzRechts = W() - rand - (vogelLinks + GROESSE + 4);
-      let links2 = andere ? andere.pos.x > v.pos.x : platzLinks >= platzRechts;
-      if (links2 && platzLinks < 120) links2 = false;
-      if (!links2 && platzRechts < 120) links2 = true;
-      const platz = links2 ? platzLinks : platzRechts;
+      v.blase.classList.toggle("rechts-vom-vogel", !linksDavon);
       v.blase.style.maxWidth = Math.max(110, Math.min(250, platz)) + "px";
       const b2 = v.blase.offsetWidth;
-      v.blase.classList.toggle("rechts-vom-vogel", !links2);
-      v.blase.style.left = (links2 ? -b2 - 4 : GROESSE + 4).toFixed(0) + "px";
-      if (verdecktFoto(v.blase)) { v.blase.classList.remove("seitlich", "rechts-vom-vogel"); v.blase.classList.add("unten"); v.blase.style.maxWidth = ""; v.blase.style.left = links.toFixed(0) + "px"; }
-    } else {
-      v.blase.classList.remove("seitlich", "rechts-vom-vogel");
+      v.blase.style.left = (linksDavon ? -b2 - 4 : GROESSE + 4).toFixed(0) + "px";
+    };
+    const vorne = v.pos && v.pos.y < 140 ? ["unten", "oben"] : ["oben", "unten"];
+    // seitlich zuerst weg vom Partner, sonst dorthin, wo mehr Platz ist
+    const seiten = (andere ? andere.pos.x > v.pos.x : platzLinks >= platzRechts) ? ["links", "rechts"] : ["rechts", "links"];
+    const reihe = [vorne[0], ...seiten.filter((x) => (x === "links" ? platzLinks : platzRechts) >= 110), vorne[1]];
+    let beste = null;
+    for (const art of reihe) {
+      lege(art);
+      const wert = verdeckung(v.blase);
+      if (wert === 0) { beste = null; break; }
+      if (!beste || wert < beste.wert) beste = { art, wert };
     }
+    if (beste) {
+      // nirgends Platz ohne ein Foto oder wichtige Schrift zu verdecken:
+      // lieber schweigen und den Satz nach der nächsten Landung sagen
+      if (beste.wert > 500) { v.blase.hidden = true; v.el.classList.remove("redet"); v.nachholen = satz; return; }
+      lege(beste.art);
+    }
+    v.nachholen = null;
   }
-  function verdecktFoto(blase) {
+  // Wie viel Fläche die Blase von Fotos, wichtiger Schrift oder dem Bildrand verdeckt
+  function verdeckung(blase) {
     const b = blase.getBoundingClientRect();
-    return [...document.querySelectorAll(".polaroid img, .lightbox-figur img")].some((img) => {
-      const r = img.getBoundingClientRect();
-      return r.width > 0 && b.left < r.right - 4 && b.right > r.left + 4 && b.top < r.bottom - 4 && b.bottom > r.top + 4;
+    const intro = document.getElementById("intro");
+    const sel = intro && !intro.hidden
+      ? "#intro .umschlag-name, #intro .countdown-ziffern, #intro .countdown-titel, #intro .siegel, #intro .countdown-gruss, #intro .intro-hinweis"
+      : ".polaroid img, .lightbox-figur img, #titel, .heute-karte .status, .zaehler-zahl";
+    let summe = 0;
+    document.querySelectorAll(sel).forEach((e) => {
+      const r = e.getBoundingClientRect();
+      if (!r.width) return;
+      const w = Math.min(b.right, r.right - 4) - Math.max(b.left, r.left + 4), h = Math.min(b.bottom, r.bottom - 4) - Math.max(b.top, r.top + 4);
+      if (w > 0 && h > 0) summe += w * h;
     });
+    // außerhalb des Bildschirms zählt doppelt
+    const aussen = Math.max(0, 4 - b.top) + Math.max(0, b.bottom - (window.innerHeight - 4)) + Math.max(0, 4 - b.left) + Math.max(0, b.right - (W() - 4));
+    return summe + aussen * b.width * 2;
   }
 
   // 10 Sekunden nach dem Sprechen (oder Landen) geht es los
@@ -268,6 +308,10 @@
     v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.ziel = null;
     v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
     v.gelandet = (v.gelandet || 0) + 1;
+    if (v.nachholen) {
+      const satz = v.nachholen;
+      setTimeout(() => { if (v.zustand === "sitzt" && v.nachholen === satz) { zeigeBlase(v, satz); setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); }, 5000); } }, 1200);
+    }
     planeAbflug(v);
   }
 
