@@ -2973,3 +2973,71 @@ dialog { overscroll-behavior: contain; }
 .anleitung-papier, .dialog-inhalt, .entdeckt-liste { overscroll-behavior: contain; }
 /* Fliegt der Vogel seitlich aus dem Bild, darf die Seite nicht waagerecht verrutschen */
 .vogel-ebene { left: 0; right: 0; width: auto; overflow-x: clip; overflow-y: visible; }
+
+/* =========================================================
+   Neue Capy Szenen 11. bis 14. November (specials.js)
+   ========================================================= */
+/* Kino */
+.special-raum .sp-kinosaal { inset: 0 0 -30vh 0; background: radial-gradient(ellipse at 50% 20%, #3a1f3a, #160a18 70%); opacity: 0; }
+.sp-kinokegel svg { display: block; width: 100%; height: 100%; }
+.sp-leinwand { border-radius: 6px; overflow: hidden; background: #2a1726; box-shadow: 0 0 0 6px #1d0f1c, 0 0 40px rgba(255, 240, 200, 0.18); }
+.sp-film { position: absolute; inset: 0; overflow: hidden; background: #fff; }
+.sp-film-himmel { position: absolute; inset: 0; background: linear-gradient(180deg, #ffd9e3, #fff2e0); }
+.sp-film-boden { position: absolute; left: 0; right: 0; bottom: 0; height: 22%; background: #b9dfb0; }
+.sp-filmcapy { position: absolute; left: -200px; }
+.sp-filmcapy > svg { display: block; width: 100%; height: auto; overflow: visible; transform-origin: 50% 90%; }
+.sp-filmherz { position: absolute; left: 50%; top: 4%; color: #ff4d7d; line-height: 1; opacity: 0; text-shadow: 0 4px 10px rgba(255, 77, 125, 0.4); }
+.sp-filmende { position: absolute; left: 50%; top: 50%; opacity: 0; font-family: "Dancing Script", cursive; font-weight: 700; color: #fff; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6); white-space: nowrap; }
+.sp-vorhang { position: absolute; top: 0; bottom: 0; width: 51%; background: repeating-linear-gradient(90deg, #b0234f 0 14px, #8a1a3d 14px 22px); box-shadow: inset 0 -20px 30px rgba(0, 0, 0, 0.25); }
+.sp-vorhang.links { left: 0; transform-origin: 0 50%; }
+.sp-vorhang.rechts { right: 0; transform-origin: 100% 50%; }
+.sp-vorhang-oben { position: absolute; left: 0; right: 0; top: 0; height: 12%; background: repeating-linear-gradient(90deg, #c2185b 0 18px, #9d2449 18px 26px); border-bottom: 3px solid #f3c84b; }
+.sp-kinoreihe { bottom: 0; }
+.sp-kinoreihe svg { display: block; width: 100%; height: 100%; }
+.sp-zuschauer { bottom: 0; transform-origin: 50% 100%; }
+.sp-zuschauer svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sp-kopf-vorne { position: absolute; inset: 0; opacity: 0; transition: opacity 0.35s ease; }
+.sp-kopf-hinten { transition: opacity 0.35s ease; }
+.sp-zuschauer.dreht .sp-kopf-vorne { opacity: 1; }
+.sp-zuschauer.dreht .sp-kopf-hinten { opacity: 0; }
+.sp-traene { position: absolute; left: 34%; top: 48%; width: 6px; height: 9px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: #7cc4f0; opacity: 0; }
+.sp-popcorn { bottom: 2%; z-index: 2; }
+.sp-popcorn svg { display: block; width: 100%; height: auto; }
+.sp-popkorn { position: absolute; width: 8px; height: 8px; border-radius: 50%; background: #fff6d8; box-shadow: inset 0 0 0 1px #f3dc9f; }
+/* Seilbahn */
+.sp-berge { left: 0; right: 0; bottom: 0; height: 46%; }
+.sp-berge svg { display: block; width: 100%; height: 100%; }
+.special-raum .sp-berge::after { content: ""; position: absolute; left: 0; right: 0; top: calc(100% - 1px); height: 30vh; background: #eef3fb; }
+.sp-wolke-fahrt svg { display: block; width: 100%; height: auto; }
+.sp-seil { pointer-events: none; }
+.sp-seil svg { display: block; }
+.sp-gondel svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 8px 10px rgba(107, 21, 50, 0.25)); }
+.sp-gondelherz svg { display: block; width: 100%; height: auto; }
+.sp-flocke { border-radius: 50%; background: #fff; box-shadow: 0 0 3px rgba(160, 180, 220, 0.8); }
+/* Fotobox */
+.sp-fotobox svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.sp-lampe { animation: sp-lampe 0.9s steps(2, jump-none) infinite; }
+@keyframes sp-lampe { 50% { fill: #fff4c2; } }
+.sp-box-innen { position: absolute; left: 15%; right: 15%; top: 22%; bottom: 5.5%; }
+.sp-box-vorhang { position: absolute; left: 15%; right: 15%; top: 22%; bottom: 5.5%; transform-origin: 50% 0; background: repeating-linear-gradient(90deg, #d6304f 0 12px, #b0234f 12px 20px); border-radius: 0 0 6px 6px; }
+.special-raum .sp-blitz { inset: 0 0 -30vh 0; background: #fff; opacity: 0; z-index: 6; }
+.sp-fotostreifen { z-index: 3; display: grid; gap: 4px; padding: 5px 5px 7px; background: #fff; box-shadow: 0 8px 18px rgba(107, 21, 50, 0.3); transform-origin: 50% 0; }
+.sp-streifen-kopf { text-align: center; font-family: "Dancing Script", cursive; font-weight: 700; font-size: 0.8rem; color: #9d2449; line-height: 1.2; }
+.sp-streifen-bild svg { display: block; width: 100%; height: auto; }
+/* Bahnhof */
+.sp-land { left: 0; right: 0; }
+.sp-land svg { display: block; width: 100%; height: 100%; }
+.special-raum .sp-land::after { content: ""; position: absolute; left: 0; right: 0; top: calc(100% - 1px); height: 40vh; background: #b9dfb0; }
+.sp-gleis { left: 0; right: 0; height: 16px; }
+.sp-gleis-schwellen { position: absolute; left: 0; right: 0; top: 2px; height: 12px; background: repeating-linear-gradient(90deg, #8a5a3a 0 8px, transparent 8px 22px); }
+.sp-gleis-schiene { position: absolute; left: 0; right: 0; top: 2px; height: 3px; background: #6b6070; border-radius: 2px; }
+.sp-gleis-schiene.unten { top: 11px; }
+.sp-schild svg { display: block; width: 100%; height: auto; transform-origin: 50% 100%; }
+.sp-schild { transform-origin: 50% 100%; }
+.sp-zug { display: flex; align-items: flex-end; white-space: nowrap; z-index: 2; }
+.sp-wagen svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sp-kupplung { width: 8px; height: 4px; background: #3a2a33; flex: none; }
+.sp-wagen { flex: none; }
+.sp-dampfherz { position: absolute; color: #fff; text-shadow: 0 0 6px rgba(255, 143, 171, 0.9); line-height: 1; z-index: 3; }
+/* Während einer Capy Szene sitzen die Vögel nicht mitten im Bild */
+html:has(.special-buehne) .vogel-ebene { visibility: hidden; }
