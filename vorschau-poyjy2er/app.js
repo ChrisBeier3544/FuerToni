@@ -44,12 +44,12 @@
 
   // TESTVERSION: Datum aus dem Anker, z. B. #dez-05 oder #nov-25
   function testdatum() {
-    const m = /^#(nov|dez)-(\d{1,2})(?:-(morgen|vormittag|mittag|nachmittag|abend|nacht|\d{4}))?$/.exec(location.hash);
+    const m = /^#(nov|dez|jan)-(\d{1,2})(?:-(morgen|vormittag|mittag|nachmittag|abend|nacht|\d{4}))?$/.exec(location.hash);
     if (!m) return null;
     const utc = /^\d{4}$/.test(m[3] || "")
       ? +m[3].slice(0, 2) - 1 + +m[3].slice(2) / 60
       : { morgen: 6.5, vormittag: 9, mittag: 12, nachmittag: 14, abend: 18, nacht: 22 }[m[3] || "mittag"];
-    return Date.UTC(KALENDER.jahr, m[1] === "nov" ? 10 : 11, +m[2], 0, Math.round(utc * 60), 0);
+    return Date.UTC(KALENDER.jahr + (m[1] === "jan" ? 1 : 0), { nov: 10, dez: 11, jan: 0 }[m[1]], +m[2], 0, Math.round(utc * 60), 0);
   }
 
   async function holeServerzeit() {
@@ -186,8 +186,62 @@
     '<path d="M30 20c7-10 18-13 21-8" fill="none" stroke="rgba(0,0,0,.15)" stroke-width="1.5"/>' +
     '<circle cx="30" cy="20" r="5.5"/><circle cx="30" cy="20" r="5.5" fill="rgba(0,0,0,.12)"/></svg>';
 
+  /* Türchen, Gutscheine und Geburtstagsbrief sind in inhalte.js verschlüsselt
+     und werden erst lesbar, wenn ihr Tag laut Serverzeit erreicht ist */
+  const SALZ = "yIoWXKkgI0-b";
+  function schluesselStrom(text) {
+    let h = 1779033703 ^ text.length;
+    for (let i = 0; i < text.length; i++) { h = Math.imul(h ^ text.charCodeAt(i), 3432918353); h = (h << 13) | (h >>> 19); }
+    const naechster = () => { h = Math.imul(h ^ (h >>> 16), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); return (h ^= h >>> 16) >>> 0; };
+    let a = naechster(), b = naechster(), c = naechster(), d = naechster();
+    return () => {
+      a >>>= 0; b >>>= 0; c >>>= 0; d >>>= 0;
+      let t = (a + b) | 0; a = b ^ (b >>> 9); b = (c + (c << 3)) | 0; c = (c << 21) | (c >>> 11); d = (d + 1) | 0; t = (t + d) | 0; c = (c + t) | 0;
+      return (t >>> 0) / 4294967296;
+    };
+  }
+  function entschluessle(text, id) {
+    try {
+      const roh = atob(text);
+      const bytes = new Uint8Array(roh.length);
+      const r = schluesselStrom(SALZ + "|" + id);
+      for (let i = 0; i < roh.length; i++) bytes[i] = roh.charCodeAt(i) ^ ((r() * 256) | 0);
+      return JSON.parse(new TextDecoder().decode(bytes));
+    } catch (_) { return {}; }
+  }
+  // Fotos liegen als WebP vor (kleiner), in inhalte.js stehen weiter die .jpg Namen
+  const webp = (datei) => String(datei).replace(/\.jpe?g$/i, ".webp");
+  const inhaltCache = new Map();
   function inhalt(n) {
-    return (KALENDER.tage && KALENDER.tage[n]) || {};
+    const roh = KALENDER.tage && KALENDER.tage[n];
+    if (!roh) return {};
+    if (typeof roh === "object") return roh;
+    if (!zeitBereit || !istVerfuegbar(n, kalenderDatum())) return {};
+    if (!inhaltCache.has(n)) inhaltCache.set(n, entschluessle(roh, "tag-" + n));
+    return inhaltCache.get(n);
+  }
+  // Gutschein erst am Tag des Eis lesbar machen
+  function entpackeEi(ei) {
+    if (ei && ei.geheim && zeitBereit && istVerfuegbar(ei.ab || 1, kalenderDatum())) {
+      Object.assign(ei, entschluessle(ei.geheim, "ei-" + (ei.ab || 1)));
+      delete ei.geheim;
+    }
+    return ei;
+  }
+  // Geburtstagsgruß und Brief ab dem Geburtstag (deutsche Zeit)
+  function geburtstagsDaten() {
+    const g = KALENDER.geburtstag;
+    if (!g) return null;
+    if (g.geheim && zeitBereit) {
+      const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(g.datum || "");
+      const d = berlinDatum(jetzt());
+      const heute = d.jahr * 10000 + d.monat * 100 + d.tag;
+      if (m && heute >= +m[1] * 10000 + +m[2] * 100 + +m[3]) {
+        Object.assign(g, entschluessle(g.geheim, "geburtstag"));
+        delete g.geheim;
+      }
+    }
+    return g;
   }
 
   function baueKalender() {
@@ -201,7 +255,7 @@
       herz.type = "button";
       herz.className = "titel-herz";
       herz.setAttribute("aria-label", "Herz antippen");
-      herz.textContent = titelText.slice(herzStelle).trim();
+      herz.innerHTML = '<svg class="titel-herz-svg" viewBox="0 0 32 29" aria-hidden="true"><use href="#i-herz"/></svg>';
       el.titel.appendChild(herz);
     } else {
       el.titel.textContent = titelText;
@@ -222,7 +276,6 @@
       const blatt = document.createElement("span");
       blatt.className = "tuer-blatt";
       blatt.innerHTML =
-        '<span class="frost"></span>' +
         '<span class="band-v"></span><span class="band-h"></span>' +
         '<span class="schleife">' + SCHLEIFE + "</span>";
       const anhaenger = document.createElement("span");
@@ -233,8 +286,10 @@
       anhaenger.appendChild(nummer);
       const schloss = document.createElement("span");
       schloss.className = "schloss";
-      schloss.textContent = "🔒";
-      blatt.append(anhaenger, schloss);
+      schloss.setAttribute("aria-hidden", "true");
+      schloss.innerHTML = '<svg class="ui-icon"><use href="#i-schloss"/></svg>';
+      anhaenger.appendChild(schloss);
+      blatt.append(anhaenger);
 
       const rueck = document.createElement("span");
       rueck.className = "tuer-rueck";
@@ -339,7 +394,10 @@
     if (d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag > 24)) {
       // 25. und 26.12. Weihnachten, danach ein Dankeschön
       const feiertag = d.jahr === KALENDER.jahr && d.monat === 12 && d.tag <= 26;
-      el.status.textContent = feiertag ? "Frohe Weihnachten, Maus 🎄♥️" : "Danke für den schönsten Dezember, Maus ♥️";
+      const e = echt || d;
+      if (e.jahr === KALENDER.jahr + 1 && e.monat === 1 && e.tag <= 6) el.status.textContent = "Frohes neues Jahr, mein Schatz 🎆 Auf " + e.jahr + " mit dir ♥️";
+      else if (e.jahr === KALENDER.jahr && e.monat === 12 && e.tag === 31) el.status.textContent = "Heute Nacht beginnt " + (e.jahr + 1) + ". Danke für dieses wunderschöne Jahr mit dir ♥️";
+      else el.status.textContent = feiertag ? "Frohe Weihnachten, Maus 🎄♥️" : "Danke für den schönsten Dezember, Maus ♥️";
       return;
     }
     if (d.jahr === KALENDER.jahr && d.monat === 12) {
@@ -745,6 +803,8 @@
     });
     ctx.textAlign = "center";
     function schritt() {
+      // solange ein Fenster offen ist, bleibt der Schnee im Hintergrund stehen
+      if (document.documentElement.classList.contains("ruhe")) { requestAnimationFrame(schritt); return; }
       ctx.clearRect(0, 0, w, h);
       const abend = document.documentElement.hasAttribute("data-abend");
       wind *= 0.94;
@@ -821,7 +881,8 @@
     const kennen = tageSeit(KALENDER.kennenSeit, d);
     if (kennen !== null && kennen > 0 && kennen % 365 === 0) {
       const jahre = kennen / 365;
-      box.textContent = "Heute vor " + (jahre === 1 ? "genau einem Jahr" : jahre + " Jahren") + " haben wir uns kennengelernt ♥️";
+      // Der Satz steht schon oben in „Dein Tag“, hier die Zahlen dazu
+      box.textContent = (jahre === 1 ? "1 Jahr" : jahre + " Jahre") + " · " + kennen.toLocaleString("de-DE") + " Tage, seit wir uns kennen · " + (zusammen !== null && zusammen >= 0 ? zusammen.toLocaleString("de-DE") + " Tage zusammen ♥️" : "♥️");
       box.classList.add("jubilaeum");
       return;
     }
@@ -835,7 +896,8 @@
       z.textContent = zahl.toLocaleString("de-DE");
       const t = document.createElement("span");
       t.className = "zaehler-text";
-      t.textContent = text;
+      t.textContent = text.replace(/\s*\u2665\uFE0F$/, "");
+      if (/\u2665\uFE0F$/.test(text)) t.insertAdjacentHTML("beforeend", ' <svg class="ui-icon" aria-hidden="true"><use href="#i-herz"/></svg>');
       k.append(z, t);
       box.appendChild(k);
     };
@@ -1330,15 +1392,15 @@
         }
         if (phase === "geburtstag") {
           cd.hidden = false;
-          cdGruss.textContent = (KALENDER.geburtstag && KALENDER.geburtstag.gruss) || "Alles Gute zum Geburtstag! 🎂";
+          cdGruss.textContent = (geburtstagsDaten() && geburtstagsDaten().gruss) || "Alles Gute zum Geburtstag! 🎂";
           cdGruss.hidden = false;
           cdTitel.textContent = "Dein Brief öffnet sich in";
           hinweis.textContent = "Gleich ist es so weit ♥️";
           if (!konfettiGezeigt) { konfettiGezeigt = true; konfettiRegen("konfetti"); }
         }
         if (phase === "offen") {
-          const gebTag = istGeburtstag() && KALENDER.geburtstag && KALENDER.geburtstag.gruss;
-          if (gebTag) { cdGruss.textContent = KALENDER.geburtstag.gruss; cdGruss.hidden = false; }
+          const gebTag = istGeburtstag() && geburtstagsDaten() && geburtstagsDaten().gruss;
+          if (gebTag) { cdGruss.textContent = gebTag; cdGruss.hidden = false; }
           cd.hidden = !gebTag;
           cdTitel.textContent = "";
           cdZiffern.textContent = "";
@@ -1362,10 +1424,10 @@
         return;
       }
       offen = true;
-      const geburtstag = istGeburtstag() && KALENDER.geburtstag;
+      const geburtstag = istGeburtstag() && geburtstagsDaten();
       if (geburtstag) {
-        document.getElementById("brief-anrede").textContent = KALENDER.geburtstag.briefAnrede || "Happy Birthday!";
-        document.getElementById("brief-text").textContent = KALENDER.geburtstag.briefText || "";
+        document.getElementById("brief-anrede").textContent = geburtstag.briefAnrede || "Happy Birthday!";
+        document.getElementById("brief-text").textContent = geburtstag.briefText || "";
       }
       umschlag.classList.add("offen");
       intro.classList.add("geoeffnet");
@@ -1512,6 +1574,7 @@
 
   function findeEi(ei, quizGeschafft) {
     if (!zeitBereit || !eiSichtbar(ei, kalenderDatum())) return;
+    entpackeEi(ei);
     const neu = !gefunden.has(ei.emblem);
     if (neu && !quizGeschafft && ei.quiz && ei.quiz.richtig) {
       zeigeQuiz(ei);
@@ -1575,7 +1638,7 @@
     const bild = document.getElementById("gutschein-bild");
     bild.hidden = !ei.bild;
     if (ei.bild) {
-      bild.src = "bilder/klein/" + ei.bild;
+      bild.src = "bilder/klein/" + webp(ei.bild);
       bild.style.objectPosition = ei.fokus || "";
       bild.onerror = () => { bild.hidden = true; };
     }
@@ -1589,6 +1652,8 @@
     sammlungListe.textContent = "";
     for (const ei of eier) {
       if (!gefunden.has(ei.emblem)) continue;
+      entpackeEi(ei);
+      if (ei.geheim) continue;
       const eintrag = document.createElement("button");
       eintrag.type = "button";
       eintrag.className = "sammlung-eintrag";
@@ -1630,7 +1695,7 @@
         knopf.className = "polaroid";
         knopf.setAttribute("aria-label", "Foto ansehen: " + (f.text || ""));
         const img = document.createElement("img");
-        img.src = "bilder/klein/" + f.datei;
+        img.src = "bilder/klein/" + webp(f.datei);
         img.alt = f.text || "";
         if (f.fokus) img.style.objectPosition = f.fokus;
         img.loading = ziel.id === "titelfotos" ? "eager" : "lazy";
@@ -1665,7 +1730,7 @@
   function zeigeFoto(index) {
     fotoIndex = (index + fotoListe.length) % fotoListe.length;
     const f = fotoListe[fotoIndex];
-    lightboxBild.src = "bilder/" + f.datei;
+    lightboxBild.src = "bilder/" + webp(f.datei);
     lightboxBild.alt = f.text || "";
     lightboxText.textContent = f.text || "";
     lightboxText.hidden = !f.text;
@@ -1755,7 +1820,7 @@
       const karte = document.createElement("div");
       karte.className = "finale-foto";
       const img = new Image();
-      img.src = "bilder/klein/" + f.datei;
+      img.src = "bilder/klein/" + webp(f.datei);
       img.alt = "";
       if (f.fokus) img.style.objectPosition = f.fokus;
       karte.appendChild(img);
@@ -1788,6 +1853,7 @@
   });
   window.adventkalender = {
     zeigeFinale,
+    entschluessle,
     schneeSturm: () => schneeSturm(),
     starteLichtershow,
     konfetti: (art) => konfettiRegen(art || "konfetti"),

@@ -2603,3 +2603,368 @@ html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
 html:has(#finale:not([hidden])) .vogel-ebene { visibility: hidden; }
 /* Polaroids oben weniger überlappen, damit alle Gesichter frei sind */
 .titelfotos .polaroid { margin: 0 -4px; }
+
+/* ---------- Kleine Überraschungen zum Antippen (interaktiv.js) ---------- */
+.adventskranz .kerze { cursor: pointer; transform-box: fill-box; transform-origin: 50% 100%; }
+.kerze.brennt.aus .flamme { opacity: 0; animation: none; transition: none; }
+.rauch-herz { pointer-events: none; }
+.rauch-herz path { fill: none; stroke: rgba(150, 140, 150, 0.85); stroke-width: 1.3; stroke-linecap: round; transform-box: fill-box; transform-origin: 50% 100%; }
+html[data-abend] .rauch-herz path { stroke: rgba(230, 220, 230, 0.8); }
+.lichterkette { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.birne.welle { background: var(--welle); box-shadow: 0 0 10px 3px var(--welle), 0 0 22px 6px color-mix(in srgb, var(--welle) 50%, transparent); transition: background 0.1s, box-shadow 0.1s; }
+.birne.wackelkontakt { animation: wackelkontakt 1.1s steps(1, end); }
+@keyframes wackelkontakt { 0% { opacity: 1; } 12% { opacity: 0.15; } 22% { opacity: 1; } 30% { opacity: 0.2; } 38% { opacity: 0.9; } 52% { opacity: 0.1; } 70%, 100% { opacity: 1; } }
+.titelfotos .polaroid img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.polaroid-chemie { position: absolute; pointer-events: none; background: radial-gradient(circle at 50% 45%, #4a4038, #2a2420); }
+.zweig .kugel { pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.kugel-treffer { fill: transparent; }
+.glitzer-funke { position: fixed; z-index: 80; pointer-events: none; text-shadow: 0 0 6px currentColor; }
+.capy-familie { position: relative; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.capy-familie:focus-visible { outline: 2px solid var(--rose-500); outline-offset: 4px; border-radius: 12px; }
+.capy-huelle { transform-box: fill-box; transform-origin: 50% 100%; }
+.mistelzweig { opacity: 0; pointer-events: none; }
+.bussi-herz { position: absolute; color: #ff4d7d; pointer-events: none; text-shadow: 0 0 6px rgba(255, 77, 125, 0.5); }
+.sonnenbrille { position: absolute; left: 50%; top: 50%; width: 62%; opacity: 0; pointer-events: none; }
+.sonnenbrille svg { display: block; width: 100%; height: auto; }
+
+/* ---------- Neujahr (neujahr.js) ---------- */
+.neujahr-countdown {
+  position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; pointer-events: none;
+  font-family: "Dancing Script", cursive; font-size: clamp(110px, 34vw, 260px); color: #ffd36b;
+  text-shadow: 0 0 30px rgba(255, 211, 107, 0.7), 0 6px 30px rgba(0, 0, 0, 0.35);
+  background: radial-gradient(circle, rgba(30, 10, 35, 0.82), rgba(30, 10, 35, 0.55) 75%);
+}
+.neujahr {
+  position: fixed; inset: 0; z-index: 95; cursor: pointer;
+  background: radial-gradient(ellipse at 50% 30%, rgba(60, 18, 52, 0.88), rgba(14, 6, 24, 0.94));
+  animation: einblenden 0.8s ease; transition: opacity 0.9s ease;
+}
+.neujahr.weg { opacity: 0; }
+.neujahr-himmel { position: absolute; inset: 0; width: 100%; height: 100%; }
+.neujahr-gruss {
+  position: absolute; left: 50%; top: 58%; transform: translate(-50%, -50%); width: min(92vw, 560px);
+  text-align: center; color: #fff4f7; pointer-events: none;
+  animation: neujahr-gruss 1.4s ease 1.2s both;
+}
+.neujahr-jahr { margin: 0; font-family: "Dancing Script", cursive; font-size: clamp(64px, 20vw, 130px); line-height: 1; color: #ffd36b; text-shadow: 0 0 24px rgba(255, 211, 107, 0.6); }
+.neujahr-titel { margin: 8px 0 6px; font-family: "Dancing Script", cursive; font-size: clamp(28px, 8vw, 44px); }
+.neujahr-text { margin: 0; font-size: 16px; opacity: 0.9; }
+@keyframes neujahr-gruss { from { opacity: 0; transform: translate(-50%, -40%); } }
+
+/* =========================================================
+   Feinschliff (feinschliff.js)
+   ========================================================= */
+.ui-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.ui-icon { display: inline-block; width: 1.15em; height: 1.15em; vertical-align: -0.22em; color: var(--beere); flex: none; }
+
+/* 1. Gesperrte Päckchen: kein Frost mehr, kleines Goldschloss am Anhänger */
+.frost { display: none; }
+.tuer.gesperrt .tuer-blatt { filter: none; }
+.schloss {
+  position: absolute; left: auto; bottom: auto; top: -7px; right: -8px;
+  width: 18px; height: 18px; display: grid; place-items: center;
+  border-radius: 50%; background: #fffdf8; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  opacity: 1; font-size: 0;
+}
+.schloss .ui-icon { width: 13px; height: 13px; vertical-align: 0; }
+.schloss[hidden] { display: none; }
+.tuer.gross .schloss { width: 24px; height: 24px; top: -9px; right: -10px; }
+.tuer.gross .schloss .ui-icon { width: 17px; height: 17px; }
+
+/* 2. Bretter als eigene Elemente, enden sauber an hohen Päckchen */
+.kalender.mit-brettern { background: repeating-linear-gradient(90deg, rgba(169, 111, 71, 0.06) 0 2px, transparent 2px 46px), linear-gradient(180deg, #fff6ee, #fbe8dc); }
+html[data-abend] .kalender.mit-brettern { background: linear-gradient(180deg, rgba(60, 30, 50, 0.6), rgba(40, 18, 36, 0.7)); }
+.bretter { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.kalender > .tuer { position: relative; z-index: 1; }
+.brett {
+  position: absolute; border-radius: 2px;
+  background: linear-gradient(180deg, var(--brett-schnee, #ffffff) 0 3px, #c48c60 3px calc(100% - 3px), #8a5a3a calc(100% - 3px));
+  box-shadow: 0 4px 6px -2px rgba(107, 21, 50, 0.18);
+}
+.brett.kante-links { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+html[data-abend] .brett { background: linear-gradient(180deg, var(--brett-schnee, #efe8f4) 0 3px, #8a5a3a 3px calc(100% - 3px), #5e3c28 calc(100% - 3px)); box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.35); }
+.kalender.ohne-deko .brett { --brett-schnee: #c48c60; }
+html[data-abend] .kalender.ohne-deko .brett { --brett-schnee: #8a5a3a; }
+
+/* 3. Eigener Player für die Sprachnachricht */
+.sprachnachricht audio { display: none; }
+.sprachnachricht-titel { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.player { display: flex; align-items: center; gap: 12px; }
+.player-knopf {
+  flex: none; width: 46px; height: 46px; border: 0; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center; color: #fff;
+  background: linear-gradient(145deg, #f7809b, var(--beere));
+  box-shadow: 0 6px 14px rgba(157, 36, 73, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.player-knopf:active { transform: scale(0.94); }
+.player-knopf:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.player-knopf .ui-icon { color: #fff; width: 22px; height: 22px; vertical-align: 0; }
+.player-knopf .player-play { margin-left: 3px; }
+.player .player-pause, .player.spielt .player-play { display: none; }
+.player.spielt .player-pause { display: inline-block; }
+.player-leiste { position: relative; flex: 1; height: 26px; cursor: pointer; touch-action: none; }
+.player-leiste::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 6px; margin-top: -3px; border-radius: 6px; background: rgba(232, 93, 126, 0.18); }
+.player-fortschritt { position: absolute; left: 0; top: 50%; height: 6px; margin-top: -3px; width: 0; border-radius: 6px; background: linear-gradient(90deg, #f7809b, var(--beere)); }
+.player-punkt { position: absolute; top: 50%; left: 0; width: 20px; height: 18px; transform: translate(-50%, -50%); filter: drop-shadow(0 2px 3px rgba(157, 36, 73, 0.35)); }
+.player-punkt .ui-icon { width: 20px; height: 18px; vertical-align: 0; }
+.player.spielt .player-punkt { animation: player-pochen 1.2s ease-in-out infinite; }
+@keyframes player-pochen { 50% { transform: translate(-50%, -50%) scale(1.15); } }
+.player-leiste:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: 8px; }
+.player-zeit { flex: none; min-width: 74px; text-align: right; font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--beere); }
+
+/* 4. Fußzeile: nicht mehr halb durchsichtig, Boden passt zur Landschaft */
+.fuss { opacity: 1; }
+.fuss-text { opacity: 0.9; }
+.capy-familie svg > path[d^="M0 100"] { fill: var(--schnee-boden, #ffffff); }
+html[data-abend] .fuss { color: #7a1f45; }
+html[data-tageszeit="nacht"] .fuss { color: #4a2a5e; }
+
+/* 5. Fotostreifen: weiche Ränder, wo es weitergeht */
+.fotostreifen { --rand-l: 0px; --rand-r: 0px; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--rand-l), #000 calc(100% - var(--rand-r)), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 var(--rand-l), #000 calc(100% - var(--rand-r)), transparent 100%); }
+.fotostreifen.rand-links { --rand-l: 40px; }
+.fotostreifen.rand-rechts { --rand-r: 56px; }
+
+/* 6. „Dein Tag“: jeder Satz in eigener, ausgewogener Zeile */
+.status .status-zeile { display: block; text-wrap: balance; }
+
+/* 7. Eigene Symbole */
+.titel-herz-svg { display: block; width: 0.92em; height: 0.84em; filter: drop-shadow(0 4px 8px rgba(214, 36, 79, 0.3)); }
+.titel-herz { display: inline-flex; align-items: center; vertical-align: -0.04em; margin-left: 0.12em; }
+.mini-herz svg { display: block; width: 1em; height: 0.9em; }
+.extra-icon .ui-icon, .hinweis-icon .ui-icon { width: 1.25em; height: 1.25em; vertical-align: middle; }
+.sammlung-knopf { display: inline-flex; align-items: center; gap: 7px; }
+.sammlung-knopf .ui-icon { width: 1.2em; height: 1.2em; vertical-align: 0; color: var(--beere-dunkel); }
+.brief-herz .ui-icon { width: 1.3em; height: 1.2em; }
+.fuss-text .ui-icon, .finale-unter .ui-icon, .zaehler-text .ui-icon { width: 1em; height: 0.92em; vertical-align: -0.12em; }
+
+/* 8. Laptop: Kopfbereich wächst mit */
+@media (min-width: 900px) {
+  .kopf h1 { font-size: 5rem; }
+  .untertitel { font-size: 1.15rem; }
+  .titelfotos { --w: 200px; margin-top: 30px; }
+  .titelfotos .polaroid { margin: 0 -6px; }
+  .heute-karte { max-width: 620px; padding: 22px 30px 18px; gap: 14px; }
+  .heute-karte .status { font-size: 1.2rem; }
+  .zaehler-zahl { font-size: 2.6rem; }
+  .zaehler-text { font-size: 0.85rem; }
+  .adventskranz svg { width: 300px; }
+}
+@media (min-width: 1300px) {
+  .titelfotos { --w: 220px; }
+}
+.herz-zeichen .ui-icon { width: 0.95em; height: 0.88em; vertical-align: -0.1em; }
+.brett.kante-rechts { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.brett.kante-links { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+
+/* =========================================================
+   Noch mehr zum Entdecken (entdecken.js)
+   ========================================================= */
+.entdecken-funke { position: fixed; z-index: 85; pointer-events: none; text-shadow: 0 0 6px currentColor; line-height: 1; }
+.entdecken-chip {
+  position: fixed; left: 50%; top: 14px; z-index: 86; max-width: calc(100% - 32px);
+  padding: 8px 16px; border-radius: 999px; transform: translate(-50%, -160%); opacity: 0;
+  background: rgba(255, 250, 240, 0.97); color: var(--beere-dunkel); font-weight: 700; font-size: 0.92rem; text-align: center;
+  box-shadow: 0 8px 22px rgba(107, 21, 50, 0.25); pointer-events: none;
+  transition: transform 0.45s cubic-bezier(0.3, 1.3, 0.5, 1), opacity 0.3s ease;
+}
+.entdecken-chip.sichtbar { transform: translate(-50%, 0); opacity: 1; }
+
+/* Winterdorf */
+.briefkasten, .schneemann, .schornstein-treffer { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.bk-klappe { transform-box: fill-box; transform-origin: 0% 50%; }
+.bk-fahne { transform-box: fill-box; transform-origin: 0% 100%; }
+.bk-zettel { transform-box: fill-box; transform-origin: 50% 100%; }
+.sm-teil { transform-box: fill-box; transform-origin: 50% 100%; }
+.sm-arm { transform-box: fill-box; transform-origin: 0% 100%; }
+.landschaft rect.fenster { cursor: pointer; }
+.landschaft rect.fenster.fenster-an, .landschaft .fenster-hell.fenster-an { fill: #ffe08a !important; filter: drop-shadow(0 0 6px rgba(255, 211, 107, 0.95)) !important; transition: fill 0.25s ease; }
+.liebeszettel {
+  position: fixed; z-index: 84; width: min(250px, calc(100vw - 20px)); padding: 14px 16px 10px;
+  border: 0; border-radius: 4px; cursor: pointer; text-align: left;
+  background: repeating-linear-gradient(180deg, #fffaf0 0 21px, #f3e2e8 21px 22px); color: var(--beere-dunkel);
+  box-shadow: 0 12px 26px rgba(107, 21, 50, 0.28); font: inherit;
+}
+.liebeszettel::before { content: ""; position: absolute; left: 50%; top: -7px; width: 46px; height: 14px; transform: translateX(-50%) rotate(-3deg); background: rgba(255, 143, 171, 0.55); }
+.liebeszettel-text { display: block; font-family: "Dancing Script", cursive; font-size: 1.35rem; line-height: 1.15; }
+.liebeszettel-gruss { display: block; margin-top: 6px; text-align: right; font-family: "Dancing Script", cursive; font-size: 1.05rem; color: var(--rose-500); }
+.liebeszettel.leer .liebeszettel-text { font-family: inherit; font-size: 0.95rem; font-weight: 700; line-height: 1.35; }
+.fensterblick {
+  position: fixed; z-index: 84; width: 170px; padding: 0; border: 0; border-radius: 14px; cursor: pointer;
+  background: #fffaf0; box-shadow: 0 14px 30px rgba(40, 10, 40, 0.35); font: inherit;
+}
+.fensterblick svg { display: block; width: 100%; height: auto; border-radius: 12px; }
+.fensterblick-text { display: block; padding: 5px 8px 7px; font-family: "Dancing Script", cursive; font-size: 1.05rem; color: var(--beere-dunkel); text-align: center; }
+.fensterblick .noten text { animation: noten-schweben 1.8s ease-in-out infinite; }
+.fensterblick .noten text:nth-child(2) { animation-delay: -0.6s; }
+.fensterblick .noten text:nth-child(3) { animation-delay: -1.2s; }
+@keyframes noten-schweben { 0%, 100% { transform: translateY(0); opacity: 0.5; } 50% { transform: translateY(-6px); opacity: 1; } }
+.fensterblick .szene-herz { transform-box: fill-box; transform-origin: center; animation: familien-herz 1.4s ease-in-out infinite; }
+.fensterblick .szene-stern { transform-box: fill-box; transform-origin: center; animation: stern-funkeln 1.6s ease-in-out infinite; }
+.fensterblick .dampf path { animation: dampf-steigen 2.2s ease-in-out infinite; }
+.fensterblick .dampf path:nth-child(2) { animation-delay: -1.1s; }
+@keyframes dampf-steigen { 0% { transform: translateY(4px); opacity: 0; } 40% { opacity: 0.8; } 100% { transform: translateY(-8px); opacity: 0; } }
+@keyframes stern-funkeln { 50% { transform: scale(1.25) rotate(12deg); filter: brightness(1.2); } }
+.kamin-teil { position: fixed; z-index: 83; pointer-events: none; line-height: 1; text-shadow: 0 0 6px currentColor; }
+.kamin-sternbild { position: fixed; z-index: 83; width: 70px; transform: translate(-50%, -50%); pointer-events: none; filter: drop-shadow(0 0 4px rgba(255, 240, 200, 0.8)); }
+.kamin-sternbild svg { display: block; width: 100%; height: auto; }
+
+/* Schneekugel */
+.kranz-reihe { display: flex; justify-content: center; align-items: flex-end; gap: 4px; margin: 6px auto 14px; padding: 0 12px; }
+.kranz-reihe .adventskranz { margin: 0; }
+.kranz-reihe .adventskranz svg { width: min(260px, 62vw); }
+.schneekugel {
+  flex: none; width: clamp(60px, 18vw, 96px); margin-bottom: 26px; padding: 0; border: 0; background: none; cursor: pointer;
+  transform-origin: 50% 100%; -webkit-tap-highlight-color: transparent; filter: drop-shadow(0 8px 10px rgba(107, 21, 50, 0.22));
+}
+.schneekugel svg { display: block; width: 100%; height: auto; }
+.schneekugel:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; border-radius: 16px; }
+.kranz-reihe:has(.adventskranz[hidden]) .schneekugel { margin-bottom: 0; }
+
+/* Wunschstern */
+.kopf > .wunschstern {
+  position: absolute; z-index: 2; top: 12px; left: calc(50% - 84px); width: 40px; height: 40px; padding: 9px; border: 0; background: none; cursor: pointer;
+  display: none; -webkit-tap-highlight-color: transparent;
+}
+.wunschstern svg { display: block; width: 100%; height: 100%; filter: drop-shadow(0 0 6px rgba(255, 224, 138, 0.9)); animation: wunsch-blinken 2.4s ease-in-out infinite; }
+html[data-abend] .wunschstern { display: block; }
+@keyframes wunsch-blinken { 0%, 100% { transform: scale(0.8); opacity: 0.65; } 50% { transform: scale(1.15) rotate(18deg); opacity: 1; } }
+@media (min-width: 900px) { .kopf > .wunschstern { left: calc(50% - 230px); top: 22px; width: 46px; height: 46px; } }
+.wunsch-text {
+  display: block; width: 100%; margin: 14px 0 12px; padding: 12px 14px; resize: none; box-sizing: border-box;
+  border: 1px solid var(--rose-300); border-radius: 14px; background: #fffaf0; color: var(--text);
+  font-family: "Dancing Script", cursive; font-size: 1.4rem; line-height: 1.25;
+}
+.wunsch-text:focus { outline: 2px solid var(--gold); outline-offset: 2px; }
+.wunsch-los {
+  padding: 10px 20px; border: 0; border-radius: 999px; cursor: pointer; font: inherit; font-weight: 800; color: #fff;
+  background: linear-gradient(145deg, #f7809b, var(--beere)); box-shadow: 0 8px 18px rgba(157, 36, 73, 0.3);
+}
+.wunsch-hinweis { margin: 12px 0 0; font-size: 0.82rem; opacity: 0.75; }
+.wunsch-blatt { position: fixed; z-index: 88; border-radius: 6px; background: repeating-linear-gradient(180deg, #fffaf0 0 18px, #f3e2e8 18px 19px); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.25); pointer-events: none; }
+.wunsch-flieger { position: fixed; z-index: 88; width: 46px; transform: translate(-50%, -50%); pointer-events: none; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3)); }
+.wunsch-flieger svg { display: block; width: 100%; height: auto; }
+
+/* Lichterkette ziehen */
+.birne { touch-action: none; cursor: grab; }
+.birne::after { content: ""; position: absolute; left: -10px; right: -10px; top: -6px; bottom: -14px; }
+.birne.regenbogen { animation: regenbogen 1.2s linear infinite; animation-delay: var(--rb-verzug, 0s); }
+@keyframes regenbogen {
+  0% { background: #ff5c7a; box-shadow: 0 0 10px 3px #ff5c7a; }
+  17% { background: #ffa24d; box-shadow: 0 0 10px 3px #ffa24d; }
+  33% { background: #ffe066; box-shadow: 0 0 10px 3px #ffe066; }
+  50% { background: #6ee09a; box-shadow: 0 0 10px 3px #6ee09a; }
+  67% { background: #63c6ff; box-shadow: 0 0 10px 3px #63c6ff; }
+  83% { background: #b48cff; box-shadow: 0 0 10px 3px #b48cff; }
+  100% { background: #ff5c7a; box-shadow: 0 0 10px 3px #ff5c7a; }
+}
+
+/* Goldene Schneeflocken */
+.goldflocke {
+  position: fixed; top: 0; z-index: 64; width: 44px; height: 44px; margin-left: -22px; padding: 6px; border: 0; background: none; cursor: pointer;
+  filter: drop-shadow(0 0 8px rgba(243, 200, 75, 0.9)); -webkit-tap-highlight-color: transparent;
+}
+.goldflocke svg { display: block; width: 100%; height: 100%; }
+
+/* Plätzchen backen */
+.backstube { position: relative; z-index: 1; margin: 26px auto 0; padding: 0 16px; max-width: 520px; text-align: center; }
+.backstube[hidden] { display: none; }
+.backstube-reihe { display: flex; justify-content: center; align-items: flex-end; gap: 12px; }
+.teig { flex: 0 1 230px; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; filter: drop-shadow(0 8px 12px rgba(107, 21, 50, 0.18)); }
+.teig svg { display: block; width: 100%; height: auto; }
+.teig:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; border-radius: 16px; }
+.nudelholz { transform-box: view-box; }
+.dose { flex: 0 0 auto; width: clamp(70px, 20vw, 100px); transform-origin: 50% 100%; filter: drop-shadow(0 8px 12px rgba(107, 21, 50, 0.18)); }
+.dose svg { display: block; width: 100%; height: auto; }
+.dose-deckel { transform-box: fill-box; transform-origin: 0% 100%; }
+.backstube-text { margin: 10px 0 0; font-family: "Dancing Script", cursive; font-size: 1.3rem; color: var(--beere); }
+html[data-abend] .backstube-text { color: #ffd0dc; }
+.keks-flug { position: fixed; z-index: 84; pointer-events: none; transform: translate(-50%, -50%); filter: drop-shadow(0 4px 5px rgba(107, 21, 50, 0.3)); }
+.keks-flug svg { display: block; width: 100%; height: 100%; overflow: visible; }
+
+/* Mistelzweig */
+.mistel-ebene { position: fixed; inset: 0; z-index: 90; overflow: hidden; cursor: pointer; background: radial-gradient(ellipse at 50% 25%, rgba(120, 30, 70, 0.55), rgba(40, 8, 28, 0.78)); animation: einblenden 0.5s ease; transition: opacity 0.8s ease; }
+.mistel-ebene.weg { opacity: 0; }
+.mistel-zweig { position: absolute; left: 50%; top: 0; width: min(64vw, 300px); margin-left: calc(min(64vw, 300px) / -2); height: auto; overflow: visible; filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.25)); }
+.mistel-blatt-gruppe { transform-box: view-box; }
+.mistel-text { position: absolute; left: 50%; top: calc(min(64vw, 300px) * 1.25 + 16px); transform: translateX(-50%); width: min(90vw, 420px); margin: 0; text-align: center; font-family: "Dancing Script", cursive; font-size: clamp(1.6rem, 6vw, 2.4rem); color: #fff; text-shadow: 0 2px 12px rgba(107, 21, 50, 0.7); animation: mistel-text 1s ease 1s both; }
+@keyframes mistel-text { from { opacity: 0; transform: translate(-50%, 10px); } }
+.mistel-herz { position: absolute; top: 0; pointer-events: none; line-height: 1; text-shadow: 0 0 6px rgba(255, 77, 125, 0.5); }
+
+/* =========================================================
+   Schneetag (schneetag.js)
+   ========================================================= */
+.schnee-decke { position: absolute; z-index: 20; touch-action: pan-y; cursor: crosshair; border-radius: 22px 22px 18px 18px; overflow: hidden; }
+.schnee-decke canvas { display: block; width: 100%; height: 100%; }
+.schnee-leiste {
+  position: fixed; left: 50%; top: 10px; z-index: 72; width: min(440px, calc(100% - 20px)); box-sizing: border-box;
+  padding: 10px 16px 10px; border-radius: 18px; transform: translate(-50%, 0); text-align: center;
+  background: rgba(255, 255, 255, 0.96); border: 1px solid #cfe0f5; box-shadow: 0 10px 28px rgba(40, 70, 120, 0.22); color: #2f4466;
+}
+.schnee-titel { margin: 0; font-weight: 800; font-size: 0.98rem; }
+.schnee-hinweis { margin: 2px 0 8px; font-size: 0.82rem; opacity: 0.8; }
+.schnee-balken { position: relative; height: 12px; border-radius: 12px; background: #e3ecf8; overflow: visible; }
+.schnee-fuellung { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: 12px; background: linear-gradient(90deg, #8fc6ff, #4d9be6); transition: width 0.15s linear, background 0.4s ease; }
+.schnee-leiste.fast .schnee-fuellung { background: linear-gradient(90deg, #8fc6ff, #f7809b); }
+.schnee-leiste.fertig .schnee-fuellung { background: linear-gradient(90deg, #f7809b, var(--beere)); }
+.schnee-marke { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--beere); border-radius: 2px; }
+.schnee-marke span { position: absolute; top: 100%; left: 50%; transform: translateX(-50%); margin-top: 2px; font-size: 0.68rem; font-weight: 800; color: var(--beere); white-space: nowrap; }
+.schnee-prozent { margin: 14px 0 0; font-size: 0.86rem; }
+.schnee-zahl { font-weight: 800; font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+.schnee-leiste.fertig { border-color: var(--rose-300); color: var(--beere-dunkel); }
+.schnee-brocken { position: fixed; z-index: 73; border-radius: 50%; background: #fff; box-shadow: 0 0 2px rgba(120, 150, 200, 0.6); pointer-events: none; }
+.schnee-schaufel { position: fixed; z-index: 74; width: 34px; margin: -44px 0 0 -6px; pointer-events: none; transform: rotate(var(--neigung, -15deg)); transform-origin: 50% 90%; transition: transform 0.12s ease; filter: drop-shadow(0 4px 5px rgba(0, 0, 0, 0.25)); }
+.schnee-schaufel[hidden] { display: none; }
+.schnee-schaufel svg { display: block; width: 100%; height: auto; }
+html[data-schneetag] .vogel-blase { z-index: 75; }
+
+/* =========================================================
+   Entdeckt Album und Ruhe (album.js)
+   ========================================================= */
+.entdeckt-balken { height: 10px; margin: 14px 0 6px; border-radius: 10px; background: var(--rose-100); overflow: hidden; }
+.entdeckt-balken span { display: block; height: 100%; width: 0; border-radius: 10px; background: linear-gradient(90deg, var(--gold-hell), var(--gold), var(--rose-500)); transition: width 0.6s ease; }
+.entdeckt-stand { margin: 0 0 12px; font-weight: 800; color: var(--beere); }
+.entdeckt-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; max-height: min(50vh, 420px); overflow-y: auto; }
+.entdeckt-eintrag { display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 84px; padding: 8px 6px; border-radius: 14px; background: #f6eef1; border: 1px dashed #e3c3cf; color: #b9a0ab; }
+.entdeckt-eintrag.da { background: linear-gradient(160deg, #fffaf0, var(--rose-50)); border: 1px solid var(--rose-300); color: var(--beere-dunkel); box-shadow: 0 4px 10px rgba(157, 36, 73, 0.08); }
+.entdeckt-zeichen { font-size: 1.7rem; line-height: 1; font-weight: 800; }
+.entdeckt-eintrag:not(.da) .entdeckt-zeichen { font-family: "Dancing Script", cursive; font-size: 2rem; }
+.entdeckt-name { font-size: 0.78rem; font-weight: 700; line-height: 1.2; text-align: center; }
+.entdeckt-tipp { margin: 14px 0 0; font-size: 0.85rem; opacity: 0.75; }
+
+/* Während ein Fenster offen ist, steht im Hintergrund alles still */
+html.ruhe .himmel *, html.ruhe .landschaft *, html.ruhe .lichterkette *, html.ruhe .zweig *, html.ruhe .adventskranz *,
+html.ruhe .capy-familie *, html.ruhe .kalender *, html.ruhe .vogel-ebene *, html.ruhe .schneekugel *, html.ruhe .wunschstern * {
+  animation-play-state: paused !important;
+}
+
+/* =========================================================
+   Anleitung als Brief (anleitung.js)
+   ========================================================= */
+.anleitung-dialog { width: min(480px, calc(100% - 24px)); background: transparent; box-shadow: none; overflow: visible; }
+.anleitung-papier {
+  position: relative; max-height: calc(100dvh - 40px); overflow-y: auto; padding: 30px 24px 18px; border-radius: 6px; transform-origin: 50% 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.6), transparent 70px), repeating-linear-gradient(180deg, #fffaf0 0 27px, #f3dfe6 27px 28px);
+  box-shadow: 0 25px 60px rgba(107, 21, 50, 0.35), inset 0 0 0 1px rgba(232, 201, 168, 0.7); color: var(--text);
+}
+.anleitung-papier::before { content: ""; position: absolute; left: 50%; top: -9px; width: 64px; height: 18px; transform: translateX(-50%) rotate(-2deg); background: rgba(255, 143, 171, 0.55); }
+.anleitung-kopf { margin: 0; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.16em; text-transform: uppercase; color: var(--rose-500); text-align: center; }
+.anleitung-seite { min-height: 250px; }
+.anleitung-seite h2 { margin: 6px 0 12px; font-family: "Dancing Script", cursive; font-size: clamp(1.9rem, 7vw, 2.3rem); line-height: 1.1; color: var(--beere); text-align: center; text-wrap: balance; }
+.anleitung-text p { margin: 0 0 12px; font-size: 1rem; line-height: 1.55; }
+.anleitung-text .anleitung-anrede { font-family: "Dancing Script", cursive; font-size: 1.35rem; color: var(--beere-dunkel); }
+.anleitung-liste { display: grid; gap: 12px; margin: 4px 0 8px; padding: 0; list-style: none; }
+.anleitung-liste li { display: grid; grid-template-columns: 2rem minmax(0, 1fr); gap: 8px; align-items: start; padding: 10px 12px; border-radius: 12px; background: rgba(255, 255, 255, 0.75); border: 1px solid var(--rose-200, #fbd3df); line-height: 1.5; }
+.anleitung-zeichen { font-size: 1.4rem; line-height: 1.2; text-align: center; }
+.anleitung-liste strong { color: var(--beere-dunkel); }
+.anleitung-gruss { margin-top: 6px !important; text-align: right; font-family: "Dancing Script", cursive; font-size: 1.6rem !important; color: var(--beere) !important; }
+.anleitung-fuss { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--rose-300); }
+.anleitung-fuss button { padding: 9px 16px; border-radius: 999px; font: inherit; font-weight: 800; cursor: pointer; }
+.anleitung-zurueck { border: 1px solid var(--rose-300); background: #fff; color: var(--beere); }
+.anleitung-zurueck:disabled { opacity: 0.35; cursor: default; }
+.anleitung-weiter { border: 0; color: #fff; background: linear-gradient(145deg, #f7809b, var(--beere)); box-shadow: 0 6px 14px rgba(157, 36, 73, 0.28); }
+.anleitung-fuss button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.anleitung-punkte { display: flex; justify-content: center; gap: 6px; margin: 0; }
+.anleitung-punkte span { width: 7px; height: 7px; border-radius: 50%; background: var(--rose-300); transition: transform 0.2s, background 0.2s; }
+.anleitung-punkte span.an { background: var(--beere); transform: scale(1.35); }

@@ -2,24 +2,27 @@
  * ===========================================================
  *  HERZ IM TITEL: Antippen lässt es in viele kleine Herzen
  *  zerspringen. Sie fliegen 7 Sekunden über den Bildschirm und
- *  setzen sich danach Stück für Stück wieder zum Herz zusammen.
+ *  werden danach Stück für Stück zurückgezogen, während die übrigen
+ *  weiterfliegen, bis das Herz wieder ganz ist.
  * ===========================================================
  */
 (function () {
   "use strict";
+  const melde = (id) => { const a = window.adventkalender; if (a && a.entdeckt) a.entdeckt(id); };
 
   const herz = document.querySelector(".titel-herz");
   if (!herz) return;
   const ruhig = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const ANZAHL = 46, FLUGZEIT = 7000;
+  const ANZAHL = 46, FLUGZEIT = 7000, HEIMZEIT = 900;
   let laeuft = false;
 
   herz.addEventListener("click", () => {
     if (laeuft) return;
     laeuft = true;
+    melde("herz");
     const r = herz.getBoundingClientRect();
     const mitte = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    const zeichen = herz.textContent;
+    const zeichen = herz.innerHTML;
     const ebene = document.createElement("div");
     ebene.className = "herz-ebene";
     document.body.appendChild(ebene);
@@ -30,7 +33,7 @@
     for (let i = 0; i < ANZAHL; i++) {
       const s = document.createElement("span");
       s.className = "mini-herz";
-      s.textContent = zeichen;
+      s.innerHTML = zeichen;
       const groesse = 14 + Math.random() * 16;
       s.style.fontSize = groesse + "px";
       ebene.appendChild(s);
@@ -51,7 +54,9 @@
       const ziel = { x: hr.left + hr.width / 2, y: hr.top + hr.height / 2 };
       teile.forEach((p, i) => {
         if (p.fertig) return;
-        if (t < zurueckAb) {
+        // Herzen, die noch nicht zurückgezogen werden, fliegen weiter frei herum
+        if (!p.heim && t >= zurueckAb + i * 90) { p.heim = true; p.heimStart = t; p.von = { x: p.x, y: p.y }; }
+        if (!p.heim) {
           // frei herumfliegen: sanft schweben, an den Rändern abprallen
           p.phase += dt * 2;
           p.vx += Math.cos(p.phase) * 40 * dt;
@@ -63,25 +68,26 @@
           if (p.y < 10 || p.y > H - 10) { p.vy *= -1; p.y = Math.max(10, Math.min(H - 10, p.y)); }
           p.dreh += p.vdreh * dt;
         } else {
-          // Stück für Stück zurück: alle 90 ms macht sich das nächste Herz auf den Weg
-          if (!p.heim && t > zurueckAb + i * 90) { p.heim = true; p.heimStart = t; p.von = { x: p.x, y: p.y }; }
-          if (p.heim) {
-            const u = Math.min(1, (t - p.heimStart) / 700);
-            const e = 1 - Math.pow(1 - u, 3);
-            p.x = p.von.x + (ziel.x - p.von.x) * e;
-            p.y = p.von.y + (ziel.y - p.von.y) * e - Math.sin(u * Math.PI) * 40;
-            p.dreh *= 0.9;
-            p.el.style.opacity = String(1 - u * 0.9);
-            if (u >= 1) {
-              p.fertig = true; p.el.remove(); angekommen++;
-              // das Herz wächst mit jedem heimgekehrten Herzchen
-              const anteil = angekommen / ANZAHL;
-              herz.style.setProperty("--herz-skala", (0.25 + anteil * 0.75).toFixed(3));
-              herz.classList.add("waechst");
-            }
+          // zurückgezogen wie von einem Magneten: erst sanft, dann immer schneller.
+          // Der Schwung aus dem Flug klingt dabei langsam aus.
+          const u = Math.min(1, (t - p.heimStart) / HEIMZEIT);
+          const schwung = Math.pow(1 - u, 2);
+          p.von.x += p.vx * dt * schwung; p.von.y += p.vy * dt * schwung;
+          const e = u * u * (1.6 - 0.6 * u);
+          p.x = p.von.x + (ziel.x - p.von.x) * e;
+          p.y = p.von.y + (ziel.y - p.von.y) * e;
+          p.dreh += p.vdreh * dt * schwung;
+          p.dreh *= 1 - 0.12 * u;
+          p.el.style.opacity = String(1 - Math.pow(u, 3) * 0.9);
+          if (u >= 1) {
+            p.fertig = true; p.el.remove(); angekommen++;
+            // das Herz wächst mit jedem heimgekehrten Herzchen
+            const anteil = angekommen / ANZAHL;
+            herz.style.setProperty("--herz-skala", (0.25 + anteil * 0.75).toFixed(3));
+            herz.classList.add("waechst");
           }
         }
-        const skala = p.heim ? 1 - Math.min(1, (t - p.heimStart) / 700) * 0.6 : 1;
+        const skala = p.heim ? 1 - Math.pow(Math.min(1, (t - p.heimStart) / HEIMZEIT), 2) * 0.6 : 1;
         p.el.style.transform = "translate(" + (p.x - p.g / 2).toFixed(1) + "px," + (p.y - p.g / 2).toFixed(1) + "px) rotate(" + p.dreh.toFixed(0) + "deg) scale(" + skala.toFixed(2) + ")";
       });
       if (angekommen < ANZAHL) requestAnimationFrame(schritt);

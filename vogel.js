@@ -291,11 +291,33 @@
   /* ---------- Was die Vögel sagen ---------- */
   const erstesEi = Math.min(...(KALENDER.eastereggs || []).map((e) => e.ab || 99));
   const HINWEIS = "Psst … auf dieser Seite sind Geheimnisse versteckt 🤫 Wenn ein Emoji mal an einer komischen Stelle ist, lohnt sich ein Klick darauf!";
+  // An einigen Tagen verrät das Rotkehlchen eine kleine Überraschung zum Antippen
+  const abends = () => /abend|nacht/.test(document.documentElement.getAttribute("data-tageszeit") || "");
+  const TIPPS = {
+    2: () => "Psst … tipp mal auf eine brennende Kerze am Adventskranz 🕯️",
+    7: () => "Psst … die Lichterkette mag es, wenn man sie antippt ✨",
+    9: () => "Psst … halt mal ein Polaroid oben ein bisschen gedrückt 📸",
+    12: () => "Psst … tipp mal auf eine Weihnachtskugel oben in der Ecke 🎄 Mit Ton klingt sie sogar!",
+    15: () => abends() ? "Psst … tipp heute mal auf den Mond 🌙" : "Psst … wenn die Sonne scheint, tipp sie mal an ☀️",
+    18: () => "Psst … schau mal, was die zwei Capys ganz unten machen, wenn du sie antippst 😘",
+    22: () => abends() ? "Psst … tipp mal auf den Mond, aber nur, wenn du dir was wünschen willst 🌠" : "Psst … heute Abend lohnt sich ein Tipp auf den Mond 🌙",
+    1: () => "Psst … unter dem Kalender liegt Plätzchenteig. Tipp mal drauf 🍪",
+    3: () => "Psst … im Dorf ganz unten steht ein Briefkasten. Schau mal, ob Post für dich drin ist 💌",
+    6: () => "Psst … unten im Schnee liegt eine kleine Kugel. Daraus lässt sich bestimmt was bauen ⛄",
+    10: () => "Psst … schüttel mal die Schneekugel neben dem Adventskranz ❄️",
+    11: () => abends() ? "Psst … oben blinkt heute ein Stern. Tipp ihn an und wünsch dir was 🌟" : "Psst … heute Abend blinkt oben ein Stern. Dem darfst du einen Wunsch verraten 🌟",
+    14: () => "Psst … leg mal einen Daumen ganz an den linken und einen ganz an den rechten Rand und halt kurz fest 🌿",
+    16: () => "Psst … tipp mal auf ein Fenster unten im Dorf. Mal sehen, was die Capys gerade machen 🏠",
+    19: () => "Psst … tipp mal auf einen Schornstein im Dorf 🏡",
+    20: () => "Psst … heute fallen ab und zu goldene Schneeflocken. Fang mal 5 Stück ✨",
+    23: () => "Psst … zieh mal ein Birnchen der Lichterkette nach unten 💡",
+  };
   const tag = () => (ak.kalenderDatum ? ak.kalenderDatum() : ak.intro.datum());
   function saetzeMaennchen() {
     const liste = [grussQuelle.textContent || ""];
     const d = tag();
     if (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag === erstesEi - 1) liste.push(HINWEIS);
+    else if (d.jahr === KALENDER.jahr && d.monat === 12 && TIPPS[d.tag]) liste.push(TIPPS[d.tag]());
     return liste;
   }
   function saetzeWeibchen() {
@@ -327,5 +349,17 @@
     requestAnimationFrame(festhalten);
   }, 250);
 
-  window.adventkalender.voegel = { voegel, fliegeWeg: (i) => fliegeWeg(voegel[i || 0]), ROUTEN: ROUTEN.length };
+  // Von außen: das Rotkehlchen sagt einen Satz, falls es gerade sitzt (sonst false)
+  function sage(satz) {
+    const v = voegel[0];
+    if (!v || v.zustand !== "sitzt" || v.el.hidden) return false;
+    const r = v.el.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > window.innerHeight) return false;
+    v.timer.forEach(clearTimeout); v.timer = [];
+    clearTimeout(v.flugTimer);
+    zeigeBlase(v, satz);
+    v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, 5600));
+    return true;
+  }
+  window.adventkalender.voegel = { voegel, sage, fliegeWeg: (i) => fliegeWeg(voegel[i || 0]), ROUTEN: ROUTEN.length };
 })();

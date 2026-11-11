@@ -1,4 +1,4 @@
-# Toni-Adeventskalender ❤️
+# Für Toni ♥️
 
 Ein romantischer Online-Adventskalender mit 24 Türchen. Jedes Türchen lässt sich
 erst an seinem Tag öffnen (1. Türchen am 01.12., 2. am 02.12. usw.), jeweils um
@@ -6,13 +6,17 @@ erst an seinem Tag öffnen (1. Türchen am 01.12., 2. am 02.12. usw.), jeweils u
 
 ## Inhalte eintragen
 
-Alles, was hinter den Türchen steckt, steht in **`inhalte.js`**. Pro Tag:
+Alles, was hinter den Türchen steckt, steht in **`inhalte.js`**. Die Türchen, die Gutscheine
+der Easter Eggs und der Geburtstagsbrief sind dort **verschlüsselt** gespeichert und werden erst an
+ihrem Tag (laut Serverzeit) lesbar. Wer vorher in den Quelltext schaut, sieht nur Zeichensalat.
+Zum Ändern einfach Claude Bescheid geben: Die Inhalte werden entschlüsselt, angepasst und neu
+verschlüsselt. Felder pro Tag:
 
 | Feld        | Bedeutung                                                    |
 |-------------|--------------------------------------------------------------|
 | `titel`     | Überschrift im geöffneten Türchen                            |
 | `text`      | Deine Nachricht (neue Zeile mit `\n`)                        |
-| `briefzahl` | Zahl für den Weihnachtsbrief                                 |
+| `briefzahl` | Stelle, an die die Wolke des Tages auf den Weihnachtsbrief kommt |
 | `paeckchen` | Nummer des Extra-Päckchens – oder `""`, wenn es keins gibt   |
 | `konfetti`  | `true` = Konfetti regnet über die Seite (z. B. Geburtstage)  |
 | `geschenkregen` | `true` = langsam fallende Geschenke 🎁 (Heiligabend)   |
@@ -20,8 +24,9 @@ Alles, was hinter den Türchen steckt, steht in **`inhalte.js`**. Pro Tag:
 | `bild`      | optional: Foto, z. B. `"bilder/tag01.jpg"`                   |
 | `hinweis`   | optional: zusätzlicher Hinweis-Kasten                        |
 
-Fotos legst du in den Ordner **`bilder/`**. Tipp: Fotos vorher auf ca. 1200 px
-Breite verkleinern, dann lädt die Seite auf dem Handy schneller.
+Fotos liegen im Ordner **`bilder/`** als WebP (große Ansicht bis 1600 px, Vorschau in
+`bilder/klein/` mit 640 px). In `inhalte.js` stehen die Namen weiter mit `.jpg`, die Seite lädt
+automatisch die `.webp` Datei.
 
 Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertitel.
 
@@ -125,8 +130,8 @@ ein Balken, wie weit man gewischt hat. In der Fußzeile kuscheln zwei Capybaras 
 
 - **Zusammen-Zähler** unter der Statuszeile (`zusammenSeit` und `kennenSeit` in `inhalte.js`).
   Am 21.12. erscheint stattdessen: „Heute vor genau einem Jahr haben wir uns kennengelernt“.
-- **Sprachnachrichten** an Tag 1, 13 und 24: Lege die Dateien als `audio/tag01.m4a`,
-  `audio/tag13.m4a` und `audio/tag24.m4a` ab. Fehlt eine Datei, wird nichts angezeigt.
+- **Sprachnachrichten** an Tag 1, 13 und 24 liegen in `audio/` unter zufälligen Namen, damit man sie
+  nicht vorher erraten kann. Der Name steht verschlüsselt im jeweiligen Türchen.
 - **Rubbelfeld** an Tag 6, 15 und 21 (`rubbeln: true`): Text und Zahlen liegen unter Gold.
 - **Capy-Begleiter** läuft gemütlich einmal durchs Bild, ist dann 7 Sekunden weg und kommt
   von der anderen Seite zurück. Beim Antippen sagt es etwas Süßes.
@@ -179,7 +184,7 @@ echten Website ignoriert.
 2. Bei *Source* „Deploy from a branch“ wählen, den Branch (z. B. `main`) und den
    Ordner `/ (root)` auswählen und speichern.
 3. Nach ca. 1 Minute ist die Seite unter
-   `https://<dein-github-name>.github.io/Toni-Adeventskalender/` erreichbar.
+   `https://<dein-github-name>.github.io/FuerToni/` erreichbar.
 
 ## Wie sicher ist die Sperre?
 
@@ -195,3 +200,51 @@ echten Website ignoriert.
 Im Ordner `vorschau-poyjy2er/` liegt eine Testversion mit Testleiste, die alle Tage
 und Türchen freischaltet. Sie nutzt die Fotos und Inhalte der echten Seite mit.
 **Diesen Ordner vor dem 1. Dezember löschen**, sonst könnte Toni darüber alles vorab sehen.
+
+## Kleine Überraschungen zum Antippen (interaktiv.js)
+
+- **Kerzen am Adventskranz:** brennende Kerze antippen, sie wird ausgepustet, Rauch steigt als Herz auf, nach gut 2 Sekunden geht sie wieder an.
+- **Lichterkette:** antippen, eine Lichtwelle in Rosa und Gold läuft von der Stelle aus über die Kette, danach flackert ein Birnchen kurz mit Wackelkontakt.
+- **Polaroids oben:** gedrückt halten, das Foto wird dunkel und entwickelt sich neu wie ein Sofortbild. Kurz tippen öffnet es wie bisher.
+- **Kugeln an den Tannenzweigen:** antippen, die Kugel schwingt, ein Glöckchen klingt (nur mit Ton), Glitzer fällt herunter.
+- **Capy Paar in der Fußzeile:** antippen, ein Mistelzweig senkt sich, Bussi mit Herzchen, danach schauen beide verlegen zur Seite.
+- **Mond:** antippen, Regen aus 26 Sternschnuppen. **Sonne:** antippen, sie setzt kurz eine Sonnenbrille auf und strahlt.
+
+## Hinweise vom Rotkehlchen
+
+An einigen Tagen verrät das Rotkehlchen nach seinem Gruß eine Überraschung zum Antippen:
+2.12. Kerze, 7.12. Lichterkette, 9.12. Polaroid gedrückt halten, 12.12. Weihnachtskugel,
+15.12. Sonne bzw. abends Mond, 18.12. Capy Paar, 22.12. Mond.
+
+## Neujahr (neujahr.js)
+
+Am 31.12. steht oben ein Dank für das Jahr. Ab 23:59:50 zählt die Seite groß von 10 herunter,
+um Mitternacht gibt es Feuerwerk (auch mit Herzen) und den Gruß „Frohes neues Jahr, mein Schatz“.
+Wer die Seite erst später öffnet, sieht das Feuerwerk beim ersten Besuch zwischen 1. und 6. Januar
+(einmal pro Gerät). Antippen schließt es früher.
+
+## Noch mehr zum Entdecken (entdecken.js)
+
+- **Schneekugel** neben dem Adventskranz: antippen oder das Handy schütteln, der Schnee wirbelt auf. Manchmal liegt danach ein Herz aus Schnee am Boden.
+- **Briefkasten** im Winterdorf: bis zu 3 Liebeszettel pro Tag (30 verschiedene), danach „Morgen kommt neue Post“.
+- **Schneemann**: jeder Tipp baut weiter (Kugel, Bauch, Kopf, Gesicht, Nase, Schal, Hut). Fertig winkt er. Am nächsten Tag beginnt er neu.
+- **Wunschstern** am Abend und in der Nacht oben links: Wunsch aufschreiben, der Zettel wird zum Papierflieger und fliegt zum Mond. Nichts wird gespeichert.
+- **Fenster** im Dorf: Licht an und eine kleine Szene (backen, Klavier, Küsschen, Buch, Kakao, Baum schmücken).
+- **Schornsteine**: Herzen und Sterne steigen auf, nachts zusätzlich ein kleines Sternbild in Herzform.
+- **Lichterkette ziehen**: ein Birnchen nach unten ziehen, die Kette schwingt zurück. Lange halten: Regenbogenlichter.
+- **Goldene Schneeflocken** fallen ab und zu (alle 30 bis 60 Sekunden). 5 gefangen an einem Tag: Spruch vom Rotkehlchen.
+- **Plätzchen** (ab 1.12.) unter dem Kalender: Teig antippen, Plätzchen wird gebacken und hüpft in die Dose. Die Dose füllt sich bis zum 24.12.
+- **Mistelzweig**: zwei Daumen gleichzeitig an den linken und rechten Rand legen und kurz halten.
+- Das Rotkehlchen verrät die neuen Überraschungen am 1., 3., 6., 10., 11., 14., 16., 19., 20. und 23.12.
+
+## Schneetage (schneetag.js)
+
+An zwei Tagen ist der ganze Kalender eingeschneit (2026: **3. und 12. Dezember**, fest aus dem Jahr berechnet).
+Oben zeigt eine Leiste, wie viel schon frei ist. Erst ab **85 %** lassen sich die Türchen wieder öffnen.
+Der Fortschritt bleibt beim Neuladen erhalten, fertig geschaufelt bleibt der Tag erledigt (pro Gerät).
+
+## Anleitung als Brief (anleitung.js)
+
+Ab dem 26.11. um 0:30 Uhr erscheint nach dem Geburtstagsbrief eine Anleitung in Briefform (8 Seiten zum Blättern,
+auch per Wischen). Danach lässt sie sich jederzeit über „Anleitung“ in „Dein Tag“ wieder öffnen. Der Text steht
+verschlüsselt in `inhalte.js` und wird erst ab 0:30 Uhr am Geburtstag lesbar.
