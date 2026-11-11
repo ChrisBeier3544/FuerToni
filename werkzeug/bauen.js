@@ -16,7 +16,7 @@ const { execFileSync } = require("child_process");
 
 const WURZEL = path.join(__dirname, "..");
 const TEILE = ["app.js", "specials.js", "himmel.js", "vogel.js", "herz.js", "aufbau.js", "vorfreude.js", "spiel.js",
-  "interaktiv.js", "neujahr.js", "feinschliff.js", "entdecken.js", "schneetag.js", "album.js"];
+  "interaktiv.js", "neujahr.js", "feinschliff.js", "entdecken.js", "schneetag.js", "album.js", "anleitung.js"];
 const pruefen = process.argv.includes("--pruefen");
 const esbuild = process.env.ESBUILD || "npx";
 const esArgs = process.env.ESBUILD ? [] : ["--yes", "esbuild@0.24.0"];

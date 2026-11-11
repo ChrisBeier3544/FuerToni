@@ -31,6 +31,55 @@ const KALENDER = {
     "11-30": { titel: "Morgen geht es los!", text: "Nur noch einmal schlafen, dann öffnest du das erste Türchen. Ich freu mich so auf diesen Dezember mit dir ♥️", bild: "meeresluft.jpg" },
   },
 
+  // Anleitung als Brief, erscheint ab dem Geburtstag um 0:30 (wird verschlüsselt)
+  anleitung: {
+    geheim:
+      "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",
+  },
+
   // Unterschrift unter jedem Türchen-Text
   unterschrift: "Dein Chris ♥️",
 

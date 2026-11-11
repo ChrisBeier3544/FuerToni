@@ -16,7 +16,7 @@ verschlüsselt. Felder pro Tag:
 |-------------|--------------------------------------------------------------|
 | `titel`     | Überschrift im geöffneten Türchen                            |
 | `text`      | Deine Nachricht (neue Zeile mit `\n`)                        |
-| `briefzahl` | Zahl für den Weihnachtsbrief                                 |
+| `briefzahl` | Stelle, an die die Wolke des Tages auf den Weihnachtsbrief kommt |
 | `paeckchen` | Nummer des Extra-Päckchens – oder `""`, wenn es keins gibt   |
 | `konfetti`  | `true` = Konfetti regnet über die Seite (z. B. Geburtstage)  |
 | `geschenkregen` | `true` = langsam fallende Geschenke 🎁 (Heiligabend)   |
@@ -242,3 +242,9 @@ Wer die Seite erst später öffnet, sieht das Feuerwerk beim ersten Besuch zwisc
 An zwei Tagen ist der ganze Kalender eingeschneit (2026: **3. und 12. Dezember**, fest aus dem Jahr berechnet).
 Oben zeigt eine Leiste, wie viel schon frei ist. Erst ab **85 %** lassen sich die Türchen wieder öffnen.
 Der Fortschritt bleibt beim Neuladen erhalten, fertig geschaufelt bleibt der Tag erledigt (pro Gerät).
+
+## Anleitung als Brief (anleitung.js)
+
+Ab dem 26.11. um 0:30 Uhr erscheint nach dem Geburtstagsbrief eine Anleitung in Briefform (8 Seiten zum Blättern,
+auch per Wischen). Danach lässt sie sich jederzeit über „Anleitung“ in „Dein Tag“ wieder öffnen. Der Text steht
+verschlüsselt in `inhalte.js` und wird erst ab 0:30 Uhr am Geburtstag lesbar.

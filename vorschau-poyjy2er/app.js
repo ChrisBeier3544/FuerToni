@@ -1853,6 +1853,7 @@
   });
   window.adventkalender = {
     zeigeFinale,
+    entschluessle,
     schneeSturm: () => schneeSturm(),
     starteLichtershow,
     konfetti: (art) => konfettiRegen(art || "konfetti"),
