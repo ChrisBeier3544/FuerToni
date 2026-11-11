@@ -63,7 +63,11 @@
       if (r.right + 24 + GROESSE / 2 < W() - 8) return { x: r.right + 24, y: r.bottom - 4 };
       const t = document.getElementById("countdown-titel"), tr = t && t.getBoundingClientRect();
       if (!tr || !tr.width || r.right - 22 - GROESSE / 2 > tr.right + 4) return { x: r.right - 22, y: r.top + 1 };
-      return null;
+      // am schmalen Handy: oben mittig auf den Umschlag
+      const u = document.getElementById("umschlag");
+      if (!sichtbar(u)) return null;
+      const ur = u.getBoundingClientRect();
+      return { x: ur.left + ur.width * 0.5, y: ur.top + 3 };
     },
     umschlagLinks: () => { const e = document.getElementById("umschlag"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + 34, y: r.top + 3 }; },
     umschlagRechts: () => { const e = document.getElementById("umschlag"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.right - 34, y: r.top + 3 }; },
@@ -116,9 +120,13 @@
     el.hidden = true;
     ebene.appendChild(el);
     const v = { el, blase: el.querySelector(".vogel-blase"), weiblich, saetze, platz: null, kontext: null, zustand: "weg", pos: null, blick: 1, timer: [], flugTimer: null };
-    el.addEventListener("click", () => {
-      if (v.zustand !== "sitzt") return;
+    el.addEventListener("click", (e) => {
+      const wahl = e.target.closest && e.target.closest(".vogel-wahl");
+      if (wahl) { e.stopPropagation(); antworte(v, wahl.dataset.antwort); return; }
+      if (v.zustand !== "sitzt" || v.fragt) return;
       el.classList.remove("hopst"); void el.offsetWidth; el.classList.add("hopst");
+      // vor dem Geburtstag fragt der Munkelvogel beim zweiten Antippen nach seiner Partnerin
+      if (!weiblich && vorGeburtstag() && v.hatGesprochen && !weibchen && !frageBeantwortet) { frage(v); return; }
       sprich(v);
     });
     voegel.push(v);
@@ -138,6 +146,7 @@
     clearTimeout(v.flugTimer);
     const liste = v.saetze().filter(Boolean);
     if (!liste.length) { planeAbflug(v); return; }
+    v.hatGesprochen = true;
     liste.forEach((satz, i) => v.timer.push(setTimeout(() => zeigeBlase(v, satz), i * 5600)));
     v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, liste.length * 5600 - 600));
   }
@@ -287,7 +296,9 @@
   async function lande(v, sofort) {
     const k = kontext();
     if (!k) { v.zustand = "weg"; v.el.hidden = true; v.platz = null; await new Promise((r) => setTimeout(r, 1000)); return lande(v, sofort); }
-    const name = sofort ? (v.partner ? freierPlatz(v, k) : ERSTER_PLATZ[k]) : freierPlatz(v, k);
+    let name = sofort ? (v.partner ? freierPlatz(v, k) : ERSTER_PLATZ[k]) : freierPlatz(v, k);
+    // ist der Lieblingsplatz gerade nicht frei (zum Beispiel zu wenig Platz am Handy), einen anderen nehmen
+    if (name && !sitzpunkt(v, k, name)) name = freierPlatz(v, k);
     const zielFn = name && (() => sitzpunkt(v, k, name));
     if (!zielFn || !zielFn()) { await new Promise((r) => setTimeout(r, 1500)); return lande(v, sofort); }
     v.ziel = name;
@@ -357,7 +368,69 @@
     23: () => "Psst … zieh mal ein Birnchen der Lichterkette nach unten 💡",
   };
   const tag = () => (ak.kalenderDatum ? ak.kalenderDatum() : ak.intro.datum());
+  const wahl = (liste) => liste[Math.floor(Math.random() * liste.length)];
+  // Countdown vor dem Geburtstag (bis 26.11., 0:00 Uhr)
+  const vorGeburtstag = () => kontext() === "countdown" && ak.intro.phase() === "warten";
+  const NAMEN = ["mein Schatz", "Maus", "Toni", "Baby"];
+  function grussVorGeburtstag() {
+    const n = wahl(NAMEN);
+    const zeit = document.documentElement.getAttribute("data-tageszeit") || "mittag";
+    const d = ak.intro.datum();
+    const wochentag = new Date(Date.UTC(d.jahr, d.monat - 1, d.tag)).getUTCDay();
+    const schultag = wochentag >= 1 && wochentag <= 5;
+    const G = {
+      morgen: schultag ? [
+        "Guten Morgen, " + n + " ☀️ Ich wünsch dir einen schönen Schultag!",
+        "Guten Morgen, " + n + "! Hab einen tollen Tag in der Schule ☀️",
+        "Morgen, " + n + " ☀️ Ich drück dir die Daumen für einen schönen Schultag!",
+        "Guten Morgen, " + n + "! Ich wünsch dir einen richtig guten Tag in der Schule 📚",
+        "Einen wunderschönen guten Morgen, " + n + " ☀️ Hab einen schönen Schultag!",
+      ] : [
+        "Guten Morgen, " + n + " ☀️ Genieß dein Wochenende!",
+        "Guten Morgen, " + n + "! Heute ist keine Schule, ganz viel Zeit für dich ☀️",
+        "Morgen, " + n + " ☀️ Ich wünsch dir einen gemütlichen Tag!",
+      ],
+      vormittag: ["Einen schönen Vormittag, " + n + " 🌤️", "Hallo " + n + "! Ich hoffe, dein Vormittag ist schön 🌤️", "Na, " + n + "? Ich wünsch dir einen tollen Vormittag 🌤️"],
+      mittag: ["Guten Mittag, " + n + " 🌞", "Mahlzeit, " + n + "! Lass es dir schmecken 🌞", "Hallo " + n + "! Ich wünsch dir eine schöne Mittagspause 🌞"],
+      nachmittag: ["Einen gemütlichen Nachmittag, " + n + " 🍪", "Hallo " + n + "! Wie war dein Tag bis jetzt? 🍪", "Schön, dass du da bist, " + n + "! Genieß den Nachmittag 🍪"],
+      abend: ["Guten Abend, " + n + " 🕯️", "Schönen Abend, " + n + "! Mach es dir gemütlich 🕯️", "Hallo " + n + "! Ich wünsch dir einen entspannten Abend 🕯️"],
+      nacht: ["Schlaf schön, " + n + " 🌙", "Gute Nacht, " + n + "! Träum was Schönes 🌙", "Na, " + n + ", noch wach? Schlaf gleich gut 🌙"],
+    };
+    return wahl(G[zeit] || G.mittag);
+  }
+  const GEHEIMNIS = [
+    "Wenn du wüsstest, was an deinem Geburtstag passiert … 🤫",
+    "Ich weiß da etwas über deinen Geburtstag. Aber ich verrate nichts 🤐",
+    "Psst … an deinem Geburtstag wartet etwas ganz Besonderes auf dich 🎁",
+    "Wenn du ahnen würdest, was an deinem Geburtstag los ist … 😏",
+    "Ich darf nichts sagen, aber dein Geburtstag wird richtig schön 🤭",
+    "Ein Vögelchen hat mir gezwitschert, was an deinem Geburtstag passiert. Ich schweige wie ein Grab 🤐",
+    "Du hast ja keine Ahnung, was an deinem Geburtstag auf dich wartet … 🎂",
+    "Ich kenne ein Geheimnis über deinen Geburtstag. Und es ist ein schönes 🤫",
+    "Wenn du wüsstest, was hier an deinem Geburtstag los ist, würdest du jetzt schon strahlen ✨",
+    "Mehr verrate ich nicht, aber freu dich auf deinen Geburtstag 😉",
+  ];
+  const DANKE = [
+    "Danke für die Einladung 🥰",
+    "Vielen Dank, dass ich auch kommen darf ♥️",
+    "Danke, dass du mich eingeladen hast 😊",
+    "Wie lieb von dir, danke für die Einladung 🥰",
+    "Danke schön! Ich freu mich so, dass ich dabei sein darf ♥️",
+    "Ich bedanke mich ganz herzlich für die Einladung 🌸",
+  ];
+  const NEIN = [
+    "Ist nicht schlimm. Dann haben wir mehr Zeit zu zweit 😊",
+    "Alles gut! Dann bleibt mehr Zeit nur für uns zwei 😊",
+    "Kein Problem, dann sind wir eben zu zweit 🥰",
+    "Macht nichts, dann hab ich dich ganz für mich allein 😉",
+  ];
+  const FRAGE = [
+    "Darf meine Partnerin auch vorbeikommen? 🥺",
+    "Hättest du was dagegen, wenn meine Partnerin auch kommt? 🥺",
+    "Darf ich meine Partnerin dazuholen? 🥺",
+  ];
   function saetzeMaennchen() {
+    if (vorGeburtstag()) return [grussVorGeburtstag(), wahl(GEHEIMNIS)];
     const liste = [grussQuelle.textContent || ""];
     const d = tag();
     if (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag === erstesEi - 1) liste.push(HINWEIS);
@@ -365,6 +438,7 @@
     return liste;
   }
   function saetzeWeibchen() {
+    if (vorGeburtstag() || weibchenEingeladen) return [wahl(DANKE)];
     const d = ak.intro.datum();
     if (d.monat === 11 && d.tag === 26) return ["Happy Birthday, Toni! Wir zwei feiern heute mit dir 🎂"];
     if (d.monat === 12 && d.tag === 21) return ["Wir zwei feiern heute mit euch. Ein Jahr, wie schön ♥️"];
@@ -375,6 +449,114 @@
   function zuZweit() {
     const d = ak.intro.datum();
     return d.jahr === KALENDER.jahr && ((d.monat === 11 && d.tag === 26) || (d.monat === 12 && (d.tag === 21 || d.tag === 24)));
+  }
+
+  /* ---------- Frage nach der Partnerin (vor dem Geburtstag) ---------- */
+  let frageBeantwortet = false, weibchenEingeladen = false, frageTimer = null;
+  function frage(v) {
+    v.timer.forEach(clearTimeout); v.timer = [];
+    clearTimeout(v.flugTimer);
+    v.fragt = true;
+    zeigeBlase(v, wahl(FRAGE));
+    if (v.blase.hidden) { v.fragt = false; planeAbflug(v); return; }
+    const knoepfe = document.createElement("span");
+    knoepfe.className = "vogel-wahlen";
+    knoepfe.innerHTML = '<span class="vogel-wahl ja" role="button" tabindex="0" data-antwort="ja">Ja 🥰</span><span class="vogel-wahl nein" role="button" tabindex="0" data-antwort="nein">Nein</span>';
+    v.blase.appendChild(knoepfe);
+    v.blase.classList.add("mit-wahl");
+    // Lage der Blase mit den Knöpfen neu prüfen
+    zeigeBlaseNeuLegen(v);
+    clearTimeout(frageTimer);
+    frageTimer = setTimeout(() => { if (v.fragt) { v.fragt = false; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); planeAbflug(v); } }, 20000);
+  }
+  function zeigeBlaseNeuLegen(v) {
+    const inhalt = [...v.blase.childNodes];
+    const text = v.blase.firstChild && v.blase.firstChild.nodeType === 3 ? v.blase.firstChild.nodeValue : "";
+    zeigeBlase(v, text);
+    inhalt.filter((k) => k.nodeType === 1).forEach((k) => v.blase.appendChild(k));
+  }
+  function antworte(v, antwort) {
+    if (!v.fragt) return;
+    v.fragt = false;
+    clearTimeout(frageTimer);
+    frageBeantwortet = true;
+    v.blase.classList.remove("mit-wahl");
+    if (antwort === "ja") {
+      zeigeBlase(v, wahl(["Juhu, ich sag ihr Bescheid! 🥰", "Wie schön! Sie ist gleich da 🥰", "Danke! Ich ruf sie sofort 🥰"]));
+      v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); }, 2600));
+      weibchenEingeladen = true;
+      setTimeout(holeWeibchen, 1400);
+      v.timer.push(setTimeout(() => planeAbflug(v), 2600));
+    } else {
+      zeigeBlase(v, wahl(NEIN));
+      v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, 5000));
+    }
+  }
+  // Tastatur: Enter oder Leertaste auf Ja oder Nein
+  ebene.addEventListener("keydown", (e) => {
+    const w = e.target.closest && e.target.closest(".vogel-wahl");
+    if (w && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); antworte(maennchen, w.dataset.antwort); }
+  });
+  // An vier Tagen vor dem Geburtstag bringt sie zehn Freunde mit
+  const SCHWARM_TAGE = [13, 17, 20, 24];
+  function holeWeibchen() {
+    if (weibchen) return;
+    weibchen = erstelleVogel(true, saetzeWeibchen);
+    weibchen.partner = maennchen;
+    lande(weibchen, false).then(() => setTimeout(() => { if (weibchen.zustand === "sitzt") sprich(weibchen); }, 1200));
+    const d = ak.intro.datum();
+    if (d.jahr === KALENDER.jahr && d.monat === 11 && SCHWARM_TAGE.includes(d.tag)) setTimeout(schwarm, 1600);
+  }
+  // Zehn Plätze rund um den Umschlag: oben, an beiden Seiten und unten, nie auf Schrift
+  function schwarmPlaetze() {
+    const u = document.getElementById("umschlag");
+    if (!u || !sichtbar(u)) return [];
+    const r = u.getBoundingClientRect();
+    const frei = (q) => !voegel.some((v) => v.pos && Math.abs(v.pos.x - q.x) < 40 && Math.abs(v.pos.y - q.y) < 60);
+    // oben so viele Plätze, dass neben dem Paar noch genug frei bleiben
+    const oben = Math.max(6, Math.min(9, Math.floor((r.width - 30) / 38)));
+    const p = [];
+    for (let i = 0; i < oben; i++) p.push({ x: r.left + 20 + (r.width - 40) * (i / (oben - 1)), y: r.top + 3 });
+    // auf der unteren Kante des Umschlags, links und rechts vom Namen
+    p.push({ x: r.left + 24, y: r.bottom + 2 }, { x: r.right - 24, y: r.bottom + 2 });
+    p.push({ x: r.left + r.width * 0.19, y: r.bottom + 2 }, { x: r.right - r.width * 0.19, y: r.bottom + 2 });
+    p.push({ x: r.left + r.width * 0.32, y: r.bottom + 2 }, { x: r.right - r.width * 0.32, y: r.bottom + 2 });
+    return p.filter(frei).slice(0, 10);
+  }
+  async function schwarm() {
+    if (ruhig) return;
+    const plaetze = schwarmPlaetze();
+    const gaeste = plaetze.map((ziel, i) => {
+      const el = document.createElement("span");
+      el.className = "vogel gast" + (i % 3 === 1 ? " weibchen" : "");
+      el.setAttribute("aria-hidden", "true");
+      el.innerHTML = vogelSvg(i % 3 === 1);
+      ebene.appendChild(el);
+      return { el, zustand: "fliegt", blick: 1, ziel };
+    });
+    await Promise.all(gaeste.map((g, i) => new Promise((r) => setTimeout(r, i * 160)).then(() => {
+      const vonLinks = i % 2 === 0;
+      const start = { x: vonLinks ? -60 : W() + 60, y: g.ziel.y - 160 - Math.random() * 140 };
+      const mitte = { x: (start.x + g.ziel.x) / 2, y: Math.min(start.y, g.ziel.y) - 50 };
+      g.el.classList.add("fliegt");
+      return animiere(g, [start, mitte, { x: g.ziel.x + (vonLinks ? -24 : 24), y: g.ziel.y - 24 }, g.ziel], 2000 + Math.random() * 700).then(() => {
+        g.zustand = "sitzt"; g.el.classList.remove("fliegt"); g.blick = g.ziel.x > W() / 2 ? -1 : 1; setzePosition(g, g.ziel);
+        g.el.classList.add("hopst");
+      });
+    })));
+    // ein bisschen herumhüpfen und dann gemeinsam wieder losfliegen
+    const hops = setInterval(() => { const g = gaeste[Math.floor(Math.random() * gaeste.length)]; if (g.zustand !== "sitzt") return; g.el.classList.remove("hopst"); void g.el.offsetWidth; g.el.classList.add("hopst"); }, 700);
+    // Sicherheitsnetz: nach spätestens 20 Sekunden sind alle Gäste wieder weg
+    const aufraeumen = setTimeout(() => gaeste.forEach((g) => g.el.remove()), 20000);
+    await new Promise((r) => setTimeout(r, 9000));
+    clearInterval(hops);
+    await Promise.all(gaeste.map((g, i) => new Promise((r) => setTimeout(r, i * 120)).then(() => {
+      g.zustand = "fliegt"; g.el.classList.remove("hopst"); g.el.classList.add("fliegt");
+      const nachRechts = g.ziel.x > W() / 2;
+      return animiere(g, [g.ziel, { x: g.ziel.x + (nachRechts ? 40 : -40), y: g.ziel.y - 80 }, { x: nachRechts ? W() + 80 : -80, y: g.ziel.y - 260 - Math.random() * 120 }], 1800 + Math.random() * 600);
+    })));
+    clearTimeout(aufraeumen);
+    gaeste.forEach((g) => g.el.remove());
   }
 
   /* ---------- Start ---------- */
