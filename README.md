@@ -222,3 +222,23 @@ Am 31.12. steht oben ein Dank für das Jahr. Ab 23:59:50 zählt die Seite groß 
 um Mitternacht gibt es Feuerwerk (auch mit Herzen) und den Gruß „Frohes neues Jahr, mein Schatz“.
 Wer die Seite erst später öffnet, sieht das Feuerwerk beim ersten Besuch zwischen 1. und 6. Januar
 (einmal pro Gerät). Antippen schließt es früher.
+
+## Noch mehr zum Entdecken (entdecken.js)
+
+- **Schneekugel** neben dem Adventskranz: antippen oder das Handy schütteln, der Schnee wirbelt auf. Manchmal liegt danach ein Herz aus Schnee am Boden.
+- **Briefkasten** im Winterdorf: bis zu 3 Liebeszettel pro Tag (30 verschiedene), danach „Morgen kommt neue Post“.
+- **Schneemann**: jeder Tipp baut weiter (Kugel, Bauch, Kopf, Gesicht, Nase, Schal, Hut). Fertig winkt er. Am nächsten Tag beginnt er neu.
+- **Wunschstern** am Abend und in der Nacht oben links: Wunsch aufschreiben, der Zettel wird zum Papierflieger und fliegt zum Mond. Nichts wird gespeichert.
+- **Fenster** im Dorf: Licht an und eine kleine Szene (backen, Klavier, Küsschen, Buch, Kakao, Baum schmücken).
+- **Schornsteine**: Herzen und Sterne steigen auf, nachts zusätzlich ein kleines Sternbild in Herzform.
+- **Lichterkette ziehen**: ein Birnchen nach unten ziehen, die Kette schwingt zurück. Lange halten: Regenbogenlichter.
+- **Goldene Schneeflocken** fallen ab und zu (alle 30 bis 60 Sekunden). 5 gefangen an einem Tag: Spruch vom Rotkehlchen.
+- **Plätzchen** (ab 1.12.) unter dem Kalender: Teig antippen, Plätzchen wird gebacken und hüpft in die Dose. Die Dose füllt sich bis zum 24.12.
+- **Mistelzweig**: zwei Daumen gleichzeitig an den linken und rechten Rand legen und kurz halten.
+- Das Rotkehlchen verrät die neuen Überraschungen am 1., 3., 6., 10., 11., 14., 16., 19., 20. und 23.12.
+
+## Schneetage (schneetag.js)
+
+An zwei Tagen ist der ganze Kalender eingeschneit (2026: **3. und 12. Dezember**, fest aus dem Jahr berechnet).
+Oben zeigt eine Leiste, wie viel schon frei ist. Erst ab **85 %** lassen sich die Türchen wieder öffnen.
+Der Fortschritt bleibt beim Neuladen erhalten, fertig geschaufelt bleibt der Tag erledigt (pro Gerät).
