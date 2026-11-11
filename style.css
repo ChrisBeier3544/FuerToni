@@ -2443,3 +2443,53 @@ html[data-abend] .intro .umschlag-rueck { box-shadow: 0 24px 60px rgba(0, 0, 0, 
 html[data-abend] .intro .cd-feld { background: rgba(255, 255, 255, 0.92); }
 html[data-abend] .special-titel { background: rgba(255, 255, 255, 0.95); }
 @media (prefers-reduced-motion: reduce) { .intro::before { animation: none; } }
+
+
+/* =========================================================
+   Himmel: Sonnenaufgang, Mittagssonne, Wetter, Mond, Sternschnuppen
+   ========================================================= */
+html.himmel-neu .sonne, html.himmel-neu .mond, html.himmel-neu .intro::after { display: none; }
+.himmel2 { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.intro > .himmel2 { position: fixed; z-index: -1; }
+.h2-glut {
+  position: absolute; inset: 0; opacity: 0; transition: opacity 3s ease;
+  background: radial-gradient(ellipse 80% 45% at 18% 100%, rgba(255, 140, 90, 0.55), rgba(255, 190, 140, 0.25) 45%, transparent 75%);
+}
+.h2-sonne {
+  --sonnenfarbe: hsl(48 100% 72%);
+  position: absolute; width: clamp(70px, 18vw, 120px); aspect-ratio: 1; border-radius: 50%;
+  transform: translate(-50%, -50%); opacity: 0;
+  background: radial-gradient(circle, #fffdf0 0 30%, var(--sonnenfarbe) 58%, transparent 72%);
+  box-shadow: 0 0 60px 30px color-mix(in srgb, var(--sonnenfarbe) 45%, transparent);
+  transition: left 4s ease, top 4s ease, opacity 3s ease, background 3s ease;
+}
+.h2-strahlen {
+  position: absolute; inset: -60%; border-radius: 50%; opacity: 0.35;
+  background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--sonnenfarbe) 60%, transparent) 0 6deg, transparent 6deg 22deg);
+  mask: radial-gradient(circle, transparent 28%, #000 32%, transparent 70%);
+  -webkit-mask: radial-gradient(circle, transparent 28%, #000 32%, transparent 70%);
+  animation: strahlen 60s linear infinite;
+}
+@keyframes strahlen { to { transform: rotate(360deg); } }
+.himmel2[data-zeit="morgen"] .h2-strahlen { opacity: 0.2; }
+html[data-wetter="diesig"] .h2-strahlen { opacity: 0.12; }
+.h2-wolken { position: absolute; inset: 0; }
+.h2-wolke { position: absolute; left: -200px; filter: drop-shadow(0 6px 8px rgba(157, 36, 73, 0.08)); animation: wolke-ziehen linear infinite; }
+.h2-wolke svg { display: block; width: 100%; height: auto; }
+@keyframes wolke-ziehen { from { transform: translateX(0); } to { transform: translateX(calc(100vw + 400px)); } }
+html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
+.h2-dunst { position: absolute; inset: 0; opacity: 0; transition: opacity 3s ease; background: linear-gradient(180deg, rgba(230, 220, 228, 0.9), rgba(240, 232, 238, 0.3) 60%, transparent); }
+.h2-mond {
+  position: absolute; width: clamp(46px, 12vw, 70px); height: auto; opacity: 0;
+  filter: drop-shadow(0 0 14px rgba(253, 241, 204, 0.6));
+  transition: opacity 3s ease, top 3s ease, right 3s ease;
+  overflow: visible;
+}
+.h2-krater { transition: opacity 1s ease; }
+.h2-schnuppe {
+  position: absolute; width: 120px; height: 2px; border-radius: 2px; transform-origin: 0 50%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.9) 85%, #fff);
+  box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.6);
+}
+.h2-schnuppe::after { content: ""; position: absolute; right: -2px; top: -2px; width: 6px; height: 6px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.8); }
+@media (prefers-reduced-motion: reduce) { .h2-strahlen, .h2-wolke { animation: none; } .h2-wolke { left: 10%; } }
