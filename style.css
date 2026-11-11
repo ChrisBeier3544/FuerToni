@@ -3041,3 +3041,7 @@ dialog { overscroll-behavior: contain; }
 .sp-dampfherz { position: absolute; color: #fff; text-shadow: 0 0 6px rgba(255, 143, 171, 0.9); line-height: 1; z-index: 3; }
 /* Während einer Capy Szene sitzen die Vögel nicht mitten im Bild */
 html:has(.special-buehne) .vogel-ebene { visibility: hidden; }
+
+/* Solange der Brief verschlossen ist, ist hinter ihm nichts zu sehen, auch nicht beim Herauszoomen */
+html:has(#intro:not([hidden]):not(.weg)) body > *:not(#intro):not(.vogel-ebene):not(.testleiste):not(script):not(dialog) { visibility: hidden !important; }
+html:has(#intro:not([hidden]):not(.weg)), html:has(#intro:not([hidden]):not(.weg)) body { overflow: hidden; background: linear-gradient(160deg, var(--rose-50), var(--rose-200)) fixed; }
