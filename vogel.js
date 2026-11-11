@@ -143,6 +143,9 @@
   }
   function zeigeBlase(v, satz) {
     if (v.zustand !== "sitzt") return;
+    // nur sprechen, wenn der Vogel gerade zu sehen ist
+    const sicht = v.el.getBoundingClientRect();
+    if (sicht.bottom < 20 || sicht.top > window.innerHeight - 20) { v.blase.hidden = true; return; }
     // die Blase des anderen Vogels ausblenden, damit sie sich nicht überlappen
     voegel.forEach((a) => { if (a !== v) { a.blase.hidden = true; a.el.classList.remove("redet"); } });
     v.blase.textContent = satz;

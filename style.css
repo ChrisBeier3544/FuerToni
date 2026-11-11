@@ -2971,3 +2971,5 @@ html.ruhe .capy-familie *, html.ruhe .kalender *, html.ruhe .vogel-ebene *, html
 /* Fenster: Scrollen bleibt im Fenster und geht nicht an die Seite dahinter */
 dialog { overscroll-behavior: contain; }
 .anleitung-papier, .dialog-inhalt, .entdeckt-liste { overscroll-behavior: contain; }
+/* Fliegt der Vogel seitlich aus dem Bild, darf die Seite nicht waagerecht verrutschen */
+.vogel-ebene { left: 0; right: 0; width: auto; overflow-x: clip; overflow-y: visible; }
