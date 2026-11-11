@@ -404,8 +404,29 @@
     const svg = dorfSvg();
     if (!svg || svg.querySelector(".briefkasten")) return;
     const B = svg.viewBox.baseVal.width || 1200;
-    baueSchneemann(svg, B * 0.35);
-    baueBriefkasten(svg, B * 0.63);
+    // sichtbarer Ausschnitt in Bildkoordinaten (am Handy ist nur die Mitte zu sehen)
+    let von = 0, bis = B;
+    try {
+      const m = svg.getScreenCTM();
+      if (m && m.a) { von = Math.max(0, (0 - m.e) / m.a); bis = Math.min(B, (document.documentElement.clientWidth - m.e) / m.a); }
+    } catch (_) { /* egal */ }
+    // Lücken zwischen Häusern und Bäumen, damit nichts vor einem Fenster steht
+    const belegt = [];
+    svg.querySelectorAll("rect.haus:not(.fenster)").forEach((r) => { const x = +r.getAttribute("x"), w = +r.getAttribute("width"); if (w > 30) belegt.push([x - 7, x + w + 7, false]); });
+    svg.querySelectorAll(".baum .trefferflaeche").forEach((r) => { const x = +r.getAttribute("x"), w = +r.getAttribute("width"); belegt.push([x + 4, x + w - 4, true]); });
+    belegt.sort((p, q) => p[0] - q[0]);
+    const luecken = [];
+    for (let i = 1; i < belegt.length; i++) {
+      const l = Math.max(...belegt.slice(0, i).map((e) => e[1])), r = belegt[i][0];
+      luecken.push({ mitte: (l + r) / 2, breite: r - l, baum: belegt[i][2] || belegt[i - 1][2] });
+    }
+    const passend = luecken.filter((g) => g.mitte > von + 34 && g.mitte < bis - 34).sort((p, q) => q.breite - p.breite);
+    const naechste = (ziel, ausser) => passend.filter((g) => !ausser || Math.abs(g.mitte - ausser) > 90).sort((p, q) => (Math.abs(p.mitte - ziel) + (p.baum ? 140 : 0)) - (Math.abs(q.mitte - ziel) + (q.baum ? 140 : 0)))[0];
+    const breite = bis - von;
+    const sm = naechste(von + breite * 0.33);
+    const bk = naechste(von + breite * 0.68, sm && sm.mitte);
+    baueSchneemann(svg, sm ? sm.mitte : von + breite * 0.33);
+    baueBriefkasten(svg, bk ? bk.mitte : von + breite * 0.68);
     richteSchornsteineEin(svg);
   }
   if (landschaft) {
