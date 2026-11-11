@@ -426,7 +426,8 @@
   ];
   const FRAGE = [
     "Darf meine Partnerin auch vorbeikommen? 🥺",
-    "Hättest du was dagegen, wenn meine Partnerin auch kommt? 🥺",
+    "Ist es okay für dich, wenn meine Partnerin auch kommt? 🥺",
+    "Darf meine Liebste auch dazukommen? 🥺",
     "Darf ich meine Partnerin dazuholen? 🥺",
   ];
   function saetzeMaennchen() {
