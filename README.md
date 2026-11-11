@@ -6,7 +6,11 @@ erst an seinem Tag öffnen (1. Türchen am 01.12., 2. am 02.12. usw.), jeweils u
 
 ## Inhalte eintragen
 
-Alles, was hinter den Türchen steckt, steht in **`inhalte.js`**. Pro Tag:
+Alles, was hinter den Türchen steckt, steht in **`inhalte.js`**. Die Türchen, die Gutscheine
+der Easter Eggs und der Geburtstagsbrief sind dort **verschlüsselt** gespeichert und werden erst an
+ihrem Tag (laut Serverzeit) lesbar. Wer vorher in den Quelltext schaut, sieht nur Zeichensalat.
+Zum Ändern einfach Claude Bescheid geben: Die Inhalte werden entschlüsselt, angepasst und neu
+verschlüsselt. Felder pro Tag:
 
 | Feld        | Bedeutung                                                    |
 |-------------|--------------------------------------------------------------|
@@ -20,8 +24,9 @@ Alles, was hinter den Türchen steckt, steht in **`inhalte.js`**. Pro Tag:
 | `bild`      | optional: Foto, z. B. `"bilder/tag01.jpg"`                   |
 | `hinweis`   | optional: zusätzlicher Hinweis-Kasten                        |
 
-Fotos legst du in den Ordner **`bilder/`**. Tipp: Fotos vorher auf ca. 1200 px
-Breite verkleinern, dann lädt die Seite auf dem Handy schneller.
+Fotos liegen im Ordner **`bilder/`** als WebP (große Ansicht bis 1600 px, Vorschau in
+`bilder/klein/` mit 640 px). In `inhalte.js` stehen die Namen weiter mit `.jpg`, die Seite lädt
+automatisch die `.webp` Datei.
 
 Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertitel.
 
@@ -125,8 +130,8 @@ ein Balken, wie weit man gewischt hat. In der Fußzeile kuscheln zwei Capybaras 
 
 - **Zusammen-Zähler** unter der Statuszeile (`zusammenSeit` und `kennenSeit` in `inhalte.js`).
   Am 21.12. erscheint stattdessen: „Heute vor genau einem Jahr haben wir uns kennengelernt“.
-- **Sprachnachrichten** an Tag 1, 13 und 24: Lege die Dateien als `audio/tag01.m4a`,
-  `audio/tag13.m4a` und `audio/tag24.m4a` ab. Fehlt eine Datei, wird nichts angezeigt.
+- **Sprachnachrichten** an Tag 1, 13 und 24 liegen in `audio/` unter zufälligen Namen, damit man sie
+  nicht vorher erraten kann. Der Name steht verschlüsselt im jeweiligen Türchen.
 - **Rubbelfeld** an Tag 6, 15 und 21 (`rubbeln: true`): Text und Zahlen liegen unter Gold.
 - **Capy-Begleiter** läuft gemütlich einmal durchs Bild, ist dann 7 Sekunden weg und kommt
   von der anderen Seite zurück. Beim Antippen sagt es etwas Süßes.
@@ -204,3 +209,16 @@ und Türchen freischaltet. Sie nutzt die Fotos und Inhalte der echten Seite mit.
 - **Kugeln an den Tannenzweigen:** antippen, die Kugel schwingt, ein Glöckchen klingt (nur mit Ton), Glitzer fällt herunter.
 - **Capy Paar in der Fußzeile:** antippen, ein Mistelzweig senkt sich, Bussi mit Herzchen, danach schauen beide verlegen zur Seite.
 - **Mond:** antippen, Regen aus 26 Sternschnuppen. **Sonne:** antippen, sie setzt kurz eine Sonnenbrille auf und strahlt.
+
+## Hinweise vom Rotkehlchen
+
+An einigen Tagen verrät das Rotkehlchen nach seinem Gruß eine Überraschung zum Antippen:
+2.12. Kerze, 7.12. Lichterkette, 9.12. Polaroid gedrückt halten, 12.12. Weihnachtskugel,
+15.12. Sonne bzw. abends Mond, 18.12. Capy Paar, 22.12. Mond.
+
+## Neujahr (neujahr.js)
+
+Am 31.12. steht oben ein Dank für das Jahr. Ab 23:59:50 zählt die Seite groß von 10 herunter,
+um Mitternacht gibt es Feuerwerk (auch mit Herzen) und den Gruß „Frohes neues Jahr, mein Schatz“.
+Wer die Seite erst später öffnet, sieht das Feuerwerk beim ersten Besuch zwischen 1. und 6. Januar
+(einmal pro Gerät). Antippen schließt es früher.

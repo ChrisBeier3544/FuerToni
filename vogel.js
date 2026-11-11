@@ -291,11 +291,23 @@
   /* ---------- Was die Vögel sagen ---------- */
   const erstesEi = Math.min(...(KALENDER.eastereggs || []).map((e) => e.ab || 99));
   const HINWEIS = "Psst … auf dieser Seite sind Geheimnisse versteckt 🤫 Wenn ein Emoji mal an einer komischen Stelle ist, lohnt sich ein Klick darauf!";
+  // An einigen Tagen verrät das Rotkehlchen eine kleine Überraschung zum Antippen
+  const abends = () => /abend|nacht/.test(document.documentElement.getAttribute("data-tageszeit") || "");
+  const TIPPS = {
+    2: () => "Psst … tipp mal auf eine brennende Kerze am Adventskranz 🕯️",
+    7: () => "Psst … die Lichterkette mag es, wenn man sie antippt ✨",
+    9: () => "Psst … halt mal ein Polaroid oben ein bisschen gedrückt 📸",
+    12: () => "Psst … tipp mal auf eine Weihnachtskugel oben in der Ecke 🎄 Mit Ton klingt sie sogar!",
+    15: () => abends() ? "Psst … tipp heute mal auf den Mond 🌙" : "Psst … wenn die Sonne scheint, tipp sie mal an ☀️",
+    18: () => "Psst … schau mal, was die zwei Capys ganz unten machen, wenn du sie antippst 😘",
+    22: () => abends() ? "Psst … tipp mal auf den Mond, aber nur, wenn du dir was wünschen willst 🌠" : "Psst … heute Abend lohnt sich ein Tipp auf den Mond 🌙",
+  };
   const tag = () => (ak.kalenderDatum ? ak.kalenderDatum() : ak.intro.datum());
   function saetzeMaennchen() {
     const liste = [grussQuelle.textContent || ""];
     const d = tag();
     if (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag === erstesEi - 1) liste.push(HINWEIS);
+    else if (d.jahr === KALENDER.jahr && d.monat === 12 && TIPPS[d.tag]) liste.push(TIPPS[d.tag]());
     return liste;
   }
   function saetzeWeibchen() {

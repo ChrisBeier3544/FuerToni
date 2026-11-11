@@ -2626,3 +2626,27 @@ html[data-abend] .rauch-herz path { stroke: rgba(230, 220, 230, 0.8); }
 .bussi-herz { position: absolute; color: #ff4d7d; pointer-events: none; text-shadow: 0 0 6px rgba(255, 77, 125, 0.5); }
 .sonnenbrille { position: absolute; left: 50%; top: 50%; width: 62%; opacity: 0; pointer-events: none; }
 .sonnenbrille svg { display: block; width: 100%; height: auto; }
+
+/* ---------- Neujahr (neujahr.js) ---------- */
+.neujahr-countdown {
+  position: fixed; inset: 0; z-index: 95; display: grid; place-items: center; pointer-events: none;
+  font-family: "Dancing Script", cursive; font-size: clamp(110px, 34vw, 260px); color: #ffd36b;
+  text-shadow: 0 0 30px rgba(255, 211, 107, 0.7), 0 6px 30px rgba(0, 0, 0, 0.35);
+  background: radial-gradient(circle, rgba(30, 10, 35, 0.82), rgba(30, 10, 35, 0.55) 75%);
+}
+.neujahr {
+  position: fixed; inset: 0; z-index: 95; cursor: pointer;
+  background: radial-gradient(ellipse at 50% 30%, rgba(60, 18, 52, 0.88), rgba(14, 6, 24, 0.94));
+  animation: einblenden 0.8s ease; transition: opacity 0.9s ease;
+}
+.neujahr.weg { opacity: 0; }
+.neujahr-himmel { position: absolute; inset: 0; width: 100%; height: 100%; }
+.neujahr-gruss {
+  position: absolute; left: 50%; top: 58%; transform: translate(-50%, -50%); width: min(92vw, 560px);
+  text-align: center; color: #fff4f7; pointer-events: none;
+  animation: neujahr-gruss 1.4s ease 1.2s both;
+}
+.neujahr-jahr { margin: 0; font-family: "Dancing Script", cursive; font-size: clamp(64px, 20vw, 130px); line-height: 1; color: #ffd36b; text-shadow: 0 0 24px rgba(255, 211, 107, 0.6); }
+.neujahr-titel { margin: 8px 0 6px; font-family: "Dancing Script", cursive; font-size: clamp(28px, 8vw, 44px); }
+.neujahr-text { margin: 0; font-size: 16px; opacity: 0.9; }
+@keyframes neujahr-gruss { from { opacity: 0; transform: translate(-50%, -40%); } }
