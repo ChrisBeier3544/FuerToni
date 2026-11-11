@@ -342,7 +342,7 @@
       { transform: "scale(1)", filter: "drop-shadow(0 0 14px rgba(253,241,204,.6))" },
     ], { duration: 1200, easing: "ease-out" });
     const box = h.querySelector(".h2-schnuppen");
-    const ANZAHL = 26;
+    const ANZAHL = 52;
     for (let k = 0; k < ANZAHL; k++) {
       setTimeout(() => {
         const s = document.createElement("span");
@@ -351,16 +351,20 @@
         const winkel = 24 + Math.random() * 14, laenge = 220 + Math.random() * 220;
         s.style.left = x + "%"; s.style.top = y + "%";
         s.style.width = 80 + Math.random() * 70 + "px";
+        // jede Sternschnuppe leuchtet anders hell: von zart bis strahlend
+        const hell = 0.3 + Math.random() * 0.7;
+        s.style.height = (1 + hell * 2).toFixed(1) + "px";
+        s.style.filter = "brightness(" + (0.7 + hell * 0.8).toFixed(2) + ") drop-shadow(0 0 " + (2 + hell * 8).toFixed(1) + "px rgba(255,250,230," + hell.toFixed(2) + "))";
         box.appendChild(s);
         const dx = Math.cos(winkel * Math.PI / 180) * laenge, dy = Math.sin(winkel * Math.PI / 180) * laenge;
         s.animate([
           { transform: "translate(0,0) rotate(" + winkel + "deg) scaleX(.2)", opacity: 0 },
-          { opacity: 1, offset: 0.15 },
+          { opacity: hell, offset: 0.15 },
           { transform: "translate(" + dx + "px," + dy + "px) rotate(" + winkel + "deg) scaleX(1)", opacity: 0 },
         ], { duration: 800 + Math.random() * 600, easing: "ease-in", fill: "forwards" }).finished.then(() => s.remove(), () => s.remove());
-      }, 150 + k * 130 + Math.random() * 90);
+      }, 150 + k * 70 + Math.random() * 60);
     }
-    setTimeout(() => { regen = false; }, ANZAHL * 130 + 1800);
+    setTimeout(() => { regen = false; }, ANZAHL * 70 + 1800);
   }
   let brille = false;
   function sonnenbrille(sonne) {
