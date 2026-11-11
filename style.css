@@ -2498,3 +2498,59 @@ html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
 @media (max-width: 600px) {
   .himmel > .himmel2 .h2-mond { width: 34px; top: 10px !important; right: auto !important; left: calc(50% + 44px); }
 }
+
+
+/* ---------- Heutiges Türchen: nur noch eine feine goldene Umrandung ---------- */
+.tuer.heute:not(.offen)::after { content: none !important; }
+.tuer.heute:not(.offen) .tuer-blatt {
+  animation: none !important;
+  box-shadow: var(--schatten), 0 0 0 2px rgba(212, 168, 75, 0.85), 0 0 10px 2px rgba(243, 220, 159, 0.55) !important;
+}
+
+/* ---------- Der Gruß kommt jetzt vom Vogel ---------- */
+#gruss, #intro-gruss { display: none !important; }
+
+/* ---------- Vogel ---------- */
+.vogel {
+  position: absolute;
+  z-index: 8;
+  width: 52px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.vogel:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 50%; }
+.vogel svg { display: block; width: 100%; height: auto; overflow: visible; }
+.heute-karte > .vogel { top: -45px; right: 14px; }
+.intro-countdown { position: relative; }
+.intro-countdown > .vogel { top: -40px; right: -8px; }
+.vogel .augenlid { transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); animation: blinzeln 5s infinite; }
+@keyframes blinzeln { 0%, 92%, 100% { transform: scaleY(0); } 95% { transform: scaleY(1); } }
+.vogel .vogel-koerper { transform-box: fill-box; transform-origin: 50% 100%; animation: atmen 3s ease-in-out infinite; }
+@keyframes atmen { 50% { transform: scale(1.03, 0.97); } }
+.vogel.redet .vogel-koerper { animation: zwitschern 0.4s ease-in-out infinite alternate; }
+@keyframes zwitschern { from { transform: rotate(-4deg); } to { transform: rotate(5deg) translateY(-1px); } }
+.vogel.hopst { animation: hopsen 0.45s ease-out; }
+@keyframes hopsen { 30% { transform: translateY(-10px); } 60% { transform: translateY(0) scale(1.05, 0.95); } }
+.vogel .vogel-blase {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 10px;
+  z-index: 9;
+  width: max-content;
+  max-width: min(250px, 72vw);
+  padding: 8px 12px;
+  border-radius: 14px 14px 4px 14px;
+  background: #fff;
+  color: var(--beere-dunkel);
+  font: 700 0.85rem/1.4 "Nunito", sans-serif;
+  text-align: left;
+  box-shadow: 0 6px 16px rgba(107, 21, 50, 0.22);
+  animation: aufpoppen 0.3s ease;
+  pointer-events: none;
+}
+.vogel .vogel-blase[hidden] { display: none; }
+.vogel .vogel-blase::after { content: ""; position: absolute; top: 100%; right: 14px; border: 7px solid transparent; border-top-color: #fff; border-right-color: #fff; }
+@media (prefers-reduced-motion: reduce) { .vogel .augenlid, .vogel .vogel-koerper, .vogel.hopst { animation: none; } }

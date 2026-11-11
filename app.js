@@ -1372,7 +1372,7 @@
         intro.classList.add("weg");
         document.documentElement.style.overflow = "";
       }, schnell ? 150 : (geburtstag ? 3600 : 2400));
-      setTimeout(() => { intro.hidden = true; zeigeHeutigesTuerchen(); }, schnell ? 400 : (geburtstag ? 4400 : 3200));
+      setTimeout(() => { intro.hidden = true; }, schnell ? 400 : (geburtstag ? 4400 : 3200));
       try { sessionStorage.setItem("toni-intro", "1"); } catch (_) { /* egal */ }
     }
     umschlag.addEventListener("click", oeffnen);
@@ -1860,7 +1860,6 @@
   synchronisiereZeit().then(() => {
     zeitBereit = true;
     aktualisiere();
-    if (document.getElementById("intro").hidden && window.scrollY < 40) setTimeout(zeigeHeutigesTuerchen, 900);
     const k = kalenderDatum();
     if (k.jahr === KALENDER.jahr && k.monat === 12 && k.tag === 24 && !geoeffnet.has(24)) setTimeout(starteLichtershow, 600);
   });

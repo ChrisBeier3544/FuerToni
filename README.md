@@ -56,6 +56,13 @@ Vom 15. bis 25. November läuft auf dem Countdown-Bildschirm jeden Tag eine ande
 Feuerwerk, Schneeballschlacht, Polonaise, Plätzchenbacken und am Vorabend der Geburtstagskuchen.
 Sie startet beim Öffnen automatisch und lässt sich über „🐹 Capy-Special nochmal ansehen“ wiederholen.
 
+## Vogel
+
+`vogel.js`: Ein kleines Rotkehlchen sitzt auf der Karte „Dein Tag“ (in der Countdown-Phase auf dem Countdown)
+und sagt 2 Sekunden nach dem Öffnen des Umschlags für 5 Sekunden den Tagesgruß. Antippen wiederholt ihn.
+Am Tag vor dem ersten Easter Egg gibt es zusätzlich einen Hinweis auf die versteckten Geheimnisse.
+Das heutige Türchen wird nicht mehr angescrollt und hat nur eine feine goldene Umrandung.
+
 ## Himmel
 
 `himmel.js`: Morgens geht die Sonne zwischen 6 und 9 Uhr auf. Tagsüber zieht sie über den Himmel,
