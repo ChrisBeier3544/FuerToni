@@ -138,6 +138,7 @@
     // die Blase des anderen Vogels ausblenden, damit sie sich nicht überlappen
     voegel.forEach((a) => { if (a !== v) { a.blase.hidden = true; a.el.classList.remove("redet"); } });
     v.blase.textContent = satz;
+    v.blase.classList.remove("seitlich", "rechts-vom-vogel");
     v.blase.classList.toggle("unten", v.pos && v.pos.y < 140);
     v.blase.style.left = "0px"; v.blase.style.right = "auto";
     v.blase.hidden = false;
@@ -150,6 +151,33 @@
     if (vogelLinks + links + breite > W() - rand) links = W() - rand - breite - vogelLinks;
     v.blase.style.left = links.toFixed(0) + "px";
     v.blase.style.setProperty("--spitze", Math.max(8, Math.min(breite - 22, kopf - links - 7)).toFixed(0) + "px");
+    // Gesichter auf den Fotos nie verdecken: sonst die Blase seitlich neben den Vogel legen
+    v.blase.style.maxWidth = "";
+    if (verdecktFoto(v.blase)) {
+      v.blase.classList.remove("unten");
+      v.blase.classList.add("seitlich");
+      // Seite wählen: weg vom Partner, sonst dorthin, wo mehr Platz ist
+      const andere = voegel.find((a) => a !== v && a.zustand === "sitzt" && a.pos && Math.abs(a.pos.x - v.pos.x) < 80);
+      const platzLinks = vogelLinks - 4 - rand, platzRechts = W() - rand - (vogelLinks + GROESSE + 4);
+      let links2 = andere ? andere.pos.x > v.pos.x : platzLinks >= platzRechts;
+      if (links2 && platzLinks < 120) links2 = false;
+      if (!links2 && platzRechts < 120) links2 = true;
+      const platz = links2 ? platzLinks : platzRechts;
+      v.blase.style.maxWidth = Math.max(110, Math.min(250, platz)) + "px";
+      const b2 = v.blase.offsetWidth;
+      v.blase.classList.toggle("rechts-vom-vogel", !links2);
+      v.blase.style.left = (links2 ? -b2 - 4 : GROESSE + 4).toFixed(0) + "px";
+      if (verdecktFoto(v.blase)) { v.blase.classList.remove("seitlich", "rechts-vom-vogel"); v.blase.classList.add("unten"); v.blase.style.maxWidth = ""; v.blase.style.left = links.toFixed(0) + "px"; }
+    } else {
+      v.blase.classList.remove("seitlich", "rechts-vom-vogel");
+    }
+  }
+  function verdecktFoto(blase) {
+    const b = blase.getBoundingClientRect();
+    return [...document.querySelectorAll(".polaroid img, .lightbox-figur img")].some((img) => {
+      const r = img.getBoundingClientRect();
+      return r.width > 0 && b.left < r.right - 4 && b.right > r.left + 4 && b.top < r.bottom - 4 && b.bottom > r.top + 4;
+    });
   }
 
   // 10 Sekunden nach dem Sprechen (oder Landen) geht es los

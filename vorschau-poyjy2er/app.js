@@ -1576,6 +1576,7 @@
     bild.hidden = !ei.bild;
     if (ei.bild) {
       bild.src = "bilder/klein/" + ei.bild;
+      bild.style.objectPosition = ei.fokus || "";
       bild.onerror = () => { bild.hidden = true; };
     }
     document.getElementById("gutschein-titel").textContent = ei.titel;

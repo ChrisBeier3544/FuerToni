@@ -159,6 +159,7 @@
     const bild = document.getElementById("postkarte-bild");
     bild.hidden = !k.bild;
     if (k.bild) bild.src = "bilder/klein/" + k.bild;
+    bild.style.objectPosition = k.fokus || "";
     document.getElementById("postkarte-stempel").textContent = "KÖLN · " + d.tag + ". NOV.";
     const oeffnen = () => { if (typeof karte.showModal === "function") karte.showModal(); else karte.setAttribute("open", ""); };
     if (!mitPostbote || ruhig || !grafik) { oeffnen(); return Promise.resolve(); }

@@ -42,7 +42,7 @@ const KALENDER = {
   postkarten: {
     "11-26": { titel: "Happy Birthday, Toni! 🎂", text: "Heute ist dein Tag! Ich wünsche dir einen wunderschönen Geburtstag voller Lachen, Kuchen und Liebe ♥️", bild: "strand-lachen.jpg" },
     "11-27": { titel: "Noch 4 Mal schlafen", text: "Dann öffnest du das erste Türchen. Die Capy Crew arbeitet schon ganz fleißig an deinem Kalender 🐹", bild: "capybara-tasse.jpg" },
-    "11-28": { titel: "Noch 3 Mal schlafen", text: "Heute wird geschmückt! Gleich bringen die Capys Schnee, Schleifen und die Lichterkette an. Schau ihnen ruhig zu ✨", bild: "dom.jpg" },
+    "11-28": { titel: "Noch 3 Mal schlafen", text: "Heute wird geschmückt! Gleich bringen die Capys Schnee, Schleifen und die Lichterkette an. Schau ihnen ruhig zu ✨", bild: "dom.jpg", fokus: "50% 100%" },
     "11-29": { titel: "Frohen 1. Advent 🕯️", text: "Heute brennt die erste Kerze. Ich wünsche dir einen gemütlichen Sonntag und denk ganz fest an dich ♥️", bild: "sofatag.jpg" },
     "11-30": { titel: "Morgen geht es los!", text: "Nur noch einmal schlafen, dann öffnest du das erste Türchen. Ich freu mich so auf diesen Dezember mit dir ♥️", bild: "meeresluft.jpg" },
   },
@@ -66,7 +66,7 @@ const KALENDER = {
   fotos: {
     titel: [
       { datei: "kuss-am-meer.jpg", text: "Am Meer", fokus: "68% 50%" },
-      { datei: "bank.jpg", text: "Lieblingsmensch" },
+      { datei: "bank.jpg", text: "Lieblingsmensch", fokus: "68% 50%" },
       { datei: "wangenkuss.jpg", text: "Küsschen", fokus: "40% 50%" },
     ],
     galerie: [
@@ -90,7 +90,7 @@ const KALENDER = {
       { datei: "palma-kuesschen.jpg", text: "Küsschen in Palma" },
       { datei: "wald.jpg", text: "Waldspaziergang", fokus: "50% 60%" },
       { datei: "sofatag.jpg", text: "Sofatag" },
-      { datei: "muetzen.jpg", text: "Mützenmodels" },
+      { datei: "muetzen.jpg", text: "Mützenmodels", fokus: "55% 28%" },
       { datei: "gemuetlich.jpg", text: "Gemütlich" },
       { datei: "abendspaziergang.jpg", text: "Abendspaziergang" },
       { datei: "gondel-abend.jpg", text: "Gondelfahrt" },
@@ -108,6 +108,7 @@ const KALENDER = {
    *              { seite: "titelfotos" } = hinter den Polaroids oben
    *              { seite: "fuss" }       = unten neben der Fußzeile
    *   bild   : (optional) Foto auf dem Gutschein, aus bilder/
+   *   fokus  : (optional) Bildausschnitt, z. B. "100% 50%" = rechter Teil
    *   art    : (optional) "foto" = kein Gutschein, nur ein lustiger Fund
    *   fundtext : (optional) eigene Überschrift beim Finden
    *   quiz   : (optional) Frage, die sie vorher richtig beantworten muss.
@@ -157,6 +158,7 @@ const KALENDER = {
       ab: 19,
       versteck: { seite: "fuss" },
       bild: "cafe.jpg",
+      fokus: "100% 50%",
       titel: "Ein Date deiner Wahl",
       text: "Du planst, ich bin dabei. Egal was du dir aussuchst, es geht auf mich ♥️",
     },
