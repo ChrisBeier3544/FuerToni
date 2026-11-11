@@ -193,7 +193,13 @@
       if (wert === 0) { beste = null; break; }
       if (!beste || wert < beste.wert) beste = { art, wert };
     }
-    if (beste) lege(beste.art);
+    if (beste) {
+      // nirgends Platz ohne ein Foto oder wichtige Schrift zu verdecken:
+      // lieber schweigen und den Satz nach der nächsten Landung sagen
+      if (beste.wert > 500) { v.blase.hidden = true; v.el.classList.remove("redet"); v.nachholen = satz; return; }
+      lege(beste.art);
+    }
+    v.nachholen = null;
   }
   // Wie viel Fläche die Blase von Fotos, wichtiger Schrift oder dem Bildrand verdeckt
   function verdeckung(blase) {
@@ -302,6 +308,10 @@
     v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.ziel = null;
     v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
     v.gelandet = (v.gelandet || 0) + 1;
+    if (v.nachholen) {
+      const satz = v.nachholen;
+      setTimeout(() => { if (v.zustand === "sitzt" && v.nachholen === satz) { zeigeBlase(v, satz); setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); }, 5000); } }, 1200);
+    }
     planeAbflug(v);
   }
 
