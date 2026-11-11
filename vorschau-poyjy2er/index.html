@@ -27,7 +27,7 @@
       <div class="brief">
         <p class="brief-anrede" id="brief-anrede">Mein Schatz,</p>
         <p class="brief-text" id="brief-text">dein Adventskalender wartet auf dich</p>
-        <p class="brief-herz" aria-hidden="true">♥️</p>
+        <p class="brief-herz" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#i-herz"/></svg></p>
       </div>
       <div class="umschlag-vorne"></div>
       <div class="umschlag-klappe"></div>
@@ -49,6 +49,23 @@
   </div>
   <div class="herzen" aria-hidden="true"></div>
 
+  <svg class="ui-sprite" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="ui-herz-verlauf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ff7096"/><stop offset="1" stop-color="#d6244f"/></linearGradient>
+    <linearGradient id="ui-gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7d77c"/><stop offset="1" stop-color="#d4a23f"/></linearGradient>
+  </defs>
+  <symbol id="i-herz" viewBox="0 0 32 29"><path d="M16 28C10 23.6 2 17.6 2 10.2 2 5.7 5.4 2.4 9.5 2.4c2.7 0 5 1.4 6.5 3.7 1.5-2.3 3.8-3.7 6.5-3.7 4.1 0 7.5 3.3 7.5 7.8C30 17.6 22 23.6 16 28z" fill="url(#ui-herz-verlauf)"/><path d="M8.4 6.2c-2.3.4-3.8 2.5-3.5 4.9" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" opacity=".6"/></symbol>
+  <symbol id="i-brief" viewBox="0 0 32 32"><rect x="3" y="7" width="26" height="19" rx="3" fill="#fff4f6" stroke="currentColor" stroke-width="2"/><path d="M4.5 9.5 16 18l11.5-8.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16 25c-1.9-1.4-3.8-2.8-3.8-4.5 0-1.1.9-2 2-2 .8 0 1.4.4 1.8 1 .4-.6 1-1 1.8-1 1.1 0 2 .9 2 2 0 1.7-1.9 3.1-3.8 4.5z" fill="url(#ui-herz-verlauf)"/></symbol>
+  <symbol id="i-geschenk" viewBox="0 0 32 32"><rect x="5" y="14" width="22" height="14" rx="2" fill="#fde3ea" stroke="currentColor" stroke-width="2"/><rect x="3" y="9.5" width="26" height="5" rx="1.5" fill="#fff4f6" stroke="currentColor" stroke-width="2"/><rect x="14" y="9.5" width="4" height="18.5" fill="#e0b04e"/><path d="M16 9.5c-2-4-7-5.5-7.6-2.6S12.4 9.5 16 9.5zm0 0c2-4 7-5.5 7.6-2.6S19.6 9.5 16 9.5z" fill="#f3c84b" stroke="#b8862f" stroke-width="1.2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-mikro" viewBox="0 0 32 32"><rect x="11" y="3" width="10" height="17" rx="5" fill="#fde3ea" stroke="currentColor" stroke-width="2"/><path d="M7 15a9 9 0 0 0 18 0M16 24v5M11 29h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-buch" viewBox="0 0 32 32"><path d="M16 8.5C12.5 6 8 5.5 3 6.5v19c5-1 9.5-.5 13 2 3.5-2.5 8-3 13-2v-19c-5-1-9.5-.5-13 2z" fill="#fff4f6" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M16 8.5v19" stroke="currentColor" stroke-width="2"/></symbol>
+  <symbol id="i-spiel" viewBox="0 0 32 32"><path d="M9 10h14a6 6 0 0 1 5.8 4.5l1.6 6.6A3.6 3.6 0 0 1 24.3 24l-3.1-3H10.8l-3.1 3a3.6 3.6 0 0 1-6.1-2.9l1.6-6.6A6 6 0 0 1 9 10z" fill="#fde3ea" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 14v5M7.5 16.5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="21.5" cy="15" r="1.6" fill="currentColor"/><circle cx="24.5" cy="18" r="1.6" fill="currentColor"/></symbol>
+  <symbol id="i-ticket" viewBox="0 0 32 32"><path d="M4 9h24v4a3 3 0 0 0 0 6v4H4v-4a3 3 0 0 0 0-6z" fill="#fff4f6" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10.5v11" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/><path d="M20 19.5c-1.6-1.1-3.2-2.3-3.2-3.7 0-.9.7-1.6 1.6-1.6.7 0 1.2.4 1.6.9.4-.5.9-.9 1.6-.9.9 0 1.6.7 1.6 1.6 0 1.4-1.6 2.6-3.2 3.7z" fill="url(#ui-herz-verlauf)"/></symbol>
+  <symbol id="i-post" viewBox="0 0 32 32"><rect x="3" y="7" width="26" height="18" rx="2" fill="#fff4f6" stroke="currentColor" stroke-width="2"/><rect x="20" y="10" width="6" height="7" rx="1" fill="#fde3ea" stroke="currentColor" stroke-width="1.5"/><path d="M7 13h9M7 17h9M7 21h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-schloss" viewBox="0 0 24 24"><path d="M7.5 10.5V8a4.5 4.5 0 0 1 9 0v2.5" fill="none" stroke="#a97b2c" stroke-width="2.4"/><rect x="4.5" y="10" width="15" height="11" rx="3" fill="url(#ui-gold)" stroke="#a97b2c" stroke-width="1.4"/><circle cx="12" cy="15.2" r="1.7" fill="#7a4f12"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13a1 1 0 0 0 1.5.9l10.4-6.5a1 1 0 0 0 0-1.8L9.5 4.6A1 1 0 0 0 8 5.5z" fill="currentColor"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="6.5" y="5" width="4" height="14" rx="1.3" fill="currentColor"/><rect x="13.5" y="5" width="4" height="14" rx="1.3" fill="currentColor"/></symbol>
+</svg>
   <header class="kopf">
     <div class="briefkopf">
       <p id="datum" class="datum"></p>
@@ -62,11 +79,11 @@
       <p id="status" class="status" aria-live="polite"></p>
       <div id="zusammen" class="zusammen"></div>
       <p class="kopf-knoepfe">
-        <button id="sammlung-knopf" class="sammlung-knopf" type="button" hidden>🎟️ Meine Gutscheine</button>
-        <button id="finale-knopf" class="sammlung-knopf" type="button" hidden>♥️ Unser Herz</button>
-        <button id="rueckblick-knopf" class="sammlung-knopf" type="button" hidden>📖 Unser Dezember</button>
-        <button id="postkarte-knopf" class="sammlung-knopf" type="button" hidden>📮 Heutige Postkarte</button>
-        <button id="spiel-knopf" class="sammlung-knopf" type="button" hidden>🎮 Capy-Spiel</button>
+        <button id="sammlung-knopf" class="sammlung-knopf" type="button" hidden><svg class="ui-icon" aria-hidden="true"><use href="#i-ticket"/></svg> Meine Gutscheine</button>
+        <button id="finale-knopf" class="sammlung-knopf" type="button" hidden><svg class="ui-icon" aria-hidden="true"><use href="#i-herz"/></svg> Unser Herz</button>
+        <button id="rueckblick-knopf" class="sammlung-knopf" type="button" hidden><svg class="ui-icon" aria-hidden="true"><use href="#i-buch"/></svg> Unser Dezember</button>
+        <button id="postkarte-knopf" class="sammlung-knopf" type="button" hidden><svg class="ui-icon" aria-hidden="true"><use href="#i-post"/></svg> Heutige Postkarte</button>
+        <button id="spiel-knopf" class="sammlung-knopf" type="button" hidden><svg class="ui-icon" aria-hidden="true"><use href="#i-spiel"/></svg> Capy-Spiel</button>
       </p>
     </section>
   </header>
@@ -117,7 +134,7 @@
         <path d="M0 100 Q60 90 120 98 T220 96 V110 H0z" fill="#fff"/>
       </svg>
     </div>
-    <p class="fuss-text">Mit ganz viel Liebe gemacht ♥️</p>
+    <p class="fuss-text">Mit ganz viel Liebe gemacht <svg class="ui-icon" aria-hidden="true"><use href="#i-herz"/></svg></p>
   </footer>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
@@ -134,12 +151,12 @@
       <p id="dialog-unterschrift" class="unterschrift"></p>
       <div class="extras">
         <div id="dialog-brief" class="extra extra-brief" hidden>
-          <span class="extra-icon" aria-hidden="true">✉️</span>
+          <span class="extra-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#i-brief"/></svg></span>
           <span class="extra-label">Zahl für deinen Weihnachtsbrief</span>
           <span id="dialog-brief-zahl" class="extra-zahl"></span>
         </div>
         <div id="dialog-paeckchen" class="extra extra-paeckchen" hidden>
-          <span class="extra-icon" aria-hidden="true">🎁</span>
+          <span class="extra-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#i-geschenk"/></svg></span>
           <span class="extra-label">Heute darfst du zusätzlich dieses Päckchen öffnen</span>
           <span id="dialog-paeckchen-zahl" class="extra-zahl"></span>
         </div>
@@ -147,11 +164,16 @@
       <canvas id="rubbel" class="rubbel" hidden aria-label="Rubbelfeld: mit dem Finger freirubbeln"></canvas>
       </div>
       <div id="dialog-audio" class="sprachnachricht" hidden>
-        <p class="sprachnachricht-titel">🎙️ Eine Sprachnachricht von mir</p>
-        <audio id="dialog-audio-player" controls preload="metadata"></audio>
+        <p class="sprachnachricht-titel"><svg class="ui-icon" aria-hidden="true"><use href="#i-mikro"/></svg> Eine Sprachnachricht von mir</p>
+        <audio id="dialog-audio-player" preload="metadata"></audio>
+        <div class="player">
+          <button type="button" class="player-knopf" aria-label="Sprachnachricht abspielen"><svg class="ui-icon player-play" aria-hidden="true"><use href="#i-play"/></svg><svg class="ui-icon player-pause" aria-hidden="true"><use href="#i-pause"/></svg></button>
+          <div class="player-leiste" role="slider" tabindex="0" aria-label="Position in der Sprachnachricht" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span class="player-fortschritt"></span><span class="player-punkt"><svg class="ui-icon" aria-hidden="true"><use href="#i-herz"/></svg></span></div>
+          <span class="player-zeit">0:00</span>
+        </div>
       </div>
       <div id="dialog-hinweis" class="hinweis" hidden>
-        <span class="hinweis-icon" aria-hidden="true">🎁</span>
+        <span class="hinweis-icon" aria-hidden="true"><svg class="ui-icon" aria-hidden="true"><use href="#i-geschenk"/></svg></span>
         <span id="dialog-hinweis-text"></span>
       </div>
     </div>
@@ -257,7 +279,7 @@
     <div id="finale-herz" class="finale-herz"></div>
     <div class="finale-text">
       <p class="finale-titel">Frohe Weihnachten, Baby</p>
-      <p class="finale-unter">24 Türchen voller Liebe ♥️</p>
+      <p class="finale-unter">24 Türchen voller Liebe <svg class="ui-icon" aria-hidden="true"><use href="#i-herz"/></svg></p>
     </div>
     <button type="button" class="schliessen finale-zu" aria-label="Schließen">×</button>
   </div>
@@ -402,5 +424,6 @@
   <script src="spiel.js"></script>
   <script src="interaktiv.js"></script>
   <script src="neujahr.js"></script>
+  <script src="feinschliff.js"></script>
 </body>
 </html>

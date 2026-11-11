@@ -2650,3 +2650,110 @@ html[data-abend] .rauch-herz path { stroke: rgba(230, 220, 230, 0.8); }
 .neujahr-titel { margin: 8px 0 6px; font-family: "Dancing Script", cursive; font-size: clamp(28px, 8vw, 44px); }
 .neujahr-text { margin: 0; font-size: 16px; opacity: 0.9; }
 @keyframes neujahr-gruss { from { opacity: 0; transform: translate(-50%, -40%); } }
+
+/* =========================================================
+   Feinschliff (feinschliff.js)
+   ========================================================= */
+.ui-sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+.ui-icon { display: inline-block; width: 1.15em; height: 1.15em; vertical-align: -0.22em; color: var(--beere); flex: none; }
+
+/* 1. Gesperrte Päckchen: kein Frost mehr, kleines Goldschloss am Anhänger */
+.frost { display: none; }
+.tuer.gesperrt .tuer-blatt { filter: none; }
+.schloss {
+  position: absolute; left: auto; bottom: auto; top: -7px; right: -8px;
+  width: 18px; height: 18px; display: grid; place-items: center;
+  border-radius: 50%; background: #fffdf8; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  opacity: 1; font-size: 0;
+}
+.schloss .ui-icon { width: 13px; height: 13px; vertical-align: 0; }
+.schloss[hidden] { display: none; }
+.tuer.gross .schloss { width: 24px; height: 24px; top: -9px; right: -10px; }
+.tuer.gross .schloss .ui-icon { width: 17px; height: 17px; }
+
+/* 2. Bretter als eigene Elemente, enden sauber an hohen Päckchen */
+.kalender.mit-brettern { background: repeating-linear-gradient(90deg, rgba(169, 111, 71, 0.06) 0 2px, transparent 2px 46px), linear-gradient(180deg, #fff6ee, #fbe8dc); }
+html[data-abend] .kalender.mit-brettern { background: linear-gradient(180deg, rgba(60, 30, 50, 0.6), rgba(40, 18, 36, 0.7)); }
+.bretter { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.kalender > .tuer { position: relative; z-index: 1; }
+.brett {
+  position: absolute; border-radius: 2px;
+  background: linear-gradient(180deg, var(--brett-schnee, #ffffff) 0 3px, #c48c60 3px calc(100% - 3px), #8a5a3a calc(100% - 3px));
+  box-shadow: 0 4px 6px -2px rgba(107, 21, 50, 0.18);
+}
+.brett.kante-links { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+html[data-abend] .brett { background: linear-gradient(180deg, var(--brett-schnee, #efe8f4) 0 3px, #8a5a3a 3px calc(100% - 3px), #5e3c28 calc(100% - 3px)); box-shadow: 0 4px 6px -2px rgba(0, 0, 0, 0.35); }
+.kalender.ohne-deko .brett { --brett-schnee: #c48c60; }
+html[data-abend] .kalender.ohne-deko .brett { --brett-schnee: #8a5a3a; }
+
+/* 3. Eigener Player für die Sprachnachricht */
+.sprachnachricht audio { display: none; }
+.sprachnachricht-titel { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.player { display: flex; align-items: center; gap: 12px; }
+.player-knopf {
+  flex: none; width: 46px; height: 46px; border: 0; border-radius: 50%; cursor: pointer;
+  display: grid; place-items: center; color: #fff;
+  background: linear-gradient(145deg, #f7809b, var(--beere));
+  box-shadow: 0 6px 14px rgba(157, 36, 73, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.player-knopf:active { transform: scale(0.94); }
+.player-knopf:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+.player-knopf .ui-icon { color: #fff; width: 22px; height: 22px; vertical-align: 0; }
+.player-knopf .player-play { margin-left: 3px; }
+.player .player-pause, .player.spielt .player-play { display: none; }
+.player.spielt .player-pause { display: inline-block; }
+.player-leiste { position: relative; flex: 1; height: 26px; cursor: pointer; touch-action: none; }
+.player-leiste::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 6px; margin-top: -3px; border-radius: 6px; background: rgba(232, 93, 126, 0.18); }
+.player-fortschritt { position: absolute; left: 0; top: 50%; height: 6px; margin-top: -3px; width: 0; border-radius: 6px; background: linear-gradient(90deg, #f7809b, var(--beere)); }
+.player-punkt { position: absolute; top: 50%; left: 0; width: 20px; height: 18px; transform: translate(-50%, -50%); filter: drop-shadow(0 2px 3px rgba(157, 36, 73, 0.35)); }
+.player-punkt .ui-icon { width: 20px; height: 18px; vertical-align: 0; }
+.player.spielt .player-punkt { animation: player-pochen 1.2s ease-in-out infinite; }
+@keyframes player-pochen { 50% { transform: translate(-50%, -50%) scale(1.15); } }
+.player-leiste:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; border-radius: 8px; }
+.player-zeit { flex: none; min-width: 74px; text-align: right; font-size: 0.85rem; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--beere); }
+
+/* 4. Fußzeile: nicht mehr halb durchsichtig, Boden passt zur Landschaft */
+.fuss { opacity: 1; }
+.fuss-text { opacity: 0.9; }
+.capy-familie svg > path[d^="M0 100"] { fill: var(--schnee-boden, #ffffff); }
+html[data-abend] .fuss { color: #7a1f45; }
+html[data-tageszeit="nacht"] .fuss { color: #4a2a5e; }
+
+/* 5. Fotostreifen: weiche Ränder, wo es weitergeht */
+.fotostreifen { --rand-l: 0px; --rand-r: 0px; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--rand-l), #000 calc(100% - var(--rand-r)), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 var(--rand-l), #000 calc(100% - var(--rand-r)), transparent 100%); }
+.fotostreifen.rand-links { --rand-l: 40px; }
+.fotostreifen.rand-rechts { --rand-r: 56px; }
+
+/* 6. „Dein Tag“: jeder Satz in eigener, ausgewogener Zeile */
+.status .status-zeile { display: block; text-wrap: balance; }
+
+/* 7. Eigene Symbole */
+.titel-herz-svg { display: block; width: 0.92em; height: 0.84em; filter: drop-shadow(0 4px 8px rgba(214, 36, 79, 0.3)); }
+.titel-herz { display: inline-flex; align-items: center; vertical-align: -0.04em; margin-left: 0.12em; }
+.mini-herz svg { display: block; width: 1em; height: 0.9em; }
+.extra-icon .ui-icon, .hinweis-icon .ui-icon { width: 1.25em; height: 1.25em; vertical-align: middle; }
+.sammlung-knopf { display: inline-flex; align-items: center; gap: 7px; }
+.sammlung-knopf .ui-icon { width: 1.2em; height: 1.2em; vertical-align: 0; color: var(--beere-dunkel); }
+.brief-herz .ui-icon { width: 1.3em; height: 1.2em; }
+.fuss-text .ui-icon, .finale-unter .ui-icon, .zaehler-text .ui-icon { width: 1em; height: 0.92em; vertical-align: -0.12em; }
+
+/* 8. Laptop: Kopfbereich wächst mit */
+@media (min-width: 900px) {
+  .kopf h1 { font-size: 5rem; }
+  .untertitel { font-size: 1.15rem; }
+  .titelfotos { --w: 200px; margin-top: 30px; }
+  .titelfotos .polaroid { margin: 0 -6px; }
+  .heute-karte { max-width: 620px; padding: 22px 30px 18px; gap: 14px; }
+  .heute-karte .status { font-size: 1.2rem; }
+  .zaehler-zahl { font-size: 2.6rem; }
+  .zaehler-text { font-size: 0.85rem; }
+  .adventskranz svg { width: 300px; }
+}
+@media (min-width: 1300px) {
+  .titelfotos { --w: 220px; }
+}
+.herz-zeichen .ui-icon { width: 0.95em; height: 0.88em; vertical-align: -0.1em; }
+.brett.kante-rechts { border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.brett.kante-links { border-top-left-radius: 4px; border-bottom-left-radius: 4px; }

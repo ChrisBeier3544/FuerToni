@@ -255,7 +255,7 @@
       herz.type = "button";
       herz.className = "titel-herz";
       herz.setAttribute("aria-label", "Herz antippen");
-      herz.textContent = titelText.slice(herzStelle).trim();
+      herz.innerHTML = '<svg class="titel-herz-svg" viewBox="0 0 32 29" aria-hidden="true"><use href="#i-herz"/></svg>';
       el.titel.appendChild(herz);
     } else {
       el.titel.textContent = titelText;
@@ -276,7 +276,6 @@
       const blatt = document.createElement("span");
       blatt.className = "tuer-blatt";
       blatt.innerHTML =
-        '<span class="frost"></span>' +
         '<span class="band-v"></span><span class="band-h"></span>' +
         '<span class="schleife">' + SCHLEIFE + "</span>";
       const anhaenger = document.createElement("span");
@@ -287,8 +286,10 @@
       anhaenger.appendChild(nummer);
       const schloss = document.createElement("span");
       schloss.className = "schloss";
-      schloss.textContent = "🔒";
-      blatt.append(anhaenger, schloss);
+      schloss.setAttribute("aria-hidden", "true");
+      schloss.innerHTML = '<svg class="ui-icon"><use href="#i-schloss"/></svg>';
+      anhaenger.appendChild(schloss);
+      blatt.append(anhaenger);
 
       const rueck = document.createElement("span");
       rueck.className = "tuer-rueck";
@@ -892,7 +893,8 @@
       z.textContent = zahl.toLocaleString("de-DE");
       const t = document.createElement("span");
       t.className = "zaehler-text";
-      t.textContent = text;
+      t.textContent = text.replace(/\s*♥️$/, "");
+      if (/♥️$/.test(text)) t.insertAdjacentHTML("beforeend", ' <svg class="ui-icon" aria-hidden="true"><use href="#i-herz"/></svg>');
       k.append(z, t);
       box.appendChild(k);
     };

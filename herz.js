@@ -19,7 +19,7 @@
     laeuft = true;
     const r = herz.getBoundingClientRect();
     const mitte = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
-    const zeichen = herz.textContent;
+    const zeichen = herz.innerHTML;
     const ebene = document.createElement("div");
     ebene.className = "herz-ebene";
     document.body.appendChild(ebene);
@@ -30,7 +30,7 @@
     for (let i = 0; i < ANZAHL; i++) {
       const s = document.createElement("span");
       s.className = "mini-herz";
-      s.textContent = zeichen;
+      s.innerHTML = zeichen;
       const groesse = 14 + Math.random() * 16;
       s.style.fontSize = groesse + "px";
       ebene.appendChild(s);
