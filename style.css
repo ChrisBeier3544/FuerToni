@@ -2968,3 +2968,6 @@ html.ruhe .capy-familie *, html.ruhe .kalender *, html.ruhe .vogel-ebene *, html
 .anleitung-punkte { display: flex; justify-content: center; gap: 6px; margin: 0; }
 .anleitung-punkte span { width: 7px; height: 7px; border-radius: 50%; background: var(--rose-300); transition: transform 0.2s, background 0.2s; }
 .anleitung-punkte span.an { background: var(--beere); transform: scale(1.35); }
+/* Fenster: Scrollen bleibt im Fenster und geht nicht an die Seite dahinter */
+dialog { overscroll-behavior: contain; }
+.anleitung-papier, .dialog-inhalt, .entdeckt-liste { overscroll-behavior: contain; }

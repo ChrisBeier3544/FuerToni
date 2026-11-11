@@ -14,7 +14,7 @@
   const html = document.documentElement;
   const LISTE = [
     ["herz", "♥️", "Herz voller Herzen"],
-    ["vogel", "🐦", "Plaudernder Vogel"],
+    ["vogel", "🐦", "Der Munkelvogel"],
     ["capy", "🐹", "Capy Spaziergang"],
     ["haus", "🏠", "Capys zu Hause"],
     ["baum", "🌲", "Schnee vom Baum"],
@@ -59,7 +59,7 @@
     '<p class="dialog-tag">Dein Entdeckerbuch</p><h2 id="entdeckt-titel">Deine Entdeckungen</h2>' +
     '<div class="entdeckt-balken" aria-hidden="true"><span></span></div><p class="entdeckt-stand"></p>' +
     '<ul class="entdeckt-liste"></ul>' +
-    '<p class="entdeckt-tipp">Auf dieser Seite reagiert ganz viel, wenn du es antippst. Und das Rotkehlchen verrät dir ab und zu ein Geheimnis 🐦</p></div>';
+    '<p class="entdeckt-tipp">Auf dieser Seite reagiert ganz viel, wenn du es antippst. Und pass gut auf, was der Munkelvogel zu sagen hat. Er weiß mehr, als er zugibt 🐦</p></div>';
   document.body.appendChild(dlg);
   dlg.querySelector(".schliessen").addEventListener("click", () => dlg.close());
   dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
@@ -132,10 +132,31 @@
   }, true);
 
   /* ---------- Ruhe im Hintergrund, solange ein Fenster offen ist ---------- */
+  // Solange ein Fenster offen ist, lässt sich die Seite dahinter nicht scrollen.
+  // Der Körper wird festgehalten und danach an dieselbe Stelle zurückgesetzt.
+  let gemerkt = 0;
+  function sperre(an) {
+    const b = document.body;
+    if (an) {
+      gemerkt = window.scrollY;
+      b.style.position = "fixed";
+      b.style.top = -gemerkt + "px";
+      b.style.left = "0";
+      b.style.right = "0";
+      b.style.width = "100%";
+    } else {
+      b.style.position = b.style.top = b.style.left = b.style.right = b.style.width = "";
+      const vorher = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+      window.scrollTo(0, gemerkt);
+      html.style.scrollBehavior = vorher;
+    }
+  }
   function ruhe() {
     const an = !!document.querySelector("dialog[open]");
     if (an === html.classList.contains("ruhe")) return;
     html.classList.toggle("ruhe", an);
+    sperre(an);
     document.querySelectorAll(".goldflocke").forEach((f) => f.getAnimations().forEach((a) => (an ? a.pause() : a.play())));
   }
   new MutationObserver(ruhe).observe(document.body, { subtree: true, attributes: true, attributeFilter: ["open"], childList: true });

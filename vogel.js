@@ -103,7 +103,7 @@
     const el = document.createElement("button");
     el.type = "button";
     el.className = "vogel" + (weiblich ? " weibchen" : "");
-    el.setAttribute("aria-label", weiblich ? "Rotkehlchen-Weibchen antippen" : "Rotkehlchen antippen");
+    el.setAttribute("aria-label", weiblich ? "Munkelvogel Weibchen antippen" : "Munkelvogel antippen");
     el.innerHTML = '<span class="vogel-blase" hidden></span>' + vogelSvg(weiblich);
     el.hidden = true;
     ebene.appendChild(el);
