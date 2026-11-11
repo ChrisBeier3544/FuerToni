@@ -2534,8 +2534,9 @@ html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
 @keyframes atmen { 50% { transform: scale(1.03, 0.97); } }
 .vogel.redet .vogel-koerper { animation: zwitschern 0.4s ease-in-out infinite alternate; }
 @keyframes zwitschern { from { transform: rotate(-4deg); } to { transform: rotate(5deg) translateY(-1px); } }
-.vogel.hopst { animation: hopsen 0.45s ease-out; }
-@keyframes hopsen { 30% { transform: translateY(-10px); } 60% { transform: translateY(0) scale(1.05, 0.95); } }
+/* Hüpfen nur an der Grafik, nie an der Position des Vogels */
+.vogel.hopst svg { animation: hopsen 0.45s ease-out; }
+@keyframes hopsen { 30% { translate: 0 -10px; } 60% { translate: 0 0; scale: 1.05 0.95; } }
 .vogel .vogel-blase {
   position: absolute;
   bottom: calc(100% + 6px);
@@ -2555,7 +2556,7 @@ html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
 }
 .vogel .vogel-blase[hidden] { display: none; }
 .vogel .vogel-blase::after { content: ""; position: absolute; top: 100%; right: 14px; border: 7px solid transparent; border-top-color: #fff; border-right-color: #fff; }
-@media (prefers-reduced-motion: reduce) { .vogel .augenlid, .vogel .vogel-koerper, .vogel.hopst { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .vogel .augenlid, .vogel .vogel-koerper, .vogel.hopst svg { animation: none; } }
 
 .vogel[hidden] { display: none; }
 .vogel svg { transition: transform 0.15s ease; }
