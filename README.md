@@ -56,6 +56,13 @@ Vom 15. bis 25. November läuft auf dem Countdown-Bildschirm jeden Tag eine ande
 Feuerwerk, Schneeballschlacht, Polonaise, Plätzchenbacken und am Vorabend der Geburtstagskuchen.
 Sie startet beim Öffnen automatisch und lässt sich über „🐹 Capy-Special nochmal ansehen“ wiederholen.
 
+## Himmel
+
+`himmel.js`: Morgens geht die Sonne zwischen 6 und 9 Uhr auf. Tagsüber zieht sie über den Himmel,
+je nach Tag sonnig, leicht bewölkt oder diesig (am Geburtstag und an Heiligabend immer sonnig).
+Abends und nachts zeigt der Mond die echte Mondphase des Tages, nachts fliegen gelegentlich
+Sternschnuppen. Gilt für den Countdown-Bildschirm und den Kalender.
+
 ## Vorfreude vom 26. bis 30. November
 
 - **26.11. Geburtstagsmodus:** Ballons am Rand, alle Fenster-Capys mit Partyhut,

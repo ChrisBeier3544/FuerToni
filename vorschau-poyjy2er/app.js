@@ -323,13 +323,16 @@
     }
 
     if (d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag > 24)) {
-      el.status.textContent = "Frohe Weihnachten, Maus 🎄♥️";
+      // 25. und 26.12. Weihnachten, danach ein Dankeschön
+      const feiertag = d.jahr === KALENDER.jahr && d.monat === 12 && d.tag <= 26;
+      el.status.textContent = feiertag ? "Frohe Weihnachten, Maus 🎄♥️" : "Danke für den schönsten Dezember, Maus ♥️";
       return;
     }
     if (d.jahr === KALENDER.jahr && d.monat === 12) {
       if (nachtFenster && d.tag < 24 && geoeffnet.has(d.tag)) el.status.textContent = "Um 4 Uhr wartet Türchen " + (d.tag + 1) + " auf dich ♥️";
+      else if (geoeffnet.has(d.tag) && inhalt(d.tag).statusOffen) el.status.textContent = inhalt(d.tag).statusOffen;
       else if (inhalt(d.tag).status) el.status.textContent = inhalt(d.tag).status;
-      else if (d.tag === 24) el.status.textContent = "Heute ist Heiligabend. Das letzte Türchen wartet auf dich ✨";
+      else if (d.tag === 24) el.status.textContent = geoeffnet.has(24) ? "Frohe Weihnachten, mein Schatz 🎄 Ich denk an dich ♥️" : "Heute ist Heiligabend. Das letzte Türchen wartet auf dich ✨";
       else if (!geoeffnet.has(d.tag)) el.status.textContent = "Heute darfst du Türchen " + d.tag + " öffnen ✨";
       else el.status.textContent = (nachtFenster ? "Um 4 Uhr wartet Türchen " : "Morgen wartet Türchen ") + (d.tag + 1) + " auf dich ♥️";
       return;
@@ -838,7 +841,7 @@
       const rest = 24 - d.tag;
       text = rest > 1 ? "Noch " + rest + " Überraschungen bis Weihnachten"
         : rest === 1 ? "Noch 1 Überraschung bis Weihnachten"
-        : "Die letzte Überraschung wartet auf dich 🎄";
+        : (geoeffnet.has(24) ? "Frohe Weihnachten 🎄" : "Die letzte Überraschung wartet auf dich 🎄");
     }
     el.untertitel.textContent = text;
   }
@@ -920,6 +923,8 @@
     const gruss = document.getElementById("gruss");
     // Kosenamen wechseln je nach Tag und Tageszeit
     const name = KOSENAMEN[(d.tag * 3 + index) % KOSENAMEN.length];
+    const introGruss = document.getElementById("intro-gruss");
+    if (introGruss) introGruss.textContent = zeitBereit && !istGeburtstag() ? zeit.gruss.replace("{name}", name) : "";
     if (gruss) gruss.textContent = zeitBereit ? (istGeburtstag() ? "Happy Birthday, " + name + " 🎂" : zeit.gruss.replace("{name}", name)) : "";
     document.documentElement.toggleAttribute("data-geburtstag", zeitBereit && istGeburtstag());
   }
@@ -1675,9 +1680,10 @@
    * Finale: Wenn alle 24 Türchen offen sind, werden die Fotos zum Herz
    * ------------------------------------------------------------ */
   const FINALE_SCHLUESSEL = "toni-advent-finale-" + KALENDER.jahr;
+  // Das Finale kommt an Heiligabend nach Türchen 24, auch wenn auf diesem
+  // Gerät nicht alle anderen Türchen geöffnet wurden
   function alleOffen() {
-    for (let n = 1; n <= 24; n++) if (!geoeffnet.has(n)) return false;
-    return istVerfuegbar(24, kalenderDatum());
+    return geoeffnet.has(24) && istVerfuegbar(24, kalenderDatum());
   }
   function finaleGesehen() {
     try { return localStorage.getItem(FINALE_SCHLUESSEL) === "1"; } catch (_) { return false; }

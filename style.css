@@ -2382,3 +2382,119 @@ html[data-staubig] .spinnwebe { display: block; }
 .sp-badegast svg { overflow: visible; }
 
 .sp-onsen .sp-badegast { bottom: 30%; }
+
+
+/* ---------- Umschlag-Bildschirm folgt der Tageszeit ---------- */
+.intro-gruss { margin: 0; font-weight: 700; color: var(--rose-500); min-height: 1.2em; }
+.intro { --stern: rgba(255, 255, 255, 0); }
+.intro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2s ease;
+  background:
+    radial-gradient(circle, #fff 0 1px, transparent 1.6px) 0 0 / 53px 47px,
+    radial-gradient(circle, rgba(255, 255, 255, 0.8) 0 1.2px, transparent 1.8px) 21px 13px / 71px 61px,
+    radial-gradient(circle, rgba(255, 255, 255, 0.6) 0 0.8px, transparent 1.3px) 37px 29px / 39px 43px;
+  animation: funkeln 4s ease-in-out infinite;
+}
+.intro::after {
+  content: "";
+  position: absolute;
+  top: calc(7% + env(safe-area-inset-top, 0px));
+  right: 12%;
+  z-index: -1;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+html[data-tageszeit="morgen"] .intro {
+  background: radial-gradient(circle at 15% 22%, rgba(255, 190, 140, 0.7), transparent 45%), linear-gradient(180deg, #ffd8c4, #ffe6e2 45%, #ffd6df);
+}
+html[data-tageszeit="morgen"] .intro-gruss, html[data-tageszeit="morgen"] .intro-hinweis { color: #d9653f; }
+html[data-tageszeit="vormittag"] .intro {
+  background: radial-gradient(circle at 85% 8%, rgba(255, 255, 255, 0.95), transparent 40%), linear-gradient(180deg, #e4efff, #fff3f6 50%, #ffe1e8);
+}
+html[data-tageszeit="vormittag"] .intro-gruss { color: #5b7fb8; }
+html[data-tageszeit="nachmittag"] .intro {
+  background: radial-gradient(circle at 90% 25%, rgba(255, 190, 110, 0.55), transparent 45%), linear-gradient(175deg, #ffe7cf, #ffd4cf 50%, #f7b6c6);
+}
+html[data-tageszeit="nachmittag"] .intro-gruss, html[data-tageszeit="nachmittag"] .intro-hinweis { color: #c4572f; }
+html[data-tageszeit="abend"] .intro {
+  background: radial-gradient(circle at 20% 10%, rgba(255, 214, 140, 0.14), transparent 40%), linear-gradient(170deg, #2b1030, #1c0b24 55%, #12081a);
+}
+html[data-tageszeit="nacht"] .intro {
+  background: radial-gradient(circle at 82% 8%, rgba(200, 210, 255, 0.14), transparent 32%), linear-gradient(180deg, #0c1030, #160f2e 55%, #1c0b24);
+}
+html[data-tageszeit="abend"] .intro::before { opacity: 0.45; }
+html[data-tageszeit="nacht"] .intro::before { opacity: 1; }
+html[data-tageszeit="nacht"] .intro::after { opacity: 1; box-shadow: 12px -5px 0 0 #fdf1cc; filter: drop-shadow(0 0 14px rgba(253, 241, 204, 0.55)); }
+html[data-tageszeit="abend"] .intro-gruss, html[data-tageszeit="abend"] .intro-hinweis,
+html[data-tageszeit="abend"] .countdown-titel, html[data-tageszeit="abend"] .countdown-gruss { color: #ffd0dc; }
+html[data-tageszeit="nacht"] .intro-gruss, html[data-tageszeit="nacht"] .intro-hinweis,
+html[data-tageszeit="nacht"] .countdown-titel, html[data-tageszeit="nacht"] .countdown-gruss { color: #e6dcff; }
+html[data-abend] .intro .umschlag-rueck { box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 60px rgba(255, 179, 198, 0.18); }
+html[data-abend] .intro .cd-feld { background: rgba(255, 255, 255, 0.92); }
+html[data-abend] .special-titel { background: rgba(255, 255, 255, 0.95); }
+@media (prefers-reduced-motion: reduce) { .intro::before { animation: none; } }
+
+
+/* =========================================================
+   Himmel: Sonnenaufgang, Mittagssonne, Wetter, Mond, Sternschnuppen
+   ========================================================= */
+html.himmel-neu .sonne, html.himmel-neu .mond, html.himmel-neu .intro::after { display: none; }
+.himmel2 { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.intro > .himmel2 { position: fixed; z-index: -1; }
+.h2-glut {
+  position: absolute; inset: 0; opacity: 0; transition: opacity 3s ease;
+  background: radial-gradient(ellipse 80% 45% at 18% 100%, rgba(255, 140, 90, 0.55), rgba(255, 190, 140, 0.25) 45%, transparent 75%);
+}
+.h2-sonne {
+  --sonnenfarbe: hsl(48 100% 72%);
+  position: absolute; width: clamp(70px, 18vw, 120px); aspect-ratio: 1; border-radius: 50%;
+  transform: translate(-50%, -50%); opacity: 0;
+  background: radial-gradient(circle, #fffdf0 0 30%, var(--sonnenfarbe) 58%, transparent 72%);
+  box-shadow: 0 0 60px 30px color-mix(in srgb, var(--sonnenfarbe) 45%, transparent);
+  transition: left 4s ease, top 4s ease, opacity 3s ease, background 3s ease;
+}
+.h2-strahlen {
+  position: absolute; inset: -60%; border-radius: 50%; opacity: 0.35;
+  background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--sonnenfarbe) 60%, transparent) 0 6deg, transparent 6deg 22deg);
+  mask: radial-gradient(circle, transparent 28%, #000 32%, transparent 70%);
+  -webkit-mask: radial-gradient(circle, transparent 28%, #000 32%, transparent 70%);
+  animation: strahlen 60s linear infinite;
+}
+@keyframes strahlen { to { transform: rotate(360deg); } }
+.himmel2[data-zeit="morgen"] .h2-strahlen { opacity: 0.2; }
+html[data-wetter="diesig"] .h2-strahlen { opacity: 0.12; }
+.h2-wolken { position: absolute; inset: 0; }
+.h2-wolke { position: absolute; left: -200px; filter: drop-shadow(0 6px 8px rgba(157, 36, 73, 0.08)); animation: wolke-ziehen linear infinite; }
+.h2-wolke svg { display: block; width: 100%; height: auto; }
+@keyframes wolke-ziehen { from { transform: translateX(0); } to { transform: translateX(calc(100vw + 400px)); } }
+html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
+.h2-dunst { position: absolute; inset: 0; opacity: 0; transition: opacity 3s ease; background: linear-gradient(180deg, rgba(230, 220, 228, 0.9), rgba(240, 232, 238, 0.3) 60%, transparent); }
+.h2-mond {
+  position: absolute; width: clamp(46px, 12vw, 70px); height: auto; opacity: 0;
+  filter: drop-shadow(0 0 14px rgba(253, 241, 204, 0.6));
+  transition: opacity 3s ease, top 3s ease, right 3s ease;
+  overflow: visible;
+}
+.h2-krater { transition: opacity 1s ease; }
+.h2-schnuppe {
+  position: absolute; width: 120px; height: 2px; border-radius: 2px; transform-origin: 0 50%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.9) 85%, #fff);
+  box-shadow: 0 0 6px 1px rgba(255, 255, 255, 0.6);
+}
+.h2-schnuppe::after { content: ""; position: absolute; right: -2px; top: -2px; width: 6px; height: 6px; border-radius: 50%; background: #fff; box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.8); }
+@media (prefers-reduced-motion: reduce) { .h2-strahlen, .h2-wolke { animation: none; } .h2-wolke { left: 10%; } }
+
+/* Mond am Handy: klein und zwischen Zweig und Datum, nicht neben dem Titel */
+@media (max-width: 600px) {
+  .himmel > .himmel2 .h2-mond { width: 34px; top: 10px !important; right: auto !important; left: calc(50% + 44px); }
+}
