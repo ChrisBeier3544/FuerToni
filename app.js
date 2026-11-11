@@ -1726,16 +1726,42 @@
     const textH = 112;
     const g = Math.max(36, Math.min(84, Math.min(W, H) / 8));
     const einheit = Math.max(4, Math.min((W - g - 24) / 33, (H - textH - g - 56) / 29));
-    const herzH = 29 * einheit + g;
+    // im Hochformat darf das Herz etwas höher werden, dann haben die Fotos mehr Platz
+    const einheitY = Math.max(einheit, Math.min(einheit * 1.3, (H - textH - g - 56) / 29));
+    const herzH = 29 * einheitY + g;
     const cy = (H - herzH - textH) / 2 + herzH / 2;
     finale.style.setProperty("--g", g.toFixed(0) + "px");
     finale.style.setProperty("--cy", cy.toFixed(0) + "px");
     finale.style.setProperty("--text-oben", (cy + herzH / 2 + 14).toFixed(0) + "px");
     const weit = Math.max(window.innerWidth, window.innerHeight);
+    // Viele Fotos: ein äußeres und ein inneres Herz, damit sie sich nicht
+    // zu stark überdecken und die Gesichter sichtbar bleiben
+    const innenSkala = 0.54;
+    const innenAnzahl = N > 32 ? Math.round(N * innenSkala / (1 + innenSkala)) : 0;
+    const aussenAnzahl = N - innenAnzahl;
+    const verzoegerung = N > 32 ? 55 : 75;
+    // Punkte gleichmäßig entlang der Herzlinie, damit sich an der Spitze
+    // keine Fotos stapeln
+    const herzPunkt = (t) => [16 * Math.pow(Math.sin(t), 3), -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t))];
+    const linie = [];
+    let laenge = 0;
+    for (let k = 0, vor = herzPunkt(0); k <= 600; k++) {
+      const p = herzPunkt((k / 600) * Math.PI * 2);
+      laenge += Math.hypot(p[0] - vor[0], p[1] - vor[1]);
+      linie.push([laenge, p]);
+      vor = p;
+    }
+    const aufLinie = (anteil) => {
+      const ziel = anteil * laenge;
+      return (linie.find((e) => e[0] >= ziel) || linie[linie.length - 1])[1];
+    };
     fotos.forEach((f, i) => {
-      const t = (i / N) * Math.PI * 2;
-      const x = 16 * Math.pow(Math.sin(t), 3) * einheit;
-      const y = -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * einheit - 2.5 * einheit;
+      const innen = i >= aussenAnzahl;
+      const s = innen ? innenSkala : 1;
+      const p = innen ? aufLinie((i - aussenAnzahl + 0.5) / innenAnzahl) : aufLinie(i / aussenAnzahl);
+      // das innere Herz wird um die Herzmitte (etwas oberhalb der Mitte) verkleinert
+      const x = p[0] * s * einheit;
+      const y = (-0.5 + (p[1] + 0.5) * s - 2.5) * einheitY;
       const karte = document.createElement("div");
       karte.className = "finale-foto";
       const img = new Image();
@@ -1751,7 +1777,7 @@
         { transform: "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + dreh + "deg) scale(1)", opacity: 1 },
       ], {
         duration: bewegungReduziert ? 1 : 1500,
-        delay: bewegungReduziert ? 0 : i * 75,
+        delay: bewegungReduziert ? 0 : i * verzoegerung,
         easing: "cubic-bezier(.2,.8,.2,1)",
         fill: "forwards",
       });
@@ -1759,7 +1785,7 @@
     setTimeout(() => {
       finale.classList.add("fertig");
       konfettiRegen("konfetti");
-    }, bewegungReduziert ? 50 : N * 75 + 1300);
+    }, bewegungReduziert ? 50 : N * verzoegerung + 1300);
     try { localStorage.setItem(FINALE_SCHLUESSEL, "1"); } catch (_) { /* egal */ }
     const fk = document.getElementById("finale-knopf");
     if (fk) fk.hidden = false;

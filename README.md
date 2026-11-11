@@ -38,7 +38,7 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
   mittags 12:00 bis 14:00 (am hellsten), nachmittags 14:00 bis 16:30 (goldene Stunde),
   abends 16:30 bis 22:00 (gemütlich dunkel), nachts 22:00 bis 6:00 (Mond und Sterne).
   Lokal testen mit z. B. `&zeit=morgen` oder einer Uhrzeit wie `&zeit=03:59`.
-- **Finale:** Sind alle 24 Türchen offen, fliegen alle Fotos zu einem Herz zusammen.
+- **Finale:** An Heiligabend nach Türchen 24 fliegen alle Fotos zu einem Herz zusammen (bei vielen Fotos ein äußeres und ein inneres Herz, gleichmäßig verteilt, damit die Gesichter sichtbar bleiben).
   Danach lässt es sich über „♥️ Unser Herz“ jederzeit wieder ansehen.
 
 ## Countdown bis zum Geburtstag
