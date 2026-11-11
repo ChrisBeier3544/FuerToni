@@ -22,7 +22,7 @@ const esbuild = process.env.ESBUILD || "npx";
 const esArgs = process.env.ESBUILD ? [] : ["--yes", "esbuild@0.24.0"];
 
 function verkleinere(code, art) {
-  return execFileSync(esbuild, [...esArgs, "--minify", "--loader=" + art, "--target=es2020", "--charset=utf8", "--legal-comments=none"], { input: code, maxBuffer: 64 << 20 }).toString();
+  return execFileSync(esbuild, [...esArgs, "--minify", "--loader=" + art, "--target=es2020", "--legal-comments=none"], { input: code, maxBuffer: 64 << 20 }).toString();
 }
 function buendel(appDatei) {
   // jede Datei für sich absichern: ein Fehler in einem Teil hält die anderen nicht auf

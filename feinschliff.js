@@ -133,7 +133,7 @@
       const text = statusEl.textContent;
       if (statusEl.dataset.text === text) return;
       // Satzende: . ! ? oder ein Emoji, danach ein neuer Satz mit Großbuchstaben
-      const saetze = text.split(/(?<=[.!?]|\p{Extended_Pictographic}️?)\s+(?=[A-ZÄÖÜ])/u);
+      const saetze = text.split(/(?<=[.!?]|\p{Extended_Pictographic}\uFE0F?)\s+(?=[A-Z\u00C4\u00D6\u00DC])/u);
       eigen = true;
       statusEl.textContent = "";
       for (const s of saetze) {
@@ -154,8 +154,8 @@
   function herzenTauschen(el) {
     const laufe = (knoten) => {
       for (const k of [...knoten.childNodes]) {
-        if (k.nodeType === 3 && /♥️|❤️/.test(k.nodeValue)) {
-          const teile = k.nodeValue.split(/♥️|❤️/);
+        if (k.nodeType === 3 && /\u2665\uFE0F|\u2764\uFE0F/.test(k.nodeValue)) {
+          const teile = k.nodeValue.split(/\u2665\uFE0F|\u2764\uFE0F/);
           const frag = document.createDocumentFragment();
           teile.forEach((t, i) => {
             if (t) frag.appendChild(document.createTextNode(t));

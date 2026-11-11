@@ -905,8 +905,8 @@
       z.textContent = zahl.toLocaleString("de-DE");
       const t = document.createElement("span");
       t.className = "zaehler-text";
-      t.textContent = text.replace(/\s*♥️$/, "");
-      if (/♥️$/.test(text)) t.insertAdjacentHTML("beforeend", ' <svg class="ui-icon" aria-hidden="true"><use href="#i-herz"/></svg>');
+      t.textContent = text.replace(/\s*\u2665\uFE0F$/, "");
+      if (/\u2665\uFE0F$/.test(text)) t.insertAdjacentHTML("beforeend", ' <svg class="ui-icon" aria-hidden="true"><use href="#i-herz"/></svg>');
       k.append(z, t);
       box.appendChild(k);
     };
