@@ -2511,9 +2511,13 @@ html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
 #gruss, #intro-gruss { display: none !important; }
 
 /* ---------- Vogel ---------- */
+.vogel-ebene { position: fixed; inset: 0; z-index: 66; pointer-events: none; overflow: hidden; }
 .vogel {
   position: absolute;
-  z-index: 8;
+  left: 0;
+  top: 0;
+  pointer-events: auto;
+  will-change: transform;
   width: 52px;
   padding: 0;
   border: 0;
@@ -2523,9 +2527,7 @@ html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
 }
 .vogel:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 50%; }
 .vogel svg { display: block; width: 100%; height: auto; overflow: visible; }
-.heute-karte > .vogel { top: -45px; right: 14px; }
 .intro-countdown { position: relative; }
-.intro-countdown > .vogel { top: -40px; right: -8px; }
 .vogel .augenlid { transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); animation: blinzeln 5s infinite; }
 @keyframes blinzeln { 0%, 92%, 100% { transform: scaleY(0); } 95% { transform: scaleY(1); } }
 .vogel .vogel-koerper { transform-box: fill-box; transform-origin: 50% 100%; animation: atmen 3s ease-in-out infinite; }
@@ -2554,3 +2556,15 @@ html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
 .vogel .vogel-blase[hidden] { display: none; }
 .vogel .vogel-blase::after { content: ""; position: absolute; top: 100%; right: 14px; border: 7px solid transparent; border-top-color: #fff; border-right-color: #fff; }
 @media (prefers-reduced-motion: reduce) { .vogel .augenlid, .vogel .vogel-koerper, .vogel.hopst { animation: none; } }
+
+.vogel[hidden] { display: none; }
+.vogel svg { transition: transform 0.15s ease; }
+.vogel.fliegt .beine { opacity: 0; }
+.vogel .fluegel-hinten { opacity: 0; transform-box: fill-box; transform-origin: 100% 100%; }
+.vogel.fliegt .fluegel-hinten { opacity: 1; animation: fluegelschlag 0.16s ease-in-out infinite alternate; }
+.vogel.fliegt .fluegel-vorne { transform-box: fill-box; transform-origin: 50% 0; animation: fluegel-vorne 0.16s ease-in-out infinite alternate; }
+.vogel.fliegt .vogel-koerper { animation: none; }
+@keyframes fluegelschlag { from { transform: rotate(-35deg) scaleY(1.1); } to { transform: rotate(25deg) scaleY(0.6); } }
+@keyframes fluegel-vorne { from { transform: rotate(0); } to { transform: rotate(-40deg) translateY(-4px); } }
+.vogel .vogel-blase.unten { bottom: auto; top: calc(100% + 6px); border-radius: 14px 4px 14px 14px; }
+.vogel .vogel-blase.unten::after { top: auto; bottom: 100%; border-top-color: transparent; border-bottom-color: #fff; }

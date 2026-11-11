@@ -61,6 +61,10 @@ Sie startet beim Öffnen automatisch und lässt sich über „🐹 Capy-Special 
 `vogel.js`: Ein kleines Rotkehlchen sitzt auf der Karte „Dein Tag“ (in der Countdown-Phase auf dem Countdown)
 und sagt 2 Sekunden nach dem Öffnen des Umschlags für 5 Sekunden den Tagesgruß. Antippen wiederholt ihn.
 Am Tag vor dem ersten Easter Egg gibt es zusätzlich einen Hinweis auf die versteckten Geheimnisse.
+10 Sekunden nach dem Sprechen fliegt es auf einer von 10 Routen aus dem Bild und landet auf einem
+von 5 Plätzen (Kalender: Karte, Polaroid, Lichterkette, Adventskranz bzw. „Unsere Momente“, Regal;
+Countdown: Countdown, Umschlag links und rechts, Siegel, Hinweistext). Am 26.11., 21.12. und 24.12.
+kommt ein Rotkehlchen-Weibchen mit Schleife dazu.
 Das heutige Türchen wird nicht mehr angescrollt und hat nur eine feine goldene Umrandung.
 
 ## Himmel

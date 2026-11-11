@@ -1,8 +1,9 @@
 /*
  * ===========================================================
- *  VOGEL: Ein kleines Rotkehlchen sitzt oben auf der Karte
- *  „Dein Tag“ (bzw. auf dem Countdown) und sagt den Tagesgruß.
- *  Am Tag vor dem ersten Easter Egg gibt es einen Hinweis.
+ *  ROTKEHLCHEN
+ *  Sitzt auf einem von 5 Plätzen, sagt den Tagesgruß, fliegt
+ *  10 Sekunden später auf einer von 10 Routen davon und landet
+ *  danach auf einem neuen Platz. An besonderen Tagen zu zweit.
  * ===========================================================
  */
 (function () {
@@ -10,81 +11,255 @@
 
   const ak = window.adventkalender;
   const intro = document.getElementById("intro");
-  const karte = document.querySelector(".heute-karte");
-  const countdown = document.getElementById("intro-countdown");
   const grussQuelle = document.getElementById("gruss");
-  if (!ak || !ak.intro || !karte || !grussQuelle) return;
+  if (!ak || !ak.intro || !grussQuelle) return;
+  const ruhig = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const GROESSE = 52;
 
-  const VOGEL =
-    '<svg viewBox="0 0 60 60" aria-hidden="true">' +
-    '<path d="M24 50l-3 6M30 50l3 6M21 56h-4M21 56l-2 3M33 56h4M33 56l2 3" stroke="#e39a3b" stroke-width="2.2" stroke-linecap="round"/>' +
-    '<g class="vogel-koerper">' +
-    '<path d="M8 34q-8 2-6 9q6-1 10-6z" fill="#7a4e33"/>' +
-    '<ellipse cx="28" cy="32" rx="21" ry="19" fill="#8a5a3a"/>' +
-    '<ellipse cx="30" cy="38" rx="15" ry="13" fill="#f26b5b"/>' +
-    '<ellipse cx="31" cy="42" rx="10" ry="8" fill="#fff2e4"/>' +
-    '<path d="M14 30q-4 10 6 14q-4-8-6-14z" fill="#6b4632"/>' +
-    '<path d="M26 13q2-6 6-5q-3 1-3 5z" fill="#8a5a3a"/>' +
-    '<circle cx="22" cy="28" r="5" fill="#fff"/><circle cx="36" cy="28" r="5" fill="#fff"/>' +
-    '<circle cx="23" cy="29" r="3.2" fill="#2a1a12"/><circle cx="37" cy="29" r="3.2" fill="#2a1a12"/>' +
-    '<circle cx="24.2" cy="27.6" r="1.2" fill="#fff"/><circle cx="38.2" cy="27.6" r="1.2" fill="#fff"/>' +
-    '<rect class="augenlid" x="16.5" y="23" width="11" height="11" rx="5.5" fill="#8a5a3a"/><rect class="augenlid" x="30.5" y="23" width="11" height="11" rx="5.5" fill="#8a5a3a"/>' +
-    '<path d="M27 33l2.5 4 2.5-4z" fill="#f3b23c"/>' +
-    '<circle cx="17" cy="35" r="3" fill="#ff9fb4" opacity=".7"/><circle cx="41" cy="35" r="3" fill="#ff9fb4" opacity=".7"/>' +
-    "</g></svg>";
+  /* ---------- Aussehen ---------- */
+  function vogelSvg(weiblich) {
+    const ruecken = weiblich ? "#a0704b" : "#8a5a3a", brust = weiblich ? "#f6877a" : "#f26b5b", fluegel = weiblich ? "#86593b" : "#6b4632";
+    return '<svg viewBox="0 0 60 60" aria-hidden="true">' +
+      '<g class="beine"><path d="M24 50l-3 6M30 50l3 6M21 56h-4M21 56l-2 3M33 56h4M33 56l2 3" stroke="#e39a3b" stroke-width="2.2" stroke-linecap="round"/></g>' +
+      '<g class="vogel-koerper">' +
+      '<path class="fluegel-hinten" d="M30 26q-18-18-26-6q8 2 14 10z" fill="' + fluegel + '"/>' +
+      '<path d="M8 34q-8 2-6 9q6-1 10-6z" fill="' + fluegel + '"/>' +
+      '<ellipse cx="28" cy="32" rx="21" ry="19" fill="' + ruecken + '"/>' +
+      '<ellipse cx="30" cy="38" rx="15" ry="13" fill="' + brust + '"/>' +
+      '<ellipse cx="31" cy="42" rx="10" ry="8" fill="#fff2e4"/>' +
+      '<path class="fluegel-vorne" d="M14 30q-4 10 6 14q-4-8-6-14z" fill="' + fluegel + '"/>' +
+      '<path d="M26 13q2-6 6-5q-3 1-3 5z" fill="' + ruecken + '"/>' +
+      '<circle cx="22" cy="28" r="5" fill="#fff"/><circle cx="36" cy="28" r="5" fill="#fff"/>' +
+      '<circle cx="23" cy="29" r="3.2" fill="#2a1a12"/><circle cx="37" cy="29" r="3.2" fill="#2a1a12"/>' +
+      '<circle cx="24.2" cy="27.6" r="1.2" fill="#fff"/><circle cx="38.2" cy="27.6" r="1.2" fill="#fff"/>' +
+      (weiblich ? '<path d="M17 23.5l-2-2M19.5 22.6l-.8-2.6M38.5 22.6l.8-2.6M41 23.5l2-2" stroke="#2a1a12" stroke-width="1.1" stroke-linecap="round"/>' : "") +
+      '<rect class="augenlid" x="16.5" y="23" width="11" height="11" rx="5.5" fill="' + ruecken + '"/><rect class="augenlid" x="30.5" y="23" width="11" height="11" rx="5.5" fill="' + ruecken + '"/>' +
+      '<path d="M27 33l2.5 4 2.5-4z" fill="#f3b23c"/>' +
+      '<circle cx="17" cy="35" r="3" fill="#ff9fb4" opacity=".7"/><circle cx="41" cy="35" r="3" fill="#ff9fb4" opacity=".7"/>' +
+      (weiblich ? '<g transform="translate(36 14) rotate(18)"><path d="M0 0-6-4v8zM0 0l6-4v8z" fill="#ff7aa2"/><circle r="2" fill="#ffd0dc"/></g>' : "") +
+      "</g></svg>";
+  }
 
-  function baueVogel(ziel) {
-    const v = document.createElement("button");
-    v.type = "button";
-    v.className = "vogel";
-    v.setAttribute("aria-label", "Vogel antippen");
-    v.innerHTML = '<span class="vogel-blase" hidden></span>' + VOGEL;
-    ziel.appendChild(v);
-    v.addEventListener("click", () => { v.classList.remove("hopst"); void v.offsetWidth; v.classList.add("hopst"); sprich(v); });
+  /* ---------- Plätze (Bildschirmkoordinaten der Füße) ---------- */
+  const sichtbar = (el) => el && el.offsetParent !== null && el.getBoundingClientRect().width > 0;
+  const PLAETZE_KALENDER = {
+    karte: () => { const e = document.querySelector(".heute-karte"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.right - 40, y: r.top + 1 }; },
+    polaroid: () => { const e = document.querySelector("#titelfotos .polaroid:last-child"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width * 0.68, y: r.top + 4 }; },
+    kette: () => { const k = document.getElementById("lichterkette"); const b = k && k.querySelectorAll(".birne")[7]; if (!sichtbar(k) || !b || k.classList.contains("noch-nicht")) return null; const r = b.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top - 2 }; },
+    // Adventskranz (ab dem 1. Advent), vorher die Überschrift „Unsere Momente“
+    kranz: () => {
+      const k = document.querySelector("#adventskranz svg");
+      if (sichtbar(k) && !document.getElementById("adventskranz").hidden) { const r = k.getBoundingClientRect(); return { x: r.left + r.width * 0.86, y: r.top + r.height * 0.42 }; }
+      const m = document.getElementById("momente-titel"); if (!sichtbar(m)) return null;
+      const r = m.getBoundingClientRect(); return { x: r.left + r.width * 0.5 + 92, y: r.top + 17 };
+    },
+    regal: () => { const e = document.getElementById("kalender"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width * 0.22, y: r.top + 2 }; },
+  };
+  const PLAETZE_COUNTDOWN = {
+    countdown: () => { const e = document.getElementById("countdown-ziffern"); if (!sichtbar(e) || !e.textContent) return null; const r = e.getBoundingClientRect(); return { x: r.right - 22, y: r.top + 1 }; },
+    umschlagLinks: () => { const e = document.getElementById("umschlag"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + 34, y: r.top + 3 }; },
+    umschlagRechts: () => { const e = document.getElementById("umschlag"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.right - 34, y: r.top + 3 }; },
+    siegel: () => { const e = document.querySelector("#umschlag .siegel"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + 4 }; },
+    hinweis: () => { const e = document.getElementById("intro-hinweis"); if (!sichtbar(e) || !e.textContent) return null; const r = e.getBoundingClientRect(); return { x: Math.min(window.innerWidth - 30, r.right + 26), y: r.top + 14 }; },
+  };
+  function kontext() {
+    const phase = ak.intro.phase();
+    if (!intro.hidden && (phase === "warten" || phase === "geburtstag")) return "countdown";
+    if (intro.hidden) return "kalender";
+    return null; // Umschlag zu, aber noch nicht geöffnet: kein Vogel
+  }
+  const plaetze = (k) => (k === "countdown" ? PLAETZE_COUNTDOWN : PLAETZE_KALENDER);
+  const ERSTER_PLATZ = { countdown: "countdown", kalender: "karte" };
+
+  /* ---------- Flugrouten (10 Stück), Punkte relativ zum Bildschirm ---------- */
+  const W = () => window.innerWidth, H = () => window.innerHeight;
+  const ROUTEN = [
+    (s) => [s, { x: s.x + 60, y: s.y - 80 }, { x: W() + 90, y: -60 }],                                       // schräg nach rechts oben
+    (s) => [s, { x: s.x - 60, y: s.y - 80 }, { x: -90, y: -60 }],                                            // schräg nach links oben
+    (s) => [s, { x: s.x + 70, y: s.y - 40 }, { x: s.x + 40, y: s.y - 130 }, { x: s.x - 30, y: s.y - 70 }, { x: s.x + 30, y: s.y - 20 }, { x: W() + 90, y: s.y - 160 }], // Looping
+    (s) => [s, { x: s.x - 50, y: s.y - 50 }, { x: s.x + 10, y: s.y - 100 }, { x: s.x - 70, y: s.y - 150 }, { x: s.x - 10, y: s.y - 200 }, { x: -90, y: -80 }], // Zickzack
+    (s) => [s, { x: s.x + 40, y: s.y + 70 }, { x: s.x + 140, y: s.y + 40 }, { x: W() + 90, y: s.y - 200 }],   // Sturzflug mit Aufschwung
+    (s) => { const p = [s]; for (let k = 1; k <= 7; k++) { const w = k * 1.1, r = 26 + k * 12; p.push({ x: s.x + Math.cos(w) * r, y: s.y - k * 28 + Math.sin(w) * r * 0.5 }); } p.push({ x: s.x, y: -100 }); return p; }, // Spirale
+    (s) => [s, { x: s.x - 40, y: s.y - 90 }, { x: W() * 0.5, y: Math.max(40, s.y - 220) }, { x: W() + 90, y: s.y - 60 }],  // großer Bogen
+    (s) => { const p = [s]; const n = 6; for (let k = 1; k <= n; k++) p.push({ x: s.x + ((W() + 100 - s.x) * k) / n, y: s.y - 40 + (k % 2 ? -30 : 30) }); return p; }, // Wellenflug
+    (s) => [s, { x: s.x - 20, y: s.y - 18 }, { x: s.x - 40, y: s.y }, { x: s.x - 60, y: s.y - 18 }, { x: s.x - 80, y: s.y }, { x: s.x - 160, y: s.y - 120 }, { x: -90, y: s.y - 220 }], // Hüpfer und Abflug
+    (s) => { const p = [s]; for (let k = 1; k <= 8; k++) { const w = -Math.PI / 2 + (k / 8) * Math.PI * 2; p.push({ x: s.x + Math.cos(w) * 55, y: s.y - 55 + Math.sin(w) * 40 }); } p.push({ x: -90, y: s.y - 120 }); return p; }, // Kreis um den Platz
+  ];
+  // Kurve durch alle Punkte (Catmull-Rom)
+  function punktAuf(p, t) {
+    const n = p.length - 1, i = Math.min(n - 1, Math.floor(t * n)), u = t * n - i;
+    const p0 = p[Math.max(0, i - 1)], p1 = p[i], p2 = p[i + 1], p3 = p[Math.min(n, i + 2)];
+    const f = (a, b, c, d) => 0.5 * ((2 * b) + (-a + c) * u + (2 * a - 5 * b + 4 * c - d) * u * u + (-a + 3 * b - 3 * c + d) * u * u * u);
+    return { x: f(p0.x, p1.x, p2.x, p3.x), y: f(p0.y, p1.y, p2.y, p3.y) };
+  }
+
+  /* ---------- Ein Vogel ---------- */
+  const ebene = document.createElement("div");
+  ebene.className = "vogel-ebene";
+  document.body.appendChild(ebene);
+  const voegel = [];
+
+  function erstelleVogel(weiblich, saetze) {
+    const el = document.createElement("button");
+    el.type = "button";
+    el.className = "vogel" + (weiblich ? " weibchen" : "");
+    el.setAttribute("aria-label", weiblich ? "Rotkehlchen-Weibchen antippen" : "Rotkehlchen antippen");
+    el.innerHTML = '<span class="vogel-blase" hidden></span>' + vogelSvg(weiblich);
+    el.hidden = true;
+    ebene.appendChild(el);
+    const v = { el, blase: el.querySelector(".vogel-blase"), weiblich, saetze, platz: null, kontext: null, zustand: "weg", pos: null, blick: 1, timer: [], flugTimer: null };
+    el.addEventListener("click", () => {
+      if (v.zustand !== "sitzt") return;
+      el.classList.remove("hopst"); void el.offsetWidth; el.classList.add("hopst");
+      sprich(v);
+    });
+    voegel.push(v);
     return v;
   }
-  const vogelKarte = baueVogel(karte);
-  const vogelIntro = countdown ? baueVogel(countdown) : null;
 
-  // Am Tag vor dem ersten Easter Egg gibt es einen Hinweis
+  function setzePosition(v, p) {
+    v.pos = p;
+    v.el.style.transform = "translate(" + (p.x - GROESSE / 2).toFixed(1) + "px," + (p.y - GROESSE).toFixed(1) + "px)";
+    v.el.querySelector("svg").style.transform = v.blick < 0 ? "scaleX(-1)" : "";
+  }
+
+  function sprich(v) {
+    v.timer.forEach(clearTimeout); v.timer = [];
+    clearTimeout(v.flugTimer);
+    const liste = v.saetze().filter(Boolean);
+    if (!liste.length) { planeAbflug(v); return; }
+    liste.forEach((satz, i) => v.timer.push(setTimeout(() => zeigeBlase(v, satz), i * 5600)));
+    v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, liste.length * 5600 - 600));
+  }
+  function zeigeBlase(v, satz) {
+    if (v.zustand !== "sitzt") return;
+    v.blase.textContent = satz;
+    v.blase.classList.toggle("unten", v.pos && v.pos.y < 130);
+    v.blase.style.right = "10px"; v.blase.style.left = "auto";
+    v.blase.hidden = false;
+    v.el.classList.add("redet");
+    const r = v.blase.getBoundingClientRect();
+    if (r.left < 12) v.blase.style.right = 10 - (12 - r.left) + "px";
+  }
+
+  // 10 Sekunden nach dem Sprechen (oder Landen) geht es los
+  function planeAbflug(v) {
+    clearTimeout(v.flugTimer);
+    if (ruhig) return;
+    v.flugTimer = setTimeout(() => fliegeWeg(v), 10000);
+  }
+
+  function animiere(v, punkte, dauer, zielFn) {
+    return new Promise((fertig) => {
+      const start = performance.now();
+      let letztes = punkte[0];
+      function schritt(t) {
+        const u = Math.min(1, (t - start) / dauer);
+        const e = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2;
+        if (zielFn) { const z = zielFn(); if (z) punkte[punkte.length - 1] = z; }
+        const p = punktAuf(punkte, e);
+        if (Math.abs(p.x - letztes.x) > 0.5) v.blick = p.x > letztes.x ? 1 : -1;
+        letztes = p;
+        setzePosition(v, p);
+        if (u < 1 && v.zustand === "fliegt") requestAnimationFrame(schritt); else fertig();
+      }
+      requestAnimationFrame(schritt);
+    });
+  }
+
+  async function fliegeWeg(v) {
+    if (v.zustand !== "sitzt" || document.hidden) { planeAbflug(v); return; }
+    v.blase.hidden = true; v.el.classList.remove("redet");
+    v.zustand = "fliegt";
+    v.el.classList.add("fliegt");
+    const route = ROUTEN[Math.floor(Math.random() * ROUTEN.length)](v.pos);
+    await animiere(v, route, 2400 + Math.random() * 900);
+    if (v.zustand !== "fliegt") return;
+    v.el.hidden = true;
+    await new Promise((r) => setTimeout(r, 2500 + Math.random() * 3000));
+    lande(v, false);
+  }
+
+  function freierPlatz(v, k) {
+    const liste = Object.keys(plaetze(k)).filter((name) => name !== v.platz && !voegel.some((a) => a !== v && a.platz === name && a.kontext === k) && plaetze(k)[name]());
+    if (!liste.length) return null;
+    return liste[Math.floor(Math.random() * liste.length)];
+  }
+
+  async function lande(v, sofort) {
+    const k = kontext();
+    if (!k) { v.zustand = "weg"; v.el.hidden = true; v.platz = null; setTimeout(() => lande(v, sofort), 1000); return; }
+    const name = sofort ? (voegel.indexOf(v) === 0 ? ERSTER_PLATZ[k] : freierPlatz(v, k)) : freierPlatz(v, k);
+    const zielFn = name && plaetze(k)[name];
+    if (!zielFn || !zielFn()) { setTimeout(() => lande(v, sofort), 1500); return; }
+    v.platz = name; v.kontext = k;
+    v.el.classList.toggle("im-countdown", k === "countdown");
+    if (sofort || ruhig) {
+      v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.el.hidden = false;
+      setzePosition(v, zielFn());
+      return;
+    }
+    // Anflug von außerhalb des Bildschirms
+    const z = zielFn(), vonLinks = Math.random() < 0.5;
+    const start = { x: vonLinks ? -80 : W() + 80, y: Math.max(-60, z.y - 200 - Math.random() * 120) };
+    const mitte = { x: (start.x + z.x) / 2 + (vonLinks ? 40 : -40), y: Math.min(start.y, z.y) - 60 };
+    v.zustand = "fliegt"; v.el.classList.add("fliegt"); v.el.hidden = false;
+    await animiere(v, [start, mitte, { x: z.x + (vonLinks ? -30 : 30), y: z.y - 30 }, z], 2600, zielFn);
+    if (v.zustand !== "fliegt") return;
+    v.zustand = "sitzt"; v.el.classList.remove("fliegt");
+    v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
+    planeAbflug(v);
+  }
+
+  // Sitzende Vögel bleiben beim Scrollen auf ihrem Platz
+  function festhalten() {
+    for (const v of voegel) {
+      if (v.zustand !== "sitzt") continue;
+      const k = kontext();
+      if (k !== v.kontext) { v.zustand = "weg"; v.el.hidden = true; clearTimeout(v.flugTimer); v.timer.forEach(clearTimeout); v.blase.hidden = true; v.platz = null; lande(v, true).then(() => { if (v === voegel[0] || v.weiblich) setTimeout(() => sprich(v), 2000); }); continue; }
+      const p = plaetze(k)[v.platz] && plaetze(k)[v.platz]();
+      if (p) setzePosition(v, p);
+    }
+    requestAnimationFrame(festhalten);
+  }
+
+  /* ---------- Was die Vögel sagen ---------- */
   const erstesEi = Math.min(...(KALENDER.eastereggs || []).map((e) => e.ab || 99));
   const HINWEIS = "Psst … auf dieser Seite sind Geheimnisse versteckt 🤫 Wenn ein Emoji mal an einer komischen Stelle ist, lohnt sich ein Klick darauf!";
-  function saetze() {
+  const tag = () => (ak.kalenderDatum ? ak.kalenderDatum() : ak.intro.datum());
+  function saetzeMaennchen() {
     const liste = [grussQuelle.textContent || ""];
-    const d = ak.kalenderDatum ? ak.kalenderDatum() : ak.intro.datum();
+    const d = tag();
     if (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag === erstesEi - 1) liste.push(HINWEIS);
-    return liste.filter(Boolean);
+    return liste;
+  }
+  function saetzeWeibchen() {
+    const d = ak.intro.datum();
+    if (d.monat === 11 && d.tag === 26) return ["Happy Birthday, Toni! Wir zwei feiern heute mit dir 🎂"];
+    if (d.monat === 12 && d.tag === 21) return ["Wir zwei feiern heute mit euch. Ein Jahr, wie schön ♥️"];
+    if (d.monat === 12 && d.tag === 24) return ["Frohe Weihnachten! Heute sind wir zu zweit für dich da 🎄"];
+    return ["Wir zwei sind heute zusammen hier ♥️"];
+  }
+  // Zu zweit: am Geburtstag, am Jahrestag und an Heiligabend
+  function zuZweit() {
+    const d = ak.intro.datum();
+    return d.jahr === KALENDER.jahr && ((d.monat === 11 && d.tag === 26) || (d.monat === 12 && (d.tag === 21 || d.tag === 24)));
   }
 
-  const timer = new Map();
-  function sprich(v) {
-    const blase = v.querySelector(".vogel-blase");
-    (timer.get(v) || []).forEach(clearTimeout);
-    const liste = saetze();
-    if (!liste.length) return;
-    const t = [];
-    liste.forEach((satz, i) => t.push(setTimeout(() => zeige(v, blase, satz), i * 5600)));
-    t.push(setTimeout(() => { blase.hidden = true; v.classList.remove("redet"); }, liste.length * 5600 - 600));
-    timer.set(v, t);
-  }
-  function zeige(v, blase, satz) {
-    blase.textContent = satz;
-    blase.style.right = "10px";
-    blase.hidden = false;
-    v.classList.add("redet");
-    // Sprechblase im Bild halten
-    const r = blase.getBoundingClientRect();
-    if (r.left < 12) blase.style.right = 10 - (12 - r.left) + "px";
-  }
-
-  // 2 Sekunden nach dem Öffnen des Umschlags (oder nach dem Laden) einmal sprechen
-  let introGesprochen = false, karteGesprochen = false;
-  setInterval(() => {
+  /* ---------- Start ---------- */
+  const maennchen = erstelleVogel(false, saetzeMaennchen);
+  let weibchen = null;
+  const warten = setInterval(() => {
     if (!ak.intro.bereit() || !grussQuelle.textContent) return;
-    const phase = ak.intro.phase();
-    const countdownSichtbar = !intro.hidden && countdown && !countdown.hidden && (phase === "warten" || phase === "geburtstag");
-    if (countdownSichtbar && !introGesprochen && vogelIntro) { introGesprochen = true; setTimeout(() => sprich(vogelIntro), 2000); }
-    if (intro.hidden && !karteGesprochen) { karteGesprochen = true; setTimeout(() => sprich(vogelKarte), 2000); }
-    if (vogelIntro) vogelIntro.hidden = !countdownSichtbar;
+    if (!kontext()) return;
+    clearInterval(warten);
+    lande(maennchen, true).then(() => setTimeout(() => sprich(maennchen), 2000));
+    if (zuZweit()) {
+      weibchen = erstelleVogel(true, saetzeWeibchen);
+      setTimeout(() => lande(weibchen, false).then(() => setTimeout(() => { if (weibchen.zustand === "sitzt") sprich(weibchen); }, 900)), 4500);
+    }
+    requestAnimationFrame(festhalten);
   }, 250);
+
+  window.adventkalender.voegel = { voegel, fliegeWeg: (i) => fliegeWeg(voegel[i || 0]), ROUTEN: ROUTEN.length };
 })();
