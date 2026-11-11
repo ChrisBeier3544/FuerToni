@@ -293,14 +293,14 @@
     return liste[Math.floor(Math.random() * liste.length)];
   }
 
-  async function lande(v, sofort) {
+  async function lande(v, sofort, ersterPlatz) {
     const k = kontext();
-    if (!k) { v.zustand = "weg"; v.el.hidden = true; v.platz = null; await new Promise((r) => setTimeout(r, 1000)); return lande(v, sofort); }
-    let name = sofort ? (v.partner ? freierPlatz(v, k) : ERSTER_PLATZ[k]) : freierPlatz(v, k);
+    if (!k) { v.zustand = "weg"; v.el.hidden = true; v.platz = null; await new Promise((r) => setTimeout(r, 1000)); return lande(v, sofort, ersterPlatz); }
+    let name = sofort || ersterPlatz ? (v.partner ? freierPlatz(v, k) : ERSTER_PLATZ[k]) : freierPlatz(v, k);
     // ist der Lieblingsplatz gerade nicht frei (zum Beispiel zu wenig Platz am Handy), einen anderen nehmen
     if (name && !sitzpunkt(v, k, name)) name = freierPlatz(v, k);
     const zielFn = name && (() => sitzpunkt(v, k, name));
-    if (!zielFn || !zielFn()) { await new Promise((r) => setTimeout(r, 1500)); return lande(v, sofort); }
+    if (!zielFn || !zielFn()) { await new Promise((r) => setTimeout(r, 1500)); return lande(v, sofort, ersterPlatz); }
     v.ziel = name;
     v.platz = name; v.kontext = k;
     v.el.classList.toggle("im-countdown", k === "countdown");
@@ -567,14 +567,43 @@
     if (!ak.intro.bereit() || !grussQuelle.textContent) return;
     if (!kontext()) return;
     clearInterval(warten);
-    lande(maennchen, true).then(() => setTimeout(() => sprich(maennchen), 2000));
-    if (zuZweit()) {
-      weibchen = erstelleVogel(true, saetzeWeibchen);
-      weibchen.partner = maennchen;
-      setTimeout(() => lande(weibchen, false).then(() => setTimeout(() => { if (weibchen.zustand === "sitzt") sprich(weibchen); }, 5200)), 3800);
-    }
     requestAnimationFrame(festhalten);
+    // Erst wenn die Animation des Tages vorbei ist (und noch 3 Sekunden mehr),
+    // fliegt der Munkelvogel ins Bild
+    wartAufRuhe().then(() => {
+      lande(maennchen, false, true).then(() => setTimeout(() => sprich(maennchen), 2000));
+      if (zuZweit()) {
+        weibchen = erstelleVogel(true, saetzeWeibchen);
+        weibchen.partner = maennchen;
+        setTimeout(() => lande(weibchen, false).then(() => setTimeout(() => { if (weibchen.zustand === "sitzt") sprich(weibchen); }, 5200)), 3800);
+      }
+    });
   }, 250);
+
+  // Läuft gerade eine Szene des Tages (Capy Special, Aufbau, Postbote)?
+  const szeneLaeuft = () => !!document.querySelector(".special-buehne, .aufbau-buehne");
+  // Gibt es heute eine Szene, die gleich von selbst startet?
+  function szeneErwartet() {
+    const d = ak.intro.datum();
+    if (d.jahr !== KALENDER.jahr || d.monat !== 11) return false;
+    if (kontext() === "countdown") return ak.intro.phase() === "warten" && d.tag >= 11 && d.tag <= 25;
+    return d.tag >= 27 && d.tag <= 30;
+  }
+  function wartAufRuhe() {
+    return new Promise((fertig) => {
+      const start = performance.now();
+      const erwartet = szeneErwartet();
+      let gesehen = false, ruhigSeit = null;
+      const t = setInterval(() => {
+        const jetzt = performance.now();
+        if (szeneLaeuft()) { gesehen = true; ruhigSeit = null; return; }
+        // auf eine angekündigte Szene höchstens 6 Sekunden warten
+        if (erwartet && !gesehen && jetzt - start < 6000) return;
+        if (ruhigSeit === null) ruhigSeit = jetzt;
+        if (jetzt - ruhigSeit >= (gesehen ? 3000 : 0) || jetzt - start > 120000) { clearInterval(t); fertig(); }
+      }, 200);
+    });
+  }
 
   // Von außen: das Rotkehlchen sagt einen Satz, falls es gerade sitzt (sonst false)
   function sage(satz) {
