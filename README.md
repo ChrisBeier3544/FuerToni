@@ -38,7 +38,7 @@ Ganz oben in `inhalte.js` stehen außerdem das Jahr, der Titel und der Untertite
   mittags 12:00 bis 14:00 (am hellsten), nachmittags 14:00 bis 16:30 (goldene Stunde),
   abends 16:30 bis 22:00 (gemütlich dunkel), nachts 22:00 bis 6:00 (Mond und Sterne).
   Lokal testen mit z. B. `&zeit=morgen` oder einer Uhrzeit wie `&zeit=03:59`.
-- **Finale:** Sind alle 24 Türchen offen, fliegen alle Fotos zu einem Herz zusammen.
+- **Finale:** An Heiligabend nach Türchen 24 fliegen alle Fotos zu einem Herz zusammen (bei vielen Fotos ein äußeres und ein inneres Herz, gleichmäßig verteilt, damit die Gesichter sichtbar bleiben).
   Danach lässt es sich über „♥️ Unser Herz“ jederzeit wieder ansehen.
 
 ## Countdown bis zum Geburtstag
@@ -55,6 +55,23 @@ Vom 15. bis 25. November läuft auf dem Countdown-Bildschirm jeden Tag eine ande
 (`specials.js`): Ballonfahrt, Gartenparty, Glühweinstand, Onsen, Rodelrennen, Matcha-Bad,
 Feuerwerk, Schneeballschlacht, Polonaise, Plätzchenbacken und am Vorabend der Geburtstagskuchen.
 Sie startet beim Öffnen automatisch und lässt sich über „🐹 Capy-Special nochmal ansehen“ wiederholen.
+
+## Vogel
+
+`vogel.js`: Ein kleines Rotkehlchen sitzt auf der Karte „Dein Tag“ (in der Countdown-Phase auf dem Countdown)
+und sagt 2 Sekunden nach dem Öffnen des Umschlags für 5 Sekunden den Tagesgruß. Antippen wiederholt ihn.
+Am Tag vor dem ersten Easter Egg gibt es zusätzlich einen Hinweis auf die versteckten Geheimnisse.
+10 Sekunden nach dem Sprechen fliegt es auf einer von 10 Routen aus dem Bild und landet auf einem
+von 5 Plätzen (Kalender: Karte, Polaroid, Lichterkette, Adventskranz bzw. „Unsere Momente“, Regal;
+Countdown: Countdown, Umschlag links und rechts, Siegel, Hinweistext). Am 26.11., 21.12. und 24.12.
+kommt ein Rotkehlchen-Weibchen mit Schleife dazu, setzt sich direkt neben das Männchen und folgt ihm.
+Erster Abflug 10 Sekunden nach dem Gruß, danach jeweils 15 Sekunden nach der Landung.
+
+## Herz im Titel
+
+`herz.js`: Antippen des ♥️ in „Für Toni“ lässt es in viele kleine Herzen zerspringen. Sie fliegen
+7 Sekunden über den Bildschirm und setzen sich dann Stück für Stück wieder zum Herz zusammen.
+Das heutige Türchen wird nicht mehr angescrollt und hat nur eine feine goldene Umrandung.
 
 ## Himmel
 
