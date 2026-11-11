@@ -920,6 +920,8 @@
     const gruss = document.getElementById("gruss");
     // Kosenamen wechseln je nach Tag und Tageszeit
     const name = KOSENAMEN[(d.tag * 3 + index) % KOSENAMEN.length];
+    const introGruss = document.getElementById("intro-gruss");
+    if (introGruss) introGruss.textContent = zeitBereit && !istGeburtstag() ? zeit.gruss.replace("{name}", name) : "";
     if (gruss) gruss.textContent = zeitBereit ? (istGeburtstag() ? "Happy Birthday, " + name + " 🎂" : zeit.gruss.replace("{name}", name)) : "";
     document.documentElement.toggleAttribute("data-geburtstag", zeitBereit && istGeburtstag());
   }
