@@ -1,6 +1,6 @@
 /*
  * ===========================================================
- *  CAPYBARA-SPECIALS vor dem Geburtstag (15. bis 25. November)
+ *  CAPYBARA-SPECIALS vor dem Geburtstag (11. bis 25. November)
  *  Jeden Tag läuft auf dem Countdown-Bildschirm eine andere
  *  kleine Capybara-Szene.
  * ===========================================================
@@ -111,6 +111,13 @@
       (o.handtuch ? '<path d="M11 9q17-12 34 0l-3 6q-14-7-28 0z" fill="' + (o.handtuch === true ? "#fff" : o.handtuch) + '"/><path d="M15 6q13-6 26 0" stroke="rgba(0,0,0,.08)" fill="none"/>' : "") +
       (o.helm ? '<path d="M7 18a21 21 0 0 1 42 0z" fill="#7cc4f0" opacity=".35"/>' : "");
   }
+  // Capybara von hinten (für das Kino), gleiche Koordinaten wie capyFront
+  function capyHinten(n) {
+    const t = typ(n);
+    return '<svg viewBox="0 -12 56 58" aria-hidden="true"><ellipse cx="14" cy="9" rx="5" ry="4" fill="' + t.ohr + '"/><ellipse cx="42" cy="9" rx="5" ry="4" fill="' + t.ohr + '"/>' +
+      '<rect x="7" y="6" width="42" height="40" rx="17" fill="' + t.fell + '"/><path d="M14 16q14-8 28 0" fill="none" stroke="' + t.dunkel + '" stroke-width="2" opacity=".5"/>' +
+      '<ellipse cx="28" cy="40" rx="17" ry="8" fill="' + t.dunkel + '" opacity=".5"/></svg>';
+  }
   function capyFront(o) { return '<svg viewBox="0 -12 56 58" aria-hidden="true">' + capyFrontInhalt(o) + "</svg>"; }
 
   let W = 0, H = 0;
@@ -152,8 +159,324 @@
     }
   }
 
-  /* ---------- Die elf Szenen ---------- */
+  /* ---------- Die fünfzehn Szenen (11. bis 25. November) ---------- */
   const SZENEN = {
+    11: { titel: "Kinoabend bei der Capy Crew 🍿", dauer: 12500, spiel() {
+      // Saal wird dunkel
+      const saal = figur("", "sp-kinosaal");
+      saal.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 900, fill: "forwards" });
+      const lb = Math.min(W * 0.86, 440), lh = lb * 0.56, lx = (W - lb) / 2, ly = Math.max(H * 0.06, 20);
+      // Lichtkegel vom Projektor
+      const kegel = figur('<svg viewBox="0 0 100 100" preserveAspectRatio="none"><defs><linearGradient id="kino-licht" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#fff6d8" stop-opacity=".55"/><stop offset="1" stop-color="#fff6d8" stop-opacity=".06"/></linearGradient></defs><path d="M47 100 L53 100 L100 0 L0 0z" fill="url(#kino-licht)"/></svg>',
+        "sp-kinokegel", { left: lx + "px", top: ly + lh + "px", width: lb + "px", height: Math.max(40, H - (ly + lh) - H * 0.2) + "px", opacity: "0" });
+      // Leinwand mit Film
+      const lw = figur('<div class="sp-film"></div><div class="sp-vorhang links"></div><div class="sp-vorhang rechts"></div><div class="sp-vorhang-oben"></div>', "sp-leinwand",
+        { left: lx + "px", top: ly + "px", width: lb + "px", height: lh + "px" });
+      lw.animate([{ opacity: 0, transform: "scale(.94)" }, { opacity: 1, transform: "scale(1)" }], { duration: 800, fill: "forwards" });
+      const film = lw.querySelector(".sp-film");
+      const [vl, vr] = lw.querySelectorAll(".sp-vorhang");
+      const auf = (an, verz) => [vl, vr].forEach((v) => v.animate([{ transform: "scaleX(" + (an ? 1 : 0.12) + ")" }, { transform: "scaleX(" + (an ? 0.12 : 1) + ")" }],
+        { duration: 1300, delay: verz || 0, easing: "cubic-bezier(.5,0,.3,1)", fill: "forwards" }));
+      spaeter(900, () => { auf(true); kegel.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0.8 }, { opacity: 1 }], { duration: 1600, fill: "forwards" }); });
+      // Der Film: zwei Capys kommen aufeinander zu und verlieben sich
+      const fg = lh * 0.42;
+      film.innerHTML = '<div class="sp-film-himmel"></div><div class="sp-film-boden"></div>';
+      const held = document.createElement("div"), heldin = document.createElement("div");
+      held.className = heldin.className = "sp-filmcapy";
+      held.innerHTML = capySeite({ typ: 2 }); heldin.innerHTML = capySeite({ typ: 0 });
+      [held, heldin].forEach((c) => { c.style.width = fg * 1.3 + "px"; c.style.bottom = lh * 0.12 + "px"; film.appendChild(c); });
+      heldin.firstChild.style.transform = "scaleX(-1)";
+      const mitteL = lb / 2 - fg * 1.3 + fg * 0.18, mitteR = lb / 2 - fg * 0.18;
+      spaeter(2100, () => {
+        held.animate([{ left: -fg * 1.4 + "px" }, { left: mitteL + "px" }], { duration: 2400, easing: "ease-out", fill: "forwards" });
+        heldin.animate([{ left: lb + "px" }, { left: mitteR + "px" }], { duration: 2400, easing: "ease-out", fill: "forwards" });
+        [held, heldin].forEach((c) => c.firstChild.animate([{ translate: "0 0" }, { translate: "0 -" + fg * 0.08 + "px" }], { duration: 300, direction: "alternate", iterations: 8 }));
+      });
+      const filmHerz = document.createElement("div");
+      filmHerz.className = "sp-filmherz"; filmHerz.textContent = "♥";
+      filmHerz.style.fontSize = lh * 0.34 + "px";
+      film.appendChild(filmHerz);
+      spaeter(4600, () => {
+        held.firstChild.animate([{ rotate: "0deg" }, { rotate: "8deg" }], { duration: 400, fill: "forwards" });
+        heldin.firstChild.animate([{ rotate: "0deg" }, { rotate: "-8deg" }], { duration: 400, fill: "forwards" });
+        filmHerz.animate([{ transform: "translate(-50%,0) scale(0)", opacity: 0 }, { transform: "translate(-50%,-10%) scale(1.25)", opacity: 1, offset: 0.6 }, { transform: "translate(-50%,-6%) scale(1)", opacity: 1 }],
+          { duration: 900, easing: "ease-out", fill: "forwards" });
+      });
+      const ende = document.createElement("div");
+      ende.className = "sp-filmende"; ende.textContent = "Ende ♥";
+      ende.style.fontSize = lh * 0.2 + "px";
+      film.appendChild(ende);
+      spaeter(7600, () => {
+        film.querySelectorAll(".sp-film-himmel, .sp-film-boden, .sp-filmcapy, .sp-filmherz").forEach((e) => e.animate([{ filter: "brightness(1)" }, { filter: "brightness(.3)" }], { duration: 600, fill: "forwards" }));
+        ende.animate([{ opacity: 0, transform: "translate(-50%,-50%) scale(.8)" }, { opacity: 1, transform: "translate(-50%,-50%) scale(1)" }], { duration: 700, fill: "forwards" });
+      });
+      spaeter(9000, () => { auf(false); kegel.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 900, fill: "forwards" }); });
+      // Publikum von hinten in roten Sesseln
+      const rb = Math.min(W * 0.96, 480), sitz = rb / 4;
+      const reihe = figur('<svg viewBox="0 0 400 70" preserveAspectRatio="none"><rect x="0" y="22" width="400" height="48" rx="10" fill="#7a1035"/>' +
+        [0, 1, 2, 3].map((i) => '<rect x="' + (i * 100 + 6) + '" y="0" width="88" height="60" rx="16" fill="#b0234f"/><rect x="' + (i * 100 + 14) + '" y="6" width="72" height="10" rx="5" fill="#c94a70" opacity=".6"/>').join("") + "</svg>",
+        "sp-kinoreihe", { left: (W - rb) / 2 + "px", width: rb + "px", height: sitz * 0.62 + "px" });
+      const gaeste = [0, 1, 2, 3].map((i) => {
+        const g = figur('<div class="sp-kopf-hinten">' + capyHinten(i === 1 ? 3 : i === 2 ? 1 : i * 2) + '</div><div class="sp-kopf-vorne">' + capyFront({ typ: i === 1 ? 3 : i === 2 ? 1 : i * 2 }) + "</div>",
+          "sp-zuschauer", { left: (W - rb) / 2 + i * sitz + sitz * 0.16 + "px", width: sitz * 0.68 + "px" });
+        g.animate([{ transform: "translateY(40%)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }], { duration: 700, delay: 300 + i * 120, easing: "cubic-bezier(.3,1.4,.5,1)", fill: "both" });
+        return g;
+      });
+      // Popcorn wird genascht
+      const eimer = figur('<svg viewBox="0 0 40 46"><path d="M6 14h28l-4 30H10z" fill="#fff"/><path d="M10 14l2 30M18 14v30M26 14l-1 30M33 14l-3 30" stroke="#e8455f" stroke-width="3"/>' +
+        [[8, 12], [14, 7], [20, 10], [26, 6], [32, 11], [17, 3], [24, 1]].map(([x, y]) => '<circle cx="' + x + '" cy="' + y + '" r="5" fill="#fff6d8" stroke="#f3dc9f"/>').join("") + "</svg>",
+        "sp-popcorn", { left: (W - rb) / 2 + sitz * 1.72 + "px", width: sitz * 0.32 + "px" });
+      eimer.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 900, fill: "both" });
+      const knabbern = () => {
+        const r = eimer.getBoundingClientRect(), b = buehne.getBoundingClientRect();
+        for (let k = 0; k < 3; k++) {
+          const s = document.createElement("span");
+          s.className = "sp-popkorn";
+          s.style.left = r.left - b.left + r.width * zufall(0.2, 0.8) + "px";
+          s.style.top = r.top - b.top + "px";
+          buehne.appendChild(s);
+          const dx = zufall(-40, 40), hoch = zufall(30, 70);
+          s.animate([{ transform: "translate(0,0)" }, { transform: "translate(" + dx / 2 + "px,-" + hoch + "px)", offset: 0.5 }, { transform: "translate(" + dx + "px,10px)", opacity: 0 }],
+            { duration: 900, easing: "ease-out", fill: "forwards" });
+        }
+      };
+      for (const t of [2600, 3800, 5200, 6600]) spaeter(t, knabbern);
+      // beim Happy End dreht sich ein Capy gerührt um
+      spaeter(5600, () => {
+        const g = gaeste[1];
+        g.classList.add("dreht");
+        const tr = document.createElement("span");
+        tr.className = "sp-traene";
+        g.appendChild(tr);
+        tr.animate([{ transform: "translateY(0)", opacity: 0 }, { opacity: 1, offset: 0.2 }, { transform: "translateY(" + sitz * 0.35 + "px)", opacity: 0 }], { duration: 1100, iterations: 2, delay: 300 });
+        const b = figur("<span>Hach, wie schön 🥹</span>", "sp-blase", { left: (W - rb) / 2 + sitz * 1.5 + "px", bottom: H - g.offsetTop + 8 + "px" });
+        spaeter(2200, () => { b.remove(); g.classList.remove("dreht"); });
+      });
+      // zum Schluss fliegt das Popcorn vor Begeisterung in die Luft
+      spaeter(10000, () => {
+        gaeste.forEach((g, i) => g.animate([{ transform: "translateY(0)" }, { transform: "translateY(-16px)" }, { transform: "translateY(0)" }], { duration: 450, delay: i * 80, iterations: 2 }));
+        const r = eimer.getBoundingClientRect(), b = buehne.getBoundingClientRect();
+        partikel(r.left - b.left + r.width / 2, r.top - b.top, ["🍿", "♥", "🍿", "✨"], 18, 150, ["#e85d7e", "#f3c84b"]);
+      });
+    } },
+
+    12: { titel: "Mit der Capy Seilbahn ganz nach oben 🚡", dauer: 12500, spiel() {
+      // Berge und Seil
+      const berge = figur('<svg viewBox="0 0 400 160" preserveAspectRatio="none">' +
+        '<path d="M0 160 L0 90 L60 40 L110 85 L170 20 L240 95 L300 35 L360 80 L400 55 V160z" fill="#c9d7ee"/>' +
+        '<path d="M60 40 L48 52 L58 50 L66 56 L72 48z M170 20 L156 36 L168 33 L176 40 L184 31z M300 35 L288 49 L298 47 L306 52 L312 45z" fill="#fff"/>' +
+        '<path d="M0 160 L0 120 Q80 95 150 118 T300 110 T400 116 V160z" fill="#eef3fb"/>' +
+        [30, 70, 250, 330, 380].map((x, i) => '<path d="M' + x + ' ' + (126 - i % 2 * 6) + ' l-9 18 h18z" fill="#3f7f55"/><path d="M' + x + ' ' + (118 - i % 2 * 6) + ' l-7 14 h14z" fill="#4f8a5b"/>').join("") + "</svg>",
+        "sp-berge");
+      berge.animate([{ transform: "translateY(40%)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }], { duration: 1000, easing: "ease-out", fill: "forwards" });
+      for (let k = 0; k < 3; k++) {
+        const w = figur('<svg viewBox="0 0 120 50"><path d="M18 46h86a16 16 0 0 0 0-32 22 22 0 0 0-40-8 18 18 0 0 0-30 8 16 16 0 0 0-16 32z" fill="#fff"/></svg>', "sp-wolke-fahrt",
+          { top: H * (0.05 + k * 0.12) + "px", width: zufall(90, 150) + "px", opacity: "0.85" });
+        w.animate([{ transform: "translateX(" + (k % 2 ? W : -160) + "px)" }, { transform: "translateX(" + (k % 2 ? -160 : W) + "px)" }], { duration: zufall(14000, 20000), delay: -k * 4000, fill: "both" });
+      }
+      const y0 = H * 0.16, y1 = H * 0.5;
+      const seilY = (x) => y0 + (y1 - y0) * (x / W) + Math.sin((x / W) * Math.PI) * H * 0.04;
+      let pfad = "";
+      for (let i = 0; i <= 40; i++) { const x = (i / 40) * W; pfad += (i ? "L" : "M") + x.toFixed(1) + " " + seilY(x).toFixed(1); }
+      const seil = figur('<svg width="' + W + '" height="' + H + '" viewBox="0 0 ' + W + " " + H + '"><path d="' + pfad + '" stroke="#4a3542" stroke-width="2.4" fill="none"/>' +
+        '<path d="' + pfad + '" stroke="#4a3542" stroke-width="1.2" fill="none" transform="translate(0 -7)" opacity=".55"/></svg>', "sp-seil", { left: "0", top: "0" });
+      seil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, fill: "forwards" });
+      // Gondel mit zwei Capys
+      const gb = Math.min(W * 0.36, 170);
+      const gondel = figur('<svg viewBox="0 0 120 150">' +
+        '<rect x="56" y="0" width="8" height="34" fill="#4a3542"/><circle cx="52" cy="6" r="7" fill="#6b5560"/><circle cx="68" cy="6" r="7" fill="#6b5560"/>' +
+        '<rect x="10" y="32" width="100" height="12" rx="6" fill="#9d2449"/>' +
+        '<rect x="6" y="42" width="108" height="98" rx="20" fill="#e85d7e"/><rect x="6" y="116" width="108" height="24" rx="12" fill="#c2185b"/>' +
+        '<rect x="16" y="52" width="88" height="56" rx="12" fill="#e7f4ff"/><path d="M22 58 l18 0 -16 22z" fill="#fff" opacity=".7"/>' +
+        '<g class="sp-gondel-paar"><g class="sp-gp-links" transform="translate(20 62) scale(.68)">' + capyFrontInhalt({ typ: 4 }) + '</g>' +
+        '<g class="sp-gp-rechts" transform="translate(62 62) scale(.68)">' + capyFrontInhalt({ typ: 0 }) + "</g></g>" +
+        '<rect x="16" y="98" width="88" height="10" fill="#e85d7e"/><text x="60" y="133" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="17" fill="#fff">Capy Lift ♥</text></svg>',
+        "sp-gondel", { left: "0", top: "0", width: gb + "px" });
+      const gh = gb * 1.25;
+      const stelle = (x, rot) => ({ transform: "translate(" + (x - gb / 2).toFixed(1) + "px," + (seilY(x) - 4).toFixed(1) + "px) rotate(" + (rot || 0) + "deg)" });
+      const mitte = W * 0.5;
+      const bahn1 = [], bahn2 = [];
+      for (let i = 0; i <= 12; i++) bahn1.push(stelle(-gb + (mitte + gb) * (i / 12), i < 12 ? Math.sin(i) * 1.5 : 0));
+      for (let i = 0; i <= 12; i++) bahn2.push(stelle(mitte + (W + gb - mitte) * (i / 12), Math.sin(i) * 1.5));
+      gondel.style.transformOrigin = gb / 2 + "px 0";
+      gondel.animate(bahn1, { duration: 3400, delay: 800, easing: "ease-out", fill: "both" });
+      // in der Mitte bleibt sie stehen und schaukelt
+      spaeter(4200, () => {
+        gondel.animate([0, 7, -6, 4, -2.5, 0].map((r) => stelle(mitte, r)), { duration: 2600, easing: "ease-in-out", fill: "forwards" });
+        const l = gondel.querySelector(".sp-gp-links"), r = gondel.querySelector(".sp-gp-rechts");
+        spaeter(900, () => {
+          l.animate([{ transform: "translate(20px,62px) scale(.68)" }, { transform: "translate(24px,60px) scale(.68) rotate(10deg)" }], { duration: 600, fill: "forwards" });
+          r.animate([{ transform: "translate(62px,62px) scale(.68)" }, { transform: "translate(58px,60px) scale(.68) rotate(-10deg)" }], { duration: 600, fill: "forwards" });
+        });
+        spaeter(1500, () => {
+          const herz = figur('<svg viewBox="0 0 32 29"><path d="M16 28C10 23.6 2 17.6 2 10.2 2 5.7 5.4 2.4 9.5 2.4c2.7 0 5 1.4 6.5 3.7 1.5-2.3 3.8-3.7 6.5-3.7 4.1 0 7.5 3.3 7.5 7.8C30 17.6 22 23.6 16 28z" fill="#ff4d7d"/></svg>',
+            "sp-gondelherz", { left: mitte - gb * 0.18 + "px", top: seilY(mitte) + gh * 0.3 + "px", width: gb * 0.36 + "px" });
+          herz.animate([{ transform: "translateY(0) scale(.2)", opacity: 0 }, { transform: "translateY(-" + gh * 0.5 + "px) scale(1.1)", opacity: 1, offset: 0.45 }, { transform: "translateY(-" + gh * 0.9 + "px) scale(1)", opacity: 0 }],
+            { duration: 2600, easing: "ease-out", fill: "forwards" });
+          partikel(mitte, seilY(mitte) + gh * 0.35, ["♥", "✨"], 10, 80, ["#ff4d7d", "#f3c84b"]);
+        });
+        spaeter(2700, () => {
+          const b = figur("<span>Hier oben ist es am schönsten mit dir 🥰</span>", "sp-blase", { left: mitte + "px", top: Math.max(8, seilY(mitte) - 54) + "px" });
+          spaeter(2200, () => b.remove());
+        });
+      });
+      spaeter(7300, () => gondel.animate(bahn2, { duration: 3800, easing: "ease-in", fill: "forwards" }));
+      // leichter Schneefall
+      for (let k = 0; k < 18; k++) {
+        const s = figur("", "sp-flocke", { left: zufall(0, W) + "px", top: "-10px", width: zufall(4, 8) + "px", height: "0" });
+        s.style.height = s.style.width;
+        s.animate([{ transform: "translate(0,0)" }, { transform: "translate(" + zufall(-30, 30) + "px," + (H + 20) + "px)" }], { duration: zufall(6000, 10000), delay: zufall(0, 6000), easing: "linear", fill: "both" });
+      }
+    } },
+
+    13: { titel: "Ab in die Capy Fotobox 📸", dauer: 12500, spiel() {
+      const bb = Math.min(W * 0.5, 290), bh = bb * 1.45, bx = W / 2 - bb / 2, by = H - bh - H * 0.04;
+      const box = figur('<svg viewBox="0 0 200 290">' +
+        '<rect x="10" y="40" width="180" height="250" rx="14" fill="#f2a7ba"/><rect x="10" y="40" width="180" height="250" rx="14" fill="none" stroke="#c2185b" stroke-width="4"/>' +
+        '<rect x="0" y="0" width="200" height="46" rx="12" fill="#9d2449"/>' +
+        '<text x="100" y="31" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="26" fill="#fff">Fotobox ♥</text>' +
+        [16, 40, 64, 88, 112, 136, 160, 184].map((x, i) => '<circle class="sp-lampe" style="animation-delay:' + (-i * 0.15) + 's" cx="' + x + '" cy="40" r="4" fill="#ffd36b"/>').join("") +
+        '<rect x="30" y="64" width="140" height="210" rx="8" fill="#3a1f2e"/>' +
+        '<rect x="176" y="150" width="20" height="8" rx="3" fill="#6b1532"/>' +
+        "</svg>" +
+        '<div class="sp-box-innen"></div><div class="sp-box-vorhang"></div>', "sp-fotobox", { left: bx + "px", top: by + "px", width: bb + "px", height: bh + "px" });
+      box.animate([{ transform: "translateY(30px) scale(.9)", opacity: 0 }, { transform: "none", opacity: 1 }], { duration: 800, easing: "cubic-bezier(.3,1.4,.5,1)", fill: "forwards" });
+      const vorhang = box.querySelector(".sp-box-vorhang");
+      vorhang.style.transform = "scaleY(.35)";
+      // vier Capys laufen nacheinander hinein
+      const gr = Math.min(W * 0.22, 130);
+      const gaeste = [0, 1, 2, 3].map((i) => figur(capySeite({ typ: [5, 1, 9, 6][i] }), "sp-gespiegelt", { width: gr + "px", top: by + bh - gr * 0.8 + "px", left: W + "px" }));
+      gaeste.forEach((g, i) => {
+        g.animate([{ left: W + 20 + "px", opacity: 1 }, { left: bx + bb * 0.32 + "px", opacity: 1, offset: 0.85 }, { left: bx + bb * 0.3 + "px", opacity: 0, transform: "scale(.7)" }],
+          { duration: 1500, delay: 900 + i * 450, easing: "ease-in", fill: "both" });
+        g.firstChild.animate([{ translate: "0 0" }, { translate: "0 -6px" }], { duration: 220, direction: "alternate", iterations: 7, delay: 900 + i * 450 });
+      });
+      spaeter(3500, () => {
+        vorhang.animate([{ transform: "scaleY(.35)" }, { transform: "scaleY(1)" }], { duration: 600, easing: "ease-in-out", fill: "forwards" });
+        box.animate([{ transform: "rotate(0)" }, { transform: "rotate(-1.5deg)" }, { transform: "rotate(1.5deg)" }, { transform: "rotate(0)" }], { duration: 500, delay: 500, iterations: 2 });
+      });
+      // dreimal Blitz
+      const blitz = figur("", "sp-blitz");
+      [4400, 5300, 6200].forEach((t, i) => spaeter(t, () => {
+        blitz.animate([{ opacity: 0 }, { opacity: 0.92, offset: 0.12 }, { opacity: 0 }], { duration: 520, easing: "ease-out" });
+        box.animate([{ transform: "scale(1)" }, { transform: "scale(1.03)" }, { transform: "scale(1)" }], { duration: 300 });
+        const b = figur("<span>" + ["Grimasse! 😝", "Cool bleiben 😎", "Küsschen! 😘"][i] + "</span>", "sp-blase", { left: W / 2 + "px", top: Math.max(6, by - 46) + "px" });
+        spaeter(800, () => b.remove());
+      }));
+      // der Fotostreifen kommt heraus und flattert zu Boden
+      const sb = Math.min(W * 0.24, 132);
+      const bild = (inhalt) => '<div class="sp-streifen-bild"><svg viewBox="0 0 112 70">' + inhalt + "</svg></div>";
+      const kopf = (x, y, s, o, rot) => '<g transform="translate(' + x + " " + y + ") rotate(" + (rot || 0) + ' 28 20) scale(' + s + ')">' + capyFrontInhalt(o) + "</g>";
+      const brille = (x, y) => '<g transform="translate(' + x + " " + y + ')"><rect x="-1" y="0" width="13" height="7" rx="3" fill="#1d1d24"/><rect x="15" y="0" width="13" height="7" rx="3" fill="#1d1d24"/><path d="M12 3h3" stroke="#1d1d24" stroke-width="2"/></g>';
+      const streifen = figur('<div class="sp-streifen-kopf">♥ 13.11. ♥</div>' +
+        bild('<rect width="112" height="70" fill="#fde3ea"/>' + kopf(2, 14, 0.5, { typ: 5, mund: "offen" }, -14) + kopf(30, 10, 0.5, { typ: 1, mund: "offen" }, 10) + kopf(58, 14, 0.5, { typ: 9, mund: "offen" }, -8) + kopf(84, 12, 0.48, { typ: 6, mund: "offen" }, 14)) +
+        bild('<rect width="112" height="70" fill="#e7f4ff"/>' + [[2, 16, 5], [30, 14, 1], [58, 16, 9], [84, 15, 6]].map(([x, y, t]) => kopf(x, y, 0.5, { typ: t }) + brille(x + 9.5, y + 12.5)).join("")) +
+        bild('<rect width="112" height="70" fill="#fff4f6"/>' + kopf(18, 14, 0.62, { typ: 5 }, 12) + kopf(56, 14, 0.62, { typ: 1 }, -12) +
+          '<path d="M56 8c-2-3.4-7.4-2.6-7.4 1.2 0 3.2 7.4 6.8 7.4 6.8s7.4-3.6 7.4-6.8c0-3.8-5.4-4.6-7.4-1.2z" fill="#ff4d7d"/>'),
+        "sp-fotostreifen", { left: bx + bb * 0.88 + "px", top: by + bh * 0.52 + "px", width: sb + "px" });
+      streifen.style.clipPath = "inset(0 0 100% 0)";
+      spaeter(7000, () => {
+        streifen.animate([{ clipPath: "inset(0 0 100% 0)" }, { clipPath: "inset(0 0 0% 0)" }], { duration: 1400, easing: "linear", fill: "forwards" });
+        streifen.animate([{ transform: "translateY(-100%)" }, { transform: "translateY(0)" }], { duration: 1400, easing: "linear", fill: "forwards" });
+      });
+      spaeter(8500, () => {
+        const ziel = Math.min(W - sb - 10, bx + bb + 14), boden = H - streifen.offsetHeight * 0.95;
+        const sy = by + bh * 0.52;
+        streifen.animate([
+          { transform: "translate(0,0) rotate(0)" },
+          { transform: "translate(" + (ziel - (bx + bb * 0.88)) * 0.4 + "px," + (boden - sy) * 0.3 + "px) rotate(18deg)" },
+          { transform: "translate(" + (ziel - (bx + bb * 0.88)) * 0.7 + "px," + (boden - sy) * 0.65 + "px) rotate(-12deg)" },
+          { transform: "translate(" + (ziel - (bx + bb * 0.88)) + "px," + (boden - sy) + "px) rotate(8deg)" },
+        ], { duration: 2100, easing: "ease-in-out", fill: "forwards" });
+      });
+      // Vorhang auf, alle hüpfen glücklich heraus
+      spaeter(8800, () => {
+        vorhang.animate([{ transform: "scaleY(1)" }, { transform: "scaleY(.35)" }], { duration: 600, fill: "forwards" });
+        gaeste.forEach((g, i) => {
+          g.classList.remove("sp-gespiegelt");
+          g.animate([{ left: bx + bb * 0.3 + "px", opacity: 0, transform: "scale(.7)" }, { left: bx + bb * 0.1 - i * gr * 0.55 + "px", opacity: 1, transform: "scale(1) translateY(-24px)", offset: 0.5 }, { left: bx - gr * 0.4 - i * gr * 0.55 + "px", opacity: 1, transform: "scale(1)" }],
+            { duration: 1200, delay: 400 + i * 200, easing: "ease-out", fill: "forwards" });
+        });
+        spaeter(1400, () => partikel(bx + bb * 0.2, by + bh * 0.7, ["♥", "✨", "📸"], 14, 110, ["#e85d7e", "#f3c84b"]));
+      });
+    } },
+
+    14: { titel: "Nächster Halt: Capyhausen 🚂", dauer: 12500, spiel() {
+      const gy = H * 0.8;
+      const land = figur('<svg viewBox="0 0 400 100" preserveAspectRatio="none"><path d="M0 30 Q100 0 200 22 T400 14 V100 H0z" fill="#d7ecd0"/><path d="M0 52 Q120 34 220 50 T400 44 V100 H0z" fill="#b9dfb0"/></svg>',
+        "sp-land", { top: gy - H * 0.22 + "px", height: H * 0.22 + 4 + "px" });
+      land.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, fill: "forwards" });
+      const gleis = figur('<div class="sp-gleis-schwellen"></div><div class="sp-gleis-schiene"></div><div class="sp-gleis-schiene unten"></div>', "sp-gleis", { top: gy + "px" });
+      gleis.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, fill: "forwards" });
+      // Bahnhofsschild
+      const schild = figur('<svg viewBox="0 0 150 120"><rect x="70" y="40" width="10" height="80" fill="#6b4a3a"/><rect x="5" y="6" width="140" height="40" rx="8" fill="#fff8e6" stroke="#9d2449" stroke-width="4"/>' +
+        '<text x="75" y="33" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="24" fill="#9d2449">Capyhausen</text></svg>',
+        "sp-schild", { left: W - Math.min(W * 0.34, 150) - W * 0.04 + "px", top: gy - Math.min(W * 0.34, 150) * 0.8 - (W < 700 ? Math.max(56, Math.min(165, (W * 0.92) / 5.55)) * 0.9 - Math.min(W * 0.34, 150) * 0.18 : 0) + "px", width: Math.min(W * 0.34, 150) + "px" });
+      schild.animate([{ transform: "scaleY(0)" }, { transform: "scaleY(1)" }], { duration: 700, delay: 300, easing: "cubic-bezier(.3,1.4,.5,1)", fill: "both" });
+      // Der Zug: Lok, drei Waggons und ein Herzwaggon
+      // der ganze Zug passt beim Halt ins Bild
+      const wb = Math.max(56, Math.min(165, (W * 0.92) / 5.55));
+      const rad = (x) => '<g class="sp-rad" style="transform-origin:' + x + 'px 92px"><circle cx="' + x + '" cy="92" r="11" fill="#3a2a33"/><circle cx="' + x + '" cy="92" r="5" fill="#f3c84b"/><path d="M' + x + ' 81v22M' + (x - 11) + ' 92h22" stroke="#f3c84b" stroke-width="2"/></g>';
+      const lok = '<svg viewBox="0 0 130 105">' +
+        '<rect x="26" y="8" width="16" height="30" rx="3" fill="#3a2a33"/><rect x="22" y="4" width="24" height="9" rx="3" fill="#3a2a33"/>' +
+        '<rect x="14" y="36" width="78" height="46" rx="14" fill="#d6304f"/><rect x="72" y="18" width="50" height="64" rx="8" fill="#9d2449"/>' +
+        '<rect x="82" y="28" width="30" height="22" rx="4" fill="#e7f4ff"/><g transform="translate(84 25) scale(.48)">' + capyFrontInhalt({ typ: 2, mund: "offen" }) + '</g>' +
+        '<path d="M2 82 L14 64 L14 82z" fill="#3a2a33"/><circle cx="18" cy="52" r="6" fill="#ffd36b"/><rect x="10" y="80" width="114" height="8" rx="3" fill="#3a2a33"/>' +
+        rad(34) + rad(66) + rad(102) + "</svg>";
+      const waggon = (t, farbe) => '<svg viewBox="0 0 120 105"><rect x="6" y="30" width="108" height="54" rx="10" fill="' + farbe + '"/><rect x="6" y="26" width="108" height="10" rx="5" fill="#fff" opacity=".5"/>' +
+        '<rect x="22" y="38" width="76" height="34" rx="8" fill="#e7f4ff"/><g class="sp-winker" transform="translate(37 32) scale(.82)">' + capyFrontInhalt({ typ: t }) + '</g>' +
+        '<path class="sp-pfote" d="M90 50 q6 -14 2 -20" stroke="#b07a52" stroke-width="7" stroke-linecap="round" fill="none"/>' +
+        '<rect x="0" y="80" width="120" height="8" rx="3" fill="#3a2a33"/>' + rad(28) + rad(92) + "</svg>";
+      const herzWaggon = '<svg viewBox="0 0 120 105"><path d="M60 88C40 76 8 58 8 34 8 20 19 10 32 10c11 0 20 6 28 16 8-10 17-16 28-16 13 0 24 10 24 24 0 24-32 42-52 54z" fill="#ff4d7d"/>' +
+        '<path d="M60 88C40 76 8 58 8 34" fill="none" stroke="#fff" stroke-width="3" opacity=".5"/>' +
+        '<g transform="translate(24 26) scale(.62) rotate(10 28 20)">' + capyFrontInhalt({ typ: 5 }) + '</g><g transform="translate(62 26) scale(.62) rotate(-10 28 20)">' + capyFrontInhalt({ typ: 1 }) + "</g>" +
+        '<rect x="0" y="82" width="120" height="8" rx="3" fill="#3a2a33"/>' + rad(30) + rad(90) + "</svg>";
+      const teile = [lok, waggon(0, "#7cc4f0"), waggon(3, "#9be3b0"), waggon(9, "#f3c84b"), herzWaggon];
+      const zug = figur(teile.map((t, i) => '<div class="sp-wagen" style="width:' + (i === 0 ? wb * 1.08 : wb) + 'px">' + t + "</div>").join('<div class="sp-kupplung" style="margin-bottom:' + (wb * 0.13).toFixed(1) + 'px"></div>'), "sp-zug",
+        { top: gy - wb * 0.86 + "px", left: "0" });
+      const zl = zug.scrollWidth || wb * 5.6;
+      const halt = zl < W ? (W - zl) / 2 : W * 0.03;
+      // passt das Schild nicht neben den haltenden Zug, steht es dahinter etwas höher
+      const sw = schild.offsetWidth;
+      if (halt + zl + 10 > W - sw - W * 0.04) schild.style.top = gy - sw * 0.8 - wb * 0.9 + sw * 0.18 + "px";
+      else schild.style.top = gy - sw * 0.8 + "px";
+      zug.animate([{ transform: "translateX(" + W + "px)" }, { transform: "translateX(" + halt + "px)" }], { duration: 3600, delay: 600, easing: "cubic-bezier(.2,.6,.35,1)", fill: "both" });
+      const raeder = [...zug.querySelectorAll(".sp-rad")];
+      const drehen = (dauer, verz) => raeder.forEach((r) => r.animate([{ transform: "rotate(0)" }, { transform: "rotate(-720deg)" }], { duration: dauer, delay: verz || 0, easing: "linear" }));
+      drehen(3600, 600);
+      // winken im Waggon
+      zug.querySelectorAll(".sp-pfote").forEach((p, i) => p.animate([{ transform: "rotate(0)" }, { transform: "rotate(-25deg)" }], { duration: 300, direction: "alternate", iterations: 24, delay: i * 120, easing: "ease-in-out" }));
+      zug.querySelectorAll(".sp-pfote").forEach((p) => { p.style.transformBox = "fill-box"; p.style.transformOrigin = "50% 100%"; });
+      // Herzwolken aus dem Schornstein
+      const dampfHerz = () => {
+        const r = zug.querySelector(".sp-wagen").getBoundingClientRect(), b = buehne.getBoundingClientRect();
+        const x = r.left - b.left + r.width * 0.26, y = r.top - b.top + r.height * 0.02;
+        if (x < -20 || x > W + 20) return;
+        const s = document.createElement("span");
+        s.className = "sp-dampfherz";
+        s.textContent = Math.random() < 0.6 ? "♥" : "●";
+        s.style.left = x + "px"; s.style.top = y + "px";
+        s.style.fontSize = zufall(14, 24) + "px";
+        buehne.appendChild(s);
+        s.animate([{ transform: "translate(-50%,0) scale(.4)", opacity: 0.95 }, { transform: "translate(calc(-50% + " + zufall(10, 40) + "px),-" + zufall(50, 90) + "px) scale(1.4)", opacity: 0 }],
+          { duration: 1500, easing: "ease-out", fill: "forwards" }).finished.then(() => s.remove(), () => s.remove());
+      };
+      for (let t = 700; t < 11800; t += 260) spaeter(t, dampfHerz);
+      // Halt am Bahnhof
+      spaeter(4300, () => {
+        const b = figur("<span>Tuut tuut! Alle einsteigen ♥</span>", "sp-blase", { left: W / 2 + "px", top: Math.max(6, gy - wb * 1.65 - 30) + "px" });
+        spaeter(1700, () => b.remove());
+        zug.querySelectorAll(".sp-winker").forEach((w, i) => w.animate([{ translate: "0 0" }, { translate: "0 -6px" }], { duration: 220, direction: "alternate", iterations: 6, delay: i * 90 }));
+        const hz = zug.lastElementChild.getBoundingClientRect(), bb = buehne.getBoundingClientRect();
+        partikel(hz.left - bb.left + hz.width / 2, hz.top - bb.top + hz.height * 0.2, ["♥"], 10, 70, ["#ff4d7d", "#ff8fab"]);
+      });
+      // weiter geht die Fahrt
+      spaeter(6200, () => {
+        zug.animate([{ transform: "translateX(" + halt + "px)" }, { transform: "translateX(" + -(zl + 40) + "px)" }], { duration: 5200, easing: "cubic-bezier(.5,0,.8,.6)", fill: "forwards" });
+        drehen(5200);
+      });
+    } },
+
     15: { titel: "Die Capy Crew geht auf Ballonfahrt 🎈", dauer: 13000, spiel() {
       const farben = ["#e85d7e", "#f3c84b", "#7cc4f0", "#9be3b0", "#b39ddb", "#fda4b8", "#ff8a65"];
       const capyIn = (n, x, y, s) => '<g transform="translate(' + x + " " + y + ") scale(" + (s || 1) + ')">' + capyFrontInhalt({ typ: n }) + "</g>";
