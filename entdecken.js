@@ -15,6 +15,7 @@
  */
 (function () {
   "use strict";
+  const melde = (id) => { const a = window.adventkalender; if (a && a.entdeckt) a.entdeckt(id); };
 
   const ak = window.adventkalender;
   if (!ak || !ak.intro) return;
@@ -168,6 +169,7 @@
       const tagNr = Math.round((Date.UTC(d.jahr, d.monat - 1, d.tag) - Date.UTC(JAHR, 10, 1)) / 86400000);
       const text = ZETTEL[((tagNr * ZETTEL_PRO_TAG + gelesen) % ZETTEL.length + ZETTEL.length) % ZETTEL.length];
       schreib(schluessel, { tag: heute, anzahl: gelesen + 1 });
+      melde("brief");
       fahne.animate([{ transform: "rotate(0)" }, { transform: "rotate(-80deg)" }, { transform: "rotate(-70deg)" }, { transform: "rotate(0)" }], { duration: ruhig ? 1 : 1400 });
       zettel.animate([{ opacity: 0, transform: "translate(0,6px)" }, { opacity: 1, transform: "translate(0,-6px) rotate(-8deg)" }], opt(420));
       await warte(380);
@@ -256,7 +258,7 @@
       schreib("toni-schneemann-" + JAHR, { tag: tagSchluessel(), stufe });
       zeigeStufe(g, stufe, true);
       funken(r.left + r.width / 2, r.top + r.height * 0.6, 6, ["❄", "✦"], ["#fff", "#cfe6ff", "#ffe9a8"], 36);
-      if (stufe === SM_STUFEN) setTimeout(() => winke(g), 450);
+      if (stufe === SM_STUFEN) { setTimeout(() => winke(g), 450); melde("schneemann"); }
     } else winke(g);
   }
   function winke(g) {
@@ -307,6 +309,7 @@
     if (!ak.intro.bereit()) return;
     document.querySelectorAll(".fensterblick").forEach((f) => f.remove());
     fenster.classList.add("fenster-an");
+    melde("fenster");
     const r = fenster.getBoundingClientRect();
     const d = kalTag();
     const szene = SZENEN[(szenenZaehler++ + (d ? d.tag : 0)) % SZENEN.length];
@@ -357,6 +360,7 @@
   function schornstein(treffer, kamin) {
     if (treffer.dataset.laeuft) return;
     treffer.dataset.laeuft = "1";
+    melde("kamin");
     setTimeout(() => delete treffer.dataset.laeuft, 1600);
     const p = aufBildschirm(kamin, +treffer.dataset.x, +treffer.dataset.y);
     const nacht = html.getAttribute("data-tageszeit") === "nacht" || html.hasAttribute("data-abend");
@@ -460,6 +464,7 @@
     function schuettle(stark) {
       if (wirbelt) return;
       wirbelt = true;
+      melde("schneekugel");
       if (!ruhig) kugel.animate([{ transform: "rotate(0)" }, { transform: "rotate(-9deg)" }, { transform: "rotate(8deg)" }, { transform: "rotate(-5deg)" }, { transform: "rotate(3deg)" }, { transform: "rotate(0)" }],
         { duration: 700, easing: "ease-in-out" });
       const herz = kugel.querySelector(".sk-herz");
@@ -548,6 +553,7 @@
       text.value = "";
       dlg.close();
       papierflieger(r, stern);
+      melde("wunsch");
     });
   }
   function papierflieger(r, stern) {
@@ -640,6 +646,7 @@
       const z = zug; zug = null;
       if (z.amp < 6) { biege(z.x0, 0); return; }
       nachZug = true;
+      melde("ziehen");
       setTimeout(() => { nachZug = false; }, 400);
       const lang = z.langAb && performance.now() - z.langAb > 800;
       const A = z.amp, t0 = performance.now();
@@ -681,7 +688,7 @@
       !html.hasAttribute("data-schneetag") && !document.querySelector("#finale:not([hidden]), .neujahr, .aufbau-buehne, .special-buehne");
   }
   function lasseFlockeFallen(immer) {
-    if (!immer && !darfFlocke()) return;
+    if (!immer && (!darfFlocke() || document.querySelector(".goldflocke"))) return;
     const f = document.createElement("button");
     f.type = "button";
     f.className = "goldflocke";
@@ -703,6 +710,7 @@
       funken(r.left + r.width / 2, r.top + r.height / 2, 16, ["✦", "✧", "❄"], GOLD, 60);
       const anzahl = flockenStand() + 1;
       schreib("toni-goldflocken-" + JAHR, { tag: tagSchluessel(), anzahl });
+      if (anzahl >= FLOCKEN_ZIEL) melde("flocken");
       if (anzahl === FLOCKEN_ZIEL) setTimeout(() => vogelSagt("Wow, du hast heute schon 5 goldene Schneeflocken gefangen! Du bist ein echter Glückspilz ✨"), 400);
       else chip(anzahl < FLOCKEN_ZIEL ? "✨ " + anzahl + " von " + FLOCKEN_ZIEL + " goldenen Flocken" : "✨ Schon " + anzahl + " goldene Flocken heute");
     });
@@ -808,6 +816,7 @@
     schreib("toni-plaetzchen-" + JAHR, { tag: tagSchluessel(), heute: s.heute + 1, gesamt: s.gesamt + 1 });
     zeigeLoecher(nr + 1);
     backText();
+    melde("plaetzchen");
     const keks = document.createElement("div");
     keks.className = "keks-flug";
     keks.style.left = start.x + "px";
@@ -889,6 +898,7 @@
   function mistelzweig() {
     if (mistelSperre) return;
     mistelSperre = true;
+    melde("mistel");
     if (navigator.vibrate) try { navigator.vibrate([20, 60, 20]); } catch (_) { /* egal */ }
     const ebene = document.createElement("div");
     ebene.className = "mistel-ebene";

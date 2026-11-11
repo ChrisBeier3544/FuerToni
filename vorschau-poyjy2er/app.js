@@ -803,6 +803,8 @@
     });
     ctx.textAlign = "center";
     function schritt() {
+      // solange ein Fenster offen ist, bleibt der Schnee im Hintergrund stehen
+      if (document.documentElement.classList.contains("ruhe")) { requestAnimationFrame(schritt); return; }
       ctx.clearRect(0, 0, w, h);
       const abend = document.documentElement.hasAttribute("data-abend");
       wind *= 0.94;

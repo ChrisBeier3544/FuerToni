@@ -8,6 +8,7 @@
  */
 (function () {
   "use strict";
+  const melde = (id) => { const a = window.adventkalender; if (a && a.entdeckt) a.entdeckt(id); };
 
   const herz = document.querySelector(".titel-herz");
   if (!herz) return;
@@ -18,6 +19,7 @@
   herz.addEventListener("click", () => {
     if (laeuft) return;
     laeuft = true;
+    melde("herz");
     const r = herz.getBoundingClientRect();
     const mitte = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
     const zeichen = herz.innerHTML;

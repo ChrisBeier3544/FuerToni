@@ -2918,3 +2918,23 @@ html[data-abend] .backstube-text { color: #ffd0dc; }
 .schnee-schaufel[hidden] { display: none; }
 .schnee-schaufel svg { display: block; width: 100%; height: auto; }
 html[data-schneetag] .vogel-blase { z-index: 75; }
+
+/* =========================================================
+   Entdeckt Album und Ruhe (album.js)
+   ========================================================= */
+.entdeckt-balken { height: 10px; margin: 14px 0 6px; border-radius: 10px; background: var(--rose-100); overflow: hidden; }
+.entdeckt-balken span { display: block; height: 100%; width: 0; border-radius: 10px; background: linear-gradient(90deg, var(--gold-hell), var(--gold), var(--rose-500)); transition: width 0.6s ease; }
+.entdeckt-stand { margin: 0 0 12px; font-weight: 800; color: var(--beere); }
+.entdeckt-liste { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; max-height: min(50vh, 420px); overflow-y: auto; }
+.entdeckt-eintrag { display: grid; justify-items: center; align-content: center; gap: 4px; min-height: 84px; padding: 8px 6px; border-radius: 14px; background: #f6eef1; border: 1px dashed #e3c3cf; color: #b9a0ab; }
+.entdeckt-eintrag.da { background: linear-gradient(160deg, #fffaf0, var(--rose-50)); border: 1px solid var(--rose-300); color: var(--beere-dunkel); box-shadow: 0 4px 10px rgba(157, 36, 73, 0.08); }
+.entdeckt-zeichen { font-size: 1.7rem; line-height: 1; font-weight: 800; }
+.entdeckt-eintrag:not(.da) .entdeckt-zeichen { font-family: "Dancing Script", cursive; font-size: 2rem; }
+.entdeckt-name { font-size: 0.78rem; font-weight: 700; line-height: 1.2; text-align: center; }
+.entdeckt-tipp { margin: 14px 0 0; font-size: 0.85rem; opacity: 0.75; }
+
+/* Während ein Fenster offen ist, steht im Hintergrund alles still */
+html.ruhe .himmel *, html.ruhe .landschaft *, html.ruhe .lichterkette *, html.ruhe .zweig *, html.ruhe .adventskranz *,
+html.ruhe .capy-familie *, html.ruhe .kalender *, html.ruhe .vogel-ebene *, html.ruhe .schneekugel *, html.ruhe .wunschstern * {
+  animation-play-state: paused !important;
+}

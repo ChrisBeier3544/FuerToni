@@ -12,6 +12,7 @@
  */
 (function () {
   "use strict";
+  const melde = (id) => { const a = window.adventkalender; if (a && a.entdeckt) a.entdeckt(id); };
 
   const ruhig = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const html = document.documentElement;
@@ -43,6 +44,7 @@
       ], { duration: 950, easing: "ease-in" }).finished.catch(() => {});
       kerze.classList.add("aus");
       rauchHerz(kerze);
+      melde("kerze");
       await warte(2300);
       kerze.classList.remove("aus");
       flamme.animate([
@@ -86,6 +88,7 @@
       const birnen = [...box.querySelectorAll(".birne")];
       if (!birnen.length) return;
       laeuft = true;
+      melde("welle");
       const r = box.getBoundingClientRect();
       const start = Math.max(0, Math.min(birnen.length - 1, Math.floor(((e.clientX - r.left) / r.width) * birnen.length)));
       const farben = ["#ff8fab", "#ffd36b"];
@@ -138,6 +141,7 @@
   function entwickle(p) {
     if (p.dataset.entwickelt) return;
     p.dataset.entwickelt = "1";
+    melde("polaroid");
     const img = p.querySelector("img");
     if (!img) return;
     const schicht = document.createElement("i");
@@ -224,6 +228,7 @@
           gloeckchen(kugel.classList.contains("kugel-b"));
           if (ruhig || kugel.dataset.laeuft) return;
           kugel.dataset.laeuft = "1";
+          melde("kugel");
           const r = kreis.getBoundingClientRect();
           glitzer(r.left + r.width / 2, r.bottom);
           kugel.animate([
@@ -270,6 +275,7 @@
     async function bussi() {
       if (laeuft || ruhig) return;
       laeuft = true;
+      melde("paar");
       const opt = (ms) => ({ duration: ms, easing: "ease-in-out", fill: "forwards" });
       mistel.animate([{ transform: "translateY(-50px)", opacity: 0 }, { transform: "translateY(4px)", opacity: 1, offset: 0.75 }, { transform: "translateY(0)", opacity: 1 }], opt(700));
       await warte(750);
@@ -329,6 +335,7 @@
   function sternschnuppenRegen(h, mond) {
     if (regen) return;
     regen = true;
+    melde("mond");
     mond.animate([
       { transform: "scale(1)", filter: "drop-shadow(0 0 14px rgba(253,241,204,.6))" },
       { transform: "scale(1.25)", filter: "drop-shadow(0 0 30px rgba(255,248,220,1))", offset: 0.3 },
@@ -359,6 +366,7 @@
   function sonnenbrille(sonne) {
     if (brille) return;
     brille = true;
+    melde("sonne");
     let b = sonne.querySelector(".sonnenbrille");
     if (!b) {
       b = document.createElement("div");

@@ -421,13 +421,17 @@
   setInterval(pruefe, 500);
 
   // Testversion: Schneetage in der Testleiste markieren
-  const testSel = document.getElementById("test-datum");
-  if (testSel) {
+  function markiereTestleiste() {
+    const testSel = document.getElementById("test-datum");
+    if (!testSel) return;
     TAGE.forEach((t) => {
       const o = testSel.querySelector('option[value="dez-' + String(t).padStart(2, "0") + '"]');
       if (o && !o.textContent.includes("❄️ Schneetag")) o.textContent += " ❄️ Schneetag";
     });
   }
+  // die Testleiste baut ihre Liste erst nach diesem Skript auf
+  setTimeout(markiereTestleiste, 0);
+  setTimeout(markiereTestleiste, 800);
 
   window.adventkalender.schneetag = { tage: TAGE, aktiv: () => !!aktiv, schaufelAlles: () => { if (aktiv) { aktiv.mctx.clearRect(0, 0, aktiv.maske.width, aktiv.maske.height); zaehle(); } } };
 })();
