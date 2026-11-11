@@ -1,4 +1,4 @@
-# Toni-Adeventskalender ❤️
+# Für Toni ♥️
 
 Ein romantischer Online-Adventskalender mit 24 Türchen. Jedes Türchen lässt sich
 erst an seinem Tag öffnen (1. Türchen am 01.12., 2. am 02.12. usw.), jeweils um
@@ -184,7 +184,7 @@ echten Website ignoriert.
 2. Bei *Source* „Deploy from a branch“ wählen, den Branch (z. B. `main`) und den
    Ordner `/ (root)` auswählen und speichern.
 3. Nach ca. 1 Minute ist die Seite unter
-   `https://<dein-github-name>.github.io/Toni-Adeventskalender/` erreichbar.
+   `https://<dein-github-name>.github.io/FuerToni/` erreichbar.
 
 ## Wie sicher ist die Sperre?
 
