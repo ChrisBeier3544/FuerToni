@@ -68,38 +68,21 @@
     "Einen Kuss auf Kommando, egal wo wir gerade sind",
     "Chris einen Kaffee ans Bett bringen",
     "15 Minuten große Massage",
-    "Einen Abend lang darf Chris die Musik aussuchen",
     "50 × SMUATSH",
-    "10 Minuten Kuscheln ohne Handy",
     "Chris darf den nächsten Film aussuchen, ohne Widerspruch",
-    "10 Minuten Fußmassage",
-    "Einen handgeschriebenen Liebesbrief mit mindestens fünf Sätzen",
     "100 × SMUATSH",
     "Chris sein Lieblingsessen kochen",
     "20 Minuten große Massage mit Öl",
     "Einen ganzen Tag lang jedes Gespräch mit einem Kompliment beginnen",
-    "Chris plant das nächste Date und du fragst nicht nach",
-    "30 Minuten Kuscheln auf dem Sofa, Chris darf die Decke aussuchen",
-    "Ein Picknick für uns zwei vorbereiten",
-    "Eine Folge von Chris' Lieblingsserie mitschauen, ohne zu meckern",
     "Frühstück ans Bett mit Kaffee und Croissant",
     "Einen Wellnessabend zu Hause mit Kerzen und Massage",
     "200 × SMUATSH",
-    "Einen Tag lang Chris' persönliche Kuschelbeauftragte sein",
-    "Ein Fotoshooting zu zweit, Chris bestimmt die Posen",
-    "Ein Abendessen bei Kerzenschein, komplett von dir geplant",
-    "45 Minuten große Massage, der ganze Rücken",
     "Ein Spieleabend, Chris sucht die Spiele aus",
     "Einen ganzen Sonntag Kuscheltag im Bett",
     "500 × SMUATSH",
-    "Einen Ausflug, den Chris aussucht, und du fährst",
-    "Eine Stunde Massage, Chris bestimmt die Stellen",
-    "Einen selbst gebackenen Kuchen nach Chris' Wunsch",
-    "Ein ganzes Wochenende lang Frühstück ans Bett",
     "1000 × SMUATSH",
-    "Einen ganzen Tag ganz nach Chris' Wünschen",
   ];
-  const FINALE_PREIS = "Das große Finale: Eine Joghurt Früchte Bowl zum Frühstück vorbereiten, liebevoll angerichtet, dazu Kaffee ans Bett und 1000 × SMUATSH ♥️";
+  const FINALE_PREIS = (smuatsh) => "Das große Finale: Eine Joghurt Früchte Bowl zum Frühstück vorbereiten, liebevoll angerichtet, dazu Kaffee ans Bett und " + smuatsh + " × SMUATSH ♥️";
   const FREI_SCHLUESSEL = "toni-freigekauft-" + KALENDER.jahr;
   const SCHULD_SCHLUESSEL = "toni-schuldscheine-" + KALENDER.jahr;
   const IDS = LISTE.map((e) => e[0]);
@@ -229,9 +212,12 @@
   function naechsterPreis() {
     const frei = freigekauft();
     const offen = LISTE.filter((e) => !gefunden.has(e[0]) && !frei.has(e[0])).length;
-    if (offen <= 1) return FINALE_PREIS;
     const n = liesListe(SCHULD_SCHLUESSEL).length;
-    return PREISE[Math.min(n, PREISE.length - 1)];
+    // auch im Finale immer mehr SMUATSH als jemals davor
+    if (offen <= 1) return FINALE_PREIS(n < PREISE.length ? 1000 : 1000 + (n - PREISE.length + 2) * 500);
+    if (n < PREISE.length) return PREISE[n];
+    // danach wird es immer mehr SMUATSH
+    return (1000 + (n - PREISE.length + 1) * 500) + " × SMUATSH";
   }
   const sicher = (t) => String(t).replace(/[<>&"]/g, (z) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" })[z]);
   function kaufe(id, name) {
