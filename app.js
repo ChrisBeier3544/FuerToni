@@ -1383,7 +1383,14 @@
       const teile = mitTagen
         ? [[Math.floor(s / 86400), "Tage"], [Math.floor(s / 3600) % 24, "Std."], [Math.floor(s / 60) % 60, "Min."], [s % 60, "Sek."]]
         : [[Math.floor(s / 60), "Min."], [s % 60, "Sek."]];
-      cdZiffern.innerHTML = teile.map(([z, l]) => '<span class="cd-feld"><b>' + zwei(z) + "</b><small>" + l + "</small></span>").join("");
+      // Felder nur einmal bauen und danach nur die Zahlen tauschen (damit Animationen daran nicht abbrechen)
+      const form = teile.map((t) => t[1]).join();
+      if (cdZiffern.dataset.form !== form || !cdZiffern.firstChild) {
+        cdZiffern.dataset.form = form;
+        cdZiffern.innerHTML = teile.map(([, l]) => '<span class="cd-feld" data-feld="' + l + '"><b></b><small>' + l + "</small></span>").join("");
+      }
+      const zahlen = cdZiffern.querySelectorAll(".cd-feld b");
+      teile.forEach(([z], i) => { const t = zwei(z); if (zahlen[i] && zahlen[i].textContent !== t) zahlen[i].textContent = t; });
     }
 
     function tick() {
@@ -1414,6 +1421,7 @@
           cd.hidden = !gebTag;
           cdTitel.textContent = "";
           cdZiffern.textContent = "";
+          delete cdZiffern.dataset.form;
           hinweis.textContent = "Tippe auf das Siegel";
           umschlag.classList.add("entsperrt");
           setTimeout(() => umschlag.classList.remove("entsperrt"), 1200);

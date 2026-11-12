@@ -480,7 +480,12 @@
     "Darf ich meine Partnerin dazuholen? 🥺",
   ];
   function saetzeMaennchen() {
-    if (vorGeburtstag()) return [grussVorGeburtstag(), wahl(GEHEIMNIS)];
+    if (vorGeburtstag()) {
+      // Hinweise auf die Entdeckungen des Tages (wartezeit.js), sonst ein Geheimnis
+      let h = null;
+      try { h = ak.wartezeitHinweis ? ak.wartezeitHinweis() : null; } catch (_) { h = null; }
+      return [grussVorGeburtstag(), h || wahl(GEHEIMNIS)];
+    }
     const liste = [grussQuelle.textContent || ""];
     const d = tag();
     if (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag === erstesEi - 1) liste.push(HINWEIS);

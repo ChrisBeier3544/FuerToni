@@ -1305,4 +1305,5 @@
   }, 300);
 
   window.adventkalender.spieleSpecial = spiele;
+  window.adventkalender.capy = { seite: capySeiteInhalt, front: capyFrontInhalt };
 })();
