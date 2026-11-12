@@ -81,7 +81,7 @@
     live = { code: c, wolken: c === 0 ? 5 : c === 1 ? 30 : c === 2 ? 60 : 100, wind: c >= 95 ? 40 : 15, zeit: Date.now(), test: true };
   }
   function liesCache() {
-    try { const v = JSON.parse(localStorage.getItem(CACHE) || "null"); return v && Date.now() - v.zeit < 20 * 60000 ? v : null; } catch (_) { return null; }
+    try { const v = JSON.parse(localStorage.getItem(CACHE) || "null"); return v && Date.now() - v.zeit < 14 * 60000 ? v : null; } catch (_) { return null; }
   }
   async function holeWetter() {
     if (live && live.test) return;
