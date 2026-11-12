@@ -185,7 +185,9 @@
   function setzePosition(v, p) {
     v.pos = p;
     v.seite = { x: p.x + window.scrollX, y: p.y + window.scrollY };
-    v.el.style.transform = "translate(" + (v.seite.x - GROESSE / 2).toFixed(1) + "px," + (v.seite.y - GROESSE).toFixed(1) + "px)";
+    // nach der echten Größe ausrichten (die Gäste sind kleiner), damit die Füße genau auf dem Punkt stehen
+    const b = v.el.offsetWidth || GROESSE, h = v.el.offsetHeight || GROESSE;
+    v.el.style.transform = "translate(" + (v.seite.x - b / 2).toFixed(1) + "px," + (v.seite.y - h).toFixed(1) + "px)";
     v.el.querySelector("svg").style.transform = v.blick < 0 ? "scaleX(-1)" : "";
   }
 
