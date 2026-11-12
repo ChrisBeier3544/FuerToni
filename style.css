@@ -3058,3 +3058,44 @@ html:has(#intro:not([hidden]):not(.weg)), html:has(#intro:not([hidden]):not(.weg
 .vogel-wahl:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 /* Die zehn Freunde der Munkelvogeline */
 .vogel.gast { width: 42px; pointer-events: none; cursor: default; }
+
+/* =========================================================
+   Zweite Akte der Capy Szenen (13. bis 25. November)
+   ========================================================= */
+.sp-regen { position: absolute; top: 0; z-index: 7; pointer-events: none; line-height: 1; text-shadow: 0 0 6px currentColor; }
+.sp-sofortbild svg, .sp-draisine svg, .sp-herzballon svg, .sp-lebkuchen svg, .sp-zielflagge svg, .sp-grosskeks svg, .sp-mond svg, .sp-signal svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sp-sofortbild { z-index: 5; padding: 6px 6px 4px; background: #fff; box-shadow: 0 12px 26px rgba(107, 21, 50, 0.3); transform-origin: 50% 100%; }
+.sp-sofortbild p { margin: 2px 0 0; text-align: center; font-family: "Dancing Script", cursive; font-weight: 700; font-size: 1.1rem; color: #9d2449; }
+.sp-draisine { z-index: 3; }
+.sp-signal { z-index: 1; }
+.sp-herzballon { z-index: 3; filter: drop-shadow(0 10px 14px rgba(157, 36, 73, 0.25)); }
+.sp-herzballon > svg { transform-origin: 50% 0; }
+.sp-scheinwerfer { top: -20px; width: 140px; height: 120vh; z-index: 1; opacity: 0; pointer-events: none; background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 240, 200, 0) 75%); clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%); transform-origin: 50% 0; mix-blend-mode: screen; }
+.sp-scheinwerfer.links { left: 4%; }
+.sp-scheinwerfer.rechts { right: 4%; }
+.sp-scheinwerfer.bunt.links { background: linear-gradient(180deg, rgba(255, 120, 160, 0.75), rgba(255, 143, 171, 0) 75%); }
+.sp-scheinwerfer.bunt.rechts { background: linear-gradient(180deg, rgba(110, 190, 255, 0.75), rgba(124, 196, 240, 0) 75%); }
+.sp-seifenblase { z-index: 4; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, 0.95); background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(190, 225, 255, 0.35) 35%, rgba(255, 170, 215, 0.35) 70%, rgba(255, 255, 255, 0.6)); box-shadow: 0 0 6px rgba(255, 255, 255, 0.8); }
+.sp-lebkuchen { z-index: 1; }
+.sp-lebkuchen > svg { transform-origin: 50% 0; }
+.sp-onsen .sp-parade { bottom: 34%; z-index: 3; }
+.sp-yuzu { z-index: 5; }
+.sp-zielflagge { z-index: 1; }
+.sp-rollkugel { width: 40px; height: 40px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #dfe9f5); box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18); display: grid; place-items: center; overflow: hidden; }
+.sp-rollkugel svg { width: 74%; height: auto; display: block; }
+.sp-kellner { z-index: 4; }
+.sp-kanne { z-index: 5; transform-origin: 80% 60%; }
+.sp-kanne svg { display: block; width: 100%; height: auto; }
+.sp-strahl { z-index: 3; width: 7px; border-radius: 4px; background: linear-gradient(180deg, #8fbf5a, #a8d07a); transform-origin: 50% 0; }
+.sp-funkenspur { z-index: 3; width: 4px; height: 26px; border-radius: 3px; background: linear-gradient(180deg, #fff, rgba(255, 220, 150, 0)); box-shadow: 0 0 8px #ffe9a8; }
+.sp-funkenname { z-index: 4; transform: translateX(-50%); display: flex; gap: 0.08em; font-family: "Dancing Script", cursive; font-weight: 700; font-size: clamp(3rem, 16vw, 6rem); line-height: 1.1; color: #fff4d6; text-shadow: 0 0 12px #f3c84b, 0 0 26px #ff8fab; white-space: nowrap; }
+.sp-funkenname span { display: inline-block; }
+.sp-funkenname .herz { color: #ff4d7d; }
+.sp-schneemann-gross { z-index: 2; }
+.sp-schneemann-gross svg { display: block; width: 100%; height: auto; overflow: visible; }
+.sp-sm-teil { transform-box: fill-box; transform-origin: 50% 100%; }
+.sp-lampion { animation: sp-lampe 1.2s steps(2, jump-none) infinite; }
+.sp-grosskeks { z-index: 4; filter: drop-shadow(0 10px 14px rgba(107, 21, 50, 0.25)); }
+.special-raum .sp-abend { opacity: 0; background: radial-gradient(circle at 70% 20%, rgba(60, 30, 90, 0.85), rgba(20, 10, 40, 0.92)); }
+.sp-mond { z-index: 1; filter: drop-shadow(0 0 14px rgba(255, 248, 220, 0.8)); }
+.sp-stern-klein { z-index: 1; color: #fff8dc; font-size: 0.9rem; text-shadow: 0 0 6px #fff; }

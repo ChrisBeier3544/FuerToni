@@ -159,6 +159,41 @@
     }
   }
 
+
+  // Sprechblase für eine bestimmte Zeit
+  function sagBlase(text, stil, ms) {
+    const b = figur("<span>" + text + "</span>", "sp-blase", stil);
+    spaeter(ms || 1800, () => b.remove());
+    return b;
+  }
+  // Regen aus Zeichen (Herzen, Konfetti, Sterne), der von oben fällt
+  function regen(zeichen, n, farben, dauer, groesse) {
+    for (let k = 0; k < n; k++) {
+      const s = document.createElement("span");
+      s.className = "sp-regen";
+      s.textContent = zeichen[k % zeichen.length];
+      s.style.left = zufall(2, 98) + "%";
+      s.style.color = farben[k % farben.length];
+      s.style.fontSize = zufall(groesse ? groesse * 0.7 : 12, groesse || 24) + "px";
+      buehne.appendChild(s);
+      s.animate([
+        { transform: "translate(0,-40px) rotate(0)", opacity: 0 },
+        { opacity: 1, offset: 0.1 },
+        { transform: "translate(" + zufall(-40, 40) + "px," + (H + 40) + "px) rotate(" + zufall(-200, 200) + "deg)", opacity: 0.9 },
+      ], { duration: zufall(dauer * 0.6, dauer), delay: zufall(0, dauer * 0.5), easing: "ease-in", fill: "both" });
+    }
+  }
+  // Schneefall
+  function schneefall(n, ab) {
+    for (let k = 0; k < n; k++) {
+      const f = figur("", "sp-flocke", { left: zufall(0, W) + "px", top: "-10px", width: zufall(4, 8) + "px" });
+      f.style.height = f.style.width;
+      f.animate([{ transform: "translate(0,0)" }, { transform: "translate(" + zufall(-30, 30) + "px," + (H + 20) + "px)" }], { duration: zufall(6000, 10000), delay: (ab || 0) + zufall(0, 9000), easing: "linear", fill: "both" });
+    }
+  }
+  // Lage eines Elements auf der Bühne
+  function lage(el) { const r = el.getBoundingClientRect(), b = buehne.getBoundingClientRect(); return { x: r.left - b.left, y: r.top - b.top, w: r.width, h: r.height }; }
+
   /* ---------- Die fünfzehn Szenen (11. bis 25. November) ---------- */
   const SZENEN = {
     11: { titel: "Kinoabend bei der Capy Crew 🍿", dauer: 12500, spiel() {
@@ -329,7 +364,7 @@
       }
     } },
 
-    13: { titel: "Ab in die Capy Fotobox 📸", dauer: 12500, spiel() {
+    13: { titel: "Ab in die Capy Fotobox 📸", dauer: 21000, spiel() {
       const bb = Math.min(W * 0.5, 290), bh = bb * 1.45, bx = W / 2 - bb / 2, by = H - bh - H * 0.04;
       const box = figur('<svg viewBox="0 0 200 290">' +
         '<rect x="10" y="40" width="180" height="250" rx="14" fill="#f2a7ba"/><rect x="10" y="40" width="180" height="250" rx="14" fill="none" stroke="#c2185b" stroke-width="4"/>' +
@@ -399,9 +434,49 @@
         });
         spaeter(1400, () => partikel(bx + bb * 0.2, by + bh * 0.7, ["♥", "✨", "📸"], 14, 110, ["#e85d7e", "#f3c84b"]));
       });
+
+      // Zweiter Akt: das Pärchen geht nochmal allein hinein
+      spaeter(11800, () => {
+        sagBlase("Jetzt nur wir zwei 🥰", { left: W / 2 + "px", top: Math.max(6, by - 46) + "px" }, 1700);
+        [gaeste[0], gaeste[1]].forEach((g, i) => {
+          g.classList.add("sp-gespiegelt");
+          g.animate([{ left: bx - gr * 0.4 - i * gr * 0.55 + "px", opacity: 1, transform: "scale(1)" }, { left: bx + bb * 0.3 + "px", opacity: 0, transform: "scale(.7)" }],
+            { duration: 1100, delay: i * 250, easing: "ease-in", fill: "forwards" });
+        });
+        [gaeste[2], gaeste[3]].forEach((g, i) => g.firstChild.animate([{ translate: "0 0" }, { translate: "0 -10px" }], { duration: 300, direction: "alternate", iterations: 14, delay: i * 150 }));
+      });
+      spaeter(13300, () => vorhang.animate([{ transform: "scaleY(.35)" }, { transform: "scaleY(1)" }], { duration: 600, easing: "ease-in-out", fill: "forwards" }));
+      spaeter(14400, () => {
+        blitz.style.background = "#ffd0dc";
+        blitz.animate([{ opacity: 0 }, { opacity: 0.9, offset: 0.12 }, { opacity: 0 }], { duration: 700, easing: "ease-out" });
+        partikel(W / 2, by + bh * 0.45, ["♥"], 14, 120, ["#ff4d7d", "#ff8fab"]);
+      });
+      // ein großes Sofortbild kommt heraus und schwebt nach oben
+      const pb = Math.min(W * 0.42, 190);
+      const foto = figur('<div class="sp-sofortbild-bild"><svg viewBox="0 0 112 92"><rect width="112" height="92" fill="#ffe3ec"/>' +
+        '<path d="M56 18c-3-5-11-4-11 2 0 5 11 11 11 11s11-6 11-11c0-6-8-7-11-2z" fill="#ff4d7d"/>' +
+        kopf(14, 30, 0.78, { typ: 5 }, 14) + kopf(54, 30, 0.78, { typ: 1 }, -14) + "</svg></div><p>Wir ♥</p>",
+        "sp-sofortbild", { left: W / 2 - pb / 2 + "px", top: by + bh * 0.5 + "px", width: pb + "px", opacity: "0" });
+      spaeter(15200, () => {
+        foto.animate([
+          { opacity: 0, transform: "translateY(0) scale(.3) rotate(0)" },
+          { opacity: 1, transform: "translateY(-" + bh * 0.55 + "px) scale(1) rotate(-6deg)", offset: 0.6 },
+          { opacity: 1, transform: "translateY(-" + bh * 0.62 + "px) scale(1.04) rotate(3deg)" },
+        ], { duration: 2000, easing: "cubic-bezier(.3,1.2,.5,1)", fill: "forwards" });
+        foto.querySelector("svg").animate([{ filter: "sepia(.9) brightness(.5)" }, { filter: "none" }], { duration: 2600, delay: 600, fill: "both" });
+      });
+      spaeter(17300, () => {
+        vorhang.animate([{ transform: "scaleY(1)" }, { transform: "scaleY(.35)" }], { duration: 600, fill: "forwards" });
+        [gaeste[0], gaeste[1]].forEach((g, i) => {
+          g.classList.remove("sp-gespiegelt");
+          g.animate([{ left: bx + bb * 0.3 + "px", opacity: 0, transform: "scale(.7)" }, { left: bx + bb * 0.62 + i * gr * 0.5 + "px", opacity: 1, transform: "scale(1) translateY(-20px)", offset: 0.5 }, { left: bx + bb * 0.75 + i * gr * 0.5 + "px", opacity: 1, transform: "scale(1)" }],
+            { duration: 1100, delay: 300 + i * 200, easing: "ease-out", fill: "forwards" });
+        });
+      });
+      spaeter(18800, () => { regen(["♥", "✨", "♥"], 26, ["#ff4d7d", "#f3c84b", "#ff8fab"], 2400); });
     } },
 
-    14: { titel: "Nächster Halt: Capyhausen 🚂", dauer: 12500, spiel() {
+    14: { titel: "Nächster Halt: Capyhausen 🚂", dauer: 21000, spiel() {
       const gy = H * 0.8;
       const land = figur('<svg viewBox="0 0 400 100" preserveAspectRatio="none"><path d="M0 30 Q100 0 200 22 T400 14 V100 H0z" fill="#d7ecd0"/><path d="M0 52 Q120 34 220 50 T400 44 V100 H0z" fill="#b9dfb0"/></svg>',
         "sp-land", { top: gy - H * 0.22 + "px", height: H * 0.22 + 4 + "px" });
@@ -475,9 +550,42 @@
         zug.animate([{ transform: "translateX(" + halt + "px)" }, { transform: "translateX(" + -(zl + 40) + "px)" }], { duration: 5200, easing: "cubic-bezier(.5,0,.8,.6)", fill: "forwards" });
         drehen(5200);
       });
+
+      // Signal am Bahnsteig springt kurz vor der Abfahrt auf Grün
+      const sig = figur('<svg viewBox="0 0 24 70"><rect x="10" y="22" width="4" height="48" fill="#4a3542"/><rect x="2" y="0" width="20" height="28" rx="5" fill="#2a1f2e"/>' +
+        '<circle class="sp-sig-rot" cx="12" cy="8" r="5" fill="#ff4d4d"/><circle class="sp-sig-gruen" cx="12" cy="20" r="5" fill="#2e5a3a"/></svg>', "sp-signal",
+        { left: Math.max(4, schild.offsetLeft - 30) + "px", top: gy - 70 + "px", width: "22px" });
+      sig.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 400, fill: "both" });
+      spaeter(5700, () => { sig.querySelector(".sp-sig-rot").setAttribute("fill", "#5a1f1f"); sig.querySelector(".sp-sig-gruen").setAttribute("fill", "#4dff7a"); });
+      // Zweiter Akt: eine Draisine mit zwei Capys und einem Banner
+      const db = Math.max(120, Math.min(W * 0.5, 230));
+      const draisine = figur('<svg viewBox="0 0 200 120">' +
+        '<rect x="20" y="78" width="160" height="12" rx="4" fill="#a96f47"/><rect x="20" y="88" width="160" height="5" fill="#6b4a3a"/>' +
+        '<rect x="96" y="40" width="8" height="40" fill="#6b4a3a"/>' +
+        '<g class="sp-hebel" style="transform-origin:100px 42px"><rect x="40" y="38" width="120" height="7" rx="3" fill="#3a2a33"/><circle cx="44" cy="41" r="5" fill="#9d2449"/><circle cx="156" cy="41" r="5" fill="#9d2449"/></g>' +
+        '<g transform="translate(18 34) scale(.72)">' + capyFrontInhalt({ typ: 5 }) + '</g><g transform="translate(140 34) scale(.72)">' + capyFrontInhalt({ typ: 1 }) + "</g>" +
+        rad(48) + rad(152) +
+        '<path d="M178 80 V20" stroke="#6b4a3a" stroke-width="3"/><path d="M178 22 h-2 q-30 6 -60 0 v20 q30 6 60 0z" fill="#fff8e6" stroke="#e85d7e" stroke-width="2" transform="translate(0 -4)"/>' +
+        '<text x="148" y="35" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="13" fill="#9d2449">Gute Reise ♥</text></svg>',
+        "sp-draisine", { top: gy - db * 0.6 + 6 + "px", left: "0", width: db + "px", transform: "translateX(" + -db * 1.3 + "px)" });
+      const dhalt = W / 2 - db / 2;
+      spaeter(11800, () => {
+        draisine.animate([{ transform: "translateX(" + -db * 1.1 + "px)" }, { transform: "translateX(" + dhalt + "px)" }], { duration: 2600, easing: "ease-out", fill: "forwards" });
+        draisine.querySelector(".sp-hebel").animate([{ transform: "rotate(-14deg)" }, { transform: "rotate(14deg)" }], { duration: 380, direction: "alternate", iterations: 20, easing: "ease-in-out" });
+        draisine.querySelectorAll(".sp-rad").forEach((r) => r.animate([{ transform: "rotate(0)" }, { transform: "rotate(-540deg)" }], { duration: 2600, easing: "ease-out" }));
+      });
+      spaeter(14600, () => {
+        sagBlase("Wir fahren mit dir, wohin du willst 🥰", { left: W / 2 + "px", top: Math.max(6, gy - db * 0.6 - 50) + "px" }, 2200);
+        partikel(W / 2, gy - db * 0.4, ["♥", "✨"], 12, 90, ["#ff4d7d", "#f3c84b"]);
+      });
+      spaeter(17200, () => {
+        draisine.animate([{ transform: "translateX(" + dhalt + "px)" }, { transform: "translateX(" + (W + 20) + "px)" }], { duration: 3200, easing: "ease-in", fill: "forwards" });
+        draisine.querySelector(".sp-hebel").animate([{ transform: "rotate(-14deg)" }, { transform: "rotate(14deg)" }], { duration: 300, direction: "alternate", iterations: 12 });
+        draisine.querySelectorAll(".sp-rad").forEach((r) => r.animate([{ transform: "rotate(0)" }, { transform: "rotate(-720deg)" }], { duration: 3200, easing: "ease-in" }));
+      });
     } },
 
-    15: { titel: "Die Capy Crew geht auf Ballonfahrt 🎈", dauer: 13000, spiel() {
+    15: { titel: "Die Capy Crew geht auf Ballonfahrt 🎈", dauer: 21000, spiel() {
       const farben = ["#e85d7e", "#f3c84b", "#7cc4f0", "#9be3b0", "#b39ddb", "#fda4b8", "#ff8a65"];
       const capyIn = (n, x, y, s) => '<g transform="translate(' + x + " " + y + ") scale(" + (s || 1) + ')">' + capyFrontInhalt({ typ: n }) + "</g>";
       // 1. Luftballon-Strauß: die Schnüre enden in den Pfoten über dem Kopf
@@ -530,9 +638,37 @@
       const sb = Math.min(W * 0.55, 240);
       const schiff = figur(luftschiff(7), "sp-luftschiff", { left: "0", top: "22%", width: sb + "px" });
       schiff.animate([{ transform: "translate(" + -sb + "px, 40px)" }, { transform: "translate(" + (W + 20) + "px, -60px)" }], { duration: 11000, delay: 900, easing: "linear", fill: "both" });
+
+      // ziehende Wolken
+      for (let k = 0; k < 4; k++) {
+        const w = figur('<svg viewBox="0 0 120 50"><path d="M18 46h86a16 16 0 0 0 0-32 22 22 0 0 0-40-8 18 18 0 0 0-30 8 16 16 0 0 0-16 32z" fill="#fff"/></svg>', "sp-wolke-fahrt",
+          { top: H * (0.08 + k * 0.14) + "px", width: zufall(90, 160) + "px", opacity: "0.8" });
+        w.animate([{ transform: "translateX(" + (k % 2 ? W : -170) + "px)" }, { transform: "translateX(" + (k % 2 ? -170 : W) + "px)" }], { duration: zufall(16000, 22000), delay: -k * 4500, fill: "both" });
+      }
+      // Zweiter Akt: ein großer Herzballon mit dem Pärchen
+      const hb = Math.min(W * 0.5, 230);
+      const herz = figur('<svg viewBox="0 0 140 210">' +
+        '<path d="M70 120C45 104 6 80 6 46 6 24 22 8 42 8c12 0 22 6 28 16 6-10 16-16 28-16 20 0 36 16 36 38 0 34-39 58-64 74z" fill="#ff4d7d"/>' +
+        '<path d="M42 16c-14 2-24 14-24 30" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".45"/>' +
+        '<path d="M70 26 V118" stroke="#d6244f" stroke-width="2" opacity=".5"/>' +
+        '<path d="M52 120 L46 150 M88 120 L94 150" stroke="#6b4a3a" stroke-width="1.6"/>' +
+        '<g transform="translate(34 126) scale(.62)">' + capyFrontInhalt({ typ: 5 }) + '</g><g transform="translate(70 126) scale(.62)">' + capyFrontInhalt({ typ: 1 }) + "</g>" +
+        '<rect x="38" y="150" width="64" height="34" rx="6" fill="#b5763e"/><path d="M38 160h64M38 170h64" stroke="#8a5a3a" stroke-width="1.4"/><rect x="36" y="147" width="68" height="7" rx="3" fill="#8a5a3a"/>' +
+        '<text x="70" y="64" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="20" fill="#fff">Toni</text></svg>',
+        "sp-herzballon", { left: W / 2 - hb / 2 + "px", top: H + "px", width: hb + "px", visibility: "hidden" });
+      const hh = hb * 1.5;
+      spaeter(11200, () => herz.style.visibility = "visible");
+      spaeter(11200, () => herz.animate([{ transform: "translateY(0)" }, { transform: "translateY(-" + (H * 0.72 + hh * 0.2) + "px)" }], { duration: 3600, easing: "cubic-bezier(.2,.7,.3,1)", fill: "forwards" }));
+      spaeter(14800, () => {
+        herz.firstChild.animate([{ transform: "rotate(-4deg)" }, { transform: "rotate(4deg)" }], { duration: 1200, direction: "alternate", iterations: 4, easing: "ease-in-out" });
+        const l = lage(herz);
+        for (let k = 0; k < 5; k++) spaeter(k * 550, () => partikel(l.x + l.w / 2, l.y + l.h * 0.78, ["🌸", "♥", "✿"], 7, 110, ["#ff8fab", "#ff4d7d", "#fff"]));
+        sagBlase("Ganz hoch hinaus, nur mit dir ♥", { left: W / 2 + "px", top: Math.max(6, l.y - 44) + "px" }, 2200);
+      });
+      spaeter(18200, () => herz.animate([{ transform: "translateY(-" + (H * 0.72 + hh * 0.2) + "px)" }, { transform: "translateY(-" + (H + hh * 1.4) + "px)" }], { duration: 2600, easing: "ease-in", fill: "forwards" }));
     } },
 
-    16: { titel: "Geheime Gartenparty der Capy Crew 🎉", dauer: 11500, spiel() {
+    16: { titel: "Geheime Gartenparty der Capy Crew 🎉", dauer: 21000, spiel() {
       const garten = figur(
         '<svg viewBox="0 0 400 120" preserveAspectRatio="none"><path d="M0 40 Q100 10 200 30 T400 25 V120 H0z" fill="#8fd18a"/><path d="M0 60 Q120 40 220 58 T400 50 V120 H0z" fill="#6fbf6b"/></svg>' +
         '<div class="sp-blumen">' + Array.from("🌷🌼🌸🌷🌼🌸🌷").map((b) => "<span>" + b + "</span>").join("") + "</div>",
@@ -549,12 +685,32 @@
           { left: 6 + i * 18 + "%", bottom: (10 + (i % 2) * 6) + "%", width: "min(22vw, 110px)", transform: i % 2 ? "scaleX(-1)" : "" });
         spaeter(1300 + i * 120, () => f.firstChild.animate(
           [{ transform: "translateY(0) rotate(0)" }, { transform: "translateY(-22px) rotate(" + (i % 2 ? 8 : -8) + "deg)" }, { transform: "translateY(0) rotate(0)" }],
-          { duration: 520, iterations: 17, easing: "ease-in-out" }));
+          { duration: 520, iterations: 34, easing: "ease-in-out" }));
       }
-      for (let k = 0; k < 6; k++) spaeter(1500 + k * 1300, () => partikel(zufall(W * 0.15, W * 0.85), H * 0.62, ["♪", "♫", "♥"], 6, 90, ["#9d2449", "#e85d7e"]));
+      for (let k = 0; k < 13; k++) spaeter(1500 + k * 1300, () => partikel(zufall(W * 0.15, W * 0.85), H * 0.62, ["♪", "♫", "♥"], 6, 90, ["#9d2449", "#e85d7e"]));
+
+      // Zweiter Akt: Scheinwerfer, Seifenblasen und ein großer Sprung zum Schluss
+      spaeter(9800, () => {
+        ["links", "rechts"].forEach((seite, i) => {
+          const s2 = figur("", "sp-scheinwerfer " + seite);
+          s2.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, fill: "forwards" });
+          s2.animate([{ transform: "rotate(" + (i ? 30 : -30) + "deg)" }, { transform: "rotate(" + (i ? -10 : 10) + "deg)" }], { duration: 1600, direction: "alternate", iterations: 7, easing: "ease-in-out" });
+        });
+        sagBlase("Jetzt wird es bunt! 🪩", { left: W / 2 + "px", top: H * 0.3 + "px" }, 1800);
+      });
+      for (let k = 0; k < 22; k++) spaeter(11000 + k * 300, () => {
+        const b = figur("", "sp-seifenblase", { left: zufall(2, 12) + "%", top: H * 0.62 + "px", width: zufall(14, 30) + "px" });
+        b.style.height = b.style.width;
+        b.animate([{ transform: "translate(0,0) scale(.3)", opacity: 0 }, { opacity: 0.95, offset: 0.1 }, { transform: "translate(" + zufall(W * 0.3, W * 0.9) + "px," + -zufall(H * 0.2, H * 0.5) + "px) scale(1)", opacity: 0 }],
+          { duration: zufall(3500, 5500), easing: "ease-out", fill: "forwards" }).finished.then(() => b.remove(), () => {});
+      });
+      spaeter(18600, () => {
+        buehne.querySelectorAll(".sp-taenzer").forEach((t) => t.animate([{ transform: (t.style.transform || "") + " translateY(0)" }, { transform: (t.style.transform || "") + " translateY(-60px)" }, { transform: (t.style.transform || "") + " translateY(0)" }], { duration: 700, easing: "ease-out" }));
+        regen(["🎉", "♥", "✨"], 30, ["#e85d7e", "#f3c84b", "#7cc4f0"], 2200);
+      });
     } },
 
-    17: { titel: "Glühwein-Abend am Capy-Stand 🍷", dauer: 11000, spiel() {
+    17: { titel: "Glühwein-Abend am Capy-Stand 🍷", dauer: 21000, spiel() {
       const breite = Math.min(W * 0.92, 440);
       const stand = figur('<svg viewBox="0 0 300 200"><rect x="20" y="70" width="10" height="130" fill="#8a5a3a"/><rect x="270" y="70" width="10" height="130" fill="#8a5a3a"/>' +
         '<path d="M5 74 L150 18 L295 74z" fill="#d6304f"/>' +
@@ -579,9 +735,29 @@
         const b = figur('<span>Prost! 🥂</span>', "sp-blase", { left: "50%", bottom: stand.offsetHeight * 0.95 + "px" });
         spaeter(1300, () => b.remove());
       });
+
+      schneefall(26, 3000);
+      // Zweiter Akt: ein Lebkuchenherz senkt sich vom Dach
+      const st = lage(stand);
+      const lb = Math.min(W * 0.26, 112);
+      const lebkuchen = figur('<svg viewBox="0 0 120 140"><path d="M60 0 V22" stroke="#d6304f" stroke-width="2.5"/>' +
+        '<path d="M60 130C36 114 4 92 4 60 4 40 18 24 38 24c10 0 18 5 22 13 4-8 12-13 22-13 20 0 34 16 34 36 0 32-32 54-56 70z" fill="#b5763e"/>' +
+        '<path d="M60 120C40 106 14 88 14 61 14 46 25 34 39 34c9 0 16 5 21 12 5-7 12-12 21-12 14 0 25 12 25 27 0 27-26 45-46 59z" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="5 4"/>' +
+        '<text x="60" y="78" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="20" fill="#fff">Für Toni</text>' +
+        '<circle cx="34" cy="96" r="4" fill="#ff4d7d"/><circle cx="86" cy="96" r="4" fill="#7cc4f0"/><circle cx="60" cy="108" r="4" fill="#9be3b0"/></svg>',
+        "sp-lebkuchen", { left: st.x + st.w / 2 - lb / 2 + "px", top: st.y + st.h * 0.2 + "px", width: lb + "px", opacity: "0" });
+      spaeter(10800, () => {
+        lebkuchen.animate([{ transform: "translateY(-" + H * 0.5 + "px)", opacity: 1 }, { transform: "translateY(8px)", opacity: 1, offset: 0.75 }, { transform: "translateY(0)", opacity: 1 }], { duration: 1800, easing: "ease-out", fill: "forwards" });
+        spaeter(1900, () => lebkuchen.firstChild.animate([{ transform: "rotate(-5deg)" }, { transform: "rotate(5deg)" }], { duration: 1300, direction: "alternate", iterations: 6, easing: "ease-in-out" }));
+      });
+      for (const [t, text] of [[13600, "Auf Toni! 🥂"], [16800, "Auf uns! ♥"]]) spaeter(t, () => {
+        [links, rechts].forEach((f) => f.firstChild.animate([{ transform: "rotate(0)" }, { transform: "rotate(-14deg) translateY(-6px)" }, { transform: "rotate(0)" }], { duration: 700, easing: "ease-in-out" }));
+        spaeter(350, () => { partikel(W / 2, H - stand.offsetHeight * 0.55, ["✨", "♥"], 10, 70, ["#f3c84b", "#e85d7e"]); sagBlase(text, { left: "50%", bottom: stand.offsetHeight * 0.95 + "px" }, 1500); });
+      });
+      spaeter(19000, () => regen(["✨", "♥", "❄"], 22, ["#f3c84b", "#ff8fab", "#fff"], 1800));
     } },
 
-    18: { titel: "Wellness-Tag im Capy-Onsen ♨️", dauer: 12000, spiel() {
+    18: { titel: "Wellness-Tag im Capy-Onsen ♨️", dauer: 21000, spiel() {
       const breite = Math.min(W * 0.95, 460);
       const quelle = figur('<div class="sp-becken"></div>', "sp-onsen", { width: breite + "px" });
       quelle.animate([{ opacity: 0, transform: "translate(-50%, 30px)" }, { opacity: 1, transform: "translate(-50%, 0)" }], { duration: 900, fill: "forwards" });
@@ -635,9 +811,36 @@
       });
       // alle spritzen sich zum Schluss gegenseitig nass
       spaeter(10000, () => gaeste.forEach((c, i) => spaeter(i * 150, () => { const m = mitte(c); spritzer(m.x, m.y + 18, 10); })));
+
+      // Zweiter Akt: Entenparade, Entspannung und Yuzu Regen
+      spaeter(11600, () => {
+        for (let k = 0; k < 4; k++) {
+          const e = document.createElement("span");
+          e.className = "sp-ente sp-parade"; e.textContent = "🐤";
+          e.style.right = "auto"; e.style.left = "-12%"; e.style.fontSize = (1.3 - k * 0.1) + "rem";
+          becken.appendChild(e);
+          e.animate([{ left: "-12%" }, { left: "108%" }], { duration: 6500, delay: k * 450, easing: "linear", fill: "both" });
+        }
+      });
+      spaeter(13800, () => {
+        gaeste.forEach((c) => c.animate([{ transform: "translateY(0)" }, { transform: "translateY(18%)" }], { duration: 1200, fill: "forwards", easing: "ease-out" }));
+        sagBlase("Ahhh, wie entspannend … ♨️", { left: "50%", bottom: quelle.offsetHeight + H * 0.06 + "px" }, 2400);
+        for (let k = 0; k < 6; k++) dampf(becken, breite * (0.1 + k * 0.16), 6, 3);
+      });
+      spaeter(16800, () => {
+        gaeste.forEach((c) => c.animate([{ transform: "translateY(18%)" }, { transform: "translateY(0)" }], { duration: 600, fill: "forwards" }));
+        for (let k = 0; k < 7; k++) spaeter(k * 260, () => {
+          const r = becken.getBoundingClientRect(), bb = buehne.getBoundingClientRect();
+          const x = r.left - bb.left + r.width * zufall(0.1, 0.9);
+          const y = figur('<svg viewBox="0 0 20 20"><circle cx="10" cy="11" r="8" fill="#ffb020"/><circle cx="7.5" cy="8" r="2" fill="#fff" opacity=".5"/><path d="M10 3q3-3 6-1" stroke="#4a8a5c" stroke-width="2" fill="none"/></svg>', "sp-yuzu", { left: x - 10 + "px", top: "-30px", width: "22px" });
+          const ziel = r.top - bb.top + r.height * 0.35;
+          y.animate([{ transform: "translateY(0) rotate(0)" }, { transform: "translateY(" + (ziel + 30) + "px) rotate(300deg)" }], { duration: 900, easing: "ease-in", fill: "forwards" }).onfinish = () => { y.remove(); spritzer(x, ziel + 30, 6); };
+        });
+      });
+      spaeter(19300, () => regen(["💦", "♥", "✨"], 18, ["#5aa9dd", "#ff8fab", "#f3c84b"], 1600));
     } },
 
-    19: { titel: "Großes Capy-Rodelrennen 🛷", dauer: 9500, spiel() {
+    19: { titel: "Großes Capy-Rodelrennen 🛷", dauer: 21000, spiel() {
       const hang = figur('<svg viewBox="0 0 400 300" preserveAspectRatio="none"><path d="M0 60 L400 250 V300 H0z" fill="#fff"/><path d="M0 60 L400 250" stroke="#dfe9f5" stroke-width="6"/></svg>', "sp-hang");
       hang.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, fill: "forwards" });
       const winkel = Math.atan2(H * 0.633, W) * 180 / Math.PI;
@@ -651,9 +854,45 @@
           { transform: "translate(" + (W + gr) + "px," + (y1 + (H * 0.633 * gr * 2.2) / W) + "px) rotate(" + winkel + "deg)" },
         ], { duration: 3200 - i * 250, delay: 900 + i * 1500, easing: "cubic-bezier(.5,0,.8,.6)", fill: "both" });
       }
+
+      // Zielflagge unten rechts
+      const fb = Math.min(W * 0.16, 70);
+      const flagge = figur('<svg viewBox="0 0 60 90"><rect x="4" y="0" width="4" height="90" fill="#6b4a3a"/><g class="sp-fahne">' +
+        Array.from({ length: 12 }, (_, i) => '<rect x="' + (8 + (i % 4) * 12) + '" y="' + (4 + Math.floor(i / 4) * 10) + '" width="12" height="10" fill="' + ((i + Math.floor(i / 4)) % 2 ? "#fff" : "#2a1f2e") + '"/>').join("") + "</g></svg>",
+        "sp-zielflagge", { left: W - fb - W * 0.04 + "px", top: H * 0.833 - fb * 1.9 + "px", width: fb + "px" });
+      flagge.querySelector(".sp-fahne").animate([{ transform: "skewY(-4deg)" }, { transform: "skewY(4deg)" }], { duration: 500, direction: "alternate", iterations: Infinity });
+      // Zweiter Akt: der Capy Bob mit drei Capys
+      const bgr = Math.min(W * 0.5, 220);
+      const bob = figur('<svg viewBox="0 0 220 90"><path d="M10 70 h180 q20 0 24 -18" stroke="#9d2449" stroke-width="4" fill="none"/>' +
+        '<path d="M14 38 h176 q18 0 18 20 v6 H14z" fill="#d6304f"/><path d="M14 46 h194" stroke="#fff" stroke-width="3" opacity=".6"/>' +
+        [20, 80, 140].map((x, i) => '<g transform="translate(' + x + ' -4) scale(.78)">' + capyFrontInhalt({ typ: [2, 5, 8][i] }) + "</g>").join("") +
+        '<text x="110" y="60" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="15" fill="#fff">Capy Bob</text></svg>',
+        "sp-rodler", { width: bgr + "px" });
+      const y0 = H * 0.2 - bgr * 0.3, y1 = H * 0.833 - bgr * 0.3;
+      bob.animate([
+        { transform: "translate(-" + bgr * 1.2 + "px," + y0 + "px) rotate(" + winkel + "deg)" },
+        { transform: "translate(" + (W + bgr) + "px," + (y1 + (H * 0.633 * bgr * 2.2) / W) + "px) rotate(" + winkel + "deg)" },
+      ], { duration: 3200, delay: 9600, easing: "cubic-bezier(.6,0,.9,.5)", fill: "both" });
+      spaeter(10600, () => partikel(W * 0.5, H * 0.5, ["❄", "✦"], 12, 80, ["#fff", "#cfe6ff"]));
+      // ein Capy rollt als Schneeball den Hang hinunter und wird immer größer
+      const kugel = figur('<div class="sp-rollkugel">' + capyFront({ typ: 4, mund: "offen" }) + "</div>", "sp-rodler", { width: "40px" });
+      kugel.animate([
+        { transform: "translate(-40px," + (H * 0.2 - 30) + "px) rotate(0) scale(.6)" },
+        { transform: "translate(" + W * 0.5 + "px," + (H * 0.52 - 60) + "px) rotate(720deg) scale(1.6)", offset: 0.55 },
+        { transform: "translate(" + (W - fb * 2.2) + "px," + (H * 0.8 - 110) + "px) rotate(1260deg) scale(2.6)" },
+      ], { duration: 3600, delay: 13000, easing: "ease-in", fill: "both" });
+      spaeter(16600, () => {
+        const l = lage(kugel);
+        partikel(l.x + l.w / 2, l.y + l.h / 2, ["❄", "●", "✦"], 22, 140, ["#fff", "#dfe9f5", "#cfe6ff"]);
+        kugel.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" });
+        const c = figur(capySeite({ typ: 4 }), "sp-rodler", { left: "0", top: "0", width: Math.min(W * 0.24, 110) + "px" });
+        c.animate([{ transform: "translate(" + (W - fb * 2.4 - 60) + "px," + (H * 0.8 - 80) + "px) translateY(-40px)", opacity: 0 }, { transform: "translate(" + (W - fb * 2.4 - 60) + "px," + (H * 0.8 - 80) + "px)", opacity: 1 }], { duration: 500, fill: "forwards" });
+        sagBlase("Ziel! Erste! 🏁", { left: Math.min(W - 80, W - fb * 2.4) + "px", top: H * 0.8 - 150 + "px" }, 2200);
+      });
+      spaeter(18800, () => regen(["🏆", "✨", "❄"], 20, ["#f3c84b", "#fff", "#cfe6ff"], 1800));
     } },
 
-    20: { titel: "Die Capy Crew trinkt den Matcha leer 🍵", dauer: 12500, spiel() {
+    20: { titel: "Die Capy Crew trinkt den Matcha leer 🍵", dauer: 21000, spiel() {
       const gr = Math.min(W * 0.78, 320);
       const koepfe = [0, 1, 2].map((n, i) => {
         const x = 18 + i * 74;
@@ -694,9 +933,40 @@
         partikel(r.left - bb.left + r.width / 2, r.top - bb.top + r.height * 0.15, ["♥", "✨"], 12, 90, ["#4a8a5c", "#e85d7e"]);
         spaeter(2000, () => b.remove());
       });
+
+      // Zweiter Akt: Nachschub!
+      const kb = Math.min(W * 0.3, 140);
+      const rand = H + 10 - gr * (310 / 240) + gr * (64 / 240);
+      const kellner = figur(capySeite({ hut: "koch" }) , "sp-gespiegelt sp-kellner", { width: kb + "px", left: W + "px", top: rand - kb * 0.76 + "px" });
+      const kanne = figur('<svg viewBox="0 0 60 60"><path d="M10 14h32l-4 40H14z" fill="#eef7e6" stroke="#4a7c3a" stroke-width="2.5"/><rect x="14" y="26" width="24" height="26" fill="#8fbf5a"/><path d="M42 18q10 0 8 12" stroke="#4a7c3a" stroke-width="3" fill="none"/><path d="M10 14 l-8 -6" stroke="#4a7c3a" stroke-width="3"/></svg>',
+        "sp-kanne", { width: kb * 0.45 + "px", left: W + "px", top: rand - kb * 0.62 + "px" });
+      const zielX = W / 2 + gr * 0.16;
+      spaeter(11400, () => {
+        sagBlase("Nachschub! 💚", { left: "50%", top: "18%" }, 1600);
+        kellner.animate([{ left: W + "px" }, { left: zielX + "px" }], { duration: 1400, easing: "ease-out", fill: "forwards" });
+        kanne.animate([{ left: W + "px" }, { left: zielX - kb * 0.3 + "px" }], { duration: 1400, easing: "ease-out", fill: "forwards" });
+      });
+      spaeter(13000, () => {
+        kanne.animate([{ transform: "rotate(0)" }, { transform: "rotate(-55deg)" }], { duration: 500, fill: "forwards" });
+        const strahl = figur("", "sp-strahl", { left: zielX - kb * 0.32 + "px", top: rand - kb * 0.5 + "px", height: Math.max(40, H - rand - gr * 0.5) + "px" });
+        strahl.animate([{ transform: "scaleY(0)" }, { transform: "scaleY(1)" }], { duration: 300, delay: 400, fill: "both" });
+        fuell.animate([{ transform: "translateY(205px)" }, { transform: "translateY(30px)" }], { duration: 2600, delay: 500, easing: "ease-out", fill: "forwards" });
+        spaeter(3100, () => { strahl.remove(); kanne.animate([{ transform: "rotate(-55deg)" }, { transform: "rotate(0)" }], { duration: 400, fill: "forwards" }); });
+      });
+      spaeter(16400, () => {
+        kellner.animate([{ left: zielX + "px" }, { left: W + 20 + "px" }], { duration: 1200, easing: "ease-in", fill: "forwards" });
+        kanne.animate([{ left: zielX - kb * 0.3 + "px" }, { left: W + 20 + "px" }], { duration: 1200, easing: "ease-in", fill: "forwards" });
+        fuell.animate([{ transform: "translateY(30px)" }, { transform: "translateY(150px)" }], { duration: 3000, easing: "ease-in", fill: "forwards" });
+        svg.querySelectorAll(".sp-trinker").forEach((t, i) => t.animate([{ transform: "translateY(0)" }, { transform: "translateY(3px)" }, { transform: "translateY(0)" }], { duration: 300, iterations: 10, delay: i * 100 }));
+      });
+      spaeter(19400, () => {
+        sagBlase("Hicks! Jetzt sind wir satt 😋💚", { left: "50%", top: "18%" }, 1600);
+        const r = becher.getBoundingClientRect(), bb = buehne.getBoundingClientRect();
+        partikel(r.left - bb.left + r.width / 2, r.top - bb.top + r.height * 0.15, ["♥", "○", "✨"], 14, 100, ["#4a8a5c", "#e85d7e", "#f6fbef"]);
+      });
     } },
 
-    21: { titel: "Capy-Feuerwerk nur für dich 🎆", dauer: 11000, spiel() {
+    21: { titel: "Capy-Feuerwerk nur für dich 🎆", dauer: 21000, spiel() {
       const nacht = figur("", "sp-nacht");
       nacht.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, fill: "forwards" });
       const gr = Math.min(W * 0.22, 90);
@@ -712,9 +982,23 @@
         schirm.animate([{ transform: "translate(-50%, 0) rotate(-6deg)" }, { transform: "translate(-30%, " + H * 0.45 + "px) rotate(6deg)" }, { transform: "translate(-60%, " + H * 0.8 + "px) rotate(-4deg)" }],
           { duration: 5800, easing: "ease-in-out", fill: "forwards" });
       });
+
+      // Zweiter Akt: drei Raketen, Toni in Funken und goldener Regen
+      const knall = (x, y, farben, form) => partikel(x, y, form || ["♥", "✦"], 22, Math.min(W, H) * 0.24, farben);
+      [[0.2, 11000, ["#ff5c85", "#fff"]], [0.5, 11700, ["#f3c84b", "#ff8fab"]], [0.8, 12400, ["#7cc4f0", "#b39ddb"]]].forEach(([fx, t, farben]) => spaeter(t, () => {
+        const sp = figur("", "sp-funkenspur", { left: W * fx + "px", top: H + "px" });
+        sp.animate([{ transform: "translateY(0)", opacity: 1 }, { transform: "translateY(-" + H * 0.7 + "px)", opacity: 1 }], { duration: 900, easing: "ease-out", fill: "forwards" })
+          .onfinish = () => { sp.remove(); knall(W * fx, H * 0.3, farben); };
+      }));
+      const name = figur("TONI".split("").map((b) => "<span>" + b + "</span>").join("") + '<span class="herz">♥</span>', "sp-funkenname", { left: "50%", top: H * 0.24 + "px" });
+      name.querySelectorAll("span").forEach((b, i) => b.animate([{ opacity: 0, transform: "scale(.2)", filter: "blur(4px)" }, { opacity: 1, transform: "scale(1.2)", filter: "blur(0)", offset: 0.6 }, { opacity: 1, transform: "scale(1)" }],
+        { duration: 700, delay: 14200 + i * 380, fill: "both" }));
+      spaeter(14200, () => { for (let i = 0; i < 5; i++) spaeter(i * 380, () => { const l = lage(name); partikel(l.x + l.w * (0.1 + i * 0.2), l.y + l.h / 2, ["✦"], 6, 40, ["#fff", "#f3c84b"]); }); });
+      spaeter(17600, () => name.animate([{ opacity: 1 }, { opacity: 0.85, filter: "brightness(1.4)" }, { opacity: 1 }], { duration: 600, iterations: 3 }));
+      spaeter(18400, () => regen(["✦", "✧", "·"], 40, ["#f3c84b", "#ffe9a8", "#fff"], 2600, 18));
     } },
 
-    22: { titel: "Große Schneeballschlacht! ❄️", dauer: 13000, spiel() {
+    22: { titel: "Große Schneeballschlacht! ❄️", dauer: 21000, spiel() {
       const gr = Math.min(W * 0.3, 140);
       const links = figur(capySeite({ typ: 2 }), "sp-werfer", { left: "4%", width: gr + "px" });
       const rechts = figur(capySeite({ typ: 4 }), "sp-werfer sp-gespiegelt", { right: "4%", width: gr + "px" });
@@ -769,26 +1053,72 @@
       };
       wuerfe.forEach((w, i) => spaeter(900 + i * 1000, () => wirf(w, i, false)));
       spaeter(900 + wuerfe.length * 1000 + 300, () => wirf({ von: "l", r: 34 }, 99, true));
+
+      // Zweiter Akt: das weggeschleuderte Capy kommt zurück, beide bauen zusammen einen Schneemann
+      spaeter(14600, () => {
+        rechts.animate([
+          { transform: "translate(" + W * 0.1 + "px," + -H + "px) rotate(-200deg) scale(.7)" },
+          { transform: "translate(0,0) rotate(0) scale(1)" },
+        ], { duration: 1100, easing: "cubic-bezier(.5,0,.7,1.4)", fill: "forwards" });
+        spaeter(1100, () => { partikel(W * 0.96 - gr * 0.5, yBoden + 10, ["●", "❄"], 16, 70, ["#fff"]); sagBlase("Plumps! 😵‍💫", { left: Math.min(W - 70, W * 0.96 - gr * 0.5) + "px", bottom: gr * 1.4 + H * 0.08 + "px" }, 1400); });
+      });
+      spaeter(17200, () => sagBlase("Lieber zusammen einen Schneemann bauen? ⛄", { left: W / 2 + "px", bottom: gr * 1.7 + H * 0.08 + "px" }, 1800));
+      const sm = Math.min(W * 0.22, 100);
+      const teile = [
+        '<circle cx="50" cy="150" r="34" fill="#fff" stroke="#dfe9f5" stroke-width="2"/>',
+        '<circle cx="50" cy="96" r="25" fill="#fff" stroke="#dfe9f5" stroke-width="2"/><circle cx="50" cy="90" r="2.4" fill="#3a2418"/><circle cx="50" cy="102" r="2.4" fill="#3a2418"/>',
+        '<circle cx="50" cy="56" r="19" fill="#fff" stroke="#dfe9f5" stroke-width="2"/><circle cx="43" cy="52" r="2.2" fill="#3a2418"/><circle cx="57" cy="52" r="2.2" fill="#3a2418"/><path d="M50 58 l14 3 -14 3z" fill="#ff8a2a"/><path d="M42 64 q8 5 16 0" stroke="#3a2418" stroke-width="1.6" fill="none"/>',
+        '<path d="M30 40 h40" stroke="#2a1f2e" stroke-width="4" stroke-linecap="round"/><rect x="38" y="18" width="24" height="22" rx="2" fill="#2a1f2e"/><rect x="38" y="32" width="24" height="5" fill="#d6304f"/><path d="M33 76 q17 8 34 0 v6 q-17 8 -34 0z" fill="#e85d7e"/>',
+      ];
+      const schneemann = figur('<svg viewBox="0 0 100 186">' + teile.map((t, i) => '<g class="sp-sm-teil" data-i="' + i + '" opacity="0">' + t + "</g>").join("") + "</svg>",
+        "sp-schneemann-gross", { left: W / 2 - sm / 2 + "px", bottom: H * 0.06 + "px", width: sm + "px" });
+      schneemann.querySelectorAll(".sp-sm-teil").forEach((t, i) => spaeter(18000 + i * 450, () => {
+        t.setAttribute("opacity", "1");
+        t.animate([{ transform: "scale(.2)" }, { transform: "scale(1.1)" }, { transform: "scale(1)" }], { duration: 400 });
+        const l = lage(schneemann); partikel(l.x + l.w / 2, l.y + l.h * (0.8 - i * 0.22), ["❄"], 5, 40, ["#fff"]);
+      }));
+      spaeter(17700, () => {
+        links.animate([{ transform: "translateX(0)" }, { transform: "translateX(" + (W / 2 - sm * 0.6 - gr - W * 0.04) + "px)" }], { duration: 900, easing: "ease-out", fill: "forwards" });
+        rechts.animate([{ transform: "translate(0,0)" }, { transform: "translateX(-" + (W / 2 - sm * 0.6 - gr - W * 0.04) + "px)" }], { duration: 900, easing: "ease-out", fill: "forwards" });
+      });
+      spaeter(20000, () => { const l = lage(schneemann); partikel(l.x + l.w / 2, l.y, ["♥"], 12, 80, ["#ff4d7d", "#ff8fab"]); });
     } },
 
-    23: { titel: "Capy-Polonaise 🎶", dauer: 12500, spiel() {
+    23: { titel: "Capy-Polonaise 🎶", dauer: 22000, spiel() {
       const gr = Math.min(W * 0.2, 96);
       const farben = ["#f3dc9f", "#fda4b8", "#9be3b0", "#7cc4f0", "#f3c84b", "#b39ddb", "#ff8fab", "#f3dc9f", "#9be3b0"];
       for (let i = 0; i < 9; i++) {
         const f = figur(capySeite({ hut: "party", hutFarbe: farben[i] }), "sp-polonaise", { width: gr + "px" });
         const y = H * 0.8 - gr * 0.6;
         const kf = [];
-        for (let s = 0; s <= 10; s++) {
-          const t = s / 10;
-          kf.push({ transform: "translate(" + (-gr * 1.5 + t * (W + gr * 3)) + "px," + (y + Math.sin(t * Math.PI * 4) * H * 0.07) + "px) rotate(" + Math.cos(t * Math.PI * 4) * 6 + "deg)" });
+        // erst nach rechts, dann in einer großen Schleife zurück und wieder hinaus
+        for (let s = 0; s <= 30; s++) {
+          const t = s / 30;
+          let x, yy;
+          if (t < 0.4) { x = -gr * 1.5 + (t / 0.4) * (W * 0.85 + gr * 1.5); yy = y + Math.sin(t * Math.PI * 6) * H * 0.06; }
+          else if (t < 0.7) { const u = (t - 0.4) / 0.3; x = W * 0.85 - Math.sin(u * Math.PI) * W * 0.1 - u * W * 0.7; yy = y - Math.sin(u * Math.PI) * H * 0.28; }
+          else { const u = (t - 0.7) / 0.3; x = W * 0.15 + u * (W * 0.85 + gr * 2); yy = y + Math.sin(u * Math.PI * 4) * H * 0.06; }
+          kf.push({ transform: "translate(" + x + "px," + yy + "px)" + (t > 0.4 && t < 0.7 ? " scaleX(-1)" : "") });
         }
-        f.animate(kf, { duration: 8500, delay: 600 + i * 380, easing: "linear", fill: "both" });
+        f.animate(kf, { duration: 17500, delay: 600 + i * 380, easing: "linear", fill: "both" });
         f.firstChild.animate([{ transform: "translateY(0)" }, { transform: "translateY(-8px)" }], { duration: 300, direction: "alternate", iterations: Infinity });
       }
-      for (let k = 0; k < 7; k++) spaeter(1200 + k * 1300, () => partikel(zufall(W * 0.1, W * 0.9), H * 0.45, ["♪", "♫"], 5, 70, ["#9d2449", "#e85d7e"]));
+      for (let k = 0; k < 14; k++) spaeter(1200 + k * 1300, () => partikel(zufall(W * 0.1, W * 0.9), H * 0.45, ["♪", "♫"], 5, 70, ["#9d2449", "#e85d7e"]));
+
+      // Lampions über der Tanzfläche und bunte Scheinwerfer
+      const kette = figur('<svg viewBox="0 0 400 60" preserveAspectRatio="none"><path d="M0 8 Q100 50 200 12 T400 10" stroke="#6b4a3a" stroke-width="1.5" fill="none"/>' +
+        [40, 95, 150, 250, 305, 360].map((x, i) => '<rect class="sp-lampion" x="' + (x - 7) + '" y="' + (i % 2 ? 26 : 30) + '" width="14" height="18" rx="6" fill="' + ["#f3c84b", "#e85d7e", "#7cc4f0", "#9be3b0", "#b39ddb", "#ff8fab"][i] + '"/>').join("") + "</svg>", "sp-lampions");
+      kette.animate([{ transform: "translateY(-120%)" }, { transform: "translateY(0)" }], { duration: 1000, delay: 300, easing: "ease-out", fill: "both" });
+      spaeter(5200, () => ["links", "rechts"].forEach((seite, i) => {
+        const s2 = figur("", "sp-scheinwerfer bunt " + seite);
+        s2.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, fill: "forwards" });
+        s2.animate([{ transform: "rotate(" + (i ? 30 : -30) + "deg)" }, { transform: "rotate(" + (i ? -10 : 10) + "deg)" }], { duration: 1500, direction: "alternate", iterations: 9, easing: "ease-in-out" });
+      }));
+      spaeter(9000, () => sagBlase("Alle mitmachen! 🎶", { left: W / 2 + "px", top: H * 0.3 + "px" }, 1800));
+      spaeter(19000, () => regen(["🎉", "♪", "♥", "✨"], 34, ["#e85d7e", "#f3c84b", "#7cc4f0", "#9be3b0"], 2000));
     } },
 
-    24: { titel: "Die Capys backen Plätzchen 🍪", dauer: 10000, spiel() {
+    24: { titel: "Die Capys backen Plätzchen 🍪", dauer: 21000, spiel() {
       const breite = Math.min(W * 0.62, 280);
       const blech = figur('<svg viewBox="0 0 200 40"><rect x="4" y="10" width="192" height="22" rx="6" fill="#9aa3ad"/><rect x="10" y="6" width="180" height="8" rx="4" fill="#c4cbd3"/></svg>', "sp-blech", { width: breite + "px" });
       const baecker = figur(capySeite({ hut: "koch" }), "sp-baecker", { width: Math.min(W * 0.3, 140) + "px" });
@@ -810,9 +1140,38 @@
         ], { duration: 2200, easing: "cubic-bezier(.2,.8,.4,1)", fill: "forwards" });
       });
       for (const t of [1000, 3600, 6400]) spaeter(t, () => partikel(W / 2, yBlech, ["●"], 10, 50, ["rgba(255,255,255,.9)"]));
+
+      // Zweiter Akt: ein großes Herz Plätzchen wird mit Toni verziert
+      const pk = Math.min(W * 0.5, 220);
+      const grossKeks = figur('<svg viewBox="0 0 200 180"><path d="M100 170C62 146 8 112 8 62 8 32 30 10 58 10c18 0 32 9 42 23 10-14 24-23 42-23 28 0 50 22 50 52 0 50-54 84-92 108z" fill="#d9a066" stroke="#b5763e" stroke-width="5"/>' +
+        '<path class="sp-guss" d="M100 158C66 136 22 106 22 63 22 40 38 24 59 24c16 0 28 9 41 25 13-16 25-25 41-25 21 0 37 16 37 39 0 43-44 73-78 95z" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-dasharray="560" stroke-dashoffset="560"/>' +
+        '<text class="sp-schrift" x="100" y="96" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="44" fill="none" stroke="#ff4d7d" stroke-width="2.4" stroke-dasharray="320" stroke-dashoffset="320">Toni</text>' +
+        '<g class="sp-streusel" opacity="0">' + Array.from({ length: 26 }, (_, i) => '<rect x="' + (40 + (i * 37) % 120) + '" y="' + (40 + (i * 53) % 90) + '" width="6" height="2.4" rx="1.2" fill="' + ["#ff4d7d", "#7cc4f0", "#9be3b0", "#f3c84b"][i % 4] + '" transform="rotate(' + (i * 47) % 180 + " " + (43 + (i * 37) % 120) + " " + (41 + (i * 53) % 90) + ')"/>').join("") + "</g></svg>",
+        "sp-grosskeks", { left: W / 2 - pk / 2 + "px", top: H * 0.16 + "px", width: pk + "px", opacity: "0" });
+      spaeter(10200, () => {
+        grossKeks.animate([{ opacity: 0, transform: "scale(.3) rotate(-20deg)" }, { opacity: 1, transform: "scale(1.06) rotate(4deg)", offset: 0.7 }, { opacity: 1, transform: "scale(1) rotate(0)" }], { duration: 1000, easing: "ease-out", fill: "forwards" });
+        sagBlase("Und jetzt das schönste Plätzchen … 🍪", { left: W / 2 + "px", top: Math.max(6, H * 0.16 - 46) + "px" }, 1900);
+      });
+      spaeter(11600, () => grossKeks.querySelector(".sp-guss").animate([{ strokeDashoffset: 560 }, { strokeDashoffset: 0 }], { duration: 1800, easing: "ease-in-out", fill: "forwards" }));
+      spaeter(13300, () => {
+        const t = grossKeks.querySelector(".sp-schrift");
+        t.animate([{ strokeDashoffset: 320 }, { strokeDashoffset: 0 }], { duration: 2000, easing: "ease-in-out", fill: "forwards" });
+        spaeter(1700, () => t.animate([{ fill: "rgba(255,77,125,0)" }, { fill: "rgba(255,77,125,1)" }], { duration: 600, fill: "forwards" }));
+      });
+      spaeter(16000, () => {
+        const st = grossKeks.querySelector(".sp-streusel");
+        st.setAttribute("opacity", "1");
+        st.animate([{ transform: "translateY(-30px)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }], { duration: 700, easing: "ease-in" });
+        const l = lage(grossKeks); partikel(l.x + l.w / 2, l.y + 10, ["•"], 16, 70, ["#ff4d7d", "#7cc4f0", "#9be3b0", "#f3c84b"]);
+      });
+      spaeter(17400, () => {
+        baecker.firstChild.animate([{ transform: "translateY(0)" }, { transform: "translateY(-14px)" }, { transform: "translateY(0)" }], { duration: 500, iterations: 3 });
+        sagBlase("Mmmh, das ist nur für Toni! 😋", { left: Math.min(W - 90, Math.max(90, W * 0.3)) + "px", bottom: H * 0.36 + "px" }, 2200);
+      });
+      spaeter(19300, () => { const l = lage(grossKeks); partikel(l.x + l.w / 2, l.y + l.h / 2, ["♥", "✨"], 16, 120, ["#ff4d7d", "#f3c84b"]); });
     } },
 
-    25: { titel: "Morgen ist es so weit! 🎂", dauer: 12000, spiel() {
+    25: { titel: "Morgen ist es so weit! 🎂", dauer: 21000, spiel() {
       const banner = figur('<span>Morgen ist dein Tag, Toni! ♥️</span>', "sp-banner");
       banner.animate([{ transform: "translateX(-50%) scaleX(0)" }, { transform: "translateX(-50%) scaleX(1)" }], { duration: 900, delay: 300, easing: "cubic-bezier(.3,1.3,.5,1)", fill: "both" });
       const breite = Math.min(W * 0.5, 230);
@@ -840,6 +1199,34 @@
         }
         partikel(W / 2, H * 0.5, ["♥", "✨", "🎉"], 16, 140, ["#e85d7e", "#f3c84b"]);
       });
+
+      // Zweiter Akt: Ständchen, dann wird es Nacht
+      spaeter(8200, () => {
+        sagBlase("Happy Birthday to you … 🎶", { left: W / 2 + "px", top: H * 0.28 + "px" }, 2200);
+        for (let k = 0; k < 6; k++) spaeter(k * 450, () => partikel(W / 2 + zufall(-W * 0.2, W * 0.2), H * 0.5, ["♪", "♫"], 4, 60, ["#9d2449", "#e85d7e"]));
+      });
+      const nacht = document.createElement("div");
+      nacht.className = "sp-figur sp-nacht sp-abend";
+      nacht.style.opacity = "0";
+      buehne.prepend(nacht);
+      const mond = figur('<svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="#fff8dc"/><circle cx="40" cy="24" r="20" fill="#2a1840"/></svg>', "sp-mond", { left: W * 0.76 + "px", top: H + "px", width: Math.min(W * 0.18, 80) + "px", visibility: "hidden" });
+      spaeter(12200, () => {
+        nacht.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 2200, fill: "forwards" });
+        mond.style.visibility = "visible";
+        mond.animate([{ transform: "translateY(0)" }, { transform: "translateY(-" + H * 0.85 + "px)" }], { duration: 3000, easing: "ease-out", fill: "forwards" });
+        banner.firstChild.textContent = "Noch einmal schlafen 🌙";
+        banner.animate([{ transform: "translateX(-50%) scaleX(1)" }, { transform: "translateX(-50%) scaleX(0)" }, { transform: "translateX(-50%) scaleX(1)" }], { duration: 900 });
+        for (let k = 0; k < 24; k++) {
+          const st = figur("✦", "sp-stern-klein", { left: zufall(4, 96) + "%", top: zufall(4, 50) + "%" });
+          st.animate([{ opacity: 0 }, { opacity: 1 }, { opacity: 0.4 }, { opacity: 1 }], { duration: zufall(1800, 3000), delay: zufall(800, 3000), iterations: 3, fill: "both" });
+        }
+      });
+      spaeter(15600, () => {
+        sagBlase("Gute Nacht, Toni. Bis morgen 💤", { left: W / 2 + "px", top: H * 0.3 + "px" }, 2600);
+        traeger.forEach((t) => t.firstChild.animate([{ transform: "rotate(0)" }, { transform: "rotate(-6deg) translateY(4px)" }], { duration: 900, fill: "forwards" }));
+        for (let k = 0; k < 5; k++) spaeter(k * 700, () => partikel(W / 2 + zufall(-W * 0.25, W * 0.25), H * 0.62, ["z", "Z"], 3, 50, ["#cfd6ff", "#fff"]));
+      });
+      spaeter(19200, () => regen(["✦", "♥"], 24, ["#fff8dc", "#ff8fab"], 1800, 16));
     } },
   };
 
