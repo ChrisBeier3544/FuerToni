@@ -706,9 +706,14 @@
     canvas.height = hoehe * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    // Über den geöffneten Dialog legen (Top-Layer), sonst einfach über die Seite
-    let alsPopover = false;
-    if (typeof canvas.showPopover === "function") {
+    // Geöffnete Karten haben immer Vorrang: Konfetti fällt dann hinter der Karte.
+    // Ohne offene Karte liegt es im Top-Layer über allem.
+    let alsPopover = false, inKarte = null;
+    const elternVorher = canvas.parentNode;
+    const flacheKarte = document.querySelector(".wz-fenster-huelle:not(.geht)");
+    const karteOffen = flacheKarte || document.querySelector("dialog[open], .liebeszettel, .fensterblick, .zr-karte");
+    if (flacheKarte) { flacheKarte.insertBefore(canvas, flacheKarte.firstChild); inKarte = flacheKarte; }
+    else if (!karteOffen && typeof canvas.showPopover === "function") {
       try { canvas.showPopover(); alsPopover = true; } catch (_) { /* ignorieren */ }
     }
     if (!alsPopover) canvas.classList.add("aktiv");
@@ -788,6 +793,7 @@
         ctx.clearRect(0, 0, breite, hoehe);
         if (alsPopover) { try { canvas.hidePopover(); } catch (_) { /* ignorieren */ } }
         canvas.classList.remove("aktiv");
+        if (inKarte && elternVorher) elternVorher.appendChild(canvas);
         regenLaeuft = false;
       }
     }
