@@ -420,30 +420,36 @@
   const wahl = (liste) => liste[Math.floor(Math.random() * liste.length)];
   // Countdown vor dem Geburtstag (bis 26.11., 0:00 Uhr)
   const vorGeburtstag = () => kontext() === "countdown" && ak.intro.phase() === "warten";
-  const NAMEN = ["mein Schatz", "Maus", "Toni", "Baby"];
-  function grussVorGeburtstag() {
-    const n = wahl(NAMEN);
+  // Der Munkelvogel spricht immer selbst und sagt immer „Toni“
+  function grussVogel() {
     const zeit = document.documentElement.getAttribute("data-tageszeit") || "mittag";
     const d = ak.intro.datum();
+    if (d.monat === 11 && d.tag === 26) return wahl(["Hi Toni! Happy Birthday 🎂", "Hallo Toni! Alles Liebe zum Geburtstag 🎂", "Hey Toni! Happy Birthday, heute ist dein Tag 🎂"]);
     const wochentag = new Date(Date.UTC(d.jahr, d.monat - 1, d.tag)).getUTCDay();
-    const schultag = wochentag >= 1 && wochentag <= 5;
+    // Weihnachtsferien vom 23.12. bis 6.1.
+    const ferien = (d.monat === 12 && d.tag >= 23) || (d.monat === 1 && d.tag <= 6);
+    const schultag = wochentag >= 1 && wochentag <= 5 && !ferien;
     const G = {
       morgen: schultag ? [
-        "Guten Morgen, " + n + " ☀️ Ich wünsch dir einen schönen Schultag!",
-        "Guten Morgen, " + n + "! Hab einen tollen Tag in der Schule ☀️",
-        "Morgen, " + n + " ☀️ Ich drück dir die Daumen für einen schönen Schultag!",
-        "Guten Morgen, " + n + "! Ich wünsch dir einen richtig guten Tag in der Schule 📚",
-        "Einen wunderschönen guten Morgen, " + n + " ☀️ Hab einen schönen Schultag!",
+        "Hi Toni! Guten Morgen ☀️ Ich wünsch dir einen schönen Schultag!",
+        "Morgen, Toni ☀️ Hab einen tollen Tag in der Schule!",
+        "Hallo Toni! Ich drück dir die Daumen für einen schönen Schultag ☀️",
+        "Hey Toni, guten Morgen! Hab einen richtig guten Tag in der Schule 📚",
+        "Hi Toni! Einen wunderschönen guten Morgen ☀️ Hab einen schönen Schultag!",
+      ] : ferien ? [
+        "Hi Toni! Guten Morgen ☀️ Genieß deine Ferien!",
+        "Morgen, Toni ☀️ Ferien! Ganz viel Zeit für dich!",
+        "Hallo Toni! Ich wünsch dir einen gemütlichen Ferientag ☀️",
       ] : [
-        "Guten Morgen, " + n + " ☀️ Genieß dein Wochenende!",
-        "Guten Morgen, " + n + "! Heute ist keine Schule, ganz viel Zeit für dich ☀️",
-        "Morgen, " + n + " ☀️ Ich wünsch dir einen gemütlichen Tag!",
+        "Hi Toni! Guten Morgen ☀️ Genieß dein Wochenende!",
+        "Morgen, Toni ☀️ Heute ist keine Schule, ganz viel Zeit für dich!",
+        "Hallo Toni! Ich wünsch dir einen gemütlichen Tag ☀️",
       ],
-      vormittag: ["Einen schönen Vormittag, " + n + " 🌤️", "Hallo " + n + "! Ich hoffe, dein Vormittag ist schön 🌤️", "Na, " + n + "? Ich wünsch dir einen tollen Vormittag 🌤️"],
-      mittag: ["Guten Mittag, " + n + " 🌞", "Mahlzeit, " + n + "! Lass es dir schmecken 🌞", "Hallo " + n + "! Ich wünsch dir eine schöne Mittagspause 🌞"],
-      nachmittag: ["Einen gemütlichen Nachmittag, " + n + " 🍪", "Hallo " + n + "! Wie war dein Tag bis jetzt? 🍪", "Schön, dass du da bist, " + n + "! Genieß den Nachmittag 🍪"],
-      abend: ["Guten Abend, " + n + " 🕯️", "Schönen Abend, " + n + "! Mach es dir gemütlich 🕯️", "Hallo " + n + "! Ich wünsch dir einen entspannten Abend 🕯️"],
-      nacht: ["Schlaf schön, " + n + " 🌙", "Gute Nacht, " + n + "! Träum was Schönes 🌙", "Na, " + n + ", noch wach? Schlaf gleich gut 🌙"],
+      vormittag: ["Hi Toni! Einen schönen Vormittag 🌤️", "Hallo Toni! Ich hoffe, dein Vormittag ist schön 🌤️", "Hey Toni! Ich wünsch dir einen tollen Vormittag 🌤️"],
+      mittag: ["Hi Toni! Guten Mittag 🌞", "Hallo Toni! Lass es dir schmecken 🌞", "Hey Toni! Ich wünsch dir eine schöne Mittagspause 🌞"],
+      nachmittag: ["Hi Toni! Einen gemütlichen Nachmittag 🍪", "Hallo Toni! Wie war dein Tag bis jetzt? 🍪", "Hey Toni, schön, dass du da bist! Genieß den Nachmittag 🍪"],
+      abend: ["Hi Toni! Guten Abend 🕯️", "Hallo Toni! Mach es dir gemütlich 🕯️", "Hey Toni! Ich wünsch dir einen entspannten Abend 🕯️"],
+      nacht: ["Hi Toni! Schlaf gleich schön 🌙", "Gute Nacht, Toni! Träum was Schönes 🌙", "Na, Toni, noch wach? Schlaf gleich gut 🌙"],
     };
     return wahl(G[zeit] || G.mittag);
   }
@@ -484,9 +490,9 @@
       // Hinweise auf die Entdeckungen des Tages (wartezeit.js), sonst ein Geheimnis
       let h = null;
       try { h = ak.wartezeitHinweis ? ak.wartezeitHinweis() : null; } catch (_) { h = null; }
-      return [grussVorGeburtstag(), h || wahl(GEHEIMNIS)];
+      return [grussVogel(), h || wahl(GEHEIMNIS)];
     }
-    const liste = [grussQuelle.textContent || ""];
+    const liste = [grussVogel()];
     const d = tag();
     if (d.jahr === KALENDER.jahr && d.monat === 12 && d.tag === erstesEi - 1) liste.push(HINWEIS);
     else if (d.jahr === KALENDER.jahr && d.monat === 12 && TIPPS[d.tag]) liste.push(TIPPS[d.tag]());
