@@ -80,12 +80,14 @@
     const c = TEST_CODES[testWetter];
     live = { code: c, wolken: c === 0 ? 5 : c === 1 ? 30 : c === 2 ? 60 : 100, wind: c >= 95 ? 40 : 15, zeit: Date.now(), test: true };
   }
-  function liesCache() {
-    try { const v = JSON.parse(localStorage.getItem(CACHE) || "null"); return v && Date.now() - v.zeit < 14 * 60000 ? v : null; } catch (_) { return null; }
+  function liesCache(maxAlter) {
+    try { const v = JSON.parse(localStorage.getItem(CACHE) || "null"); return v && Date.now() - v.zeit < maxAlter ? v : null; } catch (_) { return null; }
   }
+  // Beim Öffnen erst das zuletzt bekannte Wetter zeigen (bis 6 Stunden alt), dann sanft auf das neue wechseln
+  if (!live) live = liesCache(6 * 3600000);
   async function holeWetter() {
     if (live && live.test) return;
-    const c = liesCache();
+    const c = liesCache(14 * 60000);
     if (c) { live = c; aktualisiere(); return; }
     try {
       const ctrl = new AbortController();
@@ -148,8 +150,15 @@
   function setzeWolken(h, anzahl, tag) {
     const box = h.querySelector(".h2-wolken");
     if (+box.dataset.anzahl === anzahl && box.dataset.tag === String(tag)) return;
+    const sanft = box.dataset.anzahl !== undefined && !ruhig;
     box.dataset.anzahl = anzahl; box.dataset.tag = tag;
-    box.innerHTML = "";
+    // alte Wolken langsam ausblenden statt hart zu wechseln
+    box.querySelectorAll(".h2-wolke:not(.geht)").forEach((w) => {
+      if (!sanft) { w.remove(); return; }
+      w.classList.add("geht");
+      w.style.opacity = 0;
+      setTimeout(() => w.remove(), 4000);
+    });
     for (let k = 0; k < anzahl; k++) {
       const w = document.createElement("span");
       w.className = "h2-wolke";
@@ -158,8 +167,10 @@
       w.style.width = 110 + ((k * 53 + tag) % 90) + "px";
       w.style.animationDuration = 70 + k * 23 + "s";
       w.style.animationDelay = -((k * 41 + tag * 7) % 70) + "s";
-      w.style.opacity = 0.55 + (k % 3) * 0.15;
+      const ziel = 0.55 + (k % 3) * 0.15;
+      w.style.opacity = sanft ? 0 : ziel;
       box.appendChild(w);
+      if (sanft) requestAnimationFrame(() => requestAnimationFrame(() => { w.style.opacity = ziel; }));
     }
   }
 
@@ -168,12 +179,22 @@
     const box = h.querySelector(".h2-niederschlag");
     const schluessel = (art || "") + "|" + staerke + "|" + Math.round(schief);
     if (box.dataset.schluessel === schluessel) return;
+    const sanft = box.dataset.schluessel !== undefined;
     box.dataset.schluessel = schluessel;
-    box.innerHTML = "";
-    box.className = "h2-niederschlag" + (art ? " " + art : "");
+    box.querySelectorAll(".h2-schicht:not(.geht)").forEach((alt) => {
+      if (!sanft) { alt.remove(); return; }
+      alt.classList.add("geht");
+      alt.style.opacity = 0;
+      setTimeout(() => alt.remove(), 4000);
+    });
     if (!art || ruhig) return;
+    const schicht = document.createElement("div");
+    schicht.className = "h2-schicht " + art;
+    schicht.style.opacity = sanft ? 0 : 1;
+    box.appendChild(schicht);
+    if (sanft) requestAnimationFrame(() => requestAnimationFrame(() => { schicht.style.opacity = 1; }));
     const anzahl = Math.round((art === "regen" ? 120 : 80) * staerke) + 20;
-    box.style.setProperty("--schief", (art === "regen" ? schief : schief * 0.5) + "deg");
+    schicht.style.setProperty("--schief", (art === "regen" ? schief : schief * 0.5) + "deg");
     for (let k = 0; k < anzahl; k++) {
       const t = document.createElement("i");
       t.style.left = (Math.random() * 120 - 10) + "%";
@@ -181,7 +202,7 @@
       t.style.animationDelay = -Math.random() * 8 + "s";
       if (art === "schnee") { const g = 3 + Math.random() * 5; t.style.width = t.style.height = g + "px"; t.style.opacity = 0.5 + Math.random() * 0.5; }
       else t.style.opacity = 0.35 + Math.random() * 0.45;
-      box.appendChild(t);
+      schicht.appendChild(t);
     }
   }
   let blitzAn = false;
@@ -286,5 +307,5 @@
   setInterval(holeWetter, 15 * 60000);
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") holeWetter(); });
 
-  window.adventkalender.himmel = { mondphase, mondName, wetter, sternschnuppe, aktualisiere, live: () => live };
+  window.adventkalender.himmel = { mondphase, mondName, wetter, sternschnuppe, aktualisiere, live: () => live, setzeLive: (l) => { live = l; aktualisiere(); } };
 })();

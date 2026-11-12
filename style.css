@@ -3549,16 +3549,21 @@ html.wetter-grau .h2-wolke svg path { fill: #dcdbe3; }
 html.wetter-grau .h2-wolke { filter: drop-shadow(0 8px 10px rgba(60, 60, 90, 0.18)); }
 html.wetter-grau .h2-strahlen { opacity: 0.05; }
 html.wetter-grau .himmel2[data-zeit="abend"] .h2-wolke svg path, html.wetter-grau .himmel2[data-zeit="nacht"] .h2-wolke svg path { fill: #4a4458; }
-html.wetter-grau .himmel2[data-zeit="abend"] .h2-wolke, html.wetter-grau .himmel2[data-zeit="nacht"] .h2-wolke { opacity: 0.7 !important; }
 html.wetter-grau .himmel2[data-zeit="abend"] .h2-dunst, html.wetter-grau .himmel2[data-zeit="nacht"] .h2-dunst { background: linear-gradient(180deg, rgba(70, 64, 88, 0.8), rgba(70, 64, 88, 0.2) 60%, transparent); }
 html.wetter-grau .intro::before { opacity: 0.2 !important; }
 html[data-wetter="nebel"] .h2-dunst { background: linear-gradient(180deg, rgba(236, 234, 240, 0.95), rgba(236, 234, 240, 0.7) 55%, rgba(236, 234, 240, 0.35)); }
-.h2-niederschlag { position: absolute; inset: -10% -10% 0; pointer-events: none; transform: skewX(calc(var(--schief, 0deg) * -1)); }
-.h2-niederschlag i { position: absolute; top: -12%; display: block; }
-.h2-niederschlag.regen i { width: 2px; height: 24px; border-radius: 1px; background: linear-gradient(transparent, rgba(105, 135, 190, 0.95)); animation: wetter-regen linear infinite; }
-.h2-niederschlag.schnee i { border-radius: 50%; background: #fff; box-shadow: 0 0 2px 1px rgba(140, 150, 190, 0.45); animation: wetter-schnee linear infinite; }
-html[data-abend] .h2-niederschlag.regen i { background: linear-gradient(transparent, rgba(190, 205, 240, 0.7)); }
+.h2-niederschlag { position: absolute; inset: -10% -10% 0; pointer-events: none; }
+.h2-schicht { position: absolute; inset: 0; transform: skewX(calc(var(--schief, 0deg) * -1)); transition: opacity 3.5s ease; }
+.h2-schicht i { position: absolute; top: -12%; display: block; }
+.h2-schicht.regen i { width: 2px; height: 24px; border-radius: 1px; background: linear-gradient(transparent, rgba(105, 135, 190, 0.95)); animation: wetter-regen linear infinite; }
+.h2-schicht.schnee i { border-radius: 50%; background: #fff; box-shadow: 0 0 2px 1px rgba(140, 150, 190, 0.45); animation: wetter-schnee linear infinite; }
+html[data-abend] .h2-schicht.regen i { background: linear-gradient(transparent, rgba(190, 205, 240, 0.7)); }
+/* sanfte Übergänge beim Wetterwechsel */
+.h2-wolke { transition: opacity 3.5s ease; }
+.h2-wolke svg path { transition: fill 3.5s ease; }
+.h2-strahlen { transition: opacity 3.5s ease; }
+.h2-dunst { transition: opacity 3.5s ease, background 3.5s ease; }
 @keyframes wetter-regen { from { transform: translateY(0); } to { transform: translateY(120vh); } }
 @keyframes wetter-schnee { 0% { transform: translate(0, 0); } 50% { transform: translate(18px, 60vh); } 100% { transform: translate(-6px, 120vh); } }
 .h2-blitz { position: absolute; inset: 0; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at 60% 10%, rgba(255, 255, 255, 0.95), rgba(220, 225, 255, 0.5) 50%, transparent 80%); }
-@media (prefers-reduced-motion: reduce) { .h2-niederschlag i { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .h2-schicht i { animation: none; } }
