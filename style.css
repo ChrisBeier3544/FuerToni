@@ -3703,3 +3703,12 @@ html[data-abend] .wz-lade-boden { background: linear-gradient(180deg, #3d2a1f, #
 @keyframes wz-denkt { 0% { opacity: 0; transform: scale(0.6); } 50% { opacity: 1; } 100% { opacity: 0; transform: scale(1.2); } }
 .wz-spiegel-rest { min-height: 1.2em; }
 .wz-spiegel-glas::after { background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.35) 50%, transparent 58%); }
+
+/* Fotobox: Partyraum im Hintergrund */
+.sp-fotoraum { z-index: 0; }
+.sp-fotoraum > svg { width: 100%; height: 100%; }
+.special-raum .sp-fotoraum::after { content: ""; position: absolute; left: 0; right: 0; top: calc(100% - 1px); height: 30vh; background: #d4a479; }
+.sp-ballons { z-index: 0; transform-origin: 50% 100%; animation: sp-ballon-schaukeln 3.4s ease-in-out infinite; }
+.sp-ballons > svg { width: 100%; height: auto; overflow: visible; }
+@keyframes sp-ballon-schaukeln { 0%, 100% { rotate: -3deg; } 50% { rotate: 3deg; } }
+@media (prefers-reduced-motion: reduce) { .sp-ballons { animation: none; } }

@@ -147,6 +147,72 @@
     setTimeout(() => b.remove(), 1300);
   }
 
+  // Partyraum hinter der Fotobox: Tapete, Holzboden, roter Teppich, Lichterkette, Ballons
+  function fotoraum(bb, boxUnten) {
+    const fb = Math.min(H * 0.8, boxUnten - bb * 0.12);   // Oberkante des Bodens
+    const r = (n) => n.toFixed(1);
+    let svg = '<svg viewBox="0 0 ' + r(W) + " " + r(H) + '" aria-hidden="true"><defs>' +
+      '<pattern id="spTapete" width="34" height="20" patternUnits="userSpaceOnUse"><rect width="34" height="20" fill="#f9e0e8"/><rect width="15" height="20" fill="#f5d2de"/><circle cx="25" cy="10" r="1.4" fill="#fbe9ef"/></pattern>' +
+      '<radialGradient id="spSpot" cx="50%" cy="0%" r="75%"><stop offset="0" stop-color="#fff8e6" stop-opacity=".75"/><stop offset=".6" stop-color="#fff8e6" stop-opacity=".12"/><stop offset="1" stop-color="#fff8e6" stop-opacity="0"/></radialGradient>' +
+      '<linearGradient id="spBoden" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b98159"/><stop offset="1" stop-color="#d4a479"/></linearGradient></defs>' +
+      // Wand, Vertäfelung, Fußleiste
+      '<rect width="' + r(W) + '" height="' + r(fb) + '" fill="url(#spTapete)"/>' +
+      '<rect y="' + r(fb - H * 0.13) + '" width="' + r(W) + '" height="' + r(H * 0.13) + '" fill="#fcecf1"/>' +
+      '<rect y="' + r(fb - H * 0.13 - 4) + '" width="' + r(W) + '" height="5" fill="#e8b4c4"/>' +
+      '<rect y="' + r(fb - 7) + '" width="' + r(W) + '" height="7" fill="#fffafc"/>';
+    for (let x = 30; x < W; x += 70) svg += '<rect x="' + r(x) + '" y="' + r(fb - H * 0.11) + '" width="50" height="' + r(H * 0.08) + '" rx="3" fill="none" stroke="#efc9d5" stroke-width="2"/>';
+    // Holzboden mit Fluchtpunkt
+    svg += '<rect y="' + r(fb) + '" width="' + r(W) + '" height="' + r(H - fb + 2) + '" fill="url(#spBoden)"/>';
+    const vx = W / 2, vy = fb - H * 0.9;
+    for (let k = -14; k <= 14; k++) {
+      const xu = W / 2 + k * W * 0.11, t = (fb - vy) / (H - vy);
+      svg += '<path d="M' + r(vx + (xu - vx) * t) + " " + r(fb) + "L" + r(xu) + " " + r(H) + '" stroke="#a7714c" stroke-width="1.2" opacity=".55"/>';
+    }
+    for (let k = 1; k <= 4; k++) { const y = fb + (H - fb) * Math.pow(k / 5, 1.6); svg += '<path d="M0 ' + r(y) + "H" + r(W) + '" stroke="#a7714c" stroke-width="1" opacity=".3"/>'; }
+    // roter Teppich bis zur Box
+    svg += '<path d="M' + r(W / 2 - bb * 0.36) + " " + r(fb + 2) + "L" + r(W / 2 + bb * 0.36) + " " + r(fb + 2) + "L" + r(W / 2 + bb * 0.75) + " " + r(H) + "L" + r(W / 2 - bb * 0.75) + " " + r(H) + 'Z" fill="#b8173f"/>' +
+      '<path d="M' + r(W / 2 - bb * 0.33) + " " + r(fb + 4) + "L" + r(W / 2 - bb * 0.69) + " " + r(H) + "M" + r(W / 2 + bb * 0.33) + " " + r(fb + 4) + "L" + r(W / 2 + bb * 0.69) + " " + r(H) + '" stroke="#f3c84b" stroke-width="2"/>';
+    // Bilderrahmen an der Wand
+    [[W * 0.16, fb * 0.36, "#e85d7e"], [W * 0.84, fb * 0.3, "#f3c84b"]].forEach(([x, y, c]) => {
+      svg += '<g transform="translate(' + r(x - 22) + " " + r(y - 28) + ')"><rect width="44" height="56" rx="3" fill="#d4a84b"/><rect x="5" y="5" width="34" height="46" fill="#fff6f8"/>' +
+        '<path d="M22 22c-2.4-4-9-3-9 1.6 0 4 9 9 9 9s9-5 9-9c0-4.6-6.6-5.6-9-1.6z" fill="' + c + '"/></g>';
+    });
+    // Lichtkegel auf die Box
+    svg += '<path d="M' + r(W / 2 - 30) + " 0L" + r(W / 2 + 30) + " 0L" + r(W / 2 + bb * 0.9) + " " + r(fb) + "L" + r(W / 2 - bb * 0.9) + " " + r(fb) + 'Z" fill="url(#spSpot)"/>';
+    // Lichterkette mit Wimpeln in zwei Bögen
+    const bogen = (x0, x1, y, tief) => {
+      let p = '<path d="M' + r(x0) + " " + r(y) + "Q" + r((x0 + x1) / 2) + " " + r(y + tief * 2) + " " + r(x1) + " " + r(y) + '" stroke="#5a4048" stroke-width="1.5" fill="none"/>';
+      const n = Math.max(5, Math.round((x1 - x0) / 34));
+      for (let k = 1; k < n; k++) {
+        const t = k / n, x = (1 - t) * (1 - t) * x0 + 2 * t * (1 - t) * ((x0 + x1) / 2) + t * t * x1, yy = (1 - t) * (1 - t) * y + 2 * t * (1 - t) * (y + tief * 2) + t * t * y;
+        const farbe = ["#e85d7e", "#f3c84b", "#7cc4f0", "#fff"][k % 4];
+        p += k % 2 ? '<path d="M' + r(x - 9) + " " + r(yy) + "L" + r(x + 9) + " " + r(yy) + "L" + r(x) + " " + r(yy + 18) + 'Z" fill="' + farbe + '" opacity=".95"/>'
+          : '<circle class="sp-lampe" style="animation-delay:' + (-k * 0.2) + 's" cx="' + r(x) + '" cy="' + r(yy + 4) + '" r="4.5" fill="#ffd36b"/>';
+      }
+      return p;
+    };
+    svg += bogen(-10, W / 2, H * 0.06, H * 0.05) + bogen(W / 2, W + 10, H * 0.06, H * 0.05);
+    // Requisitentisch rechts
+    const tx = W * 0.86, ty = fb + (H - fb) * 0.15;
+    svg += '<g transform="translate(' + r(tx) + " " + r(ty) + ')"><rect x="-3" y="-34" width="6" height="34" fill="#8a5a3c"/><ellipse cx="0" cy="-34" rx="26" ry="6" fill="#a8713f"/><ellipse cx="0" cy="-36" rx="26" ry="6" fill="#c48852"/>' +
+      '<path d="M-18 -40l7 -18 7 18z" fill="#7cc4f0"/><circle cx="-11" cy="-58" r="2.6" fill="#f3c84b"/>' +
+      '<g transform="translate(2 -44)"><rect width="9" height="5" rx="2.5" fill="#1d1d24"/><rect x="11" width="9" height="5" rx="2.5" fill="#1d1d24"/><path d="M9 2h2" stroke="#1d1d24" stroke-width="1.5"/></g>' +
+      '<ellipse cx="0" cy="0" rx="18" ry="4" fill="rgba(60,30,20,.25)"/></g>';
+    svg += "</svg>";
+    const raum = figur(svg, "sp-fotoraum", { left: "0", top: "0", width: W + "px", height: H + "px" });
+    raum.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, fill: "forwards" });
+    // Ballontrauben links und rechts, schaukeln leicht
+    [[W * 0.06, ["#e85d7e", "#fff", "#f3c84b"]], [W * 0.94, ["#f3c84b", "#ff9ec0", "#fff"]]].forEach(([x, farben], i) => {
+      const bw = Math.min(120, W * 0.16), bhoch = fb - H * 0.3;
+      const b = figur('<svg viewBox="0 0 70 ' + r(fb - bhoch + 40) + '" aria-hidden="true">' +
+        '<path d="M35 ' + r(fb - bhoch + 40) + 'Q30 70 22 40M35 ' + r(fb - bhoch + 40) + 'Q38 70 48 36M35 ' + r(fb - bhoch + 40) + 'Q34 60 35 30" stroke="#a08890" stroke-width="1" fill="none"/>' +
+        [[22, 22, 0], [48, 18, 1], [35, 12, 2]].map(([cx, cy, k]) => '<ellipse cx="' + cx + '" cy="' + cy + '" rx="13" ry="15.5" fill="' + farben[k] + '" stroke="rgba(0,0,0,.06)"/><path d="M' + (cx - 1.5) + " " + (cy + 15) + "l1.5 3 1.5-3z" + '" fill="' + farben[k] + '"/><ellipse cx="' + (cx - 4.5) + '" cy="' + (cy - 6) + '" rx="3.4" ry="5" fill="#fff" opacity=".5"/>').join("") +
+        "</svg>", "sp-ballons", { left: x - bw / 2 + "px", top: bhoch - 20 + "px", width: bw + "px" });
+      b.style.animationDelay = -i * 1.3 + "s";
+      b.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 700, fill: "forwards" });
+    });
+  }
+
   let W = 0, H = 0;
   function figur(html, cls, stil) {
     const d = document.createElement("div");
@@ -393,6 +459,7 @@
 
     13: { titel: "Ab in die Capy Fotobox 📸", dauer: 21000, spiel() {
       const bb = Math.min(W * 0.5, 290), bh = bb * 1.45, bx = W / 2 - bb / 2, by = H - bh - H * 0.04;
+      fotoraum(bb, by + bh);
       const box = figur('<svg viewBox="0 0 200 290">' +
         '<rect x="10" y="40" width="180" height="250" rx="14" fill="#f2a7ba"/><rect x="10" y="40" width="180" height="250" rx="14" fill="none" stroke="#c2185b" stroke-width="4"/>' +
         '<rect x="0" y="0" width="200" height="46" rx="12" fill="#9d2449"/>' +
