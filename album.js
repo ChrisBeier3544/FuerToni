@@ -35,11 +35,40 @@
     ["flocken", "⭐", "5 goldene Flocken"],
     ["plaetzchen", "🍪", "Plätzchen gebacken"],
     ["mistel", "🌿", "Mistelzweig"],
+    // Wartezeit bis zum Geburtstag
+    ["stempel", "🔏", "Wachssiegel gestempelt"],
+    ["kalender", "📅", "Capy Fakt des Tages"],
+    ["kranich", "🦢", "Kranich gefaltet"],
+    ["spiegel", "🪞", "Zauberspiegel"],
+    ["ziffern", "🤭", "Kitzelige Ziffern"],
+    ["schlafmuetzen", "😴", "Schlafende Zahlen"],
+    ["marke", "🔍", "Briefmarke unter der Lupe"],
+    ["knopf", "🔴", "Der verbotene Knopf"],
+    ["schuetteln", "🫨", "Umschlag geschüttelt"],
+    ["adresse", "✒️", "Liebe im Adressfeld"],
+    ["licht", "🔦", "Gegen das Licht"],
+    ["sternbild", "🌌", "Sternbild verbunden"],
+    ["flieger", "✈️", "Papierflieger gefangen"],
+    ["tasse", "☕", "Cappuccino"],
+    ["scheibe", "🌫️", "Beschlagene Scheibe"],
+    ["kennzeichen", "🚗", "Das Kennzeichen 3544"],
+    ["vogeline", "💕", "Die Munkelvogeline"],
+    ["freunde", "🎉", "Munkelvogels Freunde"],
   ];
+  // Preis für eine verpasste Überraschung
+  const PREIS_ZAHL = 10, PREIS_WORT = "Smudge";
+  const PREIS = PREIS_ZAHL + " × " + PREIS_WORT;
+  const FREI_SCHLUESSEL = "toni-freigekauft-" + KALENDER.jahr;
+  const SCHULD_SCHLUESSEL = "toni-schuldscheine-" + KALENDER.jahr;
   const IDS = LISTE.map((e) => e[0]);
   const lies = () => { try { const v = JSON.parse(localStorage.getItem(SCHLUESSEL) || "[]"); return Array.isArray(v) ? v.filter((x) => IDS.includes(x)) : []; } catch (_) { return []; } };
   const schreib = (v) => { try { localStorage.setItem(SCHLUESSEL, JSON.stringify(v)); } catch (_) { /* egal */ } };
   let gefunden = new Set(lies());
+  const liesListe = (k) => { try { const v = JSON.parse(localStorage.getItem(k) || "[]"); return Array.isArray(v) ? v : []; } catch (_) { return []; } };
+  const schreibListe = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (_) { return false; } };
+  const freigekauft = () => new Set(liesListe(FREI_SCHLUESSEL));
+  const zr = () => ak.zeitreise;
+  const wiederholen = () => !!(zr() && zr().erlaubt() && ak.fuehrung);
 
   /* ---------- Knopf in „Dein Tag“ ---------- */
   const knoepfe = document.querySelector(".kopf-knoepfe");
@@ -58,7 +87,11 @@
     '<div class="dialog-inhalt"><button class="schliessen" type="button" aria-label="Schließen">×</button>' +
     '<p class="dialog-tag">Dein Entdeckerbuch</p><h2 id="entdeckt-titel">Deine Entdeckungen</h2>' +
     '<div class="entdeckt-balken" aria-hidden="true"><span></span></div><p class="entdeckt-stand"></p>' +
+    '<div class="entdeckt-reise" hidden><p class="entdeckt-abschnitt">Zeitreise durch den November</p><p class="entdeckt-klein">Tipp auf einen Tag und erlebe ihn nochmal.</p><div class="entdeckt-tage"></div>' +
+    '<p class="entdeckt-abschnitt">Nochmal erleben</p><p class="entdeckt-klein">Tipp bei einer Entdeckung auf Nochmal, dann zeigt dir das Handy, wie es geht.</p></div>' +
     '<ul class="entdeckt-liste"></ul>' +
+    '<div class="entdeckt-schulden" hidden></div>' +
+    '<div class="entdeckt-kauf" hidden></div>' +
     '<p class="entdeckt-tipp">Auf dieser Seite reagiert ganz viel, wenn du es antippst. Und pass gut auf, was der Munkelvogel zu sagen hat. Er weiß mehr, als er zugibt 🐦</p></div>';
   document.body.appendChild(dlg);
   dlg.querySelector(".schliessen").addEventListener("click", () => dlg.close());
@@ -75,23 +108,134 @@
     // Gefundenes zuerst, in der Reihenfolge des Findens; der Rest bleibt verdeckt,
     // ohne dass die Position etwas verrät
     const reihenfolge = [...[...gefunden].map((id) => LISTE.find((e) => e[0] === id)), ...LISTE.filter((e) => !gefunden.has(e[0]))];
+    const frei = freigekauft();
+    const mitReise = wiederholen();
     for (const [id, zeichen, name] of reihenfolge) {
       const li = document.createElement("li");
-      const da = gefunden.has(id);
-      li.className = "entdeckt-eintrag" + (da ? " da" : "");
+      const da = gefunden.has(id) || frei.has(id);
+      li.className = "entdeckt-eintrag" + (da ? " da" : "") + (frei.has(id) && !gefunden.has(id) ? " gekauft" : "");
       li.innerHTML = '<span class="entdeckt-zeichen" aria-hidden="true"></span><span class="entdeckt-name"></span>';
       li.firstChild.textContent = da ? zeichen : "?";
-      li.lastChild.textContent = da ? name : "???";
+      li.children[1].textContent = da ? name : "???";
+      if (mitReise && ak.fuehrung.kann(id)) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "entdeckt-nochmal" + (da ? "" : " zu");
+        b.textContent = da ? "▶ Nochmal" : "🔒 " + PREIS;
+        b.addEventListener("click", () => (da ? ak.fuehrung.starte(id) : kaufe(id, name)));
+        li.appendChild(b);
+      }
       liste.appendChild(li);
     }
+    dlg.querySelector(".entdeckt-kauf").hidden = true;
+    liste.hidden = false;
+    zeigeReise(mitReise);
+    zeigeSchulden();
     const n = gefunden.size;
+    const gekauft = [...frei].filter((x) => !gefunden.has(x)).length;
     dlg.querySelector(".entdeckt-balken span").style.width = (n / LISTE.length) * 100 + "%";
     dlg.querySelector(".entdeckt-stand").textContent = n === LISTE.length
       ? "Du hast alles entdeckt, Maus! 🎉 Du bist die beste Entdeckerin der Welt ♥️"
-      : n + " von " + LISTE.length + " Überraschungen entdeckt";
+      : n + " von " + LISTE.length + " Überraschungen entdeckt" + (gekauft ? " · " + gekauft + " freigekauft" : "");
+    if (dlg.open) return;
     if (typeof dlg.showModal === "function") dlg.showModal(); else dlg.setAttribute("open", "");
   }
   knopf.addEventListener("click", oeffne);
+
+  /* ---------- Zeitreise durch den November (ab 27.12.) ---------- */
+  function zeigeReise(an) {
+    const box = dlg.querySelector(".entdeckt-reise");
+    box.hidden = !an;
+    if (!an) return;
+    const tage = box.querySelector(".entdeckt-tage");
+    tage.textContent = "";
+    for (const e of ak.fuehrung.TAGE) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "entdeckt-tag" + (e.tag === 26 ? " geburtstag" : "");
+      b.innerHTML = "<small></small><b></b>";
+      b.firstChild.textContent = ak.fuehrung.wochentag(KALENDER.jahr, 11, e.tag);
+      b.lastChild.textContent = e.tag + ".11.";
+      b.setAttribute("aria-label", "Zeitreise zum " + e.tag + ". November");
+      b.addEventListener("click", () => ak.fuehrung.reiseTag(e.tag));
+      tage.appendChild(b);
+    }
+  }
+
+  /* ---------- Schuldscheine ---------- */
+  function zeigeSchulden() {
+    const box = dlg.querySelector(".entdeckt-schulden");
+    const liste = liesListe(SCHULD_SCHLUESSEL);
+    box.hidden = liste.length === 0;
+    if (!liste.length) return;
+    box.innerHTML = '<p class="entdeckt-abschnitt">Deine Schuldscheine</p><p class="entdeckt-klein"></p><div class="schuld-liste"></div>';
+    box.querySelector(".entdeckt-klein").textContent = "Du schuldest Chris insgesamt " + liste.length * PREIS_ZAHL + " × " + PREIS_WORT + " 😘";
+    const l = box.querySelector(".schuld-liste");
+    for (const s of liste) {
+      const k = document.createElement("div");
+      k.className = "schuldschein";
+      k.innerHTML = '<p class="schuld-text"></p><img alt="Unterschrift"><p class="schuld-datum"></p>';
+      k.querySelector(".schuld-text").textContent = "Ich schulde Chris " + PREIS + " für: " + s.name;
+      k.querySelector("img").src = s.bild;
+      k.querySelector(".schuld-datum").textContent = s.datum;
+      l.appendChild(k);
+    }
+  }
+
+  /* ---------- Verpasste Überraschung freikaufen ---------- */
+  function kaufe(id, name) {
+    const liste = dlg.querySelector(".entdeckt-liste");
+    const box = dlg.querySelector(".entdeckt-kauf");
+    const reise = dlg.querySelector(".entdeckt-reise"), schulden = dlg.querySelector(".entdeckt-schulden");
+    liste.hidden = true; reise.hidden = true; schulden.hidden = true;
+    box.hidden = false;
+    box.innerHTML =
+      '<div class="kauf-schritt kauf-eins"><p class="kauf-gross">🔒</p><p class="kauf-titel">Diese Überraschung hast du verpasst</p>' +
+      '<p class="kauf-preis">Preis: <b>' + PREIS + '</b></p><div class="kauf-knoepfe"><button type="button" class="kauf-zurueck">Abbrechen</button><button type="button" class="kauf-ok">Bestätigen</button></div></div>' +
+      '<div class="kauf-schritt kauf-zwei" hidden><p class="kauf-titel">Schuldschein</p><p class="kauf-preis">Ich, Toni, schulde Chris <b>' + PREIS + '</b>.</p>' +
+      '<p class="entdeckt-klein">Bitte hier unterschreiben:</p><canvas class="kauf-feld" width="600" height="220" aria-label="Unterschriftsfeld"></canvas>' +
+      '<div class="kauf-knoepfe"><button type="button" class="kauf-loeschen">Löschen</button><button type="button" class="kauf-ok2" disabled>Bestätigen</button></div></div>';
+    dlg.querySelector(".dialog-inhalt").scrollTop = 0;
+    const zurueck = () => oeffne();
+    box.querySelector(".kauf-zurueck").addEventListener("click", zurueck);
+    box.querySelector(".kauf-ok").addEventListener("click", () => {
+      box.querySelector(".kauf-eins").hidden = true;
+      box.querySelector(".kauf-zwei").hidden = false;
+      unterschrift(box.querySelector(".kauf-feld"), box.querySelector(".kauf-ok2"), box.querySelector(".kauf-loeschen"), (bild) => {
+        const d = (zr() && zr().echtDatum()) || ak.intro.datum();
+        const s = liesListe(SCHULD_SCHLUESSEL);
+        s.push({ id, name, bild, datum: d.tag + "." + d.monat + "." + d.jahr + ", " + String(d.stunde).padStart(2, "0") + ":" + String(d.minute).padStart(2, "0") + " Uhr" });
+        schreibListe(SCHULD_SCHLUESSEL, s);
+        const f = freigekauft(); f.add(id); schreibListe(FREI_SCHLUESSEL, [...f]);
+        box.innerHTML = '<p class="kauf-gross">✨</p><p class="kauf-titel">Danke, Toni!</p><p class="entdeckt-klein">Gleich zeigt dir das Handy: ' + name.replace(/</g, "") + "</p>";
+        setTimeout(() => ak.fuehrung.starte(id), 1600);
+      });
+    });
+  }
+  // Unterschriftsfeld: mit dem Finger malen, Bestätigen erst nach einer echten Unterschrift
+  function unterschrift(c, ok, loeschen, fertig) {
+    const g = c.getContext("2d");
+    g.lineWidth = 5; g.lineCap = "round"; g.lineJoin = "round"; g.strokeStyle = "#6b1532";
+    let malt = false, letzter = null, punkte = 0;
+    const pos = (e) => { const r = c.getBoundingClientRect(); return [((e.clientX - r.left) / r.width) * c.width, ((e.clientY - r.top) / r.height) * c.height]; };
+    c.addEventListener("pointerdown", (e) => { malt = true; letzter = pos(e); try { c.setPointerCapture(e.pointerId); } catch (_) { /* egal */ } e.preventDefault(); });
+    c.addEventListener("pointermove", (e) => {
+      if (!malt) return;
+      const p = pos(e);
+      g.beginPath(); g.moveTo(letzter[0], letzter[1]); g.lineTo(p[0], p[1]); g.stroke();
+      letzter = p; punkte++;
+      if (punkte > 25) ok.disabled = false;
+    });
+    ["pointerup", "pointercancel"].forEach((n) => c.addEventListener(n, () => { malt = false; }));
+    loeschen.addEventListener("click", () => { g.clearRect(0, 0, c.width, c.height); punkte = 0; ok.disabled = true; });
+    ok.addEventListener("click", () => {
+      // klein speichern
+      const k = document.createElement("canvas");
+      k.width = 300; k.height = 110;
+      k.getContext("2d").drawImage(c, 0, 0, k.width, k.height);
+      fertig(k.toDataURL("image/png"));
+    });
+  }
 
   function hinweis(text) {
     let c = document.getElementById("entdecken-chip");

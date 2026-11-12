@@ -3043,7 +3043,7 @@ dialog { overscroll-behavior: contain; }
 html:has(.special-buehne) .vogel-ebene { visibility: hidden; }
 
 /* Solange der Brief verschlossen ist, ist hinter ihm nichts zu sehen, auch nicht beim Herauszoomen */
-html:has(#intro:not([hidden]):not(.weg)) body > *:not(#intro):not(.vogel-ebene):not(.testleiste):not(script):not(dialog) { visibility: hidden !important; }
+html:has(#intro:not([hidden]):not(.weg)) body > *:not(#intro):not(.vogel-ebene):not(.testleiste):not(script):not(dialog):not(.zr-banner):not(.zr-karte):not(.zr-ring):not(.entdecken-chip) { visibility: hidden !important; }
 html:has(#intro:not([hidden]):not(.weg)), html:has(#intro:not([hidden]):not(.weg)) body { overflow: hidden; background: linear-gradient(160deg, var(--rose-50), var(--rose-200)) fixed; }
 
 /* Munkelvogel fragt nach seiner Partnerin (vor dem Geburtstag) */
@@ -3452,3 +3452,70 @@ html[data-abend] .wz-knopf-huelle small { color: #ffd0dc; }
   .wz-kalender.frisch, .wz-funkeln, .wz-stern, .wz-stern.naechster, .wz-feder, .wz-marke, .wz-dampf i, .wz-spiegel-glas::after, .intro.wz-nacht .cd-feld::after { animation: none; }
 }
 html:has(.wz-show) .vogel-ebene, html:has(.wz-scheibe) .vogel-blase { visibility: hidden; }
+
+/* =========================================================
+   Entdeckerbuch: Zeitreise, Nochmal ansehen, Schuldscheine
+   ========================================================= */
+.entdeckt-abschnitt { margin: 16px 0 2px; font: 700 1.35rem "Dancing Script", cursive; color: var(--beere); }
+.entdeckt-klein { margin: 0 0 10px; font-size: 0.84rem; font-weight: 600; color: var(--rose-500); }
+.entdeckt-tage { display: flex; gap: 6px; overflow-x: auto; padding: 2px 2px 8px; margin-bottom: 4px; scroll-snap-type: x proximity; overscroll-behavior-x: contain; }
+.entdeckt-tag {
+  flex: 0 0 auto; display: grid; justify-items: center; gap: 1px; min-width: 58px; padding: 7px 6px; border-radius: 12px; cursor: pointer; scroll-snap-align: start;
+  border: 1px solid var(--rose-300); background: linear-gradient(160deg, #fffaf0, var(--rose-50)); color: var(--beere-dunkel);
+}
+.entdeckt-tag small { font-size: 0.68rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: var(--rose-500); }
+.entdeckt-tag b { font-size: 0.95rem; }
+.entdeckt-tag.geburtstag { background: linear-gradient(160deg, #fff8e6, var(--gold-hell)); border-color: var(--gold); }
+.entdeckt-tag:focus-visible, .entdeckt-nochmal:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.entdeckt-nochmal {
+  margin-top: 4px; padding: 4px 9px; border: 0; border-radius: 999px; cursor: pointer; font: 800 0.7rem "Nunito", sans-serif;
+  background: var(--beere); color: #fff;
+}
+.entdeckt-nochmal.zu { background: #fff; color: var(--beere); border: 1px solid var(--rose-300); }
+.entdeckt-eintrag.gekauft .entdeckt-name::after { content: " 🖋"; }
+.kauf-schritt { display: grid; justify-items: center; gap: 6px; text-align: center; }
+.kauf-gross { margin: 6px 0 0; font-size: 2.6rem; }
+.entdeckt-kauf { display: grid; justify-items: center; text-align: center; }
+.kauf-titel { margin: 0; font: 700 1.6rem "Dancing Script", cursive; color: var(--beere); }
+.kauf-preis { margin: 0; font-weight: 700; color: var(--beere-dunkel); }
+.kauf-preis b { color: var(--rose-500); }
+.kauf-knoepfe { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
+.kauf-knoepfe button { padding: 10px 20px; border-radius: 999px; font: 800 0.95rem "Nunito", sans-serif; cursor: pointer; border: 1px solid var(--rose-300); background: #fff; color: var(--beere); }
+.kauf-knoepfe .kauf-ok, .kauf-knoepfe .kauf-ok2 { border: 0; background: linear-gradient(135deg, var(--rose-500), var(--beere)); color: #fff; }
+.kauf-knoepfe button:disabled { opacity: 0.4; cursor: default; }
+.kauf-feld { width: 100%; max-width: 360px; aspect-ratio: 600 / 220; border-radius: 12px; touch-action: none; cursor: crosshair; background: repeating-linear-gradient(transparent 0 calc(100% - 26px), rgba(107, 21, 50, 0.25) calc(100% - 26px) calc(100% - 24px), transparent calc(100% - 24px)), #fffdf7; border: 1px dashed var(--rose-300); }
+.schuld-liste { display: grid; gap: 8px; }
+.schuldschein { padding: 10px 12px; border-radius: 12px; background: #fffdf7; border: 1px solid #ecd9c4; text-align: left; }
+.schuld-text { margin: 0; font-size: 0.85rem; font-weight: 700; color: var(--beere-dunkel); }
+.schuldschein img { display: block; width: 150px; max-width: 60%; height: auto; margin: 4px 0; }
+.schuld-datum { margin: 0; font-size: 0.72rem; color: #a07080; }
+
+/* Zeitreise: Hinweisleiste oben, Ring um die Stelle, Karte mit Anleitung */
+.zr-banner {
+  position: fixed; z-index: 95; left: 50%; top: calc(8px + env(safe-area-inset-top, 0px)); transform: translateX(-50%);
+  display: flex; align-items: center; gap: 8px; max-width: calc(100% - 16px); padding: 5px 6px 5px 12px; border-radius: 999px;
+  background: rgba(43, 12, 32, 0.88); color: #fff; font: 700 0.8rem "Nunito", sans-serif; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25); white-space: nowrap;
+}
+.zr-text { overflow: hidden; text-overflow: ellipsis; }
+.zr-zurueck { flex: 0 0 auto; padding: 6px 10px; border: 0; border-radius: 999px; background: var(--gold-hell, #f3d58a); color: #4a3510; font: 800 0.75rem "Nunito", sans-serif; cursor: pointer; }
+html.zeitreise .special-knopf { margin-top: 40px; }
+html.zeitreise body { padding-top: 44px; }
+.zr-ring {
+  position: fixed; z-index: 94; pointer-events: none; border-radius: 18px; border: 3px solid #f3c84b;
+  box-shadow: 0 0 0 4000px rgba(43, 12, 32, 0.28), 0 0 22px 6px rgba(243, 200, 75, 0.8); animation: zr-puls 1.4s ease-in-out infinite; transition: opacity 0.4s ease;
+}
+.zr-ring.weg { opacity: 0; }
+@keyframes zr-puls { 50% { border-color: #fff4c2; } }
+.zr-karte {
+  position: fixed; z-index: 96; left: 50%; width: min(calc(100% - 24px), 380px); padding: 16px 18px 14px; border-radius: 20px; transform: translate(-50%, 20px);
+  background: #fffaf3; box-shadow: 0 18px 44px rgba(43, 12, 32, 0.35); text-align: center; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease;
+}
+.zr-karte.unten { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+.zr-karte.oben { top: calc(56px + env(safe-area-inset-top, 0px)); }
+.zr-karte.da { opacity: 1; transform: translate(-50%, 0); }
+.zr-kopf { margin: 0; font: 700 1.5rem "Dancing Script", cursive; color: var(--beere); }
+.zr-anleitung { margin: 4px 0 12px; font: 600 1rem/1.45 "Nunito", sans-serif; color: var(--beere-dunkel); }
+.zr-knoepfe { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.zr-knoepfe button { padding: 9px 16px; border-radius: 999px; font: 800 0.92rem "Nunito", sans-serif; cursor: pointer; border: 1px solid var(--rose-300); background: #fff; color: var(--beere); }
+.zr-knoepfe .zr-vorspielen { border: 0; background: linear-gradient(135deg, var(--rose-500), var(--beere)); color: #fff; }
+.entdeckt-dialog [hidden] { display: none !important; }

@@ -1300,7 +1300,12 @@
     if (!api.bereit()) return;
     const t = heutigeSzene();
     if (!t) { if (api.phase() !== "laden") clearInterval(warte); knopf.hidden = true; return; }
-    if (!gestartet) { gestartet = true; setTimeout(() => spiele(t), 900); }
+    if (!gestartet) {
+      gestartet = true;
+      // bei einer Zeitreise zu einer bestimmten Entdeckung startet die Szene nicht von selbst
+      const zr = window.adventkalender.zeitreise;
+      if (!(zr && zr.aufgabe())) setTimeout(() => spiele(t), 900);
+    }
     else if (!laeuft && api.phase() !== "warten") knopf.hidden = true;
   }, 300);
 
