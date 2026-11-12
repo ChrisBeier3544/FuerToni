@@ -1908,7 +1908,29 @@ html[data-abend] .heute-karte .status { background: none; border: 0; box-shadow:
 .sp-badegast svg { width: 100%; height: auto; display: block; }
 @keyframes sp-wippen { 50% { translate: 0 6px; } }
 .sp-wasser { position: absolute; left: 0; right: 0; bottom: 0; height: 46%; background: linear-gradient(180deg, rgba(122, 196, 236, 0.85), rgba(90, 169, 221, 0.95)); border-top: 3px solid rgba(255, 255, 255, 0.6); }
-.sp-ente { position: absolute; right: 10%; bottom: 36%; font-size: 1.6rem; animation: sp-wippen 1.8s ease-in-out infinite; }
+.sp-ente { position: absolute; bottom: 38%; width: 3rem; z-index: 2; animation: sp-wippen 1.8s ease-in-out infinite; }
+.sp-ente > svg { display: block; width: 100%; overflow: visible; transition: transform 0.6s ease; }
+.sp-ente.links > svg { transform: scaleX(-1); }
+.sp-ente .ente-koerper { transform-box: fill-box; transform-origin: 50% 100%; animation: ente-schaukeln var(--takt, 1.8s) ease-in-out infinite; }
+.sp-ente .ente-kopf { transform-box: fill-box; transform-origin: 30% 95%; animation: ente-nicken 2.6s ease-in-out infinite; }
+.sp-ente .ente-fluegel { transform-box: fill-box; transform-origin: 8% 60%; animation: ente-flattern 3.4s ease-in-out infinite; }
+.sp-ente .ente-unten { transform-box: fill-box; transform-origin: 0 0; }
+.sp-ente.quakt .ente-unten { animation: ente-quak 0.5s ease 2; }
+.sp-ente.quakt .ente-kopf { animation: ente-quakkopf 0.5s ease 2; }
+.sp-ente .ente-welle { transform-box: fill-box; transform-origin: center; animation: ente-welle 1.6s ease-out infinite; }
+.sp-ente.kueken .ente-kopf { animation-duration: 1.4s; }
+@keyframes ente-schaukeln { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(4deg); } }
+@keyframes ente-nicken { 0%, 70%, 100% { transform: none; } 78% { transform: rotate(14deg) translate(1px, 2px); } 86% { transform: rotate(-4deg); } }
+@keyframes ente-flattern { 0%, 76%, 100% { transform: none; } 80%, 88% { transform: rotate(-28deg); } 84%, 92% { transform: rotate(4deg); } }
+@keyframes ente-quak { 50% { transform: rotate(24deg); } }
+@keyframes ente-quakkopf { 50% { transform: rotate(-10deg) translateY(-2px); } }
+@keyframes ente-welle { 0% { transform: scale(0.7); opacity: 0.9; } 100% { transform: scale(1.25); opacity: 0; } }
+.ente-quak {
+  position: absolute; left: 60%; bottom: 100%; padding: 2px 7px; border-radius: 10px; background: #fff; color: #c46a00;
+  font: 800 0.7rem "Nunito", sans-serif; white-space: nowrap; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15); animation: ente-blase 1.3s ease forwards;
+}
+@keyframes ente-blase { 0% { opacity: 0; transform: translateY(6px) scale(0.7); } 15%, 75% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .sp-ente .ente-koerper, .sp-ente .ente-kopf, .sp-ente .ente-fluegel, .sp-ente .ente-welle { animation: none; } }
 
 /* Rodeln */
 .sp-hang { left: 0; right: 0; bottom: 0; height: 100%; }
