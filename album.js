@@ -56,7 +56,7 @@
     ["freunde", "🎉", "Munkelvogels Freunde"],
   ];
   // Preis für eine verpasste Überraschung
-  const PREIS_ZAHL = 10, PREIS_WORT = "Smudge";
+  const PREIS_ZAHL = 10, PREIS_WORT = "SMUATSH";
   const PREIS = PREIS_ZAHL + " × " + PREIS_WORT;
   const FREI_SCHLUESSEL = "toni-freigekauft-" + KALENDER.jahr;
   const SCHULD_SCHLUESSEL = "toni-schuldscheine-" + KALENDER.jahr;
