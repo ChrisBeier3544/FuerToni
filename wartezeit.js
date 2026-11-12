@@ -88,12 +88,40 @@
   const ebene = el("div", "wz-ebene");
   intro.appendChild(ebene);
   // Fensterbank unten: der Himmel ist der Blick aus dem Fenster, die Dinge stehen darauf
-  const sims = el("div", "wz-sims", '<span class="wz-sims-oben"></span><span class="wz-sims-vorne"></span>');
-  ebene.appendChild(sims);
-  const leiste = el("div", "wz-leiste");
-  const fachL = el("div", "wz-fach wz-fach-links"), fachM = el("div", "wz-fach wz-fach-mitte"), fachR = el("div", "wz-fach wz-fach-rechts");
-  leiste.append(fachL, fachM, fachR);
-  ebene.appendChild(leiste);
+  // darunter ein Schränkchen mit zwei Schubladen, in denen die Dinge liegen
+  const STIFTE = '<svg class="wz-deko wz-stifte" viewBox="0 0 70 26" aria-hidden="true">' +
+    '<g transform="rotate(-8 35 13)"><rect x="4" y="5" width="52" height="5" rx="1" fill="#e85d7e"/><path d="M56 5l9 2.5-9 2.5z" fill="#f2d2b0"/><path d="M62 6.6l3 .9-3 .9z" fill="#3a2a2a"/><rect x="4" y="5" width="4" height="5" fill="#d4a84b"/></g>' +
+    '<g transform="rotate(4 35 13)"><rect x="8" y="15" width="50" height="5" rx="1" fill="#7cc4f0"/><path d="M58 15l9 2.5-9 2.5z" fill="#f2d2b0"/><path d="M64 16.6l3 .9-3 .9z" fill="#3a2a2a"/><rect x="8" y="15" width="4" height="5" fill="#d4a84b"/></g></svg>';
+  const UMSCHLAEGE = '<svg class="wz-deko wz-umschlaege" viewBox="0 0 56 40" aria-hidden="true">' +
+    '<g transform="rotate(-10 28 20)"><rect x="6" y="8" width="44" height="28" rx="2" fill="#fdf3e7" stroke="#e6d3bf"/><path d="M6 8l22 15 22-15" fill="none" stroke="#e6d3bf"/></g>' +
+    '<g transform="rotate(6 28 20)"><rect x="4" y="4" width="44" height="28" rx="2" fill="#fde2e8" stroke="#f2bccb"/><path d="M4 4l22 15 22-15" fill="none" stroke="#f2bccb"/><path d="M26 17c-1.5-1.1-2.8-2.2-2.8-3.3 0-.8.6-1.4 1.4-1.4.6 0 1.1.3 1.4.8.3-.5.8-.8 1.4-.8.8 0 1.4.6 1.4 1.4 0 1.1-1.3 2.2-2.8 3.3z" fill="#e85d7e"/></g></svg>';
+  const LIPPENSTIFT = '<svg class="wz-deko wz-lippenstift" viewBox="0 0 40 14" aria-hidden="true"><g transform="rotate(-14 20 7)">' +
+    '<rect x="2" y="3" width="20" height="8" rx="1.5" fill="#2b2b33"/><rect x="21" y="3.5" width="6" height="7" fill="#d4a84b"/><path d="M27 4.2h6l4 2.8-4 2.8h-6z" fill="#c2185b"/><rect x="4" y="4" width="16" height="1.4" fill="#fff" opacity=".25"/></g></svg>';
+  const SPANGE = '<svg class="wz-deko wz-spange" viewBox="0 0 34 16" aria-hidden="true"><g transform="rotate(10 17 8)">' +
+    '<rect x="3" y="5" width="28" height="6" rx="3" fill="#f3c84b"/><circle cx="9" cy="8" r="2" fill="#fff" opacity=".8"/><circle cx="17" cy="8" r="2" fill="#fff" opacity=".8"/><circle cx="25" cy="8" r="2" fill="#fff" opacity=".8"/></g></svg>';
+  const moebel = el("div", "wz-moebel",
+    '<div class="wz-bank"><span class="wz-bank-oben"></span><span class="wz-bank-vorne"></span><div class="wz-auf-bank"></div></div>' +
+    '<div class="wz-schrank">' +
+    ['links', 'rechts'].map((seite) => '<div class="wz-schublade" data-seite="' + seite + '"><div class="wz-lade-innen"><div class="wz-lade-boden"></div></div>' +
+      '<button type="button" class="wz-lade-front" aria-label="Schublade ' + seite + ' öffnen"><span class="wz-griff"></span></button></div>').join("") +
+    "</div>");
+  ebene.appendChild(moebel);
+  const fachL = moebel.querySelector('[data-seite="links"] .wz-lade-boden');
+  const fachR = moebel.querySelector('[data-seite="rechts"] .wz-lade-boden');
+  const fachM = moebel.querySelector(".wz-auf-bank");
+  fachL.insertAdjacentHTML("beforeend", UMSCHLAEGE + STIFTE);
+  fachR.insertAdjacentHTML("beforeend", LIPPENSTIFT + SPANGE);
+  function schublade(seite, auf) {
+    moebel.querySelectorAll(".wz-schublade").forEach((s) => {
+      const soll = s.dataset.seite === seite ? (auf === undefined ? !s.classList.contains("offen") : auf) : false;
+      if (soll !== s.classList.contains("offen")) {
+        s.classList.toggle("offen", soll);
+        s.querySelector(".wz-lade-front").setAttribute("aria-label", "Schublade " + s.dataset.seite + (soll ? " schließen" : " öffnen"));
+        if (soll) plopp(false);
+      }
+    });
+  }
+  moebel.querySelectorAll(".wz-lade-front").forEach((f) => f.addEventListener("click", () => schublade(f.parentNode.dataset.seite)));
   // Dinge, die mit dem schwebenden Umschlag mitschweben
   const aufUmschlag = el("div", "wz-auf-umschlag");
   umschlag.appendChild(aufUmschlag);
@@ -280,7 +308,7 @@
   const kalender = el("button", "wz-kalender");
   kalender.type = "button";
   kalender.setAttribute("aria-label", "Abreißkalender");
-  fachL.appendChild(kalender);
+  fachL.prepend(kalender);
   function zeichneKalender() {
     const t = heute();
     const abgerissen = hatTag("blatt", t);
@@ -437,17 +465,23 @@
     "Puh, so viel Schönheit an einem Tag. Ich brauche eine Pause. Bis morgen ♥️",
     "Mein Glas ist ganz beschlagen vor Bewunderung. Frag mich morgen wieder ♥️",
   ];
-  const SPIEGEL_SVG = '<svg viewBox="0 0 60 90" aria-hidden="true"><defs><linearGradient id="wzGlas" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eaf4ff"/><stop offset=".5" stop-color="#bcd3ee"/><stop offset="1" stop-color="#e6f0fb"/></linearGradient></defs>' +
-    '<rect x="25" y="54" width="10" height="32" rx="5" fill="#d4a84b"/><rect x="27" y="58" width="6" height="24" rx="3" fill="#f3d58a"/>' +
-    '<ellipse cx="30" cy="30" rx="26" ry="29" fill="#d4a84b"/><ellipse cx="30" cy="30" rx="21" ry="24" fill="url(#wzGlas)"/>' +
-    '<path d="M18 18q6-8 14-9" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none" opacity=".8"/>' +
-    '<circle cx="30" cy="2" r="3" fill="#e85d7e"/><circle cx="8" cy="40" r="2.2" fill="#e85d7e"/><circle cx="52" cy="40" r="2.2" fill="#e85d7e"/></svg>';
+  // Handspiegel, liegt von oben gesehen in der Schublade
+  const SPIEGEL_SVG = '<svg viewBox="0 0 110 54" aria-hidden="true"><defs>' +
+    '<linearGradient id="wzGlas" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4f9ff"/><stop offset=".45" stop-color="#b9cfe8"/><stop offset=".55" stop-color="#d8e6f6"/><stop offset="1" stop-color="#a9c0dc"/></linearGradient>' +
+    '<linearGradient id="wzGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6dc96"/><stop offset=".5" stop-color="#d4a84b"/><stop offset="1" stop-color="#9c7425"/></linearGradient></defs>' +
+    '<ellipse cx="56" cy="50" rx="50" ry="3.5" fill="rgba(60,30,15,.22)"/>' +
+    '<path d="M50 23h46q8 0 9 4.5-1 4.5-9 4.5H50z" fill="url(#wzGold)"/><path d="M58 25.5h40" stroke="#fff3c9" stroke-width="1.2" opacity=".7"/><circle cx="101" cy="27.5" r="2.2" fill="#e85d7e"/>' +
+    '<ellipse cx="29" cy="27" rx="26" ry="22.5" fill="url(#wzGold)"/>' +
+    '<g fill="#f6dc96">' + Array.from({ length: 14 }, (_, k) => { const w = (k / 14) * Math.PI * 2; return '<circle cx="' + (29 + Math.cos(w) * 24).toFixed(1) + '" cy="' + (27 + Math.sin(w) * 20.7).toFixed(1) + '" r="1.5"/>'; }).join("") + "</g>" +
+    '<ellipse cx="29" cy="27" rx="20.5" ry="17.5" fill="url(#wzGlas)"/>' +
+    '<path d="M14 18q7-9 18-9" stroke="#fff" stroke-width="2.6" stroke-linecap="round" fill="none" opacity=".85"/><path d="M38 40q5-2 8-7" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".5"/>' +
+    '<circle cx="29" cy="7.5" r="2.4" fill="#e85d7e"/></svg>';
   const spiegel = el("button", "wz-spiegel", '<span class="wz-spiegel-liegt">' + SPIEGEL_SVG + "</span>");
   spiegel.type = "button";
   spiegel.setAttribute("aria-label", "Zauberspiegel");
-  fachR.appendChild(spiegel);
-  // ein kleines Bäumchen im Topf, hinter dem der Spiegel halb versteckt liegt
-  fachR.appendChild(el("span", "wz-baeumchen", '<svg viewBox="0 0 40 64" aria-hidden="true">' +
+  fachR.prepend(spiegel);
+  // ein kleines Bäumchen im Topf auf der Fensterbank
+  moebel.querySelector(".wz-bank").appendChild(el("span", "wz-baeumchen", '<svg viewBox="0 0 40 64" aria-hidden="true">' +
     '<path d="M20 2 34 30h-6l8 14H4l8-14H6z" fill="#3f7f55"/><path d="M20 2 27 16h-14z" fill="#4f9a66"/>' +
     '<circle cx="14" cy="26" r="2" fill="#e85d7e"/><circle cx="25" cy="34" r="2" fill="#f3c84b"/><circle cx="17" cy="40" r="1.8" fill="#7cc4f0"/><circle cx="23" cy="21" r="1.6" fill="#f3c84b"/>' +
     '<path d="M20 0l1.4 2.8 3 .4-2.2 2 .6 3-2.8-1.5-2.8 1.5.6-3-2.2-2 3-.4z" fill="#f3c84b"/>' +
@@ -640,8 +674,8 @@
   }
   function knoepfe(an) {
     if (an && !knopf) {
-      knopf = el("div", "wz-knopf-huelle", '<button type="button" class="wz-knopf" aria-label="Roter Knopf"></button><small>Bitte nicht drücken</small>');
-      fachM.appendChild(knopf);
+      knopf = el("div", "wz-knopf-huelle", '<span class="wz-knopf-kasten"><button type="button" class="wz-knopf" aria-label="Roter Knopf"></button></span><small>Bitte nicht drücken</small>');
+      fachR.appendChild(knopf);
       const b = knopf.querySelector("button");
       b.addEventListener("click", () => {
         if (knopf.classList.contains("unterwegs")) return;
@@ -991,13 +1025,15 @@
       const male = () => {
         const voll = 1 - schluck / 4;
         tasse.innerHTML = '<span class="wz-dampf"><i></i><i></i><i></i></span><svg viewBox="0 0 76 60" aria-hidden="true">' +
-          '<ellipse cx="34" cy="55" rx="31" ry="5" fill="#f3e6dc"/><ellipse cx="34" cy="53.5" rx="24" ry="3" fill="#e2cfc0"/>' +
-          '<path d="M56 22q14 0 13 11-1 10-15 10" stroke="#f7d6df" stroke-width="5" fill="none"/>' +
-          '<path d="M6 16h56l-5 32q-1 6-8 6H19q-7 0-8-6z" fill="#f7d6df"/><path d="M6 16h56l-1 6H7z" fill="#f2c2cf"/>' +
+          '<defs><linearGradient id="wzPorz" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e9e3df"/><stop offset=".3" stop-color="#fffdfb"/><stop offset=".7" stop-color="#f6f1ec"/><stop offset="1" stop-color="#d8cfc8"/></linearGradient></defs>' +
+          '<ellipse cx="34" cy="56" rx="32" ry="4.5" fill="rgba(70,40,20,.2)"/>' +
+          '<ellipse cx="34" cy="54" rx="31" ry="5" fill="url(#wzPorz)"/><ellipse cx="34" cy="52.6" rx="22" ry="3" fill="#e6ddd6"/><ellipse cx="34" cy="54" rx="31" ry="5" fill="none" stroke="#d4a84b" stroke-width=".8"/>' +
+          '<path d="M57 23q13 0 12 10-1 9-14 9" stroke="#efe8e2" stroke-width="5.5" fill="none" stroke-linecap="round"/><path d="M57 23q13 0 12 10-1 9-14 9" stroke="#fffdfb" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+          '<path d="M6 16h56l-5 32q-1 6-8 6H19q-7 0-8-6z" fill="url(#wzPorz)"/>' +
           '<g transform="translate(4 ' + (8 + (1 - voll) * 18) + ') scale(1 ' + (0.5 + 0.5 * voll) + ')">' +
           (voll > 0 ? '<ellipse cx="30" cy="24" rx="27" ry="10" fill="#a0683a"/>' + (schluck === 0 ? '<g transform="translate(0 4) scale(1 .5) translate(0 14)">' + motiv() + "</g>" : '<ellipse cx="30" cy="24" rx="16" ry="5" fill="#d9b89a" opacity=".6"/>') : "") +
-          '</g><ellipse cx="34" cy="16" rx="28" ry="5.5" fill="none" stroke="#f2c2cf" stroke-width="2"/>' +
-          '<path d="M30 34q-3-4-6-1.5-2.5 3 2 6l4 3 4-3q4.5-3 2-6-3-2.5-6 1.5z" fill="#e85d7e" opacity=".8"/></svg>';
+          '</g><ellipse cx="34" cy="16" rx="28" ry="5.5" fill="none" stroke="#efe8e2" stroke-width="2"/><ellipse cx="34" cy="16" rx="28.6" ry="5.9" fill="none" stroke="#d4a84b" stroke-width=".8"/>' +
+          '<path d="M34 34q-2.4-3.2-4.8-1.2-2 2.4 1.6 4.8l3.2 2.4 3.2-2.4q3.6-2.4 1.6-4.8-2.4-2-4.8 1.2z" fill="#e85d7e" opacity=".55"/></svg>';
         tasse.classList.toggle("leer", schluck >= 4);
       };
       male();
@@ -1339,7 +1375,7 @@
      ========================================================= */
   const HINWEISE = {
     marke: () => "Psst … schau dir mal die Briefmarke auf dem Umschlag ganz genau an 🔍",
-    knopf: () => "Was auch immer du tust: Drück NICHT auf den roten Knopf 😳",
+    knopf: () => "In der rechten Schublade liegt heute ein roter Knopf. Was auch immer du tust: Drück ihn NICHT 😳",
     schuetteln: () => "Man munkelt, im Umschlag klimpert etwas. Wisch ihn mal ganz schnell hin und her 👀",
     adresse: () => "Psst … tipp heute Abend mal auf deinen Namen auf dem Umschlag ✒️",
     licht: () => "Halt den Umschlag mal mit zwei Fingern fest. Vielleicht scheint ja ein Licht hindurch 🔦",
@@ -1364,8 +1400,8 @@
     Object.keys(HINWEISE).forEach((k) => { if (istAn(k) && !(k === "flieger" && hatTag("flieger", t)) && !(k === "sternbild" && hatTag("sternbild", t))) jetzt.push(HINWEISE[k]()); });
     if (jetzt.length) return wahl(jetzt);
     if (!hatTag("stempel", t)) return "Psst … halt mal das Siegel ganz lange gedrückt. Jeden Tag gibt es einen neuen Stempel ♥️";
-    if (!hatTag("blatt", t)) return "Unten liegt ein Kalender. Reiß doch mal das heutige Blatt ab 📅";
-    if (lies("spiegel-" + t, 0) < PRO_TAG) return "Frag mal den kleinen Spiegel unten, wer die Schönste im ganzen Land ist 🪞";
+    if (!hatTag("blatt", t)) return "Psst … in der linken Schublade unter der Fensterbank liegt etwas für jeden Tag 📅";
+    if (lies("spiegel-" + t, 0) < PRO_TAG) return "Schau mal in die rechte Schublade. Da liegt ein Spiegel, der dir etwas sagen will 🪞";
     const spaeter = [];
     ["mittag", "abend"].forEach((f) => Object.keys(SPAETER[f]).forEach((k) => { if (kommtNoch(k) === f) spaeter.push(SPAETER[f][k]); }));
     if (spaeter.length) return wahl(spaeter);
@@ -1378,6 +1414,7 @@
      ========================================================= */
   // Für das Entdeckerbuch: einzelne Dinge direkt vorspielen
   window.adventkalender.wartezeit = {
+    schublade,
     vorspielen(id) {
       if (!heute()) return false;
       const r = umschlag.getBoundingClientRect();

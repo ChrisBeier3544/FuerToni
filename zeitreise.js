@@ -59,13 +59,13 @@
     mistel: { wann: DEZ, text: "Leg je einen Daumen an den linken und an den rechten Rand und halt kurz fest.", spiel: () => ak.entdecken && ak.entdecken.mistelzweig() },
 
     stempel: { wann: [11, 13, 17, 30], wo: ".siegel", text: "Halt das Siegel ganz lange gedrückt.", spiel: vorspiel("stempel") },
-    kalender: { wann: [11, 13, 17, 30], wo: ".wz-kalender", text: "Reiß das Kalenderblatt ab: antippen oder nach unten ziehen.", spiel: klickSel(".wz-kalender") },
-    kranich: { wann: [11, 13, 17, 30], wo: ".wz-kalender", text: "Reiß das Kalenderblatt ab und tipp danach doppelt auf den Capy Fakt." },
-    spiegel: { wann: [11, 13, 17, 30], wo: ".wz-spiegel", text: "Tipp auf den kleinen Spiegel und frag ihn.", spiel: klickSel(".wz-spiegel") },
+    kalender: { vorher: () => ak.wartezeit && ak.wartezeit.schublade("links", true), wann: [11, 13, 17, 30], wo: ".wz-kalender", text: "Reiß das Kalenderblatt ab: antippen oder nach unten ziehen.", spiel: klickSel(".wz-kalender") },
+    kranich: { vorher: () => ak.wartezeit && ak.wartezeit.schublade("links", true), wann: [11, 13, 17, 30], wo: ".wz-kalender", text: "Reiß das Kalenderblatt ab und tipp danach doppelt auf den Capy Fakt." },
+    spiegel: { vorher: () => ak.wartezeit && ak.wartezeit.schublade("rechts", true), wann: [11, 13, 17, 30], wo: ".wz-spiegel", text: "Tipp auf den kleinen Spiegel und frag ihn.", spiel: klickSel(".wz-spiegel") },
     ziffern: { wann: [11, 13, 17, 30], wo: ".cd-feld", text: "Tipp auf die Zahlen vom Countdown.", spiel: klickSel(".cd-feld") },
     schlafmuetzen: { wann: [11, 14, 23, 30], wo: ".cd-feld", text: "Nachts schlafen die Zahlen. Tipp sie an, um sie zu wecken.", spiel: klickSel(".cd-feld") },
     marke: { wann: [11, 13, 17, 30], wo: ".wz-marke", text: "Tipp auf die Briefmarke oben rechts auf dem Umschlag.", spiel: klickSel(".wz-marke") },
-    knopf: { wann: [11, 14, 17, 30], wo: ".wz-knopf", text: "Drück auf den roten Knopf. Auch wenn man das eigentlich nicht soll.", spiel: klickSel(".wz-knopf") },
+    knopf: { vorher: () => ak.wartezeit && ak.wartezeit.schublade("rechts", true), wann: [11, 14, 17, 30], wo: ".wz-knopf", text: "Drück auf den roten Knopf. Auch wenn man das eigentlich nicht soll.", spiel: klickSel(".wz-knopf") },
     schuetteln: { wann: [11, 15, 17, 30], wo: "#umschlag", text: "Wisch ganz schnell hin und her über den Umschlag.", spiel: vorspiel("schuetteln") },
     adresse: { wann: [11, 14, 17, 30], wo: ".umschlag-name", text: "Tipp auf deinen Namen auf dem Umschlag.", spiel: klickSel(".umschlag-name") },
     licht: { wann: [11, 25, 19, 0], wo: "#umschlag", text: "Halt den Umschlag mit zwei Fingern fest, oder lange mit einem Finger.", spiel: vorspiel("licht") },
@@ -130,11 +130,12 @@
       if (u) setTimeout(() => u.click(), 600);
     }
     const start = performance.now();
-    let ziel = null;
+    let ziel = null, vorbereitet = false;
     await new Promise((fertig) => {
       const t = setInterval(() => {
         const zeit = performance.now() - start;
         const introZu = !intro || intro.hidden || intro.classList.contains("weg") || f.wann[0] === 11;
+        if (f.vorher && !vorbereitet && zeit > 1200 && !unruhig()) { vorbereitet = true; try { f.vorher(); } catch (_) { /* egal */ } }
         if (zeit > 25000 || (introZu && zeit > 1500 && !unruhig() && (!f.wo || (ziel = finde(f.wo))))) { clearInterval(t); fertig(); }
       }, 250);
     });
