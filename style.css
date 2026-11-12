@@ -3691,3 +3691,15 @@ html[data-abend] .wz-lade-boden { background: linear-gradient(180deg, #3d2a1f, #
 .wz-lade-boden:has(.wz-knopf-huelle) .wz-spange, .wz-lade-boden:has(.wz-knopf-huelle) .wz-lippenstift { display: none; }
 .wz-lade-boden .wz-knopf-kasten { width: 44px; height: 40px; }
 .wz-lade-boden .wz-knopf { width: 28px; height: 28px; }
+
+/* Zauberspiegel: gut lesbare Schrift, längere Frage, kurzes Überlegen */
+.wz-spiegel-frage { font: italic 500 1.02rem/1.45 "Lora", Georgia, serif; color: #3e5272; transition: opacity 1s ease, transform 1s ease; }
+.wz-spiegel-antwort { font: italic 600 1.08rem/1.5 "Lora", Georgia, serif; color: #7a1a3c; text-shadow: 0 0 8px rgba(255, 255, 255, 0.95); transition: opacity 1.1s ease, transform 1.1s ease; }
+.wz-spiegel-glas.denkt .wz-spiegel-frage { opacity: 0.25; transform: scale(0.97); filter: blur(1px); transition: opacity 1.2s ease, transform 1.2s ease, filter 1.2s ease; }
+.wz-spiegel-glas.denkt::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.9), rgba(214, 228, 248, 0.4) 45%, transparent 70%); animation: wz-denkt 1.4s ease-in-out;
+}
+@keyframes wz-denkt { 0% { opacity: 0; transform: scale(0.6); } 50% { opacity: 1; } 100% { opacity: 0; transform: scale(1.2); } }
+.wz-spiegel-rest { min-height: 1.2em; }
+.wz-spiegel-glas::after { background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, 0.35) 50%, transparent 58%); }

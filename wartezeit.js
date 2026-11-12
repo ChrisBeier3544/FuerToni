@@ -494,9 +494,21 @@
       '<div class="wz-spiegel-rahmen"><div class="wz-spiegel-glas"><p class="wz-spiegel-frage">Spieglein, Spieglein an der Wand, wer ist die Schönste im ganzen Land?</p><p class="wz-spiegel-antwort"></p></div></div><p class="wz-spiegel-rest"></p>');
     const antwort = f.karte.querySelector(".wz-spiegel-antwort"), rest = f.karte.querySelector(".wz-spiegel-rest"), frage = f.karte.querySelector(".wz-spiegel-frage");
     const glas = f.karte.querySelector(".wz-spiegel-glas");
+    let beschaeftigt = false;
+    // Wundertüte: jeder Spruch kommt zufällig und erst wieder, wenn alle einmal dran waren
+    function ziehe() {
+      let tuete = lies("spiegel-tuete", []).filter((x) => x >= 0 && x < SPRUECHE.length);
+      const zuletzt = lies("spiegel-zuletzt", -1);
+      if (!tuete.length) tuete = SPRUECHE.map((_, k) => k).filter((k) => k !== zuletzt);
+      const i = tuete.splice(Math.floor(Math.random() * tuete.length), 1)[0];
+      schreib("spiegel-tuete", tuete);
+      schreib("spiegel-zuletzt", i);
+      return i;
+    }
     function naechste() {
+      if (beschaeftigt) return;
       const n = lies("spiegel-" + t, 0);
-      glas.classList.remove("antwortet");
+      glas.classList.remove("antwortet", "denkt");
       void glas.offsetWidth;
       if (n >= PRO_TAG) {
         frage.hidden = true;
@@ -505,13 +517,20 @@
         rest.textContent = "";
         return;
       }
+      beschaeftigt = true;
       schreib("spiegel-" + t, n + 1);
-      const i = ((t - 13) * PRO_TAG + n) % SPRUECHE.length;
       frage.hidden = false;
-      antwort.textContent = SPRUECHE[i];
-      setTimeout(() => glas.classList.add("antwortet"), ruhig ? 0 : 1500);
-      const uebrig = PRO_TAG - n - 1;
-      rest.textContent = uebrig > 0 ? "Tipp auf den Spiegel für noch eine Antwort (heute noch " + uebrig + ")" : "Für heute war das die letzte Antwort ♥️";
+      antwort.textContent = SPRUECHE[ziehe()];
+      rest.textContent = "";
+      // erst lange die Frage, dann überlegt der Spiegel kurz, dann kommt die Antwort
+      setTimeout(() => glas.classList.add("denkt"), ruhig ? 0 : 3800);
+      setTimeout(() => {
+        glas.classList.remove("denkt");
+        glas.classList.add("antwortet");
+        beschaeftigt = false;
+        const uebrig = PRO_TAG - n - 1;
+        rest.textContent = uebrig > 0 ? "Tipp auf den Spiegel für noch eine Antwort (heute noch " + uebrig + ")" : "Für heute war das die letzte Antwort ♥️";
+      }, ruhig ? 0 : 5200);
     }
     glas.addEventListener("click", naechste);
     naechste();
