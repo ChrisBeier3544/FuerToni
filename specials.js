@@ -797,7 +797,7 @@
       spaeter(19000, () => regen(["✨", "♥", "❄"], 22, ["#f3c84b", "#ff8fab", "#fff"], 1800));
     } },
 
-    18: { titel: "Wellness-Tag im Capy-Onsen ♨️", dauer: 21000, spiel() {
+    18: { titel: "Wellness-Tag im Capy-Thermalbad ♨️", dauer: 21000, spiel() {
       const breite = Math.min(W * 0.95, 460);
       const quelle = figur('<div class="sp-becken"></div>', "sp-onsen", { width: breite + "px" });
       quelle.animate([{ opacity: 0, transform: "translate(-50%, 30px)" }, { opacity: 1, transform: "translate(-50%, 0)" }], { duration: 900, fill: "forwards" });
