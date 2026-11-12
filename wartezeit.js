@@ -87,6 +87,9 @@
   /* ---------- Ebenen ---------- */
   const ebene = el("div", "wz-ebene");
   intro.appendChild(ebene);
+  // Fensterbank unten: der Himmel ist der Blick aus dem Fenster, die Dinge stehen darauf
+  const sims = el("div", "wz-sims", '<span class="wz-sims-oben"></span><span class="wz-sims-vorne"></span>');
+  ebene.appendChild(sims);
   const leiste = el("div", "wz-leiste");
   const fachL = el("div", "wz-fach wz-fach-links"), fachM = el("div", "wz-fach wz-fach-mitte"), fachR = el("div", "wz-fach wz-fach-rechts");
   leiste.append(fachL, fachM, fachR);
@@ -284,7 +287,7 @@
     const zeigeTag = abgerissen ? Math.min(t + 1, 26) : t;
     const k = lies("kranich", []).length;
     kalender.innerHTML = '<span class="wz-kal-ringe"></span><span class="wz-kal-blatt' + (abgerissen ? " morgen" : "") + '"><small>Nov</small><b>' + zeigeTag + "</b>" +
-      (abgerissen ? "<em>morgen</em>" : "<em>ziehen</em>") + "</span>" +
+      "</span>" +
       (k ? '<span class="wz-kal-kraniche">' + KRANICH_SVG + k + "</span>" : "");
     kalender.classList.toggle("frisch", !abgerissen);
   }
@@ -439,10 +442,16 @@
     '<ellipse cx="30" cy="30" rx="26" ry="29" fill="#d4a84b"/><ellipse cx="30" cy="30" rx="21" ry="24" fill="url(#wzGlas)"/>' +
     '<path d="M18 18q6-8 14-9" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none" opacity=".8"/>' +
     '<circle cx="30" cy="2" r="3" fill="#e85d7e"/><circle cx="8" cy="40" r="2.2" fill="#e85d7e"/><circle cx="52" cy="40" r="2.2" fill="#e85d7e"/></svg>';
-  const spiegel = el("button", "wz-spiegel", SPIEGEL_SVG + '<span class="wz-funkeln">✨</span>');
+  const spiegel = el("button", "wz-spiegel", '<span class="wz-spiegel-liegt">' + SPIEGEL_SVG + "</span>");
   spiegel.type = "button";
   spiegel.setAttribute("aria-label", "Zauberspiegel");
   fachR.appendChild(spiegel);
+  // ein kleines Bäumchen im Topf, hinter dem der Spiegel halb versteckt liegt
+  fachR.appendChild(el("span", "wz-baeumchen", '<svg viewBox="0 0 40 64" aria-hidden="true">' +
+    '<path d="M20 2 34 30h-6l8 14H4l8-14H6z" fill="#3f7f55"/><path d="M20 2 27 16h-14z" fill="#4f9a66"/>' +
+    '<circle cx="14" cy="26" r="2" fill="#e85d7e"/><circle cx="25" cy="34" r="2" fill="#f3c84b"/><circle cx="17" cy="40" r="1.8" fill="#7cc4f0"/><circle cx="23" cy="21" r="1.6" fill="#f3c84b"/>' +
+    '<path d="M20 0l1.4 2.8 3 .4-2.2 2 .6 3-2.8-1.5-2.8 1.5.6-3-2.2-2 3-.4z" fill="#f3c84b"/>' +
+    '<path d="M11 44h18l-2 18H13z" fill="#c9774f"/><rect x="9.5" y="43" width="21" height="4.5" rx="1.5" fill="#d98a62"/></svg>'));
   function befrageSpiegel() {
     const t = heute();
     if (!t) return;
