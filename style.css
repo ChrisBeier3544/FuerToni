@@ -3712,3 +3712,7 @@ html[data-abend] .wz-lade-boden { background: linear-gradient(180deg, #3d2a1f, #
 .sp-ballons > svg { width: 100%; height: auto; overflow: visible; }
 @keyframes sp-ballon-schaukeln { 0%, 100% { rotate: -3deg; } 50% { rotate: 3deg; } }
 @media (prefers-reduced-motion: reduce) { .sp-ballons { animation: none; } }
+
+/* Fenster der Wartezeit (Lupe, Spiegel, Kalenderblatt …) liegen über allem, auch über den Munkelvögeln */
+html:has(.wz-fenster-huelle:not(.geht)) .vogel-ebene, html:has(.wz-fenster-huelle:not(.geht)) .entdecken-chip { visibility: hidden; }
+.wz-fenster-huelle { z-index: 20; }
