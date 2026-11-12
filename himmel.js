@@ -29,7 +29,8 @@
       '<clipPath id="mondclip' + (vorne ? "v" : "h") + '"><path class="h2-mond-clip"/></clipPath>' +
       '<circle r="25" fill="rgba(240,232,210,.13)"/><path class="h2-mond-licht" fill="url(#mondlicht' + (vorne ? "v" : "h") + ')"/>' +
       '<g class="h2-krater" clip-path="url(#mondclip' + (vorne ? "v" : "h") + ')" fill="rgba(200,185,150,.35)"><circle cx="-8" cy="-6" r="3.5"/><circle cx="6" cy="8" r="4.5"/><circle cx="9" cy="-9" r="2.3"/><circle cx="-6" cy="11" r="2"/></g></svg>' +
-      '<div class="h2-schnuppen"></div>';
+      '<div class="h2-schnuppen"></div>' +
+      '<div class="h2-niederschlag"></div><div class="h2-blitz"></div>';
     if (vorne) ziel.prepend(h); else ziel.appendChild(h);
     return h;
   }
@@ -67,21 +68,97 @@
     return "abnehmende Sichel";
   }
 
-  /* ---------- Wetter für den Tag (immer gleich für denselben Tag) ---------- */
+  /* ---------- Echtes Wetter in Köln Merheim (Open-Meteo, ohne Schlüssel) ---------- */
+  const WETTER_URL = "https://api.open-meteo.com/v1/forecast?latitude=50.954&longitude=7.057" +
+    "&current=temperature_2m,weather_code,cloud_cover,precipitation,wind_speed_10m,is_day&timezone=Europe%2FBerlin";
+  const CACHE = "toni-wetter-koeln";
+  let live = null;
+  // Nur zum Testen: ?wetter=regen (klar, wolkig, bedeckt, nebel, niesel, regen, starkregen, schnee, gewitter)
+  const TEST_CODES = { klar: 0, heiter: 1, wolkig: 2, bedeckt: 3, nebel: 45, niesel: 53, regen: 63, starkregen: 65, schnee: 73, schneesturm: 75, gewitter: 95 };
+  const testWetter = new URLSearchParams(location.search).get("wetter");
+  if (testWetter && TEST_CODES[testWetter] !== undefined) {
+    const c = TEST_CODES[testWetter];
+    live = { code: c, wolken: c === 0 ? 5 : c === 1 ? 30 : c === 2 ? 60 : 100, wind: c >= 95 ? 40 : 15, zeit: Date.now(), test: true };
+  }
+  function liesCache(maxAlter) {
+    try { const v = JSON.parse(localStorage.getItem(CACHE) || "null"); return v && Date.now() - v.zeit < maxAlter ? v : null; } catch (_) { return null; }
+  }
+  // Beim Öffnen erst das zuletzt bekannte Wetter zeigen (bis 6 Stunden alt), dann sanft auf das neue wechseln
+  if (!live) live = liesCache(6 * 3600000);
+  async function holeWetter() {
+    if (live && live.test) return;
+    const c = liesCache(14 * 60000);
+    if (c) { live = c; aktualisiere(); return; }
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 8000);
+      const a = await fetch(WETTER_URL, { signal: ctrl.signal, cache: "no-store" });
+      clearTimeout(t);
+      if (!a.ok) return;
+      const j = await a.json();
+      const cur = j && j.current;
+      if (!cur || typeof cur.weather_code !== "number") return;
+      live = { code: cur.weather_code, wolken: cur.cloud_cover || 0, wind: cur.wind_speed_10m || 0, temperatur: cur.temperature_2m, zeit: Date.now() };
+      try { localStorage.setItem(CACHE, JSON.stringify(live)); } catch (_) { /* egal */ }
+      aktualisiere();
+    } catch (_) { /* ohne Netz bleibt das ausgedachte Wetter */ }
+  }
+  // Echtes Wetter nur für die echte Gegenwart (nicht bei einer Zeitreise)
+  function liveGilt(d) {
+    if (!live) return false;
+    const zr = ak.zeitreise;
+    if (zr && zr.aktiv()) return false;
+    const e = zr && zr.echtDatum && zr.echtDatum();
+    return !e || (e.jahr === d.jahr && e.monat === d.monat && e.tag === d.tag);
+  }
+  // WMO Wettercode in Bild übersetzen
+  function ausLive(l) {
+    const c = l.code, n = Math.round(Math.min(100, l.wolken) / 100 * 7);
+    const schief = Math.min(30, l.wind * 0.6);
+    const w = (name, hell, wolken, dunst, extra) => Object.assign({ name, hell, wolken, dunst, niederschlag: null, staerke: 0, schief, grau: false, blitz: false }, extra || {});
+    if (c === 0) return w("sonnig", 1, Math.min(n, 1), 0);
+    if (c === 1) return w("sonnig", 1, Math.max(1, Math.min(n, 3)), 0);
+    if (c === 2) return w("leicht bewölkt", 0.85, Math.max(3, n), 0.1);
+    if (c === 3) return w("bedeckt", 0.3, 7, 0.28, { grau: true });
+    if (c === 45 || c === 48) return w("nebel", 0.25, 2, 0.75, { grau: true });
+    if (c >= 51 && c <= 57) return w("regen", 0.25, 7, 0.3, { grau: true, niederschlag: "regen", staerke: 0.35 });
+    if ((c >= 61 && c <= 67) || (c >= 80 && c <= 82)) {
+      const stark = c === 65 || c === 67 || c === 82 ? 1 : c === 63 || c === 81 ? 0.7 : 0.45;
+      return w("regen", 0.2, 7, 0.32, { grau: true, niederschlag: "regen", staerke: stark });
+    }
+    if ((c >= 71 && c <= 77) || c === 85 || c === 86) {
+      const stark = c === 75 || c === 86 ? 1 : c === 73 ? 0.7 : 0.45;
+      return w("schnee", 0.35, 6, 0.3, { grau: true, niederschlag: "schnee", staerke: stark });
+    }
+    if (c >= 95) return w("gewitter", 0.1, 7, 0.4, { grau: true, niederschlag: "regen", staerke: 1, blitz: true });
+    return w("leicht bewölkt", 0.85, Math.max(2, n), 0.1);
+  }
+
+  /* ---------- Wetter für den Tag ---------- */
+  const SONNE = { name: "sonnig", hell: 1, wolken: 1, dunst: 0, niederschlag: null, staerke: 0, schief: 0, grau: false, blitz: false };
   function wetter(d) {
     // An ihrem Geburtstag und an Heiligabend scheint immer die Sonne
-    if ((d.monat === 11 && d.tag === 26) || (d.monat === 12 && d.tag === 24)) return { name: "sonnig", hell: 1, wolken: 1, dunst: 0 };
+    if ((d.monat === 11 && d.tag === 26) || (d.monat === 12 && d.tag === 24)) return SONNE;
+    if (liveGilt(d)) return ausLive(live);
+    // ohne echte Daten: ausgedachtes Wetter, immer gleich für denselben Tag
     const z = Math.abs(Math.sin(d.jahr * 31 + d.monat * 97 + d.tag * 13.37)) * 1000 % 1;
-    if (z < 0.4) return { name: "sonnig", hell: 1, wolken: 1, dunst: 0 };
-    if (z < 0.75) return { name: "leicht bewölkt", hell: 0.85, wolken: 3, dunst: 0.12 };
-    return { name: "diesig", hell: 0.7, wolken: 4, dunst: 0.26 };
+    if (z < 0.4) return SONNE;
+    if (z < 0.75) return Object.assign({}, SONNE, { name: "leicht bewölkt", hell: 0.85, wolken: 3, dunst: 0.12 });
+    return Object.assign({}, SONNE, { name: "diesig", hell: 0.7, wolken: 4, dunst: 0.26 });
   }
   const WOLKE = '<svg viewBox="0 0 120 50"><path d="M18 46h86a16 16 0 0 0 0-32 22 22 0 0 0-40-8 18 18 0 0 0-30 8 16 16 0 0 0-16 32z" fill="#fff"/></svg>';
   function setzeWolken(h, anzahl, tag) {
     const box = h.querySelector(".h2-wolken");
     if (+box.dataset.anzahl === anzahl && box.dataset.tag === String(tag)) return;
+    const sanft = box.dataset.anzahl !== undefined && !ruhig;
     box.dataset.anzahl = anzahl; box.dataset.tag = tag;
-    box.innerHTML = "";
+    // alte Wolken langsam ausblenden statt hart zu wechseln
+    box.querySelectorAll(".h2-wolke:not(.geht)").forEach((w) => {
+      if (!sanft) { w.remove(); return; }
+      w.classList.add("geht");
+      w.style.opacity = 0;
+      setTimeout(() => w.remove(), 4000);
+    });
     for (let k = 0; k < anzahl; k++) {
       const w = document.createElement("span");
       w.className = "h2-wolke";
@@ -90,15 +167,61 @@
       w.style.width = 110 + ((k * 53 + tag) % 90) + "px";
       w.style.animationDuration = 70 + k * 23 + "s";
       w.style.animationDelay = -((k * 41 + tag * 7) % 70) + "s";
-      w.style.opacity = 0.55 + (k % 3) * 0.15;
+      const ziel = 0.55 + (k % 3) * 0.15;
+      w.style.opacity = sanft ? 0 : ziel;
       box.appendChild(w);
+      if (sanft) requestAnimationFrame(() => requestAnimationFrame(() => { w.style.opacity = ziel; }));
     }
   }
+
+  /* ---------- Regen, Schnee und Blitze ---------- */
+  function setzeNiederschlag(h, art, staerke, schief) {
+    const box = h.querySelector(".h2-niederschlag");
+    const schluessel = (art || "") + "|" + staerke + "|" + Math.round(schief);
+    if (box.dataset.schluessel === schluessel) return;
+    const sanft = box.dataset.schluessel !== undefined;
+    box.dataset.schluessel = schluessel;
+    box.querySelectorAll(".h2-schicht:not(.geht)").forEach((alt) => {
+      if (!sanft) { alt.remove(); return; }
+      alt.classList.add("geht");
+      alt.style.opacity = 0;
+      setTimeout(() => alt.remove(), 4000);
+    });
+    if (!art || ruhig) return;
+    const schicht = document.createElement("div");
+    schicht.className = "h2-schicht " + art;
+    schicht.style.opacity = sanft ? 0 : 1;
+    box.appendChild(schicht);
+    if (sanft) requestAnimationFrame(() => requestAnimationFrame(() => { schicht.style.opacity = 1; }));
+    const anzahl = Math.round((art === "regen" ? 120 : 80) * staerke) + 20;
+    schicht.style.setProperty("--schief", (art === "regen" ? schief : schief * 0.5) + "deg");
+    for (let k = 0; k < anzahl; k++) {
+      const t = document.createElement("i");
+      t.style.left = (Math.random() * 120 - 10) + "%";
+      t.style.animationDuration = (art === "regen" ? 0.55 + Math.random() * 0.4 : 5 + Math.random() * 6) + "s";
+      t.style.animationDelay = -Math.random() * 8 + "s";
+      if (art === "schnee") { const g = 3 + Math.random() * 5; t.style.width = t.style.height = g + "px"; t.style.opacity = 0.5 + Math.random() * 0.5; }
+      else t.style.opacity = 0.35 + Math.random() * 0.45;
+      schicht.appendChild(t);
+    }
+  }
+  let blitzAn = false;
+  (function blitze() {
+    setTimeout(() => {
+      if (blitzAn && !ruhig && !document.hidden) {
+        himmelListe.forEach((h) => {
+          const b = h.querySelector(".h2-blitz");
+          b.animate([{ opacity: 0 }, { opacity: 0.85 }, { opacity: 0.1 }, { opacity: 0.7 }, { opacity: 0 }], { duration: 650, easing: "ease-out" });
+        });
+      }
+      blitze();
+    }, 6000 + Math.random() * 12000);
+  })();
 
   /* ---------- Sternschnuppen ---------- */
   function sternschnuppe() {
     const zeit = html.getAttribute("data-tageszeit");
-    if (zeit !== "nacht" || ruhig || document.hidden) return;
+    if (zeit !== "nacht" || ruhig || document.hidden || html.classList.contains("wetter-grau")) return;
     const h = vorne && !intro.hidden ? vorne : hinten;
     const box = h.querySelector(".h2-schnuppen");
     const s = document.createElement("span");
@@ -127,7 +250,10 @@
     const minuten = d.stunde * 60 + d.minute;
     const p = mondphase(Date.UTC(d.jahr, d.monat - 1, d.tag, 20));
     const w = wetter(d);
-    html.dataset.wetter = w.name === "sonnig" ? "sonnig" : w.name === "diesig" ? "diesig" : "wolkig";
+    html.dataset.wetter = { sonnig: "sonnig", diesig: "diesig", bedeckt: "bedeckt", nebel: "nebel", regen: "regen", schnee: "schnee", gewitter: "gewitter" }[w.name] || "wolkig";
+    html.classList.toggle("wetter-grau", !!w.grau);
+    blitzAn = !!w.blitz;
+    const nacht = zeit === "abend" || zeit === "nacht";
     for (const h of himmelListe) {
       h.dataset.zeit = zeit;
       const sonne = h.querySelector(".h2-sonne");
@@ -156,15 +282,18 @@
       } else {
         sonne.style.opacity = 0;
         glut.style.opacity = 0;
-        dunst.style.opacity = 0;
-        setzeWolken(h, 0, d.tag);
+        // nachts nur bei echtem schlechtem Wetter Wolken und Dunst
+        dunst.style.opacity = w.grau ? (w.dunst * 0.6).toFixed(2) : 0;
+        setzeWolken(h, w.grau ? Math.min(w.wolken, 5) : 0, d.tag);
       }
+      if (zeit === "morgen" && w.grau) { sonne.style.opacity = w.hell; dunst.style.opacity = w.dunst; setzeWolken(h, w.wolken, d.tag); }
+      setzeNiederschlag(h, w.niederschlag, w.staerke, w.schief || 0);
       // Abends und nachts: Mond mit der echten Phase des Tages
       const mond = h.querySelector(".h2-mond");
       mond.querySelector(".h2-mond-licht").setAttribute("d", mondPfad(p));
       mond.querySelector(".h2-mond-clip").setAttribute("d", mondPfad(p));
       mond.setAttribute("aria-label", mondName(p));
-      mond.style.opacity = zeit === "abend" ? 0.8 : zeit === "nacht" ? 1 : 0;
+      mond.style.opacity = !nacht ? 0 : w.grau ? 0.3 : zeit === "abend" ? 0.8 : 1;
       mond.style.top = zeit === "abend" ? "13%" : "7%";
       mond.style.right = zeit === "abend" ? "16%" : "11%";
     }
@@ -173,5 +302,10 @@
   const start = setInterval(() => { if (ak.intro.bereit()) { aktualisiere(); clearInterval(start); } }, 200);
   new MutationObserver(aktualisiere).observe(html, { attributes: true, attributeFilter: ["data-tageszeit"] });
 
-  window.adventkalender.himmel = { mondphase, mondName, wetter, sternschnuppe, aktualisiere };
+  // Wetter holen und alle 15 Minuten neu
+  holeWetter();
+  setInterval(holeWetter, 15 * 60000);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") holeWetter(); });
+
+  window.adventkalender.himmel = { mondphase, mondName, wetter, sternschnuppe, aktualisiere, live: () => live, setzeLive: (l) => { live = l; aktualisiere(); } };
 })();

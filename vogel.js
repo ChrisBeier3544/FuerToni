@@ -543,6 +543,7 @@
     frageBeantwortet = true;
     v.blase.classList.remove("mit-wahl");
     if (antwort === "ja") {
+      if (ak.entdeckt) ak.entdeckt("vogeline");
       zeigeBlase(v, wahl(["Juhu, ich sag ihr Bescheid! 🥰", "Wie schön! Sie ist gleich da 🥰", "Danke! Ich ruf sie sofort 🥰"]));
       v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); }, 2600));
       weibchenEingeladen = true;
@@ -599,6 +600,7 @@
     return p.filter((q) => q && frei(q)).slice(0, 10);
   }
   async function schwarm() {
+    if (ak.entdeckt) ak.entdeckt("freunde");
     if (ruhig) return;
     const plaetze = schwarmPlaetze();
     const gaeste = plaetze.map((ziel, i) => {
@@ -703,5 +705,15 @@
     v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, 5600));
     return true;
   }
-  window.adventkalender.voegel = { voegel, sage, fliegeWeg: (i) => fliegeWeg(voegel[i || 0]), ROUTEN: ROUTEN.length };
+  window.adventkalender.voegel = { voegel, sage, frage: () => {
+    // erst wenn er gelandet ist und seine Sätze gesagt hat (höchstens 30 Sekunden warten)
+    let n = 0;
+    const los = () => {
+      const v = maennchen;
+      if (weibchen || frageBeantwortet || v.fragt) return;
+      if (v.zustand === "sitzt" && v.hatGesprochen && v.blase.hidden) { frage(v); return; }
+      if (++n < 60) setTimeout(los, 500);
+    };
+    los();
+  }, fliegeWeg: (i) => fliegeWeg(voegel[i || 0]), ROUTEN: ROUTEN.length };
 })();

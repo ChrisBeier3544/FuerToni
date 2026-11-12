@@ -1,3 +1,21 @@
+/* Zeitreise aus dem Entdeckerbuch: Tagesabhängige Zwischenstände (Stempel, Schneemann,
+   Briefkasten …) liegen während der Reise in einem frischen Zwischenspeicher, damit sich
+   alles wiederholen lässt und die echten Daten unberührt bleiben. */
+(function () {
+  "use strict";
+  let reise = null;
+  try { reise = JSON.parse(sessionStorage.getItem("toni-zeitreise") || "null"); } catch (_) { return; }
+  if (!reise) return;
+  const SCHATTEN = /^toni-(wz-|schneemann-|goldflocken-|plaetzchen-|briefkasten-|aufbau-|postkarte-|schnee-|vorfreude-)/;
+  const P = Storage.prototype, hol = P.getItem, setz = P.setItem, weg = P.removeItem;
+  let lokal = null;
+  try { lokal = window.localStorage; } catch (_) { return; }
+  const umleiten = (s, k) => s === lokal && SCHATTEN.test(String(k));
+  P.getItem = function (k) { return umleiten(this, k) ? hol.call(sessionStorage, "zr:" + k) : hol.call(this, k); };
+  P.setItem = function (k, v) { return umleiten(this, k) ? setz.call(sessionStorage, "zr:" + k, v) : setz.call(this, k, v); };
+  P.removeItem = function (k) { return umleiten(this, k) ? weg.call(sessionStorage, "zr:" + k) : weg.call(this, k); };
+})();
+
 (function () {
   "use strict";
 
@@ -80,16 +98,36 @@
     }
   }
 
+  // Zeitreise aus dem Entdeckerbuch (erst ab dem 27.12.): die Seite zeigt einen früheren Zeitpunkt
+  const ZEITREISE_AB = Date.UTC(KALENDER.jahr, 11, 26, 23, 0, 0);
+  let zeitreise = null, zeitreiseAn = false, echtMs = null, echtPerf = 0;
+  try { zeitreise = JSON.parse(sessionStorage.getItem("toni-zeitreise") || "null"); } catch (_) { zeitreise = null; }
+  const echtJetzt = () => (echtMs === null ? null : echtMs + (performance.now() - echtPerf));
+  function raeumeZeitreiseAuf() {
+    try {
+      sessionStorage.removeItem("toni-zeitreise");
+      Object.keys(sessionStorage).filter((k) => k.indexOf("zr:") === 0).forEach((k) => sessionStorage.removeItem(k));
+    } catch (_) { /* egal */ }
+  }
+
   async function synchronisiereZeit() {
     const test = testdatum();
-    if (test !== null) {
-      basisMs = test;
-      basisPerf = performance.now();
-      return;
+    const echt = test !== null ? test : await holeServerzeit();
+    if (echt !== null) { echtMs = echt; echtPerf = performance.now(); }
+    if (zeitreiseAn) return;
+    if (zeitreise && echt !== null) {
+      if (echt >= ZEITREISE_AB && typeof zeitreise.ziel === "number" && zeitreise.ziel <= echt) {
+        basisMs = zeitreise.ziel;
+        basisPerf = performance.now();
+        zeitreiseAn = true;
+        document.documentElement.classList.add("zeitreise");
+        return;
+      }
+      zeitreise = null;
+      raeumeZeitreiseAuf();
     }
-    const server = await holeServerzeit();
-    if (server !== null) {
-      basisMs = server;
+    if (echt !== null) {
+      basisMs = echt;
       basisPerf = performance.now();
     } else if (!zeitBereit) {
       basisMs = Date.now();
@@ -1878,6 +1916,20 @@
     kalenderDatum: () => kalenderDatum(),
     istGeburtstag: () => istGeburtstag(),
     intro: { bereit: () => zeitBereit, phase: () => introPhase(), datum: () => berlinDatum(jetzt()) },
+    zeitreise: {
+      aktiv: () => zeitreiseAn,
+      aufgabe: () => (zeitreiseAn && zeitreise ? zeitreise.aufgabe || null : null),
+      ziel: () => (zeitreiseAn && zeitreise ? zeitreise.ziel : null),
+      erlaubt: () => { const e = echtJetzt(); return e !== null && e >= ZEITREISE_AB; },
+      echtDatum: () => { const e = echtJetzt(); return e === null ? null : berlinDatum(e); },
+      zeitpunkt: (jahr, monat, tag, stunde, minute) => berlinZeitpunkt(jahr + "-" + String(monat).padStart(2, "0") + "-" + String(tag).padStart(2, "0") + "T" + String(stunde).padStart(2, "0") + ":" + String(minute || 0).padStart(2, "0")),
+      starte(ziel, aufgabe) {
+        raeumeZeitreiseAuf();
+        try { sessionStorage.setItem("toni-zeitreise", JSON.stringify({ ziel, aufgabe: aufgabe || null })); } catch (_) { return; }
+        location.reload();
+      },
+      beende() { raeumeZeitreiseAuf(); location.reload(); },
+    },
   };
 
   /* Tannenzweige mit Beeren und Kugeln in den oberen Ecken */

@@ -120,6 +120,33 @@
   }
   function capyFront(o) { return '<svg viewBox="0 -12 56 58" aria-hidden="true">' + capyFrontInhalt(o) + "</svg>"; }
 
+  // Badeente mit Kopf, Flügel und Schnabel zum Animieren (schaut nach rechts)
+  function badeente(farbe) {
+    const f = farbe || "#ffd23f", dunkel = "#f2b705";
+    return '<svg viewBox="0 0 64 52" aria-hidden="true">' +
+      '<ellipse class="ente-welle" cx="30" cy="45" rx="26" ry="3.4" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.6"/>' +
+      '<g class="ente-koerper">' +
+      '<path d="M12 31 Q3 20 6 15 Q13 21 17 27z" fill="' + dunkel + '"/>' +
+      '<ellipse cx="30" cy="34" rx="21" ry="11" fill="' + f + '"/>' +
+      '<ellipse cx="30" cy="40" rx="17" ry="4" fill="rgba(0,0,0,.06)"/>' +
+      '<path class="ente-fluegel" d="M19 31 q9 -9 20 -3 q-4 9 -20 3z" fill="' + dunkel + '"/>' +
+      '<g class="ente-kopf"><circle cx="43" cy="19" r="10.5" fill="' + f + '"/>' +
+      '<path d="M37 9 q2 -5 6 -3 q-2 1 -2 4" fill="' + dunkel + '"/>' +
+      '<circle cx="46" cy="16" r="2" fill="#2b2b2b"/><circle cx="46.7" cy="15.3" r=".7" fill="#fff"/>' +
+      '<circle cx="44" cy="22" r="2.4" fill="#ff9eb5" opacity=".6"/>' +
+      '<g class="ente-schnabel"><path d="M51 19 q9 -2 11 2 q-5 2 -11 1z" fill="#ff8a1f"/><path class="ente-unten" d="M51 22 q8 0 10 1.5 q-5 2.5 -10 .5z" fill="#e5700f"/></g>' +
+      "</g></g></svg>";
+  }
+  function quaken(ente, text) {
+    if (!ente || !ente.isConnected) return;
+    ente.classList.remove("quakt"); void ente.offsetWidth; ente.classList.add("quakt");
+    const b = document.createElement("span");
+    b.className = "ente-quak";
+    b.textContent = text || "Quak!";
+    ente.appendChild(b);
+    setTimeout(() => b.remove(), 1300);
+  }
+
   let W = 0, H = 0;
   function figur(html, cls, stil) {
     const d = document.createElement("div");
@@ -792,9 +819,14 @@
       const wasser = document.createElement("div");
       wasser.className = "sp-wasser";
       becken.appendChild(wasser);
-      const ente = document.createElement("span");
-      ente.className = "sp-ente"; ente.textContent = "🐤";
+      // Die Badeente schwimmt hin und her, nickt, flattert und quakt
+      const ente = document.createElement("div");
+      ente.className = "sp-ente links";
+      ente.innerHTML = badeente();
       becken.appendChild(ente);
+      ente.animate([{ left: "76%" }, { left: "4%", offset: 0.42 }, { left: "4%", offset: 0.5 }, { left: "76%" }], { duration: 19000, easing: "ease-in-out", fill: "both" });
+      spaeter(19000 * 0.46, () => ente.classList.remove("links"));
+      [2600, 6200, 9800, 15500].forEach((t, i) => spaeter(t, () => quaken(ente, i === 2 ? "Quak quak!" : "Quak!")));
       for (let k = 0; k < 6; k++) dampf(becken, breite * (0.12 + k * 0.15), 10, 2);
       // Wasserball, der zwischen den Capys hin und her fliegt
       const ball = figur('<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#fff"/><path d="M20 2a18 18 0 0 1 0 36z" fill="#e85d7e"/><path d="M2 20a18 18 0 0 1 36 0z" fill="#7cc4f0" opacity=".85"/><circle cx="20" cy="20" r="18" fill="none" stroke="rgba(0,0,0,.1)"/><circle cx="13" cy="12" r="4" fill="#fff" opacity=".6"/></svg>', "sp-wasserball", { left: "0", top: "0" });
@@ -827,12 +859,18 @@
 
       // Zweiter Akt: Entenparade, Entspannung und Yuzu Regen
       spaeter(11600, () => {
+        // Entenmama mit drei Küken, die hinterherpaddeln
         for (let k = 0; k < 4; k++) {
-          const e = document.createElement("span");
-          e.className = "sp-ente sp-parade"; e.textContent = "🐤";
-          e.style.right = "auto"; e.style.left = "-12%"; e.style.fontSize = (1.3 - k * 0.1) + "rem";
+          const e = document.createElement("div");
+          e.className = "sp-ente sp-parade" + (k ? " kueken" : "");
+          e.innerHTML = badeente(k ? "#ffe066" : "#ffd23f");
+          e.style.width = (k ? 1.9 : 2.8) + "rem";
+          e.style.animationDelay = -k * 0.35 + "s";
+          e.style.setProperty("--takt", 0.9 + k * 0.12 + "s");
           becken.appendChild(e);
-          e.animate([{ left: "-12%" }, { left: "108%" }], { duration: 6500, delay: k * 450, easing: "linear", fill: "both" });
+          e.animate([{ left: "-14%" }, { left: "110%" }], { duration: 6800, delay: k * 520, easing: "linear", fill: "both" });
+          if (k === 0) spaeter(1800, () => quaken(e, "Quak, Kinder!"));
+          if (k === 3) spaeter(4200, () => quaken(e, "Piep!"));
         }
       });
       spaeter(13800, () => {
@@ -1300,7 +1338,12 @@
     if (!api.bereit()) return;
     const t = heutigeSzene();
     if (!t) { if (api.phase() !== "laden") clearInterval(warte); knopf.hidden = true; return; }
-    if (!gestartet) { gestartet = true; setTimeout(() => spiele(t), 900); }
+    if (!gestartet) {
+      gestartet = true;
+      // bei einer Zeitreise zu einer bestimmten Entdeckung startet die Szene nicht von selbst
+      const zr = window.adventkalender.zeitreise;
+      if (!(zr && zr.aufgabe())) setTimeout(() => spiele(t), 900);
+    }
     else if (!laeuft && api.phase() !== "warten") knopf.hidden = true;
   }, 300);
 

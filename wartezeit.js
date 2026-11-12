@@ -33,6 +33,7 @@
   const szeneLaeuft = () => !!document.querySelector(".special-buehne");
   const vogelRedet = () => [...document.querySelectorAll(".vogel-blase")].some((b) => !b.hidden);
   const NAMEN = ["mein Schatz", "Maus", "Toni", "Baby"];
+  const melde = (id) => { if (ak.entdeckt) ak.entdeckt(id); };
 
   const datum = () => ak.intro.datum();
   // Welcher Tag (13 bis 25) ist gerade dran? 0 = keiner
@@ -226,10 +227,13 @@
 
   langDruck(siegel, 900,
     () => { if (heute()) siegel.classList.add("wz-gluehen"); },
-    () => {
+    () => stempeln(),
+    () => siegel.classList.remove("wz-gluehen"));
+  function stempeln() {
       siegel.classList.remove("wz-gluehen");
       const t = heute();
       if (!t) return;
+      melde("stempel");
       if (hatTag("stempel", t)) { blase(siegel, "Heute hast du schon gestempelt ♥️ Morgen gibt es ein neues Motiv", 2800); return; }
       merkeTag("stempel", t);
       const st = setzeStempel(t, true);
@@ -238,8 +242,7 @@
       if (st) setTimeout(() => st.classList.remove("neu"), 1200);
       const n = lies("stempel", []).length;
       setTimeout(() => blase(siegel, t === 25 ? "Dein Umschlag ist voll gestempelt. Morgen ist es so weit ♥️" : (n === 1 ? "Dein erster Stempel! Jeden Tag kommt ein neuer dazu ♥️" : n + " Stempel. Der Umschlag füllt sich ♥️"), 2800), 700);
-    },
-    () => siegel.classList.remove("wz-gluehen"));
+  }
 
   // Tipp auf den verschlossenen Umschlag: kleiner Hinweis aufs Siegel
   umschlag.addEventListener("click", () => {
@@ -306,6 +309,7 @@
     setTimeout(() => zeigeFakt(t), ruhig ? 200 : 650);
   }
   function zeigeFakt(t) {
+    melde("kalender");
     const gefaltet = hatTag("kranich", t);
     const legende = lies("kranich", []).length === 0 && !gefaltet;
     const f = fenster("wz-fakt",
@@ -318,6 +322,7 @@
     const falten = () => {
       if (f !== offenesFenster || f.karte.classList.contains("faltet")) return;
       merkeTag("kranich", t);
+      melde("kranich");
       f.karte.classList.add("faltet");
       const r = f.karte.getBoundingClientRect();
       const kr = el("div", "wz-kranich", KRANICH_SVG);
@@ -441,6 +446,7 @@
   function befrageSpiegel() {
     const t = heute();
     if (!t) return;
+    melde("spiegel");
     const f = fenster("wz-spiegel-gross",
       '<div class="wz-spiegel-rahmen"><div class="wz-spiegel-glas"><p class="wz-spiegel-frage">Spieglein, Spieglein an der Wand, wer ist die Schönste im ganzen Land?</p><p class="wz-spiegel-antwort"></p></div></div><p class="wz-spiegel-rest"></p>');
     const antwort = f.karte.querySelector(".wz-spiegel-antwort"), rest = f.karte.querySelector(".wz-spiegel-rest"), frage = f.karte.querySelector(".wz-spiegel-frage");
@@ -482,9 +488,11 @@
     if (intro.classList.contains("wz-nacht")) {
       intro.classList.remove("wz-nacht");
       wachBis = performance.now() + 9000;
+      melde("schlafmuetzen");
       blase(feld, wahl(GRUMMELN), 2600);
       return;
     }
+    melde("ziffern");
     if (ruhig) { blase(feld, wahl(KICHERN), 1400); return; }
     if (feld.dataset.feld === "Sek.") {
       const weg = (Math.random() < 0.5 ? -1 : 1) * zufall(50, 80);
@@ -567,6 +575,7 @@
       aufUmschlag.appendChild(marke);
       marke.addEventListener("click", (e) => {
         e.stopPropagation();
+        melde("marke");
         fenster("wz-lupe", '<div class="wz-lupe-glas">' + markenSvg(t) + '</div><p class="wz-fakt-text">' + MARKEN[t].lupe + "</p>");
       });
     } else if (!an && marke) { marke.remove(); marke = null; }
@@ -627,6 +636,7 @@
       const b = knopf.querySelector("button");
       b.addEventListener("click", () => {
         if (knopf.classList.contains("unterwegs")) return;
+        melde("knopf");
         let i = lies("knopf", 0);
         const [text, effekt] = i < KNOPF.length ? KNOPF[i] : KNOPF[Math.floor(Math.random() * (KNOPF.length - 1))];
         schreib("knopf", i + 1);
@@ -687,6 +697,7 @@
   });
   ["pointerup", "pointercancel"].forEach((n) => umschlag.addEventListener(n, () => { schuettel = null; }));
   function geschuettelt() {
+    melde("schuetteln");
     umschlag.classList.remove("wz-schuettelt"); void umschlag.offsetWidth; umschlag.classList.add("wz-schuettelt");
     setTimeout(() => umschlag.classList.remove("wz-schuettelt"), 800);
     const i = lies("schuetteln", 0);
@@ -749,6 +760,7 @@
     const t = heute();
     const namen = KOSENAMEN[t];
     if (!namen) return;
+    melde("adresse");
     const f = fenster("wz-adresse", '<p class="wz-adresse-an">An Toni,</p><div class="wz-adresse-zeilen"></div>');
     const zeilen = f.karte.querySelector(".wz-adresse-zeilen");
     let ms = 400;
@@ -784,6 +796,7 @@
   }
   function lichtStart(e) {
     if (licht) return;
+    melde("licht");
     licht = baueLicht();
     aufUmschlag.appendChild(licht);
     lichtBewegt(e);
@@ -873,6 +886,7 @@
         himmel.querySelectorAll(".wz-stern").forEach((x) => x.classList.add("an"));
         if (neu) {
           merkeTag("sternbild", t);
+          melde("sternbild");
           const r = himmel.getBoundingClientRect();
           for (let k = 0; k < 3; k++) setTimeout(() => herzenAus(r.left + zufall(0.2, 0.8) * r.width, r.top + r.height * 0.5, 8), k * 300);
         }
@@ -932,6 +946,7 @@
       a.pause();
       flieger = null;
       merkeTag("flieger", t);
+      melde("flieger");
       f.classList.add("gefangen");
       setTimeout(() => f.remove(), 500);
       fenster("wz-luftpost", '<p class="wz-fakt-kopf">Luftpost für Toni ✈️</p><p class="wz-wunsch-text">' + FLIEGER_TEXT[t] + '</p><p class="wz-fakt-fuss">Dein Chris</p>');
@@ -981,6 +996,7 @@
         if (fuellt) return;
         if (schluck < 4) {
           schluck++;
+          melde("tasse");
           tasse.animate([{ transform: "rotate(0)" }, { transform: "rotate(-24deg) translateY(-6px)" }, { transform: "rotate(-24deg) translateY(-6px)", offset: 0.6 }, { transform: "rotate(0)" }], { duration: 800, easing: "ease-in-out" });
           setTimeout(male, 400);
           blase(tasse, schluck >= 4 ? "Leer! Haaallo, Nachschub bitte! ☕" : wahl(["schlürf", "Mmmh 😋", "*schlürf*", "Lecker!"]), 1300);
@@ -1080,6 +1096,7 @@
         }
         if (i < alle.length) setTimeout(tick, ruhig ? 0 : 40);
         else {
+          melde("scheibe");
           text.textContent = t === 21 ? "Psst … von der anderen Seite. Merk dir die Zahl gut 😉" : "Psst … von der anderen Seite 😉";
           text.classList.add("da");
           setTimeout(() => { c.classList.add("weg"); text.classList.remove("da"); }, 6000);
@@ -1279,6 +1296,7 @@
       showLaeuft = false;
       const neu = !geloest();
       schreib("code", true);
+      melde("kennzeichen");
       zeigePlakette();
       zeigeGutschein(neu);
     });
@@ -1349,10 +1367,50 @@
   /* =========================================================
      Alles an und aus schalten
      ========================================================= */
-  let warHeute = -1;
+  // Für das Entdeckerbuch: einzelne Dinge direkt vorspielen
+  window.adventkalender.wartezeit = {
+    vorspielen(id) {
+      if (!heute()) return false;
+      const r = umschlag.getBoundingClientRect();
+      const punkt = (fx, fy) => ({ clientX: r.left + r.width * fx, clientY: r.top + r.height * fy });
+      switch (id) {
+        case "stempel": {
+          schreib("stempel", lies("stempel", []).filter((x) => x !== heute()));
+          const alt = aufUmschlag.querySelector('[data-stempel="' + heute() + '"]');
+          if (alt) alt.remove();
+          stempeln();
+          return true;
+        }
+        case "schuetteln": geschuettelt(); return true;
+        case "licht": {
+          if (!lichtAn) return false;
+          lichtStart(punkt(0.25, 0.4));
+          const weg = [[0.35, 0.45], [0.5, 0.5], [0.62, 0.55], [0.72, 0.62], [0.5, 0.6]];
+          weg.forEach(([x, y], i) => setTimeout(() => lichtBewegt(punkt(x, y)), 700 * (i + 1)));
+          setTimeout(lichtEnde, 700 * (weg.length + 1) + 600);
+          return true;
+        }
+        case "flieger": schreib("flieger", lies("flieger", []).filter((x) => x !== heute())); starteFlieger(); return true;
+        case "scheibe": scheibeGezeigt = false; if (scheibeWarte) { clearInterval(scheibeWarte); scheibeWarte = null; } beschlagen(); return true;
+        case "kennzeichen": kennzeichenShow(); return true;
+        case "schloss": oeffneSchloss(); return true;
+        default: return false;
+      }
+    },
+  };
+
+  let warHeute = -1, reiseVorbereitet = false;
   function pruefe() {
     const t = heute();
     const an = !!t;
+    // Zeitreise: die Stempel der Tage davor sind schon da
+    if (an && !reiseVorbereitet && ak.zeitreise && ak.zeitreise.aktiv()) {
+      reiseVorbereitet = true;
+      const vorher = [];
+      for (let d = 13; d < t; d++) vorher.push(d);
+      schreib("stempel", vorher);
+      vorher.forEach((d) => setzeStempel(d, false));
+    }
     intro.classList.toggle("wz-aktiv", an);
     if (t !== warHeute) { warHeute = t; if (an) zeichneKalender(); }
     const nacht = an && istNacht() && performance.now() > wachBis;
