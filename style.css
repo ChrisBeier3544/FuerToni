@@ -3714,5 +3714,13 @@ html[data-abend] .wz-lade-boden { background: linear-gradient(180deg, #3d2a1f, #
 @media (prefers-reduced-motion: reduce) { .sp-ballons { animation: none; } }
 
 /* Fenster der Wartezeit (Lupe, Spiegel, Kalenderblatt …) liegen über allem, auch über den Munkelvögeln */
-html:has(.wz-fenster-huelle:not(.geht)) .vogel-ebene, html:has(.wz-fenster-huelle:not(.geht)) .entdecken-chip { visibility: hidden; }
+html:has(.wz-fenster-huelle:not(.geht)) :is(.vogel-ebene, .entdecken-chip, .special-buehne, .zr-banner, .zr-ring, .zr-karte, .goldflocke) { visibility: hidden; }
 .wz-fenster-huelle { z-index: 20; }
+/* Konfetti hinter einer offenen Karte der Wartezeit */
+.wz-fenster-huelle > .konfetti-regen { position: absolute; z-index: 0; }
+.wz-fenster-huelle > .wz-fenster { z-index: 1; }
+
+/* Liebeszettel und Fensterblick liegen über allem auf der Seite */
+.liebeszettel, .fensterblick { z-index: 97; }
+html:has(.liebeszettel, .fensterblick) :is(.entdecken-chip, .vogel-ebene) { visibility: hidden; }
+.konfetti-regen.aktiv:not(:popover-open) { display: block; }
