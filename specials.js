@@ -567,7 +567,7 @@
         rad(48) + rad(152) +
         '<path d="M178 80 V20" stroke="#6b4a3a" stroke-width="3"/><path d="M178 22 h-2 q-30 6 -60 0 v20 q30 6 60 0z" fill="#fff8e6" stroke="#e85d7e" stroke-width="2" transform="translate(0 -4)"/>' +
         '<text x="148" y="35" text-anchor="middle" font-family="Dancing Script, cursive" font-weight="700" font-size="13" fill="#9d2449">Gute Reise ♥</text></svg>',
-        "sp-draisine", { top: gy - db * 0.6 + 6 + "px", left: "0", width: db + "px", transform: "translateX(" + -db * 1.3 + "px)" });
+        "sp-draisine", { top: gy + 2 - db * (103 / 200) + "px", left: "0", width: db + "px", transform: "translateX(" + -db * 1.3 + "px)" });
       const dhalt = W / 2 - db / 2;
       spaeter(11800, () => {
         draisine.animate([{ transform: "translateX(" + -db * 1.1 + "px)" }, { transform: "translateX(" + dhalt + "px)" }], { duration: 2600, easing: "ease-out", fill: "forwards" });
@@ -575,7 +575,7 @@
         draisine.querySelectorAll(".sp-rad").forEach((r) => r.animate([{ transform: "rotate(0)" }, { transform: "rotate(-540deg)" }], { duration: 2600, easing: "ease-out" }));
       });
       spaeter(14600, () => {
-        sagBlase("Wir fahren mit dir, wohin du willst 🥰", { left: W / 2 + "px", top: Math.max(6, gy - db * 0.6 - 50) + "px" }, 2200);
+        sagBlase("Wir fahren mit dir, wohin du willst 🥰", { left: W / 2 + "px", top: Math.max(6, gy - db * 0.55 - 50) + "px" }, 2200);
         partikel(W / 2, gy - db * 0.4, ["♥", "✨"], 12, 90, ["#ff4d7d", "#f3c84b"]);
       });
       spaeter(17200, () => {
@@ -712,6 +712,19 @@
 
     17: { titel: "Glühwein-Abend am Capy-Stand 🍷", dauer: 21000, spiel() {
       const breite = Math.min(W * 0.92, 440);
+      // Abendlicher Weihnachtsmarkt hinter dem Stand
+      const mh = Math.max(breite * 0.67 + 70, H * 0.55);
+      const markt = figur('<svg viewBox="0 0 400 220" preserveAspectRatio="none">' +
+        '<defs><linearGradient id="sp-markt-himmel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3a1f4a" stop-opacity="0"/><stop offset=".3" stop-color="#4a2550"/><stop offset="1" stop-color="#2a1430"/></linearGradient></defs>' +
+        '<rect width="400" height="220" fill="url(#sp-markt-himmel)"/>' +
+        [[10, 70, "#5a2a4a"], [80, 60, "#6e3558"], [300, 66, "#5a2a4a"], [350, 58, "#6e3558"]].map(([x, h, c]) =>
+          '<path d="M' + x + ' 130 v-' + (h - 18) + ' l25 -18 l25 18 v' + (h - 18) + 'z" fill="' + c + '"/><rect x="' + (x + 18) + '" y="' + (130 - h * 0.55) + '" width="14" height="12" rx="2" fill="#ffd36b" opacity=".85"/>').join("") +
+        '<path d="M0 60 Q100 90 200 62 T400 64" stroke="#2a1430" stroke-width="1.2" fill="none"/>' +
+        [20, 60, 100, 140, 180, 220, 260, 300, 340, 380].map((x, i) => '<circle class="sp-markt-licht" style="animation-delay:' + (-i * 0.3) + 's" cx="' + x + '" cy="' + (66 + Math.sin(i) * 8) + '" r="3.2" fill="' + ["#ffd36b", "#ff8fab", "#fff2c4"][i % 3] + '"/>').join("") +
+        '<rect x="0" y="130" width="400" height="90" fill="#3a2236"/>' +
+        Array.from({ length: 30 }, (_, i) => '<rect x="' + ((i * 41) % 400) + '" y="' + (138 + (i % 5) * 16) + '" width="22" height="10" rx="3" fill="#4a2c44"/>').join("") +
+        "</svg>", "sp-markt", { height: mh + "px" });
+      markt.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 900, fill: "forwards" });
       const stand = figur('<svg viewBox="0 0 300 200"><rect x="20" y="70" width="10" height="130" fill="#8a5a3a"/><rect x="270" y="70" width="10" height="130" fill="#8a5a3a"/>' +
         '<path d="M5 74 L150 18 L295 74z" fill="#d6304f"/>' +
         Array.from({ length: 10 }, (_, i) => '<path d="M' + (5 + i * 29) + ' 74 q14.5 16 29 0z" fill="' + (i % 2 ? "#fff" : "#d6304f") + '"/>').join("") +

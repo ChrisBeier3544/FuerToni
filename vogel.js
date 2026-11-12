@@ -97,11 +97,31 @@
       const ur = u.getBoundingClientRect();
       return { x: ur.left + ur.width * 0.5, y: ur.top + 3 };
     },
-    umschlagLinks: () => { const e = document.getElementById("umschlag"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + 34, y: r.top + 3 }; },
-    umschlagRechts: () => { const e = document.getElementById("umschlag"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.right - 34, y: r.top + 3 }; },
-    siegel: () => { const e = document.querySelector("#umschlag .siegel"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + 4 }; },
+    umschlagLinks: () => ankerPunkt("34px", "oben", 3),
+    umschlagRechts: () => ankerPunkt("calc(100% - 34px)", "oben", 3),
+    siegel: () => { const e = document.querySelector("#umschlag .siegel"); if (!sichtbar(e)) return null; return ankerPunkt("50%", e.offsetTop + "px", 4); },
     hinweis: () => { const e = document.getElementById("intro-hinweis"); if (!sichtbar(e) || !e.textContent) return null; const r = e.getBoundingClientRect(); return { x: Math.min(window.innerWidth - 30, r.right + 26), y: r.top + 14 }; },
   };
+  // Unsichtbare Punkte im Umschlag. Weil sie im Brief stecken, folgen sie seinem
+  // Schweben und Kippen genau, und die Vögel bewegen sich natürlich mit.
+  const anker = new Map();
+  function ankerPunkt(links, oben, plus) {
+    const u = document.getElementById("umschlag");
+    if (!sichtbar(u)) return null;
+    const key = links + "|" + oben;
+    let a = anker.get(key);
+    if (!a || !a.isConnected) {
+      a = document.createElement("span");
+      a.className = "vogel-anker";
+      a.setAttribute("aria-hidden", "true");
+      a.style.left = links;
+      if (oben === "unten") a.style.bottom = "0"; else a.style.top = oben === "oben" ? "0" : oben;
+      u.appendChild(a);
+      anker.set(key, a);
+    }
+    const r = a.getBoundingClientRect();
+    return { x: r.left, y: r.top + (plus || 0) };
+  }
   function kontext() {
     const phase = ak.intro.phase();
     if (!intro.hidden && (phase === "warten" || phase === "geburtstag")) return "countdown";
@@ -365,7 +385,8 @@
       const p = sitzpunkt(v, k, v.platz);
       if (p && v.seite) {
         const dx = p.x + window.scrollX - v.seite.x, dy = p.y + window.scrollY - v.seite.y;
-        if (Math.abs(dx) > 1.5 || Math.abs(dy) > 1.5) setzePosition(v, p);
+        const schwelle = k === "countdown" ? 0.2 : 1.5;
+        if (Math.abs(dx) > schwelle || Math.abs(dy) > schwelle) setzePosition(v, p);
       }
     }
     requestAnimationFrame(festhalten);
@@ -560,12 +581,11 @@
     // oben so viele Plätze, dass neben dem Paar noch genug frei bleiben
     const oben = Math.max(6, Math.min(9, Math.floor((r.width - 30) / 38)));
     const p = [];
-    for (let i = 0; i < oben; i++) p.push({ x: r.left + 20 + (r.width - 40) * (i / (oben - 1)), y: r.top + 3 });
+    const platz = (links, wo, plus) => { const fn = () => ankerPunkt(links, wo, plus); const q = fn(); return q && Object.assign(q, { fn }); };
+    for (let i = 0; i < oben; i++) p.push(platz("calc(20px + (100% - 40px) * " + (i / (oben - 1)).toFixed(3) + ")", "oben", 3));
     // auf der unteren Kante des Umschlags, links und rechts vom Namen
-    p.push({ x: r.left + 24, y: r.bottom + 2 }, { x: r.right - 24, y: r.bottom + 2 });
-    p.push({ x: r.left + r.width * 0.19, y: r.bottom + 2 }, { x: r.right - r.width * 0.19, y: r.bottom + 2 });
-    p.push({ x: r.left + r.width * 0.32, y: r.bottom + 2 }, { x: r.right - r.width * 0.32, y: r.bottom + 2 });
-    return p.filter(frei).slice(0, 10);
+    for (const links of ["24px", "calc(100% - 24px)", "19%", "81%", "32%", "68%"]) p.push(platz(links, "unten", 2));
+    return p.filter((q) => q && frei(q)).slice(0, 10);
   }
   async function schwarm() {
     if (ruhig) return;
@@ -595,6 +615,8 @@
       g.el.classList.add("fliegt");
       return animiere(g, [start, mitte, { x: g.ziel.x + (vonLinks ? -24 : 24), y: g.ziel.y - 24 }, g.ziel], 2000 + Math.random() * 700).then(() => {
         g.zustand = "sitzt"; g.el.classList.remove("fliegt"); g.blick = g.ziel.x > W() / 2 ? -1 : 1; setzePosition(g, g.ziel);
+        const mit = () => { if (g.zustand !== "sitzt" || !g.el.isConnected) return; const q = g.ziel.fn && g.ziel.fn(); if (q) setzePosition(g, q); requestAnimationFrame(mit); };
+        requestAnimationFrame(mit);
         g.el.classList.add("hopst");
       });
     })));

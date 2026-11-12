@@ -3099,3 +3099,11 @@ html:has(#intro:not([hidden]):not(.weg)), html:has(#intro:not([hidden]):not(.weg
 .special-raum .sp-abend { opacity: 0; background: radial-gradient(circle at 70% 20%, rgba(60, 30, 90, 0.85), rgba(20, 10, 40, 0.92)); }
 .sp-mond { z-index: 1; filter: drop-shadow(0 0 14px rgba(255, 248, 220, 0.8)); }
 .sp-stern-klein { z-index: 1; color: #fff8dc; font-size: 0.9rem; text-shadow: 0 0 6px #fff; }
+/* Ankerpunkte im Umschlag für die Vögel */
+.vogel-anker { position: absolute; width: 0; height: 0; pointer-events: none; }
+/* Weihnachtsmarkt hinter dem Glühweinstand */
+.sp-markt { left: 0; right: 0; bottom: 0; z-index: 0; }
+.sp-markt > svg { width: 100%; height: 100%; }
+.special-raum .sp-markt::after { content: ""; position: absolute; left: 0; right: 0; top: calc(100% - 1px); height: 30vh; background: #3a2236; }
+.sp-markt-licht { animation: sp-lampe 1.4s steps(2, jump-none) infinite; }
+.sp-stand { z-index: 1; }
