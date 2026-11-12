@@ -56,8 +56,50 @@
     ["freunde", "🎉", "Munkelvogels Freunde"],
   ];
   // Preis für eine verpasste Überraschung
-  const PREIS_ZAHL = 10, PREIS_WORT = "SMUATSH";
-  const PREIS = PREIS_ZAHL + " × " + PREIS_WORT;
+  // Preise für verpasste Überraschungen: jeder Freikauf ist teurer als der davor.
+  // Die allerletzte noch verpasste Überraschung kostet immer das Finale.
+  const PREISE = [
+    "10 × SMUATSH",
+    "10 Sekunden Kuscheln",
+    "20 × SMUATSH",
+    "1 Minute Kuscheln am Stück",
+    "5 Minuten Rücken kraulen",
+    "30 × SMUATSH",
+    "Einen Kuss auf Kommando, egal wo wir gerade sind",
+    "Chris einen Kaffee ans Bett bringen",
+    "15 Minuten große Massage",
+    "Einen Abend lang darf Chris die Musik aussuchen",
+    "50 × SMUATSH",
+    "10 Minuten Kuscheln ohne Handy",
+    "Chris darf den nächsten Film aussuchen, ohne Widerspruch",
+    "10 Minuten Fußmassage",
+    "Einen handgeschriebenen Liebesbrief mit mindestens fünf Sätzen",
+    "100 × SMUATSH",
+    "Chris sein Lieblingsessen kochen",
+    "20 Minuten große Massage mit Öl",
+    "Einen ganzen Tag lang jedes Gespräch mit einem Kompliment beginnen",
+    "Chris plant das nächste Date und du fragst nicht nach",
+    "30 Minuten Kuscheln auf dem Sofa, Chris darf die Decke aussuchen",
+    "Ein Picknick für uns zwei vorbereiten",
+    "Eine Folge von Chris' Lieblingsserie mitschauen, ohne zu meckern",
+    "Frühstück ans Bett mit Kaffee und Croissant",
+    "Einen Wellnessabend zu Hause mit Kerzen und Massage",
+    "200 × SMUATSH",
+    "Einen Tag lang Chris' persönliche Kuschelbeauftragte sein",
+    "Ein Fotoshooting zu zweit, Chris bestimmt die Posen",
+    "Ein Abendessen bei Kerzenschein, komplett von dir geplant",
+    "45 Minuten große Massage, der ganze Rücken",
+    "Ein Spieleabend, Chris sucht die Spiele aus",
+    "Einen ganzen Sonntag Kuscheltag im Bett",
+    "500 × SMUATSH",
+    "Einen Ausflug, den Chris aussucht, und du fährst",
+    "Eine Stunde Massage, Chris bestimmt die Stellen",
+    "Einen selbst gebackenen Kuchen nach Chris' Wunsch",
+    "Ein ganzes Wochenende lang Frühstück ans Bett",
+    "1000 × SMUATSH",
+    "Einen ganzen Tag ganz nach Chris' Wünschen",
+  ];
+  const FINALE_PREIS = "Das große Finale: Eine Joghurt Früchte Bowl zum Frühstück vorbereiten, liebevoll angerichtet, dazu Kaffee ans Bett und 1000 × SMUATSH ♥️";
   const FREI_SCHLUESSEL = "toni-freigekauft-" + KALENDER.jahr;
   const SCHULD_SCHLUESSEL = "toni-schuldscheine-" + KALENDER.jahr;
   const IDS = LISTE.map((e) => e[0]);
@@ -121,7 +163,7 @@
         const b = document.createElement("button");
         b.type = "button";
         b.className = "entdeckt-nochmal" + (da ? "" : " zu");
-        b.textContent = da ? "▶ Nochmal" : "🔒 " + PREIS;
+        b.textContent = da ? "▶ Nochmal" : "🔒 Freikaufen";
         b.addEventListener("click", () => (da ? ak.fuehrung.starte(id) : kaufe(id, name)));
         li.appendChild(b);
       }
@@ -169,13 +211,13 @@
     box.hidden = liste.length === 0;
     if (!liste.length) return;
     box.innerHTML = '<p class="entdeckt-abschnitt">Deine Schuldscheine</p><p class="entdeckt-klein"></p><div class="schuld-liste"></div>';
-    box.querySelector(".entdeckt-klein").textContent = "Du schuldest Chris insgesamt " + liste.length * PREIS_ZAHL + " × " + PREIS_WORT + " 😘";
+    box.querySelector(".entdeckt-klein").textContent = liste.length === 1 ? "Das schuldest du Chris noch 😘" : "Das alles schuldest du Chris 😘";
     const l = box.querySelector(".schuld-liste");
     for (const s of liste) {
       const k = document.createElement("div");
       k.className = "schuldschein";
       k.innerHTML = '<p class="schuld-text"></p><img alt="Unterschrift"><p class="schuld-datum"></p>';
-      k.querySelector(".schuld-text").textContent = "Ich schulde Chris " + PREIS + " für: " + s.name;
+      k.querySelector(".schuld-text").textContent = "Ich schulde Chris: " + (s.preis || "10 × SMUATSH") + " (für: " + s.name + ")";
       k.querySelector("img").src = s.bild;
       k.querySelector(".schuld-datum").textContent = s.datum;
       l.appendChild(k);
@@ -183,7 +225,17 @@
   }
 
   /* ---------- Verpasste Überraschung freikaufen ---------- */
+  // Der nächste Preis: je mehr schon freigekauft ist, desto höher
+  function naechsterPreis() {
+    const frei = freigekauft();
+    const offen = LISTE.filter((e) => !gefunden.has(e[0]) && !frei.has(e[0])).length;
+    if (offen <= 1) return FINALE_PREIS;
+    const n = liesListe(SCHULD_SCHLUESSEL).length;
+    return PREISE[Math.min(n, PREISE.length - 1)];
+  }
+  const sicher = (t) => String(t).replace(/[<>&"]/g, (z) => ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", '"': "&quot;" })[z]);
   function kaufe(id, name) {
+    const PREIS = sicher(naechsterPreis());
     const liste = dlg.querySelector(".entdeckt-liste");
     const box = dlg.querySelector(".entdeckt-kauf");
     const reise = dlg.querySelector(".entdeckt-reise"), schulden = dlg.querySelector(".entdeckt-schulden");
@@ -192,7 +244,7 @@
     box.innerHTML =
       '<div class="kauf-schritt kauf-eins"><p class="kauf-gross">🔒</p><p class="kauf-titel">Diese Überraschung hast du verpasst</p>' +
       '<p class="kauf-preis">Preis: <b>' + PREIS + '</b></p><div class="kauf-knoepfe"><button type="button" class="kauf-zurueck">Abbrechen</button><button type="button" class="kauf-ok">Bestätigen</button></div></div>' +
-      '<div class="kauf-schritt kauf-zwei" hidden><p class="kauf-titel">Schuldschein</p><p class="kauf-preis">Ich, Toni, schulde Chris <b>' + PREIS + '</b>.</p>' +
+      '<div class="kauf-schritt kauf-zwei" hidden><p class="kauf-titel">Schuldschein</p><p class="kauf-preis">Ich, Toni, schulde Chris:<br><b>' + PREIS + '</b></p>' +
       '<p class="entdeckt-klein">Bitte hier unterschreiben:</p><canvas class="kauf-feld" width="600" height="220" aria-label="Unterschriftsfeld"></canvas>' +
       '<div class="kauf-knoepfe"><button type="button" class="kauf-loeschen">Löschen</button><button type="button" class="kauf-ok2" disabled>Bestätigen</button></div></div>';
     dlg.querySelector(".dialog-inhalt").scrollTop = 0;
@@ -204,7 +256,7 @@
       unterschrift(box.querySelector(".kauf-feld"), box.querySelector(".kauf-ok2"), box.querySelector(".kauf-loeschen"), (bild) => {
         const d = (zr() && zr().echtDatum()) || ak.intro.datum();
         const s = liesListe(SCHULD_SCHLUESSEL);
-        s.push({ id, name, bild, datum: d.tag + "." + d.monat + "." + d.jahr + ", " + String(d.stunde).padStart(2, "0") + ":" + String(d.minute).padStart(2, "0") + " Uhr" });
+        s.push({ id, name, bild, preis: naechsterPreis(), datum: d.tag + "." + d.monat + "." + d.jahr + ", " + String(d.stunde).padStart(2, "0") + ":" + String(d.minute).padStart(2, "0") + " Uhr" });
         schreibListe(SCHULD_SCHLUESSEL, s);
         const f = freigekauft(); f.add(id); schreibListe(FREI_SCHLUESSEL, [...f]);
         box.innerHTML = '<p class="kauf-gross">✨</p><p class="kauf-titel">Danke, Toni!</p><p class="entdeckt-klein">Gleich zeigt dir das Handy: ' + name.replace(/</g, "") + "</p>";
