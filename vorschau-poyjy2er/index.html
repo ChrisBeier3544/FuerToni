@@ -291,9 +291,9 @@
   <script src="vorschau-poyjy2er/kalender.min.js?v=7f7ea9a2cf"></script>
 <style>
   .testleiste {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    position: fixed; left: 8px; bottom: 8px; z-index: 90; max-width: min(560px, calc(100vw - 16px)); border-radius: 16px;
     display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-    padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+    padding: 8px 10px;
     background: #2b0f1c; color: #ffe4ea;
     font: 600 13px/1.3 "Nunito", system-ui, sans-serif;
     box-shadow: 0 -6px 20px rgba(0,0,0,.25);
@@ -307,11 +307,19 @@
   .testleiste button:focus-visible, .testleiste select:focus-visible { outline: 2px solid #f3dc9f; outline-offset: 2px; }
   .testleiste .zu { margin-left: auto; }
   .testleiste input { accent-color: #f7809b; }
-  .testleiste.klein > :not(.zu):not(b) { display: none; }
-  body { padding-bottom: 120px; }
-  .toast { bottom: 110px; }
+  .testleiste .griff { cursor: grab; padding: 4px 6px; font-size: 16px; line-height: 1; color: #f7809b; user-select: none; -webkit-user-select: none; touch-action: none; }
+  .testleiste .mini { display: none; }
+  .testleiste.klein { padding: 0; border-radius: 50%; gap: 0; background: transparent; box-shadow: none; }
+  .testleiste.klein > * { display: none; }
+  .testleiste.klein > .mini {
+    display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border-radius: 50%; font-size: 20px;
+    background: #2b0f1c; border: 2px solid #f7809b; box-shadow: 0 4px 14px rgba(0,0,0,.3); touch-action: none; cursor: grab;
+  }
+  .testleiste.zieht, .testleiste.zieht * { cursor: grabbing !important; }
 </style>
 <div class="testleiste" id="testleiste" role="region" aria-label="Testleiste">
+  <button type="button" class="mini" id="test-mini" aria-label="Testleiste öffnen (ziehen zum Verschieben)">🧪</button>
+  <span class="griff" id="test-griff" title="Ziehen zum Verschieben" aria-hidden="true">⠿</span>
   <b>🧪 Testversion</b>
   <label for="test-datum">Tag:</label>
   <select id="test-datum"></select>
@@ -330,7 +338,7 @@
   <button type="button" id="test-schuetteln">Schütteln ❄️</button>
   <button type="button" id="test-lichter">Lichtershow</button>
   <button type="button" id="test-reset">Alles zurücksetzen</button>
-  <button type="button" class="zu" id="test-zu" aria-label="Testleiste einklappen">▾</button>
+  <button type="button" class="zu" id="test-zu" aria-label="Testleiste verkleinern">–</button>
 </div>
 <script>
 (function () {
@@ -344,7 +352,7 @@
     ["nov-15", "15. November 🐹 Ballonfahrt"],
     ["nov-16", "16. November 🐹 Gartenparty"],
     ["nov-17", "17. November 🐹 Glühweinstand"],
-    ["nov-18", "18. November 🐹 Onsen"],
+    ["nov-18", "18. November 🐹 Thermalbad"],
     ["nov-19", "19. November 🐹 Rodelrennen"],
     ["nov-20", "20. November 🐹 Matcha-Bad"],
     ["nov-21", "21. November 🐹 Feuerwerk"],
@@ -412,11 +420,60 @@
     } catch (e) {}
     gehe("");
   });
+  // Verkleinern auf eine kleine Kugel und frei verschieben (Lage wird gemerkt)
   var leiste = document.getElementById("testleiste");
-  document.getElementById("test-zu").addEventListener("click", function () {
-    leiste.classList.toggle("klein");
-    this.textContent = leiste.classList.contains("klein") ? "▴ Testleiste" : "▾";
-  });
+  var MERK = "toni-testleiste-lage";
+  var lage = null;
+  try { lage = JSON.parse(localStorage.getItem(MERK) || "null"); } catch (e) {}
+  function merke() { try { localStorage.setItem(MERK, JSON.stringify(lage)); } catch (e) {} }
+  function klemme() {
+    if (!lage || lage.x === undefined) return;
+    var r = leiste.getBoundingClientRect();
+    lage.x = Math.max(4, Math.min(window.innerWidth - r.width - 4, lage.x));
+    lage.y = Math.max(4, Math.min(window.innerHeight - r.height - 4, lage.y));
+    leiste.style.left = lage.x + "px"; leiste.style.top = lage.y + "px"; leiste.style.bottom = "auto";
+  }
+  function setzeKlein(klein) {
+    leiste.classList.toggle("klein", klein);
+    lage = lage || {}; lage.klein = klein; merke();
+    requestAnimationFrame(klemme);
+  }
+  if (lage && lage.klein) leiste.classList.add("klein");
+  klemme();
+  window.addEventListener("resize", klemme);
+  document.getElementById("test-zu").addEventListener("click", function () { setzeKlein(true); });
+  // Ziehen am Griff oder an der Kugel; ein kurzer Tipp auf die Kugel öffnet die Leiste
+  function ziehbar(el, beiTipp) {
+    var start = null;
+    el.addEventListener("pointerdown", function (e) {
+      var r = leiste.getBoundingClientRect();
+      start = { x: e.clientX, y: e.clientY, l: r.left, t: r.top, bewegt: false };
+      try { el.setPointerCapture(e.pointerId); } catch (_) {}
+      e.preventDefault();
+    });
+    el.addEventListener("pointermove", function (e) {
+      if (!start) return;
+      var dx = e.clientX - start.x, dy = e.clientY - start.y;
+      if (!start.bewegt && Math.abs(dx) + Math.abs(dy) < 6) return;
+      start.bewegt = true;
+      leiste.classList.add("zieht");
+      lage = lage || {}; lage.x = start.l + dx; lage.y = start.t + dy;
+      klemme();
+    });
+    function ende() {
+      if (!start) return;
+      var war = start.bewegt;
+      start = null;
+      leiste.classList.remove("zieht");
+      if (war) merke(); else if (beiTipp) beiTipp();
+    }
+    el.addEventListener("pointerup", ende);
+    el.addEventListener("pointercancel", function () { start = null; leiste.classList.remove("zieht"); });
+  }
+  ziehbar(document.getElementById("test-griff"));
+  ziehbar(document.getElementById("test-mini"), function () { setzeKlein(false); });
+  // mit der Tastatur (Enter oder Leertaste) öffnen
+  document.getElementById("test-mini").addEventListener("click", function (e) { if (e.detail === 0) setzeKlein(false); });
 })();
 </script>
 </body>
