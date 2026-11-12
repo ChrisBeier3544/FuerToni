@@ -17,8 +17,9 @@
   const GROESSE = 52;
 
   /* ---------- Aussehen ---------- */
-  function vogelSvg(weiblich) {
-    const ruecken = weiblich ? "#a0704b" : "#8a5a3a", brust = weiblich ? "#f6877a" : "#f26b5b", fluegel = weiblich ? "#86593b" : "#6b4632";
+  function vogelSvg(weiblich, aussehen) {
+    const a = aussehen || {};
+    const ruecken = a.ruecken || (weiblich ? "#a0704b" : "#8a5a3a"), brust = a.brust || (weiblich ? "#f6877a" : "#f26b5b"), fluegel = a.fluegel || (weiblich ? "#86593b" : "#6b4632");
     return '<svg viewBox="0 0 60 60" aria-hidden="true">' +
       '<g class="beine"><path d="M24 50l-3 6M30 50l3 6M21 56h-4M21 56l-2 3M33 56h4M33 56l2 3" stroke="#e39a3b" stroke-width="2.2" stroke-linecap="round"/></g>' +
       '<g class="vogel-koerper">' +
@@ -36,9 +37,36 @@
       '<rect class="augenlid" x="16.5" y="23" width="11" height="11" rx="5.5" fill="' + ruecken + '"/><rect class="augenlid" x="30.5" y="23" width="11" height="11" rx="5.5" fill="' + ruecken + '"/>' +
       '<path d="M27 33l2.5 4 2.5-4z" fill="#f3b23c"/>' +
       '<circle cx="17" cy="35" r="3" fill="#ff9fb4" opacity=".7"/><circle cx="41" cy="35" r="3" fill="#ff9fb4" opacity=".7"/>' +
-      (weiblich ? '<g transform="translate(36 14) rotate(18)"><path d="M0 0-6-4v8zM0 0l6-4v8z" fill="#ff7aa2"/><circle r="2" fill="#ffd0dc"/></g>' : "") +
+      (weiblich && !a.deko ? '<g transform="translate(36 14) rotate(18)"><path d="M0 0-6-4v8zM0 0l6-4v8z" fill="#ff7aa2"/><circle r="2" fill="#ffd0dc"/></g>' : "") +
+      (a.deko ? DEKO[a.deko](a.farbe || "#d6304f") : "") +
       "</g></svg>";
   }
+  // Weihnachtliche Deko für die Freunde der Munkelvogeline
+  const DEKO = {
+    muetze: (c) => '<path d="M14 18 C18 2 40 0 46 14 L40 18z" fill="' + c + '"/><rect x="12" y="15" width="34" height="6" rx="3" fill="#fff"/><circle cx="48" cy="12" r="4" fill="#fff"/>',
+    schal: (c) => '<path d="M12 44 q18 8 36 0 v6 q-18 8 -36 0z" fill="' + c + '"/><rect x="36" y="46" width="6" height="12" rx="2" fill="' + c + '"/><path d="M15 47h28" stroke="#fff" stroke-width="1.6" stroke-dasharray="3 3"/>',
+    ohren: (c) => '<path d="M12 26 q0 -18 34 -14" fill="none" stroke="#6b5560" stroke-width="2.4"/><circle cx="11" cy="28" r="6" fill="' + c + '"/><circle cx="47" cy="22" r="6" fill="' + c + '"/><circle cx="11" cy="28" r="3" fill="#fff" opacity=".5"/><circle cx="47" cy="22" r="3" fill="#fff" opacity=".5"/>',
+    geweih: (c) => '<path d="M20 14 l-4 -10 M17 7 l-5 -2 M38 14 l4 -10 M41 7 l5 -2" stroke="#8a5a3a" stroke-width="2.4" stroke-linecap="round"/><circle cx="29.5" cy="35" r="3.4" fill="#ff3b3b"/>',
+    pudel: (c) => '<path d="M15 20 a14 12 0 0 1 28 0z" fill="' + c + '"/><path d="M15 20h28" stroke="#fff" stroke-width="3"/><path d="M19 15h20M21 11h16" stroke="#fff" stroke-width="1.6" opacity=".6"/><circle cx="29" cy="6" r="4.5" fill="#fff"/>',
+    stern: (c) => '<path d="M14 18 q15 -12 30 0" fill="none" stroke="#d4a84b" stroke-width="2"/><path d="M29 2 l2.4 5 5.4.6 -4 3.7 1.1 5.3 -4.9 -2.8 -4.9 2.8 1.1 -5.3 -4 -3.7 5.4 -.6z" fill="' + c + '"/>',
+    fliege: (c) => '<path d="M30 46 l-8 -5 v10z M30 46 l8 -5 v10z" fill="' + c + '"/><circle cx="30" cy="46" r="2.4" fill="#fff" opacity=".8"/>',
+    glocke: (c) => '<path d="M14 44 q16 7 32 0" fill="none" stroke="#d6304f" stroke-width="2.6"/><path d="M26 47 q4 -8 8 0 v3 h-8z" fill="' + c + '"/><circle cx="30" cy="51" r="1.6" fill="#a97b2c"/>',
+    mistel: (c) => '<ellipse cx="38" cy="15" rx="6" ry="2.6" transform="rotate(-30 38 15)" fill="#3f7f55"/><ellipse cx="44" cy="16" rx="6" ry="2.6" transform="rotate(30 44 16)" fill="#4f8a5b"/><circle cx="40" cy="18" r="2" fill="#fff"/><circle cx="43" cy="19" r="2" fill="#fff"/>',
+    krone: (c) => '<path d="M18 18 l2 -10 5 6 4.5 -8 4.5 8 5 -6 2 10z" fill="' + c + '"/><circle cx="29.5" cy="8" r="1.6" fill="#ff4d7d"/><rect x="18" y="16" width="23" height="4" rx="1" fill="#d4a84b"/>',
+  };
+  // Zehn verschiedene Freunde: andere Federfarben, andere Deko, keiner gleicht dem anderen
+  const FREUNDE = [
+    { ruecken: "#8a5a3a", brust: "#f26b5b", fluegel: "#6b4632", deko: "muetze", farbe: "#d6304f" },
+    { ruecken: "#5a7fb0", brust: "#f3d45b", fluegel: "#3f5f8a", deko: "schal", farbe: "#e85d7e" },
+    { ruecken: "#7a8a52", brust: "#f6a25b", fluegel: "#5a6a3a", deko: "ohren", farbe: "#b39ddb" },
+    { ruecken: "#9a6a4a", brust: "#ffb3a0", fluegel: "#7a4e33", deko: "geweih" },
+    { ruecken: "#6a5a8a", brust: "#ff9fc4", fluegel: "#4e4070", deko: "pudel", farbe: "#3f9a6a" },
+    { ruecken: "#b08a5a", brust: "#fff0c2", fluegel: "#8a6a3a", deko: "stern", farbe: "#f3c84b" },
+    { ruecken: "#4f7f7a", brust: "#ffcf8a", fluegel: "#3a605c", deko: "fliege", farbe: "#d6304f" },
+    { ruecken: "#a05a5a", brust: "#ffd0dc", fluegel: "#7a3e3e", deko: "glocke", farbe: "#f3c84b" },
+    { ruecken: "#8a8a8a", brust: "#ff8a7a", fluegel: "#666", deko: "mistel" },
+    { ruecken: "#c08060", brust: "#b8e0ff", fluegel: "#9a5e40", deko: "krone", farbe: "#f3c84b" },
+  ];
 
   /* ---------- Plätze (Bildschirmkoordinaten der Füße) ---------- */
   const sichtbar = (el) => el && el.offsetParent !== null && el.getBoundingClientRect().width > 0;
@@ -500,13 +528,28 @@
   });
   // An vier Tagen vor dem Geburtstag bringt sie zehn Freunde mit
   const SCHWARM_TAGE = [13, 17, 20, 24];
+  const ANKUENDIGUNG = [
+    "Danke für die Einladung! Ich hab noch ein paar Freunde mitgebracht 🥳",
+    "Danke, dass ich kommen darf! Und schau mal, wer da noch kommt 🥳",
+    "Wie lieb, danke! Meine Freunde wollten unbedingt auch mit 🥳",
+  ];
   function holeWeibchen() {
     if (weibchen) return;
+    const d = ak.intro.datum();
+    const mitFreunden = d.jahr === KALENDER.jahr && d.monat === 11 && SCHWARM_TAGE.includes(d.tag);
     weibchen = erstelleVogel(true, saetzeWeibchen);
     weibchen.partner = maennchen;
-    lande(weibchen, false).then(() => setTimeout(() => { if (weibchen.zustand === "sitzt") sprich(weibchen); }, 1200));
-    const d = ak.intro.datum();
-    if (d.jahr === KALENDER.jahr && d.monat === 11 && SCHWARM_TAGE.includes(d.tag)) setTimeout(schwarm, 1600);
+    lande(weibchen, false).then(() => setTimeout(() => {
+      if (weibchen.zustand !== "sitzt") return;
+      if (mitFreunden) {
+        // erst kündigt sie ihre Freunde an, dann kommen sie angeflogen
+        weibchen.timer.forEach(clearTimeout); weibchen.timer = [];
+        weibchen.hatGesprochen = true;
+        zeigeBlase(weibchen, wahl(ANKUENDIGUNG));
+        weibchen.timer.push(setTimeout(() => { weibchen.blase.hidden = true; weibchen.el.classList.remove("redet"); }, 4200));
+        setTimeout(schwarm, 1800);
+      } else sprich(weibchen);
+    }, 1200));
   }
   // Zehn Plätze rund um den Umschlag: oben, an beiden Seiten und unten, nie auf Schrift
   function schwarmPlaetze() {
@@ -529,15 +572,25 @@
     const plaetze = schwarmPlaetze();
     const gaeste = plaetze.map((ziel, i) => {
       const el = document.createElement("span");
-      el.className = "vogel gast" + (i % 3 === 1 ? " weibchen" : "");
+      el.className = "vogel gast";
       el.setAttribute("aria-hidden", "true");
-      el.innerHTML = vogelSvg(i % 3 === 1);
+      el.innerHTML = vogelSvg(false, FREUNDE[i % FREUNDE.length]);
+      // bis zum eigenen Abflug unsichtbar, sonst stünde er kurz oben links
+      el.style.visibility = "hidden";
       ebene.appendChild(el);
       return { el, zustand: "fliegt", blick: 1, ziel };
     });
-    await Promise.all(gaeste.map((g, i) => new Promise((r) => setTimeout(r, i * 160)).then(() => {
+    // in kleinen Grüppchen mit Pausen, nach gut 10 Sekunden sind alle da
+    const GRUPPEN = [[0, 2], [2000, 1], [3600, 3], [6400, 2], [7900, 2]];
+    const startZeit = [];
+    GRUPPEN.forEach(([t, n]) => { for (let k = 0; k < n; k++) startZeit.push(t + k * 300); });
+    await Promise.all(gaeste.map((g, i) => new Promise((r) => setTimeout(r, startZeit[i] || i * 1000)).then(() => {
       const vonLinks = i % 2 === 0;
       const start = { x: vonLinks ? -60 : W() + 60, y: g.ziel.y - 160 - Math.random() * 140 };
+      // erst außerhalb des Bildes hinsetzen, dann sichtbar machen
+      g.blick = vonLinks ? 1 : -1;
+      setzePosition(g, start);
+      g.el.style.visibility = "";
       const mitte = { x: (start.x + g.ziel.x) / 2, y: Math.min(start.y, g.ziel.y) - 50 };
       g.el.classList.add("fliegt");
       return animiere(g, [start, mitte, { x: g.ziel.x + (vonLinks ? -24 : 24), y: g.ziel.y - 24 }, g.ziel], 2000 + Math.random() * 700).then(() => {
@@ -548,7 +601,7 @@
     // ein bisschen herumhüpfen und dann gemeinsam wieder losfliegen
     const hops = setInterval(() => { const g = gaeste[Math.floor(Math.random() * gaeste.length)]; if (g.zustand !== "sitzt") return; g.el.classList.remove("hopst"); void g.el.offsetWidth; g.el.classList.add("hopst"); }, 700);
     // Sicherheitsnetz: nach spätestens 20 Sekunden sind alle Gäste wieder weg
-    const aufraeumen = setTimeout(() => gaeste.forEach((g) => g.el.remove()), 20000);
+    const aufraeumen = setTimeout(() => gaeste.forEach((g) => g.el.remove()), 40000);
     await new Promise((r) => setTimeout(r, 9000));
     clearInterval(hops);
     await Promise.all(gaeste.map((g, i) => new Promise((r) => setTimeout(r, i * 120)).then(() => {
