@@ -427,7 +427,6 @@
     "Du, Toni. Nicht ein bisschen schön, sondern richtig.",
     "Ganz klar du. Deine Figur ist der Wahnsinn, und du trägst sie mit so viel Selbstverständlichkeit.",
     "Die Schönste bist du. Dein Gesicht ist so harmonisch, als hätte jemand ganz lange daran gefeilt.",
-    "Du, Toni. Im Kleid genauso wie im Pulli.",
     "Das bist du. Und ja, ich habe genau hingeschaut, sogar deine Nase ist einfach süß.",
     "Du, Toni. Dein Lächeln fängt bei den Lippen an und endet in deinen Augen, das können nur wenige.",
     "Natürlich du. Wenn du lachst, wenn du nachdenkst und sogar, wenn du müde bist.",
