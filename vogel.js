@@ -423,23 +423,27 @@
   // Countdown vor dem Geburtstag (bis 26.11., 0:00 Uhr)
   const vorGeburtstag = () => kontext() === "countdown" && ak.intro.phase() === "warten";
   // Der Munkelvogel spricht immer selbst und sagt immer „Toni“
-  // Besondere Tage: Toni arbeitet am 13. und 14.11. abends, am 15.11. ist Brunch mit Karla
+  // Besondere Tage: Toni arbeitet am 13., 14., 16., 18. und 19.11. abends, am 15.11. ist Brunch mit Karla und Chris
   function tagesGruss(d) {
     if (d.jahr !== KALENDER.jahr || d.monat !== 11 || (ak.zeitreise && ak.zeitreise.aktiv())) return null;
     const h = d.stunde, t = d.tag;
-    if (t === 13 || t === 14) {
-      if (h >= 5 && h < 12) return t === 13
+    // Tage, an denen Toni abends arbeitet
+    const ARBEIT = [13, 14, 16, 18, 19];
+    const wochenende = [0, 6].includes(new Date(Date.UTC(d.jahr, d.monat - 1, t)).getUTCDay());
+    if (ARBEIT.includes(t)) {
+      if (h >= 5 && h < 12) return !wochenende
         ? wahl(["Guten Morgen, Toni ☀️ Heute Abend musst du noch arbeiten. Ich wünsch dir jetzt schon eine entspannte Schicht!", "Morgen, Toni ☀️ Hab einen schönen Schultag, und heute Abend eine ganz ruhige Schicht!"])
         : wahl(["Guten Morgen, Toni ☀️ Genieß deinen Samstag! Und heute Abend wünsch ich dir eine schöne, entspannte Schicht.", "Morgen, Toni ☀️ Mach dir einen schönen Tag. Die Schicht heute Abend wird bestimmt ganz entspannt!"]);
       if (h >= 12 && h < 17) return wahl(["Hi Toni! Heute Abend musst du arbeiten. Ich wünsch dir eine schöne Schicht, ohne viel Stress 🍀", "Hallo Toni! Genieß noch die Zeit vor der Arbeit. Ich drück dir die Daumen für eine ruhige Schicht ☕"]);
       if (h >= 17 && h < 23) return wahl(["Hi Toni! Du bist bestimmt gerade bei der Arbeit. Ich halte hier solange die Stellung 🐦", "Hey Toni! Ich wünsch dir eine schöne Schicht, hoffentlich ist heute alles ganz entspannt 🍀", "Hallo Toni! Ich hoffe, die Schicht ist heute nicht zu anstrengend. Ich halte hier solange die Stellung 🐦"]);
-      if (h >= 23) return t === 13
-        ? "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Ruh dich gut aus 🌙"
-        : "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Morgen ist Brunch mit Karla und Chris 🥐";
+      if (h >= 23) return t === 14
+        ? "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Morgen ist Brunch mit Karla und Chris 🥐"
+        : "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Ruh dich gut aus 🌙";
     }
-    if ((t === 14 || t === 15) && h < 5) return t === 14
-      ? "Feierabend, Toni! Ich hoffe, die Schicht war nicht zu anstrengend. Schlaf schön 🌙"
-      : "Feierabend, Toni! Schlaf schön, um 11 Uhr ist schon Brunch mit Karla und Chris 🥐";
+    // nach Mitternacht: Feierabend nach der Schicht vom Vortag
+    if (h < 5 && ARBEIT.includes(t - 1)) return t === 15
+      ? "Feierabend, Toni! Schlaf schön, um 11 Uhr ist schon Brunch mit Karla und Chris 🥐"
+      : "Feierabend, Toni! Ich hoffe, die Schicht war nicht zu anstrengend. Schlaf schön 🌙";
     if (t === 15) {
       if (h >= 5 && h < 11) return wahl(["Guten Morgen, Toni ☀️ Um 11 Uhr ist Brunch mit Karla und Chris! Lasst es euch richtig schmecken 🥐", "Morgen, Toni ☀️ Heute um 11 Uhr geht es mit Karla und Chris zum Brunch. Ich bin ein bisschen neidisch 🥐"]);
       if (h >= 11 && h < 14) return wahl(["Hi Toni! Guten Appetit beim Brunch mit Karla und Chris 🥐 Grüß die beiden lieb von mir!", "Hallo Toni! Lasst es euch zu dritt schmecken, und hebt mir ein Croissant auf 🥐"]);
