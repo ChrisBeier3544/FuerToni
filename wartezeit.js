@@ -1462,6 +1462,135 @@
   /* =========================================================
      Alles an und aus schalten
      ========================================================= */
+  /* =========================================================
+     15. Klausurkerze (23.11. Erdkunde, 25.11. Englisch)
+     Beim ersten Besuch morgens zündet der Munkelvogel eine Kerze an,
+     beim nächsten Besuch fragt die Seite „Klausur fertig?“.
+     Bei Ja pustet er sie aus, packt sie ein und fliegt mit ihr davon.
+     ========================================================= */
+  const KLAUSUR = { 23: "Erdkunde", 25: "Englisch" };
+  const KERZE_SVG = '<svg viewBox="0 0 34 64" aria-hidden="true">' +
+    '<ellipse cx="17" cy="60" rx="16" ry="3.6" fill="rgba(60,30,20,.25)"/>' +
+    '<path d="M2 56h30l-3 5H5z" fill="#c7963a"/><ellipse cx="17" cy="56" rx="15" ry="3" fill="#f6dc96"/>' +
+    '<rect x="9" y="18" width="16" height="38" rx="2.5" fill="#fff7ec"/><rect x="9" y="18" width="5" height="38" fill="#fff" opacity=".7"/><rect x="20" y="18" width="5" height="38" fill="#f0e2cf"/>' +
+    '<path d="M9 22q4 3 8 0t8 0" stroke="#e85d7e" stroke-width="2.2" fill="none"/><path d="M12 30l2 2-2 2M20 38l2 2-2 2" stroke="#f3c84b" stroke-width="1.2" fill="none"/>' +
+    '<ellipse cx="17" cy="18" rx="8" ry="1.8" fill="#f3e6d6"/><path d="M17 18v-5" stroke="#3a2a2a" stroke-width="1.4" stroke-linecap="round"/></svg>' +
+    '<span class="wz-flamme"><i></i></span>';
+  const PAKET_SVG = '<svg viewBox="0 0 40 26" aria-hidden="true"><rect x="2" y="6" width="36" height="16" rx="4" fill="#fde2e8" stroke="#f2bccb"/>' +
+    '<path d="M2 14h36" stroke="#e85d7e" stroke-width="2.4"/><path d="M20 14c-6-8-12-6-9-1 2 3 9 1 9 1zM20 14c6-8 12-6 9-1-2 3-9 1-9 1z" fill="#e85d7e"/></svg>';
+  let kerzenPlatz = null, kerzeFertigLaeuft = false;
+  const kerzenStand = (t) => lies("kerze-" + t, null);
+  function baueKerze(an) {
+    if (kerzenPlatz) return kerzenPlatz;
+    kerzenPlatz = el("div", "wz-kerzenplatz", '<div class="wz-kerze' + (an ? " an" : "") + '">' + KERZE_SVG + "</div>");
+    moebel.querySelector(".wz-bank").appendChild(kerzenPlatz);
+    return kerzenPlatz;
+  }
+  // Wo der Munkelvogel neben der Kerze steht
+  const nebenKerze = () => {
+    if (!kerzenPlatz) return null;
+    const r = kerzenPlatz.getBoundingClientRect();
+    return { x: r.right + 24, y: r.bottom - 1 };
+  };
+  const warteBisVogelDa = (max) => new Promise((fertig) => {
+    let start = performance.now();
+    let ruhigSeit = 0;
+    const t = setInterval(() => {
+      const v = ak.voegel;
+      // nie während einer Capy-Szene (dort ist der Vogel ausgeblendet)
+      // die Wartezeit zählt erst ab dem Ende der Szene
+      if (szeneLaeuft()) { start = performance.now(); return; }
+      // erst wenn er ein paar Sekunden am Stück frei ist (Toni könnte ihn gerade antippen)
+      if (v && v.istDa && v.istDa()) ruhigSeit = ruhigSeit || performance.now(); else ruhigSeit = 0;
+      if ((ruhigSeit && performance.now() - ruhigSeit > 3000) || performance.now() - start > max) { clearInterval(t); fertig(); }
+    }, 400);
+  });
+  function funken(x, y) {
+    for (let k = 0; k < 8; k++) {
+      const f = el("span", "wz-funke", "✦");
+      f.style.left = x + "px"; f.style.top = y + "px";
+      ebene.appendChild(f);
+      const w = Math.random() * Math.PI * 2, r = 12 + Math.random() * 18;
+      f.animate([{ transform: "translate(-50%,-50%) scale(.4)", opacity: 1 }, { transform: "translate(calc(-50% + " + Math.cos(w) * r + "px), calc(-50% + " + Math.sin(w) * r + "px)) scale(1)", opacity: 0 }],
+        { duration: 700, easing: "ease-out", fill: "forwards" }).onfinish = () => f.remove();
+    }
+  }
+  // Erster Besuch am Klausurtag (morgens): Kerze anzünden
+  async function kerzeAnzuenden(t) {
+    merkeKerze(t, "an");
+    await warteBisVogelDa(30000);
+    const platz = baueKerze(false);
+    platz.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 600, fill: "forwards" });
+    const v = ak.voegel;
+    const mitVogel = v && v.fliegeZu && (await v.fliegeZu(nebenKerze));
+    await new Promise((r) => setTimeout(r, 500));
+    const docht = platz.querySelector(".wz-kerze").getBoundingClientRect();
+    funken(docht.left + docht.width / 2, docht.top + docht.height * 0.2);
+    plopp(true);
+    platz.querySelector(".wz-kerze").classList.add("an");
+    const text = "Ich zünde dir eine Kerze an, Toni 🕯️ Ganz viel Erfolg bei deiner " + KLAUSUR[t] + "klausur! Du schaffst das 🍀";
+    if (mitVogel) { await v.sagKurz(text, 6500); v.weiter(); }
+    else blase(platz, text, 6500);
+  }
+  function merkeKerze(t, wert) { schreib("kerze-" + t, wert); }
+  // Späterer Besuch: Klausur fertig?
+  function frageKlausur(t) {
+    const platz = baueKerze(true);
+    if (platz.querySelector(".wz-klausur-frage")) return;
+    const frage = el("div", "wz-klausur-frage",
+      "<p>" + KLAUSUR[t] + "klausur fertig?</p><div><button type=\"button\" class=\"ja\">Ja 🎉</button><button type=\"button\" class=\"nein\">Nein</button></div>");
+    platz.appendChild(frage);
+    frage.querySelector(".nein").addEventListener("click", async () => {
+      frage.remove();
+      const v = ak.voegel;
+      const text = "Okay, dann lass ich die Kerze noch brennen. Ganz viel Erfolg, Toni 🍀";
+      if (v && v.fliegeZu && (await v.fliegeZu(nebenKerze))) { await v.sagKurz(text, 4500); v.weiter(); }
+      else blase(platz, text, 4000);
+    });
+    frage.querySelector(".ja").addEventListener("click", () => { frage.remove(); kerzeAuspusten(t); });
+  }
+  async function kerzeAuspusten(t) {
+    if (kerzeFertigLaeuft) return;
+    kerzeFertigLaeuft = true;
+    merkeKerze(t, "fertig");
+    const platz = kerzenPlatz, kerze = platz.querySelector(".wz-kerze");
+    await warteBisVogelDa(4000);
+    const v = ak.voegel;
+    const mitVogel = v && v.fliegeZu && (await v.fliegeZu(nebenKerze));
+    if (mitVogel) await v.sagKurz("Geschafft! Ich bin so stolz auf dich, Toni 🎉 Dann puste ich die Kerze jetzt aus.", 4200);
+    // auspusten mit einem Rauchfaden
+    kerze.classList.remove("an");
+    kerze.classList.add("aus");
+    await new Promise((r) => setTimeout(r, 1400));
+    // einpacken
+    const r = kerze.getBoundingClientRect();
+    kerze.animate([{ transform: "none", opacity: 1 }, { transform: "scale(.4) rotate(70deg)", opacity: 0 }], { duration: 600, easing: "ease-in", fill: "forwards" });
+    const paket = el("div", "wz-kerzenpaket", PAKET_SVG);
+    paket.style.left = r.left + r.width / 2 + "px"; paket.style.top = r.bottom - 20 + "px";
+    ebene.appendChild(paket);
+    paket.animate([{ transform: "translate(-50%,-50%) scale(.2)", opacity: 0 }, { transform: "translate(-50%,-50%) scale(1)", opacity: 1 }], { duration: 500, delay: 450, easing: "cubic-bezier(.3,1.5,.5,1)", fill: "both" });
+    await new Promise((res) => setTimeout(res, 1100));
+    platz.remove(); kerzenPlatz = null;
+    if (mitVogel) {
+      await v.sagKurz("Die nehm ich mit. Tschüss! 🐦", 1800);
+      await v.fliegeDavon(paket);
+    } else {
+      paket.animate([{ transform: "translate(-50%,-50%)", opacity: 1 }, { transform: "translate(-50%,-300px)", opacity: 0 }], { duration: 1500, fill: "forwards" }).onfinish = () => paket.remove();
+    }
+    kerzeFertigLaeuft = false;
+  }
+  let kerzeGeprueft = false;
+  function pruefeKerze() {
+    if (kerzeGeprueft) return;
+    const t = heute();
+    if (!t || !KLAUSUR[t] || (ak.zeitreise && ak.zeitreise.aktiv())) return;
+    kerzeGeprueft = true;
+    const stand = kerzenStand(t);
+    if (stand === "fertig") return;
+    if (stand === "an") { baueKerze(true); warteBisVogelDa(15000).then(() => frageKlausur(t)); return; }
+    if (stunde() < 14) kerzeAnzuenden(t);
+  }
+
   // Für das Entdeckerbuch: einzelne Dinge direkt vorspielen
   window.adventkalender.wartezeit = {
     schublade,
@@ -1520,6 +1649,7 @@
     fliegerZustand(an && istAn("flieger"));
     tassen(an && istAn("tasse"));
     scheibeZustand(an && istAn("scheibe"));
+    if (an) pruefeKerze();
     if (!an && offenesFenster && !intro.classList.contains("weg")) { /* Fenster bleibt, bis sie es schließt */ }
   }
   setInterval(pruefe, 1000);
