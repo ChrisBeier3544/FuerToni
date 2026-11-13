@@ -1449,6 +1449,8 @@
     const jetzt = [];
     Object.keys(HINWEISE).forEach((k) => { if (istAn(k) && !(k === "flieger" && hatTag("flieger", t)) && !(k === "sternbild" && hatTag("sternbild", t))) jetzt.push(HINWEISE[k]()); });
     if (jetzt.length) return wahl(jetzt);
+    if (SCHATZ[t] && !hatTag("schatz", t) && Math.random() < 0.5) return "Psst … in der rechten Schublade liegt heute etwas, das nur heute drin ist 👀";
+    if (t >= 14 && !lies("puzzle", []).includes(t - 14) && Math.random() < 0.5) return "In der linken Schublade wartet ein Puzzleteil auf seinen Platz 🧩";
     if (!hatTag("stempel", t)) return "Psst … halt mal das Siegel ganz lange gedrückt. Jeden Tag gibt es einen neuen Stempel ♥️";
     if (!hatTag("blatt", t)) return "Psst … in der linken Schublade unter der Fensterbank liegt etwas für jeden Tag 📅";
     if (lies("spiegel-" + t, 0) < PRO_TAG) return "Schau mal in die rechte Schublade. Da liegt ein Spiegel, der dir etwas sagen will 🪞";
@@ -1591,6 +1593,212 @@
     if (stunde() < 14) kerzeAnzuenden(t);
   }
 
+  /* =========================================================
+     16. Tagesüberraschungen in den Schubladen (14. bis 25.11.)
+     Jeden Tag liegt nur an diesem Tag etwas in der rechten Schublade,
+     dazu in der linken jeden Tag ein Puzzleteil für ein Foto von euch.
+     ========================================================= */
+  const PUZZLE_BILD = "bilder/ueber-dem-rhein.webp", PUZZLE_SPALTEN = 4, PUZZLE_ZEILEN = 3;
+  const SCHATZ = { 14: "rubbellos", 15: "seifenblasen", 16: "glueckskeks", 17: "wackelcapy", 18: "liebesbrief", 19: "sternenglas",
+    20: "kompass", 21: "spieluhr", 22: "polaroid", 23: "fernglas", 24: "origami", 25: "schluessel" };
+  const TEXTE = {
+    glueckskeks: "Deine Zukunft: ganz viel Kuscheln, richtig gutes Essen und ein Freund, der dich über alles liebt ♥️",
+    origami: "Ich hab mein Herz klein gefaltet, damit es in die Schublade passt. Eigentlich ist es viel größer, und es gehört ganz dir ♥️",
+    liebesbrief: "Liebe Toni, jeder Tag mit dir ist ein kleines Geschenk. Ich zähle nicht nur die Tage bis zu deinem Geburtstag, sondern jeden Moment, bis ich dich wiedersehe.",
+    polaroid: "Wir zwei im Sonnenuntergang. Mit dir ist jeder Abend der schönste ♥️",
+  };
+  const SCHATZ_SVG = {
+    rubbellos: '<svg viewBox="0 0 56 34"><rect x="1" y="1" width="54" height="32" rx="3" fill="#fff3d6" stroke="#d4a84b"/><text x="28" y="11" font-size="6.5" font-weight="800" text-anchor="middle" fill="#9d2449" font-family="Nunito, sans-serif">GLÜCKSLOS</text><rect x="7" y="15" width="42" height="13" rx="2" fill="#c9ccd4"/><path d="M10 21h36" stroke="#b5b8c0" stroke-width="5" stroke-dasharray="3 2"/></svg>',
+    seifenblasen: '<svg viewBox="0 0 34 46"><rect x="9" y="12" width="16" height="30" rx="4" fill="#bfe6fb" stroke="#7cc4f0"/><rect x="9" y="26" width="16" height="16" rx="4" fill="#9bd3f2" opacity=".7"/><rect x="11" y="6" width="12" height="7" rx="2" fill="#e85d7e"/><path d="M17 6V0" stroke="#e85d7e" stroke-width="1.6"/><circle cx="17" cy="0" r="3" fill="none" stroke="#e85d7e" stroke-width="1.4"/><circle cx="28" cy="8" r="4" fill="rgba(255,255,255,.4)" stroke="#bfe6fb"/></svg>',
+    glueckskeks: '<svg viewBox="0 0 46 34"><path class="keks-l" d="M23 30C10 30 2 22 4 13c4 6 11 8 19 7z" fill="#e7b46a"/><path class="keks-r" d="M23 30c13 0 21-8 19-17-4 6-11 8-19 7z" fill="#d9a159"/><path d="M4 13C8 4 20 2 23 12 26 2 38 4 42 13" fill="none" stroke="#c98d47" stroke-width="2"/><rect class="keks-zettel" x="18" y="18" width="18" height="5" rx="1" fill="#fff" stroke="#e6d3bf" stroke-width=".6"/></svg>',
+    wackelcapy: '<svg viewBox="0 0 40 52"><ellipse cx="20" cy="48" rx="14" ry="3.5" fill="#6b4a3a"/><path d="M20 46c-4-2 4-4 0-6s4-4 0-6 4-4 0-6" stroke="#9aa3ad" stroke-width="1.8" fill="none"/><g class="wackel-kopf">' + (ak.capy ? '<g transform="translate(2 -2) scale(.64)">' + ak.capy.front({ typ: 4 }) + "</g>" : "") + "</g></svg>",
+    liebesbrief: '<svg viewBox="0 0 48 34"><rect x="2" y="3" width="44" height="28" rx="2" fill="#fffaf0" stroke="#e6d3bf"/><path d="M2 3l22 15 22-15" fill="none" stroke="#e6d3bf"/><circle class="brief-siegel" cx="24" cy="18" r="5.5" fill="#c2185b"/><path d="M24 20.4c-1.2-.9-2.3-1.8-2.3-2.7 0-.6.5-1.1 1.1-1.1.5 0 .9.3 1.2.6.3-.3.7-.6 1.2-.6.6 0 1.1.5 1.1 1.1 0 .9-1.1 1.8-2.3 2.7z" fill="#ffd6e0"/></svg>',
+    sternenglas: '<svg viewBox="0 0 36 46"><rect class="glas-deckel" x="7" y="3" width="22" height="6" rx="2" fill="#d4a84b"/><path d="M8 10h20v4q4 2 4 8v18q0 4-4 4H8q-4 0-4-4V22q0-6 4-8z" fill="rgba(210,230,255,.55)" stroke="#bcd3ee"/><g class="glas-sterne" fill="#ffd36b"><circle cx="13" cy="28" r="1.6"/><circle cx="21" cy="34" r="1.8"/><circle cx="24" cy="24" r="1.3"/><circle cx="15" cy="38" r="1.4"/><circle cx="26" cy="36" r="1.2"/></g><path d="M10 18v20" stroke="#fff" stroke-width="2" opacity=".6"/></svg>',
+    kompass: '<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="#d4a84b"/><circle cx="22" cy="22" r="16.5" fill="#fffaf0"/><text x="22" y="10.5" font-size="5" text-anchor="middle" fill="#9d2449" font-weight="800" font-family="Nunito, sans-serif">♥ Chris</text><g class="kompass-nadel"><path d="M22 9l3 13h-6z" fill="#e0182f"/><path d="M22 35l3-13h-6z" fill="#5a5f6a"/></g><circle cx="22" cy="22" r="2" fill="#d4a84b"/></svg>',
+    spieluhr: '<svg viewBox="0 0 50 44"><g class="uhr-deckel"><path d="M5 16h40l-2-7H7z" fill="#c48852"/></g><rect x="5" y="16" width="40" height="22" rx="3" fill="#a8713f"/><rect x="8" y="20" width="34" height="14" rx="2" fill="none" stroke="#f3c84b" stroke-width="1.2"/><path d="M25 25.5c-1.6-1.2-3-2.4-3-3.6 0-.8.6-1.4 1.4-1.4.7 0 1.2.4 1.6.9.4-.5.9-.9 1.6-.9.8 0 1.4.6 1.4 1.4 0 1.2-1.4 2.4-3 3.6z" fill="#e85d7e"/><g class="uhr-kurbel"><path d="M45 27h4v6" stroke="#d4a84b" stroke-width="2" fill="none"/><circle cx="49" cy="34" r="1.8" fill="#d4a84b"/></g></svg>',
+    polaroid: '<svg viewBox="0 0 40 46"><g transform="rotate(-8 20 23)"><rect x="3" y="3" width="34" height="40" rx="1.5" fill="#fff" stroke="#e6e0da"/><image href="bilder/klein/sonnenuntergang-zu-zweit.webp" x="6" y="6" width="28" height="27" preserveAspectRatio="xMidYMid slice"/></g></svg>',
+    fernglas: '<svg viewBox="0 0 48 34"><rect x="4" y="10" width="16" height="20" rx="5" fill="#2b2b33"/><rect x="28" y="10" width="16" height="20" rx="5" fill="#2b2b33"/><rect x="18" y="14" width="12" height="8" rx="2" fill="#3a3a46"/><circle cx="12" cy="28" r="6" fill="#4a4a58" stroke="#d4a84b" stroke-width="1.4"/><circle cx="36" cy="28" r="6" fill="#4a4a58" stroke="#d4a84b" stroke-width="1.4"/><circle cx="10" cy="26" r="1.8" fill="#bcd3ee" opacity=".8"/><circle cx="34" cy="26" r="1.8" fill="#bcd3ee" opacity=".8"/></svg>',
+    origami: '<svg viewBox="0 0 40 36"><path d="M20 33 4 17q-5-6 0-11 6-5 12 1l4 4 4-4q6-6 12-1 5 5 0 11z" fill="#ff8fab"/><path d="M20 33V11M4 17l16-6 16 6" stroke="#e85d7e" stroke-width="1" fill="none"/><path d="M20 11 4 6M20 11l16-5" stroke="#ffc2d1" stroke-width="1" fill="none"/></svg>',
+    schluessel: '<svg viewBox="0 0 58 30"><circle cx="11" cy="15" r="8" fill="none" stroke="#d4a84b" stroke-width="4"/><path d="M19 15h22v6M33 15v5M41 15v4" stroke="#d4a84b" stroke-width="4" fill="none"/><path d="M3 15c-2 4-1 10 6 12" stroke="#e85d7e" stroke-width="1.2" fill="none"/><rect x="40" y="2" width="17" height="10" rx="2" fill="#fff3d6" stroke="#d4a84b" stroke-width=".8" transform="rotate(14 48 7)"/><text x="48" y="9.2" font-size="4" text-anchor="middle" fill="#9d2449" font-weight="800" font-family="Nunito, sans-serif" transform="rotate(14 48 7)">0:30</text></svg>',
+  };
+  const SCHATZ_NAME = { rubbellos: "Rubbellos", seifenblasen: "Seifenblasen", glueckskeks: "Glückskeks", wackelcapy: "Wackel-Capy", liebesbrief: "kleiner Liebesbrief",
+    sternenglas: "Glas voller Sterne", kompass: "Kompass", spieluhr: "Spieluhr", polaroid: "Sofortbild", fernglas: "Fernglas", origami: "Origami-Herz", schluessel: "goldener Schlüssel" };
+  let schatz = null, schatzTag = 0;
+  function legeSchatz(t) {
+    if (schatzTag === t) return;
+    schatzTag = t;
+    if (schatz) { schatz.remove(); schatz = null; }
+    const art = SCHATZ[t];
+    if (!art) return;
+    schatz = el("button", "wz-schatz wz-schatz-" + art, SCHATZ_SVG[art]);
+    schatz.type = "button";
+    schatz.setAttribute("aria-label", SCHATZ_NAME[art]);
+    fachR.appendChild(schatz);
+    schatz.addEventListener("click", () => { merkeTag("schatz", t); oeffneSchatz(art, schatz); });
+  }
+  // Seifenblasen, Sterne und Noten steigen aus der Schublade auf
+  function steigtAuf(x, y, html, cls, n, dauer) {
+    for (let k = 0; k < n; k++) {
+      const b = el("span", cls, html);
+      b.style.left = x + zufall(-20, 20) + "px"; b.style.top = y + "px";
+      ebene.appendChild(b);
+      const dx = zufall(-90, 90), dy = -zufall(window.innerHeight * 0.35, window.innerHeight * 0.75);
+      b.animate([{ transform: "translate(-50%,-50%) scale(.2)", opacity: 0 }, { opacity: 1, offset: 0.12 },
+        { transform: "translate(calc(-50% + " + dx * 0.6 + "px), calc(-50% + " + dy * 0.5 + "px)) scale(1)", offset: 0.5 },
+        { transform: "translate(calc(-50% + " + dx + "px), calc(-50% + " + dy + "px)) scale(1.05)", opacity: 0 }],
+        { duration: zufall(dauer * 0.7, dauer), delay: k * zufall(90, 220), easing: "ease-out", fill: "both" }).onfinish = () => b.remove();
+      b.addEventListener("pointerdown", () => { b.classList.add("platzt"); setTimeout(() => b.remove(), 250); plopp(true); });
+    }
+  }
+  function oeffneSchatz(art, knopf) {
+    const r = knopf.getBoundingClientRect(), mx = r.left + r.width / 2, my = r.top + r.height / 2;
+    if (art === "seifenblasen") {
+      plopp(true);
+      steigtAuf(mx, my - 10, '<i></i>', "wz-blase", 16, 5200);
+      setTimeout(() => steigtAuf(mx, my - 10, '<i></i><b>♥</b>', "wz-blase herz", 5, 5600), 400);
+    } else if (art === "sternenglas") {
+      if (knopf.classList.contains("offen")) { knopf.classList.remove("offen"); return; }
+      knopf.classList.add("offen");
+      plopp(true);
+      steigtAuf(mx, my - 6, "✦", "wz-stern-flug", 18, 4800);
+    } else if (art === "kompass") {
+      const nadel = knopf.querySelector(".kompass-nadel");
+      nadel.animate([{ transform: "rotate(0)" }, { transform: "rotate(" + (720 + 300) + "deg)", offset: 0.55 }, { transform: "rotate(" + (720 + 340) + "deg)", offset: 0.7 }, { transform: "rotate(" + 720 + "deg)" }],
+        { duration: 2600, easing: "cubic-bezier(.2,.8,.3,1)" });
+      setTimeout(() => blase(knopf, "Egal wie ich ihn drehe, er zeigt immer zu Chris 🧭♥️", 3000), 2500);
+    } else if (art === "wackelcapy") {
+      const kopf = knopf.querySelector(".wackel-kopf"), w = [];
+      for (let k = 0; k <= 16; k++) w.push({ transform: "rotate(" + (Math.cos(k * 1.1) * 26 * Math.pow(0.84, k)).toFixed(1) + "deg)" });
+      kopf.animate(w, { duration: 2800, easing: "linear" });
+      setTimeout(() => blase(knopf, wahl(["hihihi 🤭", "Huiii!", "Mir ist ganz schwindelig 😵‍💫", "Nochmal! 😄"]), 1600), 400);
+    } else if (art === "spieluhr") {
+      if (knopf.classList.contains("spielt")) return;
+      knopf.classList.add("spielt");
+      // „Morgen kommt der Weihnachtsmann“ als Spieluhr
+      const MELODIE = [0, 0, 7, 7, 9, 9, 7, -1, 5, 5, 4, 4, 2, 2, 0];
+      const a = ctx();
+      MELODIE.forEach((ton, i) => {
+        if (ton < 0) return;
+        setTimeout(() => {
+          if (a) {
+            const t = a.currentTime, o = a.createOscillator(), g = a.createGain();
+            o.type = "sine"; o.frequency.value = 784 * Math.pow(2, ton / 12);
+            g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.12, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
+            o.connect(g).connect(a.destination); o.start(t); o.stop(t + 1);
+          }
+          steigtAuf(mx + 10, my - 18, wahl(["♪", "♫", "♩"]), "wz-note", 1, 2200);
+        }, i * 420);
+      });
+      const tanz = el("div", "wz-tanzcapy", ak.capy ? '<svg viewBox="0 -12 56 58">' + ak.capy.front({ typ: 2 }) + "</svg>" : "");
+      tanz.style.left = mx + "px"; tanz.style.top = r.top - 6 + "px";
+      ebene.appendChild(tanz);
+      setTimeout(() => { tanz.classList.add("weg"); knopf.classList.remove("spielt"); setTimeout(() => tanz.remove(), 500); }, MELODIE.length * 420 + 600);
+    } else if (art === "glueckskeks") {
+      if (knopf.classList.contains("offen")) { zeigeZettel("Dein Glückskeks sagt", TEXTE.glueckskeks); return; }
+      knopf.classList.add("offen"); plopp(false);
+      setTimeout(() => zeigeZettel("Dein Glückskeks sagt", TEXTE.glueckskeks), 700);
+    } else if (art === "liebesbrief") {
+      knopf.classList.add("offen"); plopp(false);
+      setTimeout(() => fenster("wz-liebesbrief", '<p class="wz-lb-text">' + TEXTE.liebesbrief + '</p><p class="wz-lb-gruss">Dein Chris ♥️</p>'), 650);
+    } else if (art === "origami") {
+      knopf.animate([{ transform: "none" }, { transform: "scale(1.3) rotateY(180deg)" }], { duration: 600 });
+      setTimeout(() => fenster("wz-origami", '<div class="wz-origami-blatt"><p>' + TEXTE.origami + '</p><p class="wz-lb-gruss">Dein Chris</p></div>'), 550);
+    } else if (art === "polaroid") {
+      const f = fenster("wz-polaroid", '<div class="wz-pol-karte"><div class="wz-pol-vorne"><img src="bilder/sonnenuntergang-zu-zweit.webp" alt="Toni und Chris im Sonnenuntergang"><span>Tipp zum Umdrehen</span></div>' +
+        '<div class="wz-pol-hinten"><p>' + TEXTE.polaroid + '</p><small>Dein Chris</small></div></div>');
+      const k = f.karte.querySelector(".wz-pol-karte");
+      k.addEventListener("click", () => k.classList.toggle("gedreht"));
+    } else if (art === "fernglas") {
+      fenster("wz-fernglas-blick", '<div class="wz-fg-sicht"><div class="wz-fg-himmel"><div class="wz-fg-ballon"><svg viewBox="-30 -46 60 110"><path d="M0-44a26 26 0 0 1 26 26c0 16-16 26-20 34h-12c-4-8-20-18-20-34a26 26 0 0 1 26-26z" fill="#e85d7e"/><path d="M-8-42q8 30 0 58M8-42q-8 30 0 58" stroke="#ff9ec0" stroke-width="3" fill="none"/>' +
+        '<path d="M-6 16l-4 12M6 16l4 12" stroke="#6b4a3a" stroke-width="1.4"/><rect x="-12" y="28" width="24" height="16" rx="3" fill="#a8713f"/>' + (ak.capy ? '<g transform="translate(-14 4) scale(.5)">' + ak.capy.front({}) + "</g>" : "") +
+        '<path class="wz-fg-winken" d="M10 22q8-6 6-14" stroke="#b07a52" stroke-width="4" stroke-linecap="round" fill="none"/></svg><span class="wz-fg-band">Hi Toni! ♥️</span></div></div></div><p class="wz-fakt-text">Da oben winkt dir jemand zu 🎈</p>');
+    } else if (art === "rubbellos") {
+      const f = fenster("wz-rubbellos", '<p class="wz-fakt-kopf">Dein Glückslos</p><div class="wz-los"><div class="wz-los-drunter"><b>Leider Niete …</b><span>… Spaß! Hauptgewinn: Chris ♥️</span></div><canvas width="560" height="240"></canvas></div><p class="wz-fakt-fuss">Mit dem Finger freirubbeln</p>');
+      rubbeln(f.karte.querySelector("canvas"));
+    } else if (art === "schluessel") {
+      knopf.animate([{ transform: "none" }, { transform: "translateY(-12px) rotate(-12deg)" }, { transform: "none" }], { duration: 900 });
+      siegel.animate([{ boxShadow: "0 4px 10px rgba(107,21,50,.45)" }, { boxShadow: "0 0 0 8px rgba(243,213,138,.6), 0 0 34px 12px rgba(243,200,75,.9)" }, { boxShadow: "0 4px 10px rgba(107,21,50,.45)" }],
+        { duration: 1800, iterations: 2 });
+      setTimeout(() => blase(knopf, "Der passt genau ins Siegel. Morgen um 0:30 Uhr ist es so weit ♥️", 4000), 700);
+    }
+  }
+  function zeigeZettel(kopf, text) { fenster("wz-zettel", '<p class="wz-fakt-kopf">' + kopf + '</p><p class="wz-zettel-text">' + text + "</p>"); }
+  function rubbeln(c) {
+    const g = c.getContext("2d");
+    const grad = g.createLinearGradient(0, 0, c.width, c.height);
+    grad.addColorStop(0, "#d6d9e0"); grad.addColorStop(0.5, "#eef0f4"); grad.addColorStop(1, "#c3c7cf");
+    g.fillStyle = grad; g.fillRect(0, 0, c.width, c.height);
+    g.fillStyle = "#9aa0aa"; g.font = "bold 34px Nunito, sans-serif"; g.textAlign = "center"; g.fillText("Hier rubbeln ✨", c.width / 2, c.height / 2 + 12);
+    g.globalCompositeOperation = "destination-out"; g.lineCap = "round"; g.lineWidth = 46;
+    let letzter = null, malt = false, weg = 0;
+    const pos = (e) => { const r = c.getBoundingClientRect(); return [((e.clientX - r.left) / r.width) * c.width, ((e.clientY - r.top) / r.height) * c.height]; };
+    c.addEventListener("pointerdown", (e) => { malt = true; letzter = pos(e); try { c.setPointerCapture(e.pointerId); } catch (_) { /* egal */ } });
+    c.addEventListener("pointermove", (e) => {
+      if (!malt) return;
+      const p = pos(e); g.beginPath(); g.moveTo(letzter[0], letzter[1]); g.lineTo(p[0], p[1]); g.stroke(); letzter = p;
+      if (++weg === 60) { c.classList.add("fast"); }
+      if (weg === 110) { c.classList.add("frei"); herzenAus(c.getBoundingClientRect().left + c.getBoundingClientRect().width / 2, c.getBoundingClientRect().top, 14); }
+    });
+    ["pointerup", "pointercancel"].forEach((n) => c.addEventListener(n, () => { malt = false; }));
+  }
+
+  // Puzzle in der linken Schublade: jeden Tag ein Teil
+  const puzzle = el("button", "wz-puzzle", '<span class="wz-puzzle-rahmen"></span>');
+  puzzle.type = "button";
+  puzzle.setAttribute("aria-label", "Puzzle");
+  let puzzleTeil = null;
+  function teilStil(i) {
+    const sx = i % PUZZLE_SPALTEN, sy = Math.floor(i / PUZZLE_SPALTEN);
+    return "background-image:url(" + PUZZLE_BILD + ");background-size:" + PUZZLE_SPALTEN * 100 + "% " + PUZZLE_ZEILEN * 100 + "%;background-position:" +
+      (sx / (PUZZLE_SPALTEN - 1)) * 100 + "% " + (sy / (PUZZLE_ZEILEN - 1)) * 100 + "%";
+  }
+  function zeichnePuzzle() {
+    const da = lies("puzzle", []);
+    const rahmen = puzzle.querySelector(".wz-puzzle-rahmen");
+    rahmen.innerHTML = Array.from({ length: PUZZLE_SPALTEN * PUZZLE_ZEILEN }, (_, i) => '<i style="' + (da.includes(i) ? teilStil(i) : "") + '" class="' + (da.includes(i) ? "da" : "") + '"></i>').join("");
+    puzzle.classList.toggle("fertig", da.length >= PUZZLE_SPALTEN * PUZZLE_ZEILEN);
+  }
+  function legePuzzle(t) {
+    if (t < 14 || t > 25) { puzzle.remove(); return; }
+    if (!puzzle.isConnected) { fachL.appendChild(puzzle); fachL.classList.add("mit-puzzle"); }
+    zeichnePuzzle();
+    const i = t - 14;
+    if (puzzleTeil) { puzzleTeil.remove(); puzzleTeil = null; }
+    if (lies("puzzle", []).includes(i)) return;
+    puzzleTeil = el("button", "wz-puzzleteil", "");
+    puzzleTeil.type = "button";
+    puzzleTeil.setAttribute("aria-label", "Puzzleteil");
+    puzzleTeil.setAttribute("style", teilStil(i));
+    fachL.appendChild(puzzleTeil);
+    puzzleTeil.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const ziel = puzzle.querySelectorAll(".wz-puzzle-rahmen i")[i].getBoundingClientRect(), von = puzzleTeil.getBoundingClientRect();
+      puzzleTeil.animate([{ transform: "none" }, { transform: "translate(" + (ziel.left - von.left) + "px," + (ziel.top - von.top) + "px) scale(" + ziel.width / von.width + ")" }], { duration: 600, easing: "ease-in-out", fill: "forwards" })
+        .onfinish = () => {
+          puzzleTeil.remove(); puzzleTeil = null;
+          let da = lies("puzzle", []);
+          if (!da.includes(i)) da.push(i);
+          // am letzten Tag findet der Munkelvogel die verpassten Teile
+          const fehlen = t === 25 && da.length < PUZZLE_SPALTEN * PUZZLE_ZEILEN;
+          if (fehlen) da = Array.from({ length: PUZZLE_SPALTEN * PUZZLE_ZEILEN }, (_, k) => k);
+          schreib("puzzle", da);
+          zeichnePuzzle(); plopp(true);
+          const n = da.length, alle = PUZZLE_SPALTEN * PUZZLE_ZEILEN;
+          if (n >= alle) setTimeout(() => zeigePuzzle(fehlen), 500);
+          else blase(puzzle, n + " von " + alle + " Teilen. Morgen kommt das nächste 🧩", 2600);
+        };
+    });
+  }
+  function zeigePuzzle(fehlen) {
+    const da = lies("puzzle", []), alle = PUZZLE_SPALTEN * PUZZLE_ZEILEN;
+    const fertig = da.length >= alle;
+    const f = fenster("wz-puzzle-gross", '<p class="wz-fakt-kopf">' + (fertig ? "Fertig! Das seid ihr ♥️" : "Dein Puzzle") + "</p>" +
+      '<div class="wz-puzzle-brett">' + Array.from({ length: alle }, (_, i) => '<i style="' + (da.includes(i) ? teilStil(i) : "") + '"></i>').join("") + "</div>" +
+      '<p class="wz-fakt-fuss">' + (fertig ? (fehlen ? "Die fehlenden Teile hat der Munkelvogel gefunden 🐦 " : "") + "Wir zwei über dem Rhein." : da.length + " von " + alle + " Teilen. Jeden Tag liegt ein neues in der Schublade.") + "</p>");
+    if (fertig) { f.karte.classList.add("fertig"); const r = f.karte.getBoundingClientRect(); for (let k = 0; k < 3; k++) setTimeout(() => herzenAus(r.left + zufall(0.2, 0.8) * r.width, r.top + r.height * 0.4, 10), 300 + k * 250); }
+  }
+  puzzle.addEventListener("click", () => zeigePuzzle(false));
+
   // Für das Entdeckerbuch: einzelne Dinge direkt vorspielen
   window.adventkalender.wartezeit = {
     schublade,
@@ -1649,7 +1857,7 @@
     fliegerZustand(an && istAn("flieger"));
     tassen(an && istAn("tasse"));
     scheibeZustand(an && istAn("scheibe"));
-    if (an) pruefeKerze();
+    if (an) { pruefeKerze(); legeSchatz(t); legePuzzle(t); }
     if (!an && offenesFenster && !intro.classList.contains("weg")) { /* Fenster bleibt, bis sie es schließt */ }
   }
   setInterval(pruefe, 1000);
