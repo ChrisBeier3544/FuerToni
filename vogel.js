@@ -429,22 +429,22 @@
     const h = d.stunde, t = d.tag;
     if (t === 13 || t === 14) {
       if (h >= 5 && h < 12) return t === 13
-        ? wahl(["Guten Morgen, Toni ☀️ Erst Schule und heute Abend noch arbeiten. Du schaffst das! 💪", "Morgen, Toni ☀️ Heute wird ein langer Tag mit Arbeit am Abend. Ich drück dir die Daumen!"])
-        : wahl(["Guten Morgen, Toni ☀️ Genieß den Tag, heute Abend musst du ja noch arbeiten.", "Morgen, Toni ☀️ Mach dir einen schönen Samstag, bevor du heute Abend arbeiten musst!"]);
-      if (h >= 12 && h < 17) return wahl(["Hi Toni! Heute Abend musst du arbeiten. Ich drück dir jetzt schon die Daumen, dass es schnell vorbeigeht 💪", "Hallo Toni! Noch ein bisschen Pause, bevor du heute Abend arbeiten musst. Genieß sie ☕"]);
-      if (h >= 17 && h < 23) return wahl(["Hi Toni! Du bist bestimmt gerade bei der Arbeit. Ich halte hier solange die Stellung 🐦", "Hey Toni, fleißig bei der Arbeit? Ich bin stolz auf dich 💪", "Hallo Toni! Schnell zurück an die Arbeit, ich pass hier auf alles auf 😉"]);
+        ? wahl(["Guten Morgen, Toni ☀️ Heute Abend musst du noch arbeiten. Ich wünsch dir jetzt schon eine entspannte Schicht!", "Morgen, Toni ☀️ Hab einen schönen Schultag, und heute Abend eine ganz ruhige Schicht!"])
+        : wahl(["Guten Morgen, Toni ☀️ Genieß deinen Samstag! Und heute Abend wünsch ich dir eine schöne, entspannte Schicht.", "Morgen, Toni ☀️ Mach dir einen schönen Tag. Die Schicht heute Abend wird bestimmt ganz entspannt!"]);
+      if (h >= 12 && h < 17) return wahl(["Hi Toni! Heute Abend musst du arbeiten. Ich wünsch dir eine schöne Schicht, ohne viel Stress 🍀", "Hallo Toni! Genieß noch die Zeit vor der Arbeit. Ich drück dir die Daumen für eine ruhige Schicht ☕"]);
+      if (h >= 17 && h < 23) return wahl(["Hi Toni! Du bist bestimmt gerade bei der Arbeit. Ich halte hier solange die Stellung 🐦", "Hey Toni! Ich wünsch dir eine schöne Schicht, hoffentlich ist heute alles ganz entspannt 🍀", "Hallo Toni! Ich hoffe, die Schicht ist heute nicht zu anstrengend. Ich halte hier solange die Stellung 🐦"]);
       if (h >= 23) return t === 13
-        ? "Na Toni, endlich Feierabend? Ruh dich gut aus, du hast es dir verdient 🌙"
-        : "Na Toni, endlich Feierabend? Schlaf gut, morgen ist ja Brunch mit Karla 🥐";
+        ? "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Ruh dich gut aus 🌙"
+        : "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Morgen ist Brunch mit Karla und Chris 🥐";
     }
     if ((t === 14 || t === 15) && h < 5) return t === 14
-      ? "Feierabend, Toni! Du hast heute so fleißig gearbeitet. Schlaf schön 🌙"
-      : "Feierabend, Toni! Schlaf schnell, bald ist Brunch mit Karla 🥐";
+      ? "Feierabend, Toni! Ich hoffe, die Schicht war nicht zu anstrengend. Schlaf schön 🌙"
+      : "Feierabend, Toni! Schlaf schön, um 11 Uhr ist schon Brunch mit Karla und Chris 🥐";
     if (t === 15) {
-      if (h >= 5 && h < 11) return wahl(["Guten Morgen, Toni ☀️ Heute ist Brunch mit Karla! Lasst es euch richtig schmecken 🥐", "Morgen, Toni ☀️ Heute geht es zum Brunch mit Karla und Chris. Ich bin ein bisschen neidisch 🥐"]);
-      if (h >= 11 && h < 14) return wahl(["Hi Toni! Guten Appetit beim Brunch mit Karla 🥐 Grüß sie lieb von mir!", "Hallo Toni! Lasst es euch beim Brunch schmecken, und hebt mir ein Croissant auf 🥐"]);
-      if (h >= 14 && h < 18) return wahl(["Hi Toni! Wie war der Brunch mit Karla? Ich hoffe, ihr hattet richtig viel Spaß ☕", "Hallo Toni! Na, satt vom Brunch mit Karla? Erzähl mal, war es schön? 🥰"]);
-      return wahl(["Schönen Sonntagabend, Toni! Was für ein schöner Tag mit Karla 🥰", "Hi Toni! Ich hoffe, der Brunch mit Karla war toll. Mach es dir jetzt gemütlich 🕯️"]);
+      if (h >= 5 && h < 11) return wahl(["Guten Morgen, Toni ☀️ Um 11 Uhr ist Brunch mit Karla und Chris! Lasst es euch richtig schmecken 🥐", "Morgen, Toni ☀️ Heute um 11 Uhr geht es mit Karla und Chris zum Brunch. Ich bin ein bisschen neidisch 🥐"]);
+      if (h >= 11 && h < 14) return wahl(["Hi Toni! Guten Appetit beim Brunch mit Karla und Chris 🥐 Grüß die beiden lieb von mir!", "Hallo Toni! Lasst es euch zu dritt schmecken, und hebt mir ein Croissant auf 🥐"]);
+      if (h >= 14 && h < 18) return wahl(["Hi Toni! Wie war der Brunch mit Karla und Chris? Ich hoffe, ihr hattet richtig viel Spaß ☕", "Hallo Toni! Na, satt vom Brunch? Erzähl mal, war es schön mit Karla und Chris? 🥰"]);
+      return wahl(["Hi Toni! Wie war der restliche Tag mit Chris? Ich hoffe, ihr hattet es richtig schön 🥰", "Schönen Sonntagabend, Toni! Wie war der Rest des Tages mit Chris? 🕯️"]);
     }
     return null;
   }
