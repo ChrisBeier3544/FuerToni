@@ -95,8 +95,18 @@
   const UMSCHLAEGE = '<svg class="wz-deko wz-umschlaege" viewBox="0 0 56 40" aria-hidden="true">' +
     '<g transform="rotate(-10 28 20)"><rect x="6" y="8" width="44" height="28" rx="2" fill="#fdf3e7" stroke="#e6d3bf"/><path d="M6 8l22 15 22-15" fill="none" stroke="#e6d3bf"/></g>' +
     '<g transform="rotate(6 28 20)"><rect x="4" y="4" width="44" height="28" rx="2" fill="#fde2e8" stroke="#f2bccb"/><path d="M4 4l22 15 22-15" fill="none" stroke="#f2bccb"/><path d="M26 17c-1.5-1.1-2.8-2.2-2.8-3.3 0-.8.6-1.4 1.4-1.4.6 0 1.1.3 1.4.8.3-.5.8-.8 1.4-.8.8 0 1.4.6 1.4 1.4 0 1.1-1.3 2.2-2.8 3.3z" fill="#e85d7e"/></g></svg>';
-  const LIPPENSTIFT = '<svg class="wz-deko wz-lippenstift" viewBox="0 0 40 14" aria-hidden="true"><g transform="rotate(-14 20 7)">' +
-    '<rect x="2" y="3" width="20" height="8" rx="1.5" fill="#2b2b33"/><rect x="21" y="3.5" width="6" height="7" fill="#d4a84b"/><path d="M27 4.2h6l4 2.8-4 2.8h-6z" fill="#c2185b"/><rect x="4" y="4" width="16" height="1.4" fill="#fff" opacity=".25"/></g></svg>';
+  // Lippenstift zum Auf und Zudrehen: bei jedem Ausfahren eine neue Farbe
+  const LIPPENFARBEN = [
+    ["#b0102c", "Klassisch Rot"], ["#d6304f", "Erdbeerrot"], ["#e0115f", "Kirschrot"], ["#ff2e4c", "Korallenrot"], ["#a0153e", "Bordeaux"],
+    ["#c2185b", "Himbeere"], ["#c71585", "Fuchsia"], ["#ff4d7d", "Pink"], ["#e85d7e", "Rosé"], ["#ff6f91", "Flamingo"], ["#f7809b", "Zartrosa"],
+  ];
+  const LIPPENSTIFT_SVG = '<svg viewBox="0 0 46 18" aria-hidden="true"><defs><clipPath id="wzLsClip"><rect x="27" y="0" width="20" height="18"/></clipPath></defs>' +
+    '<g transform="rotate(-14 23 9)">' +
+    '<g clip-path="url(#wzLsClip)"><path class="wz-ls-mine" d="M24 5.2h9.5l4.5 3.8-4.5 3.8H24z" fill="var(--ls, #c2185b)"/><path class="wz-ls-mine" d="M25 6.4h8" stroke="#fff" stroke-width=".9" opacity=".35"/></g>' +
+    '<rect x="2" y="4" width="20" height="10" rx="1.6" fill="#2b2b33"/><rect x="4" y="5" width="16" height="1.6" fill="#fff" opacity=".22"/>' +
+    '<rect x="21.5" y="4.6" width="6" height="8.8" fill="#d4a84b"/><rect x="21.5" y="4.6" width="6" height="1.6" fill="#f6dc96"/>' +
+    '<g class="wz-ls-kappe"><rect x="20.5" y="3.4" width="21" height="11.2" rx="2.2" fill="#2b2b33"/><rect x="20.5" y="3.4" width="3" height="11.2" fill="#d4a84b"/><rect x="25" y="4.6" width="14" height="1.6" fill="#fff" opacity=".2"/></g>' +
+    "</g></svg>";
   const SPANGE = '<svg class="wz-deko wz-spange" viewBox="0 0 34 16" aria-hidden="true"><g transform="rotate(10 17 8)">' +
     '<rect x="3" y="5" width="28" height="6" rx="3" fill="#f3c84b"/><circle cx="9" cy="8" r="2" fill="#fff" opacity=".8"/><circle cx="17" cy="8" r="2" fill="#fff" opacity=".8"/><circle cx="25" cy="8" r="2" fill="#fff" opacity=".8"/></g></svg>';
   const moebel = el("div", "wz-moebel",
@@ -110,7 +120,27 @@
   const fachR = moebel.querySelector('[data-seite="rechts"] .wz-lade-boden');
   const fachM = moebel.querySelector(".wz-auf-bank");
   fachL.insertAdjacentHTML("beforeend", UMSCHLAEGE + STIFTE);
-  fachR.insertAdjacentHTML("beforeend", LIPPENSTIFT + SPANGE);
+  const lippenstift = el("button", "wz-lippenstift", LIPPENSTIFT_SVG);
+  lippenstift.type = "button";
+  lippenstift.setAttribute("aria-label", "Lippenstift");
+  let lippenFarbe = Math.floor(Math.random() * LIPPENFARBEN.length);
+  lippenstift.style.setProperty("--ls", LIPPENFARBEN[lippenFarbe][0]);
+  lippenstift.addEventListener("click", () => {
+    const zu = !lippenstift.classList.contains("zu");
+    if (!zu) {
+      // beim Ausfahren eine andere Farbe als zuletzt
+      let n = lippenFarbe;
+      while (n === lippenFarbe) n = Math.floor(Math.random() * LIPPENFARBEN.length);
+      lippenFarbe = n;
+      lippenstift.style.setProperty("--ls", LIPPENFARBEN[n][0]);
+      setTimeout(() => blase(lippenstift, "💄 " + LIPPENFARBEN[n][1], 1500), 700);
+    }
+    if (zu && lippenstift._wzBlase) lippenstift._wzBlase.remove();
+    lippenstift.classList.toggle("zu", zu);
+    plopp(!zu);
+  });
+  fachR.appendChild(lippenstift);
+  fachR.insertAdjacentHTML("beforeend", SPANGE);
   function schublade(seite, auf) {
     moebel.querySelectorAll(".wz-schublade").forEach((s) => {
       const soll = s.dataset.seite === seite ? (auf === undefined ? !s.classList.contains("offen") : auf) : false;
@@ -406,59 +436,59 @@
      3. Zauberspiegel (4 Komplimente pro Tag)
      ========================================================= */
   const SPRUECHE = [
-    "Du, Toni. Ganz ehrlich, das war noch nie eine knappe Entscheidung.",
-    "Deine Augen haben dieses warme Leuchten, in dem man sich sofort verlieren kann.",
-    "Dein Lächeln ist das Schönste, was ich je spiegeln durfte.",
-    "Deine Haare fallen so weich über deine Schultern, das kann kein Friseur nachmachen.",
-    "Du hast ein wunderschönes Gesicht. Klar, sanft und unglaublich hübsch.",
-    "Deine Figur ist einfach traumhaft. Egal was du trägst, es steht dir.",
-    "Wenn du lachst, bekommst du dieses Funkeln in den Augen. Das ist pure Magie.",
-    "Deine Wangen werden so süß rosa, wenn du dich freust.",
-    "Du bist natürlich schön. Ganz ohne Filter, ganz ohne Mühe.",
-    "Deine Frisur sitzt heute perfekt. Ehrlich gesagt sitzt sie immer perfekt.",
-    "Du hast eine Ausstrahlung, die einen ganzen Raum heller macht.",
-    "Deine Lippen formen das schönste Lächeln der Welt.",
-    "Selbst morgens, verschlafen und mit zerzausten Haaren, bist du wunderschön.",
-    "Deine Haut strahlt so zart und frisch, als hättest du immer Urlaub.",
-    "Du hast so schöne Hände. Selbst deine Nägel sehen immer perfekt aus.",
-    "Wenn du deine Haare zusammenbindest, sieht man erst richtig, wie schön dein Gesicht ist.",
-    "Und mit offenen Haaren siehst du aus wie aus einem Film.",
-    "Deine Augen sagen mehr als tausend Worte. Und alle sind schön.",
-    "Du bist unglaublich hübsch. Nicht ein bisschen, sondern richtig.",
-    "Deine Figur ist der Wahnsinn, und du trägst sie mit so viel Selbstverständlichkeit.",
-    "Dein Gesicht ist so harmonisch, als hätte jemand ganz lange daran gefeilt.",
-    "In jedem Outfit siehst du umwerfend aus. Im Kleid genauso wie im Pulli.",
-    "Deine Nase ist einfach süß. Ja, ich habe genau hingeschaut.",
-    "Dein Lächeln fängt bei den Lippen an und endet in deinen Augen. Das können nur wenige.",
-    "Du bist schön, wenn du lachst, wenn du nachdenkst und sogar, wenn du müde bist.",
-    "Deine Haare glänzen im Licht so schön, dass ich fast neidisch werde.",
-    "Du hast diese natürliche Eleganz in jeder Bewegung.",
-    "Deine Augenbrauen sind perfekt geformt. Ein echtes Kunstwerk.",
-    "Geschminkt siehst du toll aus. Und ungeschminkt genauso.",
-    "Wenn du dich zurechtmachst, verschlägt es mir die Sprache. Und das passiert einem Spiegel selten.",
-    "Deine Wimpern sind so lang, dass sie fast meinen Rahmen streifen.",
-    "Du hast ein Gesicht, das man nie wieder vergisst.",
-    "Dein Blick ist sanft und gleichzeitig so stark. Wunderschön.",
-    "Schneewittchen hat angerufen. Sie gibt sich geschlagen.",
-    "Chris hat recht: Du wirst jeden Tag noch schöner.",
-    "Du bist eine wunderschöne Frau, Toni. Innen wie außen.",
-    "Dein Lachen macht dein Gesicht noch hübscher, als es ohnehin schon ist.",
-    "Deine Haare sind so weich, dass man sie ständig berühren möchte.",
-    "Deine Augen leuchten im Winterlicht noch schöner.",
-    "Deine Haltung ist so selbstbewusst, du strahlst richtig.",
-    "Mit Mütze und Schal siehst du so süß aus, dass der Winter ruhig länger bleiben darf.",
-    "Wenn du verschmitzt lächelst, ist es um jeden geschehen.",
-    "Dein Profil ist wunderschön. Von der Seite genauso wie von vorne.",
-    "Du siehst aus wie jemand, in den man sich sofort verliebt. Chris kann das bestätigen.",
-    "Dein Gesicht ist das Erste, was Chris morgens sehen will. Ich verstehe ihn.",
-    "Deine Beine sind ein echter Traum.",
-    "Du siehst heute wieder umwerfend aus. Und das meine ich ganz ernst.",
-    "Deine Schönheit ist nicht laut, sie ist einfach da. Und das ist das Schönste daran.",
-    "Wenn du einen Raum betrittst, schauen alle hin. Zu Recht.",
-    "Bald hast du Geburtstag. Und du wirst mit jedem Jahr noch schöner.",
-    "Ich bin nur ein Spiegel. Aber wenn ich ein Herz hätte, würde es für dich schlagen ♥️",
+    "Du, Toni. Und das war noch nie eine knappe Entscheidung.",
+    "Das bist du, Toni. Deine Augen haben dieses warme Leuchten, in dem man sich sofort verlieren kann.",
+    "Ganz klar du. Dein Lächeln ist das Schönste, was ich je spiegeln durfte.",
+    "Die Schönste bist du. Deine Haare fallen so weich über deine Schultern, das kann kein Friseur nachmachen.",
+    "Du, Toni. Du hast ein wunderschönes Gesicht, klar, sanft und unglaublich hübsch.",
+    "Natürlich du. Deine Figur ist traumhaft, und egal was du trägst, es steht dir.",
+    "Das bist du. Wenn du lachst, bekommst du dieses Funkeln in den Augen, das ist pure Magie.",
+    "Du, Toni. Vor allem, wenn deine Wangen so süß rosa werden, weil du dich freust.",
+    "Ganz ehrlich? Du. Ganz ohne Filter und ganz ohne Mühe.",
+    "Die Schönste im ganzen Land bist du. Und deine Frisur sitzt heute wieder perfekt.",
+    "Du, Toni. Deine Ausstrahlung macht einen ganzen Raum heller.",
+    "Das bist du. Mit dem schönsten Lächeln der Welt.",
+    "Du, Toni. Sogar morgens, verschlafen und mit zerzausten Haaren.",
+    "Keine Frage, du. Deine Haut strahlt so zart und frisch, als hättest du immer Urlaub.",
+    "Du bist es, Toni. Bis in die Fingerspitzen, sogar deine Nägel sehen immer perfekt aus.",
+    "Die Schönste bist du. Mit zusammengebundenen Haaren sieht man erst richtig, wie schön dein Gesicht ist.",
+    "Du, Toni. Und mit offenen Haaren siehst du aus wie aus einem Film.",
+    "Das bist du. Deine Augen sagen mehr als tausend Worte, und alle sind schön.",
+    "Du, Toni. Nicht ein bisschen schön, sondern richtig.",
+    "Ganz klar du. Deine Figur ist der Wahnsinn, und du trägst sie mit so viel Selbstverständlichkeit.",
+    "Die Schönste bist du. Dein Gesicht ist so harmonisch, als hätte jemand ganz lange daran gefeilt.",
+    "Das bist du. Und ja, ich habe genau hingeschaut, sogar deine Nase ist einfach süß.",
+    "Du, Toni. Dein Lächeln fängt bei den Lippen an und endet in deinen Augen, das können nur wenige.",
+    "Natürlich du. Wenn du lachst, wenn du nachdenkst und sogar, wenn du müde bist.",
+    "Die Schönste bist du. Deine Haare glänzen im Licht so schön, dass ich fast neidisch werde.",
+    "Du, Toni. In jeder Bewegung steckt so viel natürliche Eleganz.",
+    "Das bist du. Sogar deine Augenbrauen sind ein kleines Kunstwerk.",
+    "Du, Toni. Geschminkt genauso wie ungeschminkt.",
+    "Du. Wenn du dich zurechtmachst, verschlägt es mir die Sprache, und das passiert einem Spiegel selten.",
+    "Ganz klar du. Deine Wimpern sind so lang, dass sie fast meinen Rahmen streifen.",
+    "Du, Toni. Dein Gesicht vergisst man nie wieder.",
+    "Die Schönste bist du. Dein Blick ist sanft und gleichzeitig so stark.",
+    "Du, Toni. Schneewittchen hat übrigens angerufen, sie gibt sich geschlagen.",
+    "Das bist du. Und Chris hat recht, du wirst jeden Tag noch schöner.",
+    "Du, Toni. Innen wie außen.",
+    "Keine Frage, du. Und wenn du lachst, wirst du sogar noch hübscher.",
+    "Die Schönste bist du. Deine Haare sind so weich, dass man sie ständig berühren möchte.",
+    "Du, Toni. Im Winterlicht leuchten deine Augen sogar noch schöner.",
+    "Das bist du. Mit einer Haltung, die so selbstbewusst strahlt.",
+    "Du, Toni. Mit Mütze und Schal so süß, dass der Winter ruhig länger bleiben darf.",
+    "Natürlich du. Besonders, wenn du so verschmitzt lächelst.",
+    "Die Schönste bist du. Von der Seite genauso wie von vorne.",
+    "Du, Toni. Man verliebt sich sofort in dich, Chris kann das bestätigen.",
+    "Das bist du. Dein Gesicht ist das Erste, was Chris morgens sehen will, und ich verstehe ihn.",
+    "Du, Toni. Von Kopf bis Fuß, und deine Beine sind ein echter Traum.",
+    "Ganz klar du. Und heute siehst du wieder umwerfend aus, das meine ich ganz ernst.",
+    "Du, Toni. Deine Schönheit ist nicht laut, sie ist einfach da, und das ist das Schönste daran.",
+    "Das bist du. Wenn du einen Raum betrittst, schauen alle hin, und zwar zu Recht.",
+    "Du, Toni. Bald hast du Geburtstag, und du wirst mit jedem Jahr noch schöner.",
+    "Du, Toni. Ich bin nur ein Spiegel, aber wenn ich ein Herz hätte, würde es für dich schlagen ♥️",
     "Die Schönste im ganzen Land? Das bist du. Heute, morgen und für immer ♥️",
   ];
+
 
   const PRO_TAG = 4;
   const MUEDE = [
