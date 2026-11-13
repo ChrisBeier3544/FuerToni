@@ -3770,3 +3770,89 @@ html:has(.liebeszettel, .fensterblick) :is(.entdecken-chip, .vogel-ebene) { visi
 .special-zu:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
 .special-buehne.vorbei .special-zu { pointer-events: none; }
 html.zeitreise .special-zu { top: calc(54px + env(safe-area-inset-top, 0px)); }
+
+/* =========================================================
+   Tagesüberraschungen und Puzzle in den Schubladen
+   ========================================================= */
+.wz-lade-boden.mit-puzzle .wz-umschlaege, .wz-lade-boden.mit-puzzle .wz-stifte { display: none; }
+.wz-lade-boden:has(.wz-schatz) .wz-spange { display: none; }
+.wz-lade-boden:has(.wz-schatz):has(.wz-knopf-huelle) .wz-spiegel { width: 62px; }
+.wz-schatz { flex: 0 1 auto; width: 48px; padding: 0; border: 0; background: none; cursor: pointer; pointer-events: auto; filter: drop-shadow(0 2px 2px rgba(40, 20, 10, 0.35)); -webkit-tap-highlight-color: transparent; animation: wz-schatz-da 0.6s ease; }
+.wz-schatz svg { display: block; width: 100%; overflow: visible; }
+.wz-schatz-seifenblasen, .wz-schatz-sternenglas { width: 34px; }
+.wz-schatz-kompass, .wz-schatz-wackelcapy { width: 40px; }
+@keyframes wz-schatz-da { from { transform: scale(0.6); opacity: 0; } }
+.wz-schatz-glueckskeks .keks-l, .wz-schatz-glueckskeks .keks-r, .wz-schatz-glueckskeks .keks-zettel { transition: transform 0.5s ease; transform-box: fill-box; }
+.wz-schatz-glueckskeks.offen .keks-l { transform: translate(-5px, 2px) rotate(-18deg); }
+.wz-schatz-glueckskeks.offen .keks-r { transform: translate(5px, 2px) rotate(18deg); }
+.wz-schatz-glueckskeks.offen .keks-zettel { transform: translateY(-10px); }
+.wz-schatz-liebesbrief .brief-siegel { transition: transform 0.5s ease, opacity 0.5s ease; transform-box: fill-box; transform-origin: center; }
+.wz-schatz-liebesbrief.offen .brief-siegel { transform: scale(1.4) rotate(30deg); opacity: 0; }
+.wz-schatz-sternenglas .glas-deckel { transition: transform 0.5s ease; transform-box: fill-box; transform-origin: center; }
+.wz-schatz-sternenglas.offen .glas-deckel { transform: translate(10px, -8px) rotate(30deg); }
+.wz-schatz-sternenglas.offen .glas-sterne { opacity: 0.2; }
+.wz-schatz-kompass .kompass-nadel, .wz-schatz-wackelcapy .wackel-kopf { transform-box: view-box; transform-origin: 50% 50%; }
+.wz-schatz-wackelcapy .wackel-kopf { transform-origin: 50% 70%; }
+.wz-schatz-spieluhr .uhr-deckel { transition: transform 0.4s ease; transform-box: fill-box; transform-origin: 0 100%; }
+.wz-schatz-spieluhr.spielt .uhr-deckel { transform: rotate(-35deg); }
+.wz-schatz-spieluhr.spielt .uhr-kurbel { animation: wz-kurbel 0.6s linear infinite; transform-box: fill-box; transform-origin: 0 0; }
+@keyframes wz-kurbel { to { transform: rotate(360deg); } }
+.wz-blase { position: absolute; z-index: 7; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; pointer-events: auto !important;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95) 0 8%, rgba(255, 255, 255, 0.15) 30%, rgba(160, 210, 255, 0.25) 60%, rgba(255, 170, 220, 0.45));
+  box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.7); }
+.wz-blase.herz { width: 40px; height: 40px; }
+.wz-blase b { color: #e85d7e; font-size: 0.9rem; }
+.wz-blase.platzt { animation: wz-platzt 0.25s ease-out forwards; }
+@keyframes wz-platzt { to { transform: translate(-50%, -50%) scale(1.6); opacity: 0; } }
+.wz-stern-flug { position: absolute; z-index: 7; color: #ffd36b; font-size: 1.1rem; text-shadow: 0 0 8px #ffb020; pointer-events: none !important; }
+.wz-note { position: absolute; z-index: 7; color: var(--beere); font-size: 1.2rem; pointer-events: none !important; }
+html[data-abend] .wz-note { color: #ffd0dc; }
+.wz-tanzcapy { position: absolute; z-index: 7; width: 40px; transform: translate(-50%, -100%); pointer-events: none !important; animation: wz-tanzen 0.8s ease-in-out infinite alternate; transition: opacity 0.4s ease; }
+.wz-tanzcapy.weg { opacity: 0; }
+.wz-tanzcapy svg { display: block; width: 100%; }
+@keyframes wz-tanzen { from { transform: translate(-50%, -100%) rotate(-12deg); } to { transform: translate(-50%, -112%) rotate(12deg); } }
+.wz-zettel-text { margin: 0; padding: 14px 16px; border-radius: 6px; background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); font: italic 600 1.05rem/1.5 "Lora", Georgia, serif; color: var(--beere-dunkel); }
+.wz-liebesbrief, .wz-origami { background: repeating-linear-gradient(transparent 0 27px, rgba(232, 93, 126, 0.12) 27px 28px), #fffaf3; }
+.wz-lb-text, .wz-origami-blatt p { margin: 0; font: italic 600 1.08rem/1.6 "Lora", Georgia, serif; color: var(--beere-dunkel); }
+.wz-lb-gruss { margin: 10px 0 0 !important; font: 700 1.5rem "Dancing Script", cursive !important; color: var(--beere) !important; text-align: right; }
+.wz-origami-blatt { padding: 6px; animation: wz-entfalten 0.7s ease; }
+@keyframes wz-entfalten { from { transform: scale(0.3) rotate(-20deg); clip-path: polygon(50% 0, 100% 40%, 50% 100%, 0 40%); } to { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); } }
+.wz-pol-karte { position: relative; width: min(70vw, 260px); aspect-ratio: 0.82; margin: 4px auto 0; cursor: pointer; transform-style: preserve-3d; transition: transform 0.7s ease; }
+.wz-pol-karte.gedreht { transform: rotateY(180deg); }
+.wz-pol-vorne, .wz-pol-hinten { position: absolute; inset: 0; padding: 10px 10px 34px; background: #fff; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.wz-pol-vorne img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.wz-pol-vorne span { position: absolute; left: 0; right: 0; bottom: 8px; text-align: center; font: 700 0.75rem "Nunito", sans-serif; color: #a07080; }
+.wz-pol-hinten { transform: rotateY(180deg); display: grid; place-items: center; padding: 20px; background: #fffaf3; }
+.wz-pol-hinten p { margin: 0; font: 700 1.5rem/1.3 "Dancing Script", cursive; color: var(--beere); text-align: center; }
+.wz-pol-hinten small { position: absolute; bottom: 14px; right: 18px; font: 700 1.1rem "Dancing Script", cursive; color: var(--rose-500); }
+.wz-fg-sicht { position: relative; width: min(76vw, 300px); aspect-ratio: 1.6; margin: 0 auto 12px; overflow: hidden;
+  -webkit-mask: radial-gradient(circle at 28% 50%, #000 0 31%, transparent 32%), radial-gradient(circle at 72% 50%, #000 0 31%, transparent 32%);
+  mask: radial-gradient(circle at 28% 50%, #000 0 31%, transparent 32%), radial-gradient(circle at 72% 50%, #000 0 31%, transparent 32%); }
+.wz-fg-himmel { position: absolute; inset: 0; background: linear-gradient(#9fd2f5, #e9f6ff); }
+.wz-fg-ballon { position: absolute; left: 50%; top: 6%; width: 34%; transform: translateX(-50%); animation: wz-ballon 3s ease-in-out infinite; }
+.wz-fg-ballon svg { display: block; width: 100%; overflow: visible; }
+.wz-fg-band { position: absolute; left: 50%; bottom: -14%; transform: translateX(-50%); white-space: nowrap; padding: 2px 8px; border-radius: 8px; background: #fff; font: 800 0.7rem "Nunito", sans-serif; color: var(--beere); }
+.wz-fg-winken { animation: wz-winken 0.6s ease-in-out infinite alternate; transform-box: fill-box; transform-origin: 0 100%; }
+@keyframes wz-ballon { 50% { transform: translate(-50%, -8%); } }
+@keyframes wz-winken { to { transform: rotate(-30deg); } }
+.wz-los { position: relative; width: min(76vw, 280px); aspect-ratio: 560 / 240; margin: 4px auto; border-radius: 10px; overflow: hidden; background: #fff3d6; border: 2px dashed var(--gold); }
+.wz-los-drunter { position: absolute; inset: 0; display: grid; place-content: center; gap: 4px; text-align: center; }
+.wz-los-drunter b { font: 800 1.15rem "Nunito", sans-serif; color: #7a6a6a; }
+.wz-los-drunter span { font: 800 1rem "Nunito", sans-serif; color: var(--beere); }
+.wz-los canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: grab; transition: opacity 0.8s ease; }
+.wz-los canvas.frei { opacity: 0; pointer-events: none; }
+/* Puzzle */
+.wz-puzzle { flex: 0 0 auto; width: 70px; padding: 3px; border: 0; border-radius: 3px; cursor: pointer; pointer-events: auto; background: #f3e6d6; box-shadow: 0 2px 4px rgba(40, 20, 10, 0.35); }
+.wz-puzzle-rahmen { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; aspect-ratio: 4 / 3; background: #d9c6ae; }
+.wz-puzzle-rahmen i { display: block; background-color: #eadbc8; }
+.wz-puzzle.fertig { box-shadow: 0 0 0 2px var(--gold), 0 2px 8px rgba(243, 200, 75, 0.6); }
+.wz-puzzleteil { flex: 0 0 auto; width: 22px; aspect-ratio: 1.1; padding: 0; border: 2px solid #fff; border-radius: 3px; cursor: pointer; pointer-events: auto; transform: rotate(-12deg); box-shadow: 0 2px 4px rgba(40, 20, 10, 0.4); animation: wz-schatz-da 0.6s ease; }
+.wz-puzzle-brett { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; width: min(76vw, 300px); aspect-ratio: 4 / 3; margin: 6px auto; padding: 2px; border-radius: 6px; background: #d9c6ae; }
+.wz-puzzle-brett i { display: block; background-color: #eadbc8; border-radius: 2px; }
+.wz-puzzle-gross.fertig .wz-puzzle-brett { gap: 0; animation: wz-leuchten 1.6s ease; }
+@keyframes wz-leuchten { 50% { box-shadow: 0 0 0 6px rgba(243, 213, 138, 0.7), 0 0 30px 10px rgba(243, 200, 75, 0.7); } }
+@media (prefers-reduced-motion: reduce) { .wz-tanzcapy, .wz-fg-ballon, .wz-fg-winken { animation: none; } }
+.wz-fg-ballon { left: 70%; top: 12%; width: 22%; }
+.wz-fg-himmel { background: radial-gradient(ellipse 14% 7% at 26% 42%, #fff 60%, transparent 62%), radial-gradient(ellipse 10% 5% at 33% 38%, #fff 60%, transparent 62%), radial-gradient(ellipse 12% 5% at 20% 64%, #fff 55%, transparent 58%), linear-gradient(#9fd2f5, #e9f6ff); }
+.wz-fg-band { bottom: -12%; font-size: 0.62rem; }
+@keyframes wz-ballon { 50% { transform: translate(-50%, -6%); } }
