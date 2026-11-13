@@ -423,9 +423,36 @@
   // Countdown vor dem Geburtstag (bis 26.11., 0:00 Uhr)
   const vorGeburtstag = () => kontext() === "countdown" && ak.intro.phase() === "warten";
   // Der Munkelvogel spricht immer selbst und sagt immer „Toni“
+  // Besondere Tage: Toni arbeitet am 13. und 14.11. abends, am 15.11. ist Brunch mit Karla
+  function tagesGruss(d) {
+    if (d.jahr !== KALENDER.jahr || d.monat !== 11 || (ak.zeitreise && ak.zeitreise.aktiv())) return null;
+    const h = d.stunde, t = d.tag;
+    if (t === 13 || t === 14) {
+      if (h >= 5 && h < 12) return t === 13
+        ? wahl(["Guten Morgen, Toni ☀️ Heute Abend musst du noch arbeiten. Ich wünsch dir jetzt schon eine entspannte Schicht!", "Morgen, Toni ☀️ Hab einen schönen Schultag, und heute Abend eine ganz ruhige Schicht!"])
+        : wahl(["Guten Morgen, Toni ☀️ Genieß deinen Samstag! Und heute Abend wünsch ich dir eine schöne, entspannte Schicht.", "Morgen, Toni ☀️ Mach dir einen schönen Tag. Die Schicht heute Abend wird bestimmt ganz entspannt!"]);
+      if (h >= 12 && h < 17) return wahl(["Hi Toni! Heute Abend musst du arbeiten. Ich wünsch dir eine schöne Schicht, ohne viel Stress 🍀", "Hallo Toni! Genieß noch die Zeit vor der Arbeit. Ich drück dir die Daumen für eine ruhige Schicht ☕"]);
+      if (h >= 17 && h < 23) return wahl(["Hi Toni! Du bist bestimmt gerade bei der Arbeit. Ich halte hier solange die Stellung 🐦", "Hey Toni! Ich wünsch dir eine schöne Schicht, hoffentlich ist heute alles ganz entspannt 🍀", "Hallo Toni! Ich hoffe, die Schicht ist heute nicht zu anstrengend. Ich halte hier solange die Stellung 🐦"]);
+      if (h >= 23) return t === 13
+        ? "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Ruh dich gut aus 🌙"
+        : "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Morgen ist Brunch mit Karla und Chris 🥐";
+    }
+    if ((t === 14 || t === 15) && h < 5) return t === 14
+      ? "Feierabend, Toni! Ich hoffe, die Schicht war nicht zu anstrengend. Schlaf schön 🌙"
+      : "Feierabend, Toni! Schlaf schön, um 11 Uhr ist schon Brunch mit Karla und Chris 🥐";
+    if (t === 15) {
+      if (h >= 5 && h < 11) return wahl(["Guten Morgen, Toni ☀️ Um 11 Uhr ist Brunch mit Karla und Chris! Lasst es euch richtig schmecken 🥐", "Morgen, Toni ☀️ Heute um 11 Uhr geht es mit Karla und Chris zum Brunch. Ich bin ein bisschen neidisch 🥐"]);
+      if (h >= 11 && h < 14) return wahl(["Hi Toni! Guten Appetit beim Brunch mit Karla und Chris 🥐 Grüß die beiden lieb von mir!", "Hallo Toni! Lasst es euch zu dritt schmecken, und hebt mir ein Croissant auf 🥐"]);
+      if (h >= 14 && h < 18) return wahl(["Hi Toni! Wie war der Brunch mit Karla und Chris? Ich hoffe, ihr hattet richtig viel Spaß ☕", "Hallo Toni! Na, satt vom Brunch? Erzähl mal, war es schön mit Karla und Chris? 🥰"]);
+      return wahl(["Hi Toni! Wie war der restliche Tag mit Chris? Ich hoffe, ihr hattet es richtig schön 🥰", "Schönen Sonntagabend, Toni! Wie war der Rest des Tages mit Chris? 🕯️"]);
+    }
+    return null;
+  }
   function grussVogel() {
     const zeit = document.documentElement.getAttribute("data-tageszeit") || "mittag";
     const d = ak.intro.datum();
+    const besonders = tagesGruss(d);
+    if (besonders) return besonders;
     if (d.monat === 11 && d.tag === 26) return wahl(["Hi Toni! Happy Birthday 🎂", "Hallo Toni! Alles Liebe zum Geburtstag 🎂", "Hey Toni! Happy Birthday, heute ist dein Tag 🎂"]);
     const wochentag = new Date(Date.UTC(d.jahr, d.monat - 1, d.tag)).getUTCDay();
     // Weihnachtsferien vom 23.12. bis 6.1.
