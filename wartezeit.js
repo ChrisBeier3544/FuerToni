@@ -95,8 +95,18 @@
   const UMSCHLAEGE = '<svg class="wz-deko wz-umschlaege" viewBox="0 0 56 40" aria-hidden="true">' +
     '<g transform="rotate(-10 28 20)"><rect x="6" y="8" width="44" height="28" rx="2" fill="#fdf3e7" stroke="#e6d3bf"/><path d="M6 8l22 15 22-15" fill="none" stroke="#e6d3bf"/></g>' +
     '<g transform="rotate(6 28 20)"><rect x="4" y="4" width="44" height="28" rx="2" fill="#fde2e8" stroke="#f2bccb"/><path d="M4 4l22 15 22-15" fill="none" stroke="#f2bccb"/><path d="M26 17c-1.5-1.1-2.8-2.2-2.8-3.3 0-.8.6-1.4 1.4-1.4.6 0 1.1.3 1.4.8.3-.5.8-.8 1.4-.8.8 0 1.4.6 1.4 1.4 0 1.1-1.3 2.2-2.8 3.3z" fill="#e85d7e"/></g></svg>';
-  const LIPPENSTIFT = '<svg class="wz-deko wz-lippenstift" viewBox="0 0 40 14" aria-hidden="true"><g transform="rotate(-14 20 7)">' +
-    '<rect x="2" y="3" width="20" height="8" rx="1.5" fill="#2b2b33"/><rect x="21" y="3.5" width="6" height="7" fill="#d4a84b"/><path d="M27 4.2h6l4 2.8-4 2.8h-6z" fill="#c2185b"/><rect x="4" y="4" width="16" height="1.4" fill="#fff" opacity=".25"/></g></svg>';
+  // Lippenstift zum Auf und Zudrehen: bei jedem Ausfahren eine neue Farbe
+  const LIPPENFARBEN = [
+    ["#b0102c", "Klassisch Rot"], ["#d6304f", "Erdbeerrot"], ["#e0115f", "Kirschrot"], ["#ff2e4c", "Korallenrot"], ["#a0153e", "Bordeaux"],
+    ["#c2185b", "Himbeere"], ["#c71585", "Fuchsia"], ["#ff4d7d", "Pink"], ["#e85d7e", "Rosé"], ["#ff6f91", "Flamingo"], ["#f7809b", "Zartrosa"],
+  ];
+  const LIPPENSTIFT_SVG = '<svg viewBox="0 0 46 18" aria-hidden="true"><defs><clipPath id="wzLsClip"><rect x="27" y="0" width="20" height="18"/></clipPath></defs>' +
+    '<g transform="rotate(-14 23 9)">' +
+    '<g clip-path="url(#wzLsClip)"><path class="wz-ls-mine" d="M24 5.2h9.5l4.5 3.8-4.5 3.8H24z" fill="var(--ls, #c2185b)"/><path class="wz-ls-mine" d="M25 6.4h8" stroke="#fff" stroke-width=".9" opacity=".35"/></g>' +
+    '<rect x="2" y="4" width="20" height="10" rx="1.6" fill="#2b2b33"/><rect x="4" y="5" width="16" height="1.6" fill="#fff" opacity=".22"/>' +
+    '<rect x="21.5" y="4.6" width="6" height="8.8" fill="#d4a84b"/><rect x="21.5" y="4.6" width="6" height="1.6" fill="#f6dc96"/>' +
+    '<g class="wz-ls-kappe"><rect x="20.5" y="3.4" width="21" height="11.2" rx="2.2" fill="#2b2b33"/><rect x="20.5" y="3.4" width="3" height="11.2" fill="#d4a84b"/><rect x="25" y="4.6" width="14" height="1.6" fill="#fff" opacity=".2"/></g>' +
+    "</g></svg>";
   const SPANGE = '<svg class="wz-deko wz-spange" viewBox="0 0 34 16" aria-hidden="true"><g transform="rotate(10 17 8)">' +
     '<rect x="3" y="5" width="28" height="6" rx="3" fill="#f3c84b"/><circle cx="9" cy="8" r="2" fill="#fff" opacity=".8"/><circle cx="17" cy="8" r="2" fill="#fff" opacity=".8"/><circle cx="25" cy="8" r="2" fill="#fff" opacity=".8"/></g></svg>';
   const moebel = el("div", "wz-moebel",
@@ -110,7 +120,27 @@
   const fachR = moebel.querySelector('[data-seite="rechts"] .wz-lade-boden');
   const fachM = moebel.querySelector(".wz-auf-bank");
   fachL.insertAdjacentHTML("beforeend", UMSCHLAEGE + STIFTE);
-  fachR.insertAdjacentHTML("beforeend", LIPPENSTIFT + SPANGE);
+  const lippenstift = el("button", "wz-lippenstift", LIPPENSTIFT_SVG);
+  lippenstift.type = "button";
+  lippenstift.setAttribute("aria-label", "Lippenstift");
+  let lippenFarbe = Math.floor(Math.random() * LIPPENFARBEN.length);
+  lippenstift.style.setProperty("--ls", LIPPENFARBEN[lippenFarbe][0]);
+  lippenstift.addEventListener("click", () => {
+    const zu = !lippenstift.classList.contains("zu");
+    if (!zu) {
+      // beim Ausfahren eine andere Farbe als zuletzt
+      let n = lippenFarbe;
+      while (n === lippenFarbe) n = Math.floor(Math.random() * LIPPENFARBEN.length);
+      lippenFarbe = n;
+      lippenstift.style.setProperty("--ls", LIPPENFARBEN[n][0]);
+      setTimeout(() => blase(lippenstift, "💄 " + LIPPENFARBEN[n][1], 1500), 700);
+    }
+    if (zu && lippenstift._wzBlase) lippenstift._wzBlase.remove();
+    lippenstift.classList.toggle("zu", zu);
+    plopp(!zu);
+  });
+  fachR.appendChild(lippenstift);
+  fachR.insertAdjacentHTML("beforeend", SPANGE);
   function schublade(seite, auf) {
     moebel.querySelectorAll(".wz-schublade").forEach((s) => {
       const soll = s.dataset.seite === seite ? (auf === undefined ? !s.classList.contains("offen") : auf) : false;
