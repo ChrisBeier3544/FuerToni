@@ -192,6 +192,7 @@
   }
 
   function sprich(v) {
+    if (v.auftrag) return;
     v.timer.forEach(clearTimeout); v.timer = [];
     clearTimeout(v.flugTimer);
     const liste = v.saetze().filter(Boolean);
@@ -289,6 +290,8 @@
   }
 
   function animiere(v, punkte, dauer, zielFn) {
+    // nur der jeweils neueste Flug bewegt den Vogel
+    const id = (v.flugId = (v.flugId || 0) + 1);
     return new Promise((fertig) => {
       const start = performance.now();
       let letztes = punkte[0];
@@ -300,6 +303,7 @@
         if (Math.abs(p.x - letztes.x) > 0.5) v.blick = p.x > letztes.x ? 1 : -1;
         letztes = p;
         setzePosition(v, p);
+        if (v.flugId !== id) { fertig(); return; }
         if (u < 1 && v.zustand === "fliegt") requestAnimationFrame(schritt); else fertig();
       }
       requestAnimationFrame(schritt);
@@ -315,7 +319,7 @@
     const folger = voegel.find((a) => a.partner === v && a.zustand === "sitzt");
     if (folger) setTimeout(() => fliegeWeg(folger), 700);
     await animiere(v, route, 2400 + Math.random() * 900);
-    if (v.zustand !== "fliegt") return;
+    if (v.zustand !== "fliegt" || v.auftrag) return;
     v.el.hidden = true;
     if (v.partner) {
       // warten, bis das Männchen seinen neuen Platz ausgesucht hat
@@ -344,6 +348,7 @@
   }
 
   async function lande(v, sofort, ersterPlatz) {
+    if (v.auftrag) return;
     const k = kontext();
     if (!k) { v.zustand = "weg"; v.el.hidden = true; v.platz = null; await new Promise((r) => setTimeout(r, 1000)); return lande(v, sofort, ersterPlatz); }
     let name = sofort || ersterPlatz ? (v.partner ? freierPlatz(v, k) : ERSTER_PLATZ[k]) : freierPlatz(v, k);
@@ -365,7 +370,7 @@
     const mitte = { x: (start.x + z.x) / 2 + (vonLinks ? 40 : -40), y: Math.min(start.y, z.y) - 60 };
     v.zustand = "fliegt"; v.el.classList.add("fliegt"); v.el.hidden = false;
     await animiere(v, [start, mitte, { x: z.x + (vonLinks ? -30 : 30), y: z.y - 30 }, z], 2600, zielFn);
-    if (v.zustand !== "fliegt") return;
+    if (v.zustand !== "fliegt" || v.auftrag) return;
     v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.ziel = null;
     v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
     v.gelandet = (v.gelandet || 0) + 1;
@@ -423,23 +428,38 @@
   // Countdown vor dem Geburtstag (bis 26.11., 0:00 Uhr)
   const vorGeburtstag = () => kontext() === "countdown" && ak.intro.phase() === "warten";
   // Der Munkelvogel spricht immer selbst und sagt immer „Toni“
-  // Besondere Tage: Toni arbeitet am 13. und 14.11. abends, am 15.11. ist Brunch mit Karla
+  // Besondere Tage: Toni arbeitet am 13., 14., 16., 18. und 19.11. abends, am 15.11. ist Brunch mit Karla und Chris
   function tagesGruss(d) {
     if (d.jahr !== KALENDER.jahr || d.monat !== 11 || (ak.zeitreise && ak.zeitreise.aktiv())) return null;
     const h = d.stunde, t = d.tag;
-    if (t === 13 || t === 14) {
-      if (h >= 5 && h < 12) return t === 13
+    // Tage, an denen Toni abends arbeitet
+    const ARBEIT = [13, 14, 16, 18, 19];
+    const wochenende = [0, 6].includes(new Date(Date.UTC(d.jahr, d.monat - 1, t)).getUTCDay());
+    if (ARBEIT.includes(t)) {
+      if (h >= 5 && h < 12) return !wochenende
         ? wahl(["Guten Morgen, Toni ☀️ Heute Abend musst du noch arbeiten. Ich wünsch dir jetzt schon eine entspannte Schicht!", "Morgen, Toni ☀️ Hab einen schönen Schultag, und heute Abend eine ganz ruhige Schicht!"])
         : wahl(["Guten Morgen, Toni ☀️ Genieß deinen Samstag! Und heute Abend wünsch ich dir eine schöne, entspannte Schicht.", "Morgen, Toni ☀️ Mach dir einen schönen Tag. Die Schicht heute Abend wird bestimmt ganz entspannt!"]);
       if (h >= 12 && h < 17) return wahl(["Hi Toni! Heute Abend musst du arbeiten. Ich wünsch dir eine schöne Schicht, ohne viel Stress 🍀", "Hallo Toni! Genieß noch die Zeit vor der Arbeit. Ich drück dir die Daumen für eine ruhige Schicht ☕"]);
       if (h >= 17 && h < 23) return wahl(["Hi Toni! Du bist bestimmt gerade bei der Arbeit. Ich halte hier solange die Stellung 🐦", "Hey Toni! Ich wünsch dir eine schöne Schicht, hoffentlich ist heute alles ganz entspannt 🍀", "Hallo Toni! Ich hoffe, die Schicht ist heute nicht zu anstrengend. Ich halte hier solange die Stellung 🐦"]);
-      if (h >= 23) return t === 13
-        ? "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Ruh dich gut aus 🌙"
-        : "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Morgen ist Brunch mit Karla und Chris 🥐";
+      if (h >= 23) return t === 14
+        ? "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Morgen ist Brunch mit Karla und Chris 🥐"
+        : "Na Toni, Feierabend? Ich hoffe, die Schicht war schön entspannt. Ruh dich gut aus 🌙";
     }
-    if ((t === 14 || t === 15) && h < 5) return t === 14
-      ? "Feierabend, Toni! Ich hoffe, die Schicht war nicht zu anstrengend. Schlaf schön 🌙"
-      : "Feierabend, Toni! Schlaf schön, um 11 Uhr ist schon Brunch mit Karla und Chris 🥐";
+    // nach Mitternacht: Feierabend nach der Schicht vom Vortag
+    if (h < 5 && ARBEIT.includes(t - 1)) return t === 15
+      ? "Feierabend, Toni! Schlaf schön, um 11 Uhr ist schon Brunch mit Karla und Chris 🥐"
+      : "Feierabend, Toni! Ich hoffe, die Schicht war nicht zu anstrengend. Schlaf schön 🌙";
+    // Klausuren: 23.11. Erdkunde, 25.11. Englisch
+    if (t === 22 && h >= 17) return wahl(["Hi Toni! Morgen schreibst du Erdkunde. Du bist bestens vorbereitet, schlaf heute gut 🌙", "Hallo Toni! Morgen ist die Erdkundeklausur. Ich glaub ganz fest an dich 🍀"]);
+    if (t === 24 && h >= 17) return wahl(["Hi Toni! Morgen schreibst du Englisch. Du bist so gut vorbereitet, das wird super 🌙", "Hallo Toni! Morgen ist die Englischklausur. Ich drück dir jetzt schon alle Federn 🍀"]);
+    if (t === 23) {
+      if (h >= 5 && h < 14) return wahl(["Guten Morgen, Toni ☀️ Heute ist die Erdkundeklausur. Du schaffst das, ich glaub ganz fest an dich! 🍀", "Morgen, Toni ☀️ Heute schreibst du Erdkunde. Du bist so gut vorbereitet, das wird super! 🍀"]);
+      if (h >= 14) return wahl(["Hi Toni! Wie lief die Erdkundeklausur? Ich bin sicher, du warst super 🍀", "Hallo Toni! Erdkunde ist geschrieben. Jetzt kannst du dich erstmal ausruhen 🥰"]);
+    }
+    if (t === 25) {
+      if (h >= 5 && h < 14) return wahl(["Guten Morgen, Toni ☀️ Heute ist die Englischklausur, und morgen hast du Geburtstag! Du schaffst das 🍀", "Morgen, Toni ☀️ Heute schreibst du Englisch. Ich glaub ganz fest an dich! 🍀"]);
+      if (h >= 14) return wahl(["Hi Toni! Wie lief die Englischklausur? Und jetzt nur noch einmal schlafen bis zu deinem Geburtstag 🎂", "Hallo Toni! Englisch ist geschrieben. Jetzt darfst du dich ganz auf morgen freuen 🎂"]);
+    }
     if (t === 15) {
       if (h >= 5 && h < 11) return wahl(["Guten Morgen, Toni ☀️ Um 11 Uhr ist Brunch mit Karla und Chris! Lasst es euch richtig schmecken 🥐", "Morgen, Toni ☀️ Heute um 11 Uhr geht es mit Karla und Chris zum Brunch. Ich bin ein bisschen neidisch 🥐"]);
       if (h >= 11 && h < 14) return wahl(["Hi Toni! Guten Appetit beim Brunch mit Karla und Chris 🥐 Grüß die beiden lieb von mir!", "Hallo Toni! Lasst es euch zu dritt schmecken, und hebt mir ein Croissant auf 🥐"]);
@@ -734,7 +754,52 @@
     v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, 5600));
     return true;
   }
-  window.adventkalender.voegel = { voegel, sage, frage: () => {
+  /* ---------- Besondere Aufträge (z. B. die Kerze vor einer Klausur) ---------- */
+  // Zu einem Punkt fliegen und dort sitzen bleiben
+  async function fliegeZu(zielFn) {
+    const v = maennchen, z0 = zielFn();
+    if (!z0) return false;
+    v.auftrag = true;
+    v.timer.forEach(clearTimeout); v.timer = []; clearTimeout(v.flugTimer);
+    v.blase.hidden = true; v.el.classList.remove("redet"); v.fragt = false;
+    const start = v.zustand === "sitzt" && !v.el.hidden && v.pos ? v.pos : { x: W() + 80, y: Math.max(-60, z0.y - 220) };
+    v.zustand = "fliegt"; v.el.hidden = false; v.el.classList.add("fliegt");
+    await animiere(v, [start, { x: (start.x + z0.x) / 2, y: Math.min(start.y, z0.y) - 70 }, { x: z0.x + 26, y: z0.y - 24 }, z0], 2000, zielFn);
+    v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.platz = null; v.ziel = null;
+    v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
+    return true;
+  }
+  // Etwas sagen und warten, bis die Blase wieder weg ist
+  function sagKurz(text, ms) {
+    const v = maennchen;
+    zeigeBlase(v, text);
+    return new Promise((fertig) => setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); fertig(); }, ms || 3800));
+  }
+  // Mit etwas im Schnabel davonfliegen und später wiederkommen
+  async function fliegeDavon(mit) {
+    const v = maennchen;
+    if (!v.pos) return;
+    v.blase.hidden = true; v.zustand = "fliegt"; v.el.classList.add("fliegt");
+    let lauf = true;
+    const trage = () => {
+      if (!lauf || !mit) return;
+      mit.style.left = v.pos.x + "px"; mit.style.top = v.pos.y - 14 + "px";
+      requestAnimationFrame(trage);
+    };
+    trage();
+    const s = v.pos;
+    await animiere(v, [s, { x: s.x + 40, y: s.y - 80 }, { x: s.x + 160, y: s.y - 220 }, { x: W() + 100, y: -100 }], 3200);
+    lauf = false;
+    v.el.hidden = true;
+    if (mit) mit.remove();
+    v.auftrag = false; v.zustand = "weg";
+    setTimeout(() => lande(v, false), 5000);
+  }
+  function weiter() { maennchen.auftrag = false; maennchen.hatGesprochen = true; planeAbflug(maennchen); }
+  // Der Munkelvogel ist frei für einen Auftrag: gelandet, hat gesprochen, keine Frage offen, alle Vögel still
+  const istDa = () => maennchen.zustand === "sitzt" && !maennchen.el.hidden && maennchen.hatGesprochen && !maennchen.fragt &&
+    voegel.every((v) => v.blase.hidden) && (!weibchen || (weibchen.zustand === "sitzt" && weibchen.hatGesprochen)) && !document.querySelector(".vogel.gast");
+  window.adventkalender.voegel = { voegel, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
     // erst wenn er gelandet ist und seine Sätze gesagt hat (höchstens 30 Sekunden warten)
     let n = 0;
     const los = () => {
