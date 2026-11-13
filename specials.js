@@ -1382,6 +1382,15 @@
     rahmen.appendChild(buehne);
     W = buehne.offsetWidth || window.innerWidth;
     H = buehne.offsetHeight || window.innerHeight;
+    // kleines X oben rechts zum vorzeitigen Beenden
+    const zu = document.createElement("button");
+    zu.type = "button";
+    zu.className = "special-zu";
+    zu.setAttribute("aria-label", "Capy-Special beenden");
+    zu.textContent = "✕";
+    rahmen.appendChild(zu);
+    let beendet = false;
+    zu.addEventListener("click", () => ende());
     if (ruhig) {
       spaeter(4000, ende);
     } else {
@@ -1389,6 +1398,8 @@
       spaeter(s.dauer, ende);
     }
     function ende() {
+      if (beendet) return;
+      beendet = true;
       const b = rahmen;
       b.classList.add("vorbei");
       setTimeout(() => b.remove(), 700);

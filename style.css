@@ -3759,3 +3759,14 @@ html:has(.liebeszettel, .fensterblick) :is(.entdecken-chip, .vogel-ebene) { visi
 .wz-kerzenpaket { position: absolute; z-index: 67; width: 34px; pointer-events: none; }
 .wz-kerzenpaket svg { display: block; width: 100%; filter: drop-shadow(0 3px 4px rgba(60, 30, 20, 0.3)); }
 @media (prefers-reduced-motion: reduce) { .wz-flamme i, .wz-kerze.an::after { animation: none; } }
+
+/* X zum Beenden eines Capy-Specials */
+.special-zu {
+  position: absolute; z-index: 10; top: calc(10px + env(safe-area-inset-top, 0px)); right: calc(10px + env(safe-area-inset-right, 0px));
+  width: 34px; height: 34px; padding: 0; border: 0; border-radius: 50%; pointer-events: auto; cursor: pointer;
+  background: rgba(255, 255, 255, 0.85); color: var(--beere); font: 800 0.95rem/1 "Nunito", sans-serif;
+  box-shadow: 0 3px 10px rgba(107, 21, 50, 0.25); -webkit-tap-highlight-color: transparent;
+}
+.special-zu:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.special-buehne.vorbei .special-zu { pointer-events: none; }
+html.zeitreise .special-zu { top: calc(54px + env(safe-area-inset-top, 0px)); }
