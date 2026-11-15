@@ -3856,3 +3856,25 @@ html[data-abend] .wz-note { color: #ffd0dc; }
 .wz-fg-himmel { background: radial-gradient(ellipse 14% 7% at 26% 42%, #fff 60%, transparent 62%), radial-gradient(ellipse 10% 5% at 33% 38%, #fff 60%, transparent 62%), radial-gradient(ellipse 12% 5% at 20% 64%, #fff 55%, transparent 58%), linear-gradient(#9fd2f5, #e9f6ff); }
 .wz-fg-band { bottom: -12%; font-size: 0.62rem; }
 @keyframes wz-ballon { 50% { transform: translate(-50%, -6%); } }
+
+/* Poststempel liegt auf der Briefmarke statt auf dem Foto, damit nie ein Gesicht verdeckt wird */
+.postkarte .poststempel { top: 50px; right: 12px; }
+@media (min-width: 560px) {
+  .postkarte .poststempel { right: auto; left: calc(50% - 92px); top: 58px; padding: 7px 4px; font-size: 0.5rem; }
+}
+
+/* ---------- Spontanes Special 15.11.: der Munkelvogel war mit beim Brunch ---------- */
+.vogel .bauch, .vogel .kruemel { display: none; }
+.vogel.satt .bauch, .vogel.satt .kruemel { display: inline; }
+.vogel.satt .vogel-koerper { scale: 1.2 1.04; }
+.vogel.zappelt .fluegel-hinten { opacity: 1; animation: fluegelschlag 0.08s ease-in-out infinite alternate; }
+.vogel.zappelt .fluegel-vorne { transform-box: fill-box; transform-origin: 50% 0; animation: fluegel-vorne 0.08s ease-in-out infinite alternate; }
+.vogel.schwer.fliegt .fluegel-hinten, .vogel.schwer.fliegt .fluegel-vorne { animation-duration: 0.09s; }
+.vogel.schwer.fliegt svg { animation: schwer-wackeln 0.55s ease-in-out infinite alternate; }
+@keyframes schwer-wackeln { from { rotate: -9deg; translate: 0 -2px; } to { rotate: 7deg; translate: 0 3px; } }
+.vogel.haengt svg { transform-origin: 50% 0; animation: baumeln 0.7s ease-in-out infinite alternate; }
+@keyframes baumeln { from { rotate: -12deg; } to { rotate: 12deg; } }
+.vogel.brunch-gast { pointer-events: none; cursor: default; }
+.brunch-staub { position: absolute; width: 15px; height: 15px; border-radius: 50%; background: radial-gradient(circle, #fff 30%, rgba(255, 244, 236, 0.85) 70%); box-shadow: 0 0 10px rgba(255, 255, 255, 0.9); pointer-events: none; z-index: 1; }
+.brunch-kruemel { position: absolute; width: 9px; height: 6px; border-radius: 55% 40% 50% 45%; background: radial-gradient(circle at 35% 35%, #ffe3a3, #d99a3c 72%); box-shadow: 0 1px 1px rgba(120, 70, 20, 0.3); pointer-events: none; z-index: 2; }
+.brunch-schweiss { position: absolute; font-size: 12px; line-height: 1; pointer-events: none; z-index: 2; }

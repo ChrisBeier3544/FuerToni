@@ -28,6 +28,7 @@
       '<ellipse cx="28" cy="32" rx="21" ry="19" fill="' + ruecken + '"/>' +
       '<ellipse cx="30" cy="38" rx="15" ry="13" fill="' + brust + '"/>' +
       '<ellipse cx="31" cy="42" rx="10" ry="8" fill="#fff2e4"/>' +
+      '<ellipse class="bauch" cx="30.5" cy="44" rx="13.5" ry="10.5" fill="#fff2e4"/><ellipse class="bauch" cx="25.5" cy="40.5" rx="4.2" ry="2.4" fill="#fff" opacity=".7"/>' +
       '<path class="fluegel-vorne" d="M14 30q-4 10 6 14q-4-8-6-14z" fill="' + fluegel + '"/>' +
       '<path d="M26 13q2-6 6-5q-3 1-3 5z" fill="' + ruecken + '"/>' +
       '<circle cx="22" cy="28" r="5" fill="#fff"/><circle cx="36" cy="28" r="5" fill="#fff"/>' +
@@ -36,6 +37,7 @@
       (weiblich ? '<path d="M17 23.5l-2-2M19.5 22.6l-.8-2.6M38.5 22.6l.8-2.6M41 23.5l2-2" stroke="#2a1a12" stroke-width="1.1" stroke-linecap="round"/>' : "") +
       '<rect class="augenlid" x="16.5" y="23" width="11" height="11" rx="5.5" fill="' + ruecken + '"/><rect class="augenlid" x="30.5" y="23" width="11" height="11" rx="5.5" fill="' + ruecken + '"/>' +
       '<path d="M27 33l2.5 4 2.5-4z" fill="#f3b23c"/>' +
+      '<g class="kruemel"><path d="M32.6 36.4l2.4-.7 1 1.8-1.7 1.2-1.9-.7z" fill="#e2a84a"/><circle cx="25.4" cy="38.6" r="1" fill="#e9b65a"/><circle cx="38.2" cy="40" r=".8" fill="#d99a3c"/></g>' +
       '<circle cx="17" cy="35" r="3" fill="#ff9fb4" opacity=".7"/><circle cx="41" cy="35" r="3" fill="#ff9fb4" opacity=".7"/>' +
       (weiblich && !a.deko ? '<g transform="translate(36 14) rotate(18)"><path d="M0 0-6-4v8zM0 0l6-4v8z" fill="#ff7aa2"/><circle r="2" fill="#ffd0dc"/></g>' : "") +
       (a.deko ? DEKO[a.deko](a.farbe || "#d6304f") : "") +
@@ -172,6 +174,7 @@
       const wahl = e.target.closest && e.target.closest(".vogel-wahl");
       if (wahl) { e.stopPropagation(); antworte(v, wahl.dataset.antwort); return; }
       if (v.zustand !== "sitzt" || v.fragt) return;
+      if (v.beimKlick && v.beimKlick()) return;
       el.classList.remove("hopst"); void el.offsetWidth; el.classList.add("hopst");
       // vor dem Geburtstag fragt der Munkelvogel beim zweiten Antippen nach seiner Partnerin
       if (!weiblich && vorGeburtstag() && v.hatGesprochen && !weibchen && !frageBeantwortet) { frage(v); return; }
@@ -269,11 +272,15 @@
       ? "#intro .umschlag-name, #intro .countdown-ziffern, #intro .countdown-titel, #intro .siegel, #intro .countdown-gruss, #intro .intro-hinweis"
       : ".polaroid img, .lightbox-figur img, #titel, .heute-karte .status, .zaehler-zahl";
     let summe = 0;
+    // Siegel, Countdown-Ziffern und Name dürfen gar nicht verdeckt werden (zählt so stark, dass der Vogel lieber schweigt)
+    const streng = "#intro .siegel, #intro .countdown-ziffern, #intro .umschlag-name";
     document.querySelectorAll(sel).forEach((e) => {
       const r = e.getBoundingClientRect();
       if (!r.width) return;
-      const w = Math.min(b.right, r.right - 4) - Math.max(b.left, r.left + 4), h = Math.min(b.bottom, r.bottom - 4) - Math.max(b.top, r.top + 4);
-      if (w > 0 && h > 0) summe += w * h;
+      // Siegel und Vogel bewegen sich leicht, deshalb um wichtige Schrift einen Sicherheitsabstand halten
+      const wichtig = e.matches(streng), m = wichtig ? -14 : 4;
+      const w = Math.min(b.right, r.right - m) - Math.max(b.left, r.left + m), h = Math.min(b.bottom, r.bottom - m) - Math.max(b.top, r.top + m);
+      if (w > 0 && h > 0) summe += w * h * (wichtig ? 100 : 1);
     });
     // außerhalb des Bildschirms zählt doppelt
     const aussen = Math.max(0, 4 - b.top) + Math.max(0, b.bottom - (window.innerHeight - 4)) + Math.max(0, 4 - b.left) + Math.max(0, b.right - (W() - 4));
@@ -311,6 +318,7 @@
   }
 
   async function fliegeWeg(v) {
+    if (v.auftrag) return;
     if (v.zustand !== "sitzt" || document.hidden) { planeAbflug(v); return; }
     v.blase.hidden = true; v.el.classList.remove("redet");
     v.zustand = "fliegt";
@@ -413,7 +421,7 @@
     18: () => "Psst … schau mal, was die zwei Capys ganz unten machen, wenn du sie antippst 😘",
     22: () => abends() ? "Psst … tipp mal auf den Mond, aber nur, wenn du dir was wünschen willst 🌠" : "Psst … heute Abend lohnt sich ein Tipp auf den Mond 🌙",
     1: () => "Psst … unter dem Kalender liegt Plätzchenteig. Tipp mal drauf 🍪",
-    3: () => "Psst … im Dorf ganz unten steht ein Briefkasten. Schau mal, ob Post für dich drin ist 💌",
+    3: () => "Psst … im Dorf ganz unten steht ein Briefkasten. Schau mal, ob Post für dich drin ist ✉️",
     6: () => "Psst … unten im Schnee liegt eine kleine Kugel. Daraus lässt sich bestimmt was bauen ⛄",
     10: () => "Psst … schüttel mal die Schneekugel neben dem Adventskranz ❄️",
     11: () => abends() ? "Psst … oben blinkt heute ein Stern. Tipp ihn an und wünsch dir was 🌟" : "Psst … heute Abend blinkt oben ein Stern. Dem darfst du einen Wunsch verraten 🌟",
@@ -697,6 +705,217 @@
     gaeste.forEach((g) => g.el.remove());
   }
 
+
+  /* ---------- Spontanes Special am 15.11. (14 bis 17 Uhr): der Munkelvogel war heimlich mit beim Brunch ---------- */
+  const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+  function brunchHeute() {
+    const d = ak.intro.datum();
+    return d.jahr === KALENDER.jahr && d.monat === 11 && d.tag === 15 && d.stunde >= 14 && d.stunde < 17 &&
+      kontext() === "countdown" && !(ak.zeitreise && ak.zeitreise.aktiv());
+  }
+  // kleine Teilchen in Seitenkoordinaten (Staub, Krümel, Schweißtropfen)
+  function teilchen(klasse, x, y, inhalt) {
+    const t = document.createElement("span");
+    t.className = klasse;
+    t.setAttribute("aria-hidden", "true");
+    if (inhalt) t.textContent = inhalt;
+    t.style.left = x + "px"; t.style.top = y + "px";
+    ebene.appendChild(t);
+    return t;
+  }
+  // Punkt im Vogelbild (viewBox 60×60) in Seitenkoordinaten, gespiegelt je nach Blickrichtung
+  function amVogel(v, sx, sy) {
+    const b = v.el.offsetWidth || GROESSE, h = v.el.offsetHeight || GROESSE;
+    const x = v.blick < 0 ? 60 - sx : sx;
+    return { x: v.seite.x - b / 2 + (x / 60) * b, y: v.seite.y - h + (sy / 60) * h };
+  }
+  function staubwolke(v) {
+    const fuss = { x: v.seite.x, y: v.seite.y - 2 };
+    for (let k = 0; k < 9; k++) {
+      const s = teilchen("brunch-staub", fuss.x, fuss.y);
+      const w = Math.PI * (0.04 + (0.92 * k) / 8), r = 26 + Math.random() * 14, g = 0.6 + Math.random() * 0.6;
+      s.animate([
+        { transform: "translate(-50%,-50%) scale(" + g * 0.5 + ")", opacity: 0.95 },
+        { transform: "translate(calc(-50% + " + (-Math.cos(w) * r).toFixed(1) + "px), calc(-50% - " + (Math.sin(w) * r * 0.45 + 4).toFixed(1) + "px)) scale(" + (g * 1.4).toFixed(2) + ")", opacity: 0 },
+      ], { duration: 700 + Math.random() * 250, easing: "cubic-bezier(.2,.7,.3,1)", fill: "forwards" }).onfinish = () => s.remove();
+    }
+  }
+  // ein Krümel fliegt im Bogen aus dem Schnabel und fällt herunter
+  function kruemelFliegt(v) {
+    const p = amVogel(v, 33, 37);
+    const k = teilchen("brunch-kruemel", p.x, p.y);
+    const dx = (v.blick < 0 ? -1 : 1) * (34 + Math.random() * 26), hoch = 26 + Math.random() * 12, fall = 70 + Math.random() * 30;
+    const bild = [];
+    for (let i = 0; i <= 8; i++) {
+      const u = i / 8, y = -4 * hoch * u * (1 - u) + fall * u * u;
+      bild.push({ transform: "translate(-50%,-50%) translate(" + (dx * u).toFixed(1) + "px," + y.toFixed(1) + "px) rotate(" + Math.round(u * 540) + "deg)", opacity: u > 0.8 ? (1 - u) * 5 : 1 });
+    }
+    k.animate(bild, { duration: 950, easing: "linear", fill: "forwards" }).onfinish = () => k.remove();
+  }
+  function schweiss(v) {
+    const p = amVogel(v, 44, 17);
+    const t = teilchen("brunch-schweiss", p.x, p.y, "💦");
+    t.animate([{ transform: "translate(-50%,-50%) scale(.3)", opacity: 0 }, { transform: "translate(-50%,-60%) scale(1)", opacity: 1, offset: 0.25 },
+      { transform: "translate(-30%,40%) scale(.9)", opacity: 0 }], { duration: 1100, easing: "ease-out", fill: "forwards" }).onfinish = () => t.remove();
+  }
+  const bild = (v) => v.el.querySelector("svg");
+  function plumps(v) {
+    return bild(v).animate([
+      { translate: "0 -8px", scale: "1 1" }, { translate: "0 0", scale: "1.32 .7", offset: 0.3 }, { translate: "0 -3px", scale: ".9 1.12", offset: 0.55 },
+      { translate: "0 0", scale: "1.06 .95", offset: 0.78 }, { translate: "0 0", scale: "1 1" },
+    ], { duration: 700, easing: "ease-out" }).finished.catch(() => {});
+  }
+  function hicks(v) {
+    kruemelFliegt(v);
+    return bild(v).animate([
+      { translate: "0 0", scale: "1 1" }, { translate: "0 -8px", scale: ".9 1.14", offset: 0.28 }, { translate: "0 0", scale: "1.1 .92", offset: 0.6 }, { translate: "0 0", scale: "1 1" },
+    ], { duration: 460, easing: "ease-out" }).finished.catch(() => {});
+  }
+  // Abheben versuchen: flattern, ein paar Pixel hoch, zappeln und wieder runterplumpsen
+  async function abhebenVersuch(v, mitSchweiss) {
+    v.el.classList.add("zappelt");
+    if (mitSchweiss) setTimeout(() => schweiss(v), 500);
+    await bild(v).animate([
+      { translate: "0 0", scale: "1 1" }, { translate: "0 -10px", offset: 0.4 }, { translate: "1.5px -8px", offset: 0.5 }, { translate: "-1.5px -10px", offset: 0.6 },
+      { translate: "1px -7px", offset: 0.7 }, { translate: "0 -6px", offset: 0.8 }, { translate: "0 0", scale: "1 1", offset: 0.87 },
+      { translate: "0 0", scale: "1.28 .76", offset: 0.93 }, { translate: "0 0", scale: "1 1" },
+    ], { duration: 1700, easing: "ease-in-out" }).finished.catch(() => {});
+    v.el.classList.remove("zappelt");
+  }
+  async function sagUndWarte(v, text, ms) {
+    zeigeBlase(v, text);
+    v.nachholen = null;
+    await pause(ms);
+    v.blase.hidden = true; v.el.classList.remove("redet");
+  }
+  async function brunchSzene() {
+    const v = maennchen;
+    v.el.classList.add("satt");
+    if (ruhig) { lande(v, false, true).then(() => setTimeout(() => sprich(v), 2000)); return; }
+    // Platz suchen wie bei einer normalen Landung
+    const k = "countdown";
+    let name = ERSTER_PLATZ[k];
+    if (!sitzpunkt(v, k, name)) name = freierPlatz(v, k);
+    if (!name) { await pause(1500); return brunchSzene(); }
+    const zielFn = () => sitzpunkt(v, k, name);
+    v.auftrag = true;
+    v.beimKlick = () => true;
+    v.platz = name; v.kontext = k; v.ziel = name;
+    v.el.classList.add("im-countdown");
+    // schwerer Anflug: durchhängen, hochkämpfen, wieder durchhängen, Bruchlandung
+    const z = zielFn(), vonRechts = z.x < W() / 2 ? false : true;
+    const sx = vonRechts ? W() + 70 : -70, l = (a) => sx + (z.x - sx) * a;
+    const weg = [{ x: sx, y: z.y - 150 }, { x: l(0.22), y: z.y - 118 }, { x: l(0.42), y: z.y - 62 }, { x: l(0.58), y: z.y - 96 }, { x: l(0.78), y: z.y - 34 }, { x: l(0.92), y: z.y - 52 }, z];
+    v.zustand = "fliegt"; v.el.classList.add("fliegt", "schwer"); v.el.hidden = false;
+    await animiere(v, weg, 4600, zielFn);
+    v.zustand = "sitzt"; v.el.classList.remove("fliegt", "schwer"); v.ziel = null;
+    v.blick = z.x < W() / 2 ? 1 : -1; setzePosition(v, zielFn() || z);
+    staubwolke(v);
+    await plumps(v);
+    await bild(v).animate([{ rotate: "0deg" }, { rotate: "-14deg", offset: 0.25 }, { rotate: "9deg", offset: 0.55 }, { rotate: "-4deg", offset: 0.8 }, { rotate: "0deg" }],
+      { duration: 1000, easing: "ease-in-out" }).finished.catch(() => {});
+    await pause(500);
+    await sagUndWarte(v, "Hi Toni! Ich war heimlich mit beim Brunch 🥐", 3600);
+    await pause(300);
+    await sagUndWarte(v, "Ich hab nur ein kleines Croissant mitgenommen… es waren sieben 😋", 4400);
+    await pause(400);
+    await abhebenVersuch(v, false);
+    await pause(500);
+    await abhebenVersuch(v, true);
+    await pause(300);
+    await sagUndWarte(v, "Puh, Toni… ich glaub, ich bin zu schwer zum Fliegen 😵", 4000);
+    // jetzt darf Toni ihn anstupsen
+    let stupser = 0, fertig;
+    const getippt = new Promise((r) => (fertig = r));
+    const SAETZE = ["Hicks! 🥐", "Hicks! Oh, da war noch ein Krümel 😳", "Bitte nicht mehr pieksen, Toni, sonst platz ich 😵"];
+    let sprichtBis = 0;
+    zeigeBlase(v, "Stups mich mal an, vielleicht hilft das 🥺");
+    v.nachholen = null;
+    v.beimKlick = () => {
+      if (stupser >= 3) return true;
+      const t = performance.now();
+      if (t < sprichtBis) return true;
+      sprichtBis = t + 900;
+      hicks(v);
+      v.timer.forEach(clearTimeout); v.timer = [];
+      zeigeBlase(v, SAETZE[stupser]); v.nachholen = null;
+      stupser++;
+      if (stupser < 3) v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); }, 3200));
+      else setTimeout(fertig, 3600);
+      return true;
+    };
+    // wenn Toni nicht tippt: selbst ein Hickser, und nach einer Weile kommt die Munkelvogeline trotzdem
+    const vonSelbst = (zeit, text) => setTimeout(() => { if (!stupser) { hicks(v); v.timer.forEach(clearTimeout); v.timer = []; zeigeBlase(v, text); v.nachholen = null; v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); }, 2600)); } }, zeit);
+    const hickser = [vonSelbst(9000, "Hicks! 😳"), vonSelbst(16000, "Hicks! Huch, schon wieder 🙈")];
+    const sicherheit = setTimeout(() => { if (stupser < 3) { stupser = 3; fertig(); } }, 23000);
+    await getippt;
+    hickser.forEach(clearTimeout); clearTimeout(sicherheit);
+    v.timer.forEach(clearTimeout); v.timer = [];
+    v.blase.hidden = true; v.el.classList.remove("redet");
+    v.beimKlick = () => true;
+    await pause(600);
+    await vogelineHoltIhn(v);
+    // später ganz normal wiederkommen, aber immer noch kugelrund
+    v.beimKlick = () => { if (v.auftrag) return true; kruemelFliegt(v); return false; };
+    await pause(5500);
+    v.auftrag = false;
+    lande(v, false).then(() => setTimeout(() => sprich(v), 2000));
+  }
+  async function vogelineHoltIhn(v) {
+    const el = document.createElement("span");
+    el.className = "vogel weibchen brunch-gast";
+    el.setAttribute("aria-hidden", "true");
+    el.innerHTML = '<span class="vogel-blase" hidden></span>' + vogelSvg(true);
+    el.style.visibility = "hidden";
+    ebene.appendChild(el);
+    const w = { el, blase: el.querySelector(".vogel-blase"), weiblich: true, zustand: "fliegt", blick: 1, pos: null, timer: [] };
+    const neben = () => { const p = v.pos; const rechts = p.x + 50 < W() - 20; return { x: p.x + (rechts ? 46 : -46), y: p.y }; };
+    const z = neben(), vonLinks = z.x < v.pos.x;
+    const start = { x: vonLinks ? -70 : W() + 70, y: z.y - 170 };
+    w.blick = vonLinks ? 1 : -1; setzePosition(w, start); el.style.visibility = "";
+    el.classList.add("fliegt");
+    await animiere(w, [start, { x: (start.x + z.x) / 2, y: Math.min(start.y, z.y) - 50 }, { x: z.x + (vonLinks ? -26 : 26), y: z.y - 26 }, z], 2400, neben);
+    w.zustand = "sitzt"; el.classList.remove("fliegt");
+    let mitgehen = true;
+    const folge = () => { if (!mitgehen || w.zustand !== "sitzt") return; w.blick = v.pos.x > w.pos.x ? 1 : -1; setzePosition(w, neben()); requestAnimationFrame(folge); };
+    folge();
+    el.classList.remove("hopst"); void el.offsetWidth; el.classList.add("hopst");
+    await pause(500);
+    // sie schüttelt den Kopf
+    const kopf = () => bild(w).animate([{ rotate: "0deg" }, { rotate: "-11deg", offset: 0.15 }, { rotate: "11deg", offset: 0.35 }, { rotate: "-10deg", offset: 0.55 }, { rotate: "9deg", offset: 0.75 }, { rotate: "0deg" }],
+      { duration: 1000, easing: "ease-in-out" }).finished.catch(() => {});
+    zeigeBlase(w, "Da bist du ja! Sieben Croissants?! 🙈");
+    await kopf();
+    await pause(2900);
+    w.blase.hidden = true; el.classList.remove("redet");
+    await pause(250);
+    v.blick = w.pos.x > v.pos.x ? 1 : -1; setzePosition(v, v.pos);
+    await sagUndWarte(v, "Es waren sehr kleine Croissants… 😇", 3200);
+    await pause(250);
+    zeigeBlase(w, "Na komm, ich bring dich nach Hause, du kleiner Vielfraß 😄");
+    await pause(3800);
+    w.blase.hidden = true; el.classList.remove("redet");
+    await pause(250);
+    await sagUndWarte(v, "Tschüss, Toni! Nie wieder sieben… höchstens sechs 🥐", 3800);
+    // sie flattert über ihn und packt ihn
+    mitgehen = false;
+    const s = { x: v.pos.x, y: v.pos.y };
+    const oben = { x: s.x, y: s.y - 40 };
+    // beim Tragen flattert sie, die Füße halten ihn fest
+    w.zustand = "fliegt"; el.classList.remove("hopst"); el.classList.add("zappelt");
+    await animiere(w, [w.pos, { x: (w.pos.x + oben.x) / 2, y: oben.y - 26 }, oben], 900);
+    // zusammen davon, er baumelt unter ihr
+    const nachRechts = s.x > W() / 2, r = nachRechts ? 1 : -1;
+    const pfad = [s, { x: s.x + r * 14, y: s.y - 26 }, { x: s.x + r * 50, y: s.y - 12 }, { x: s.x + r * 110, y: s.y - 80 }, { x: s.x + r * 175, y: s.y - 62 }, { x: nachRechts ? W() + 110 : -110, y: s.y - 230 }];
+    v.zustand = "fliegt"; v.el.classList.add("haengt"); v.platz = null;
+    await Promise.all([
+      animiere(v, pfad.map((p) => ({ x: p.x, y: p.y })), 4400),
+      animiere(w, pfad.map((p) => ({ x: p.x, y: p.y - 40 })), 4400),
+    ]);
+    el.remove();
+    v.el.hidden = true; v.el.classList.remove("haengt"); v.zustand = "weg";
+  }
+
   /* ---------- Start ---------- */
   const maennchen = erstelleVogel(false, saetzeMaennchen);
   let weibchen = null;
@@ -708,6 +927,7 @@
     // Erst wenn die Animation des Tages vorbei ist (und noch 3 Sekunden mehr),
     // fliegt der Munkelvogel ins Bild
     wartAufRuhe().then(() => {
+      if (brunchHeute()) { brunchSzene(); return; }
       lande(maennchen, false, true).then(() => setTimeout(() => sprich(maennchen), 2000));
       if (zuZweit()) {
         weibchen = erstelleVogel(true, saetzeWeibchen);
@@ -745,7 +965,7 @@
   // Von außen: das Rotkehlchen sagt einen Satz, falls es gerade sitzt (sonst false)
   function sage(satz) {
     const v = voegel[0];
-    if (!v || v.zustand !== "sitzt" || v.el.hidden) return false;
+    if (!v || v.auftrag || v.zustand !== "sitzt" || v.el.hidden) return false;
     const r = v.el.getBoundingClientRect();
     if (r.bottom < 0 || r.top > window.innerHeight) return false;
     v.timer.forEach(clearTimeout); v.timer = [];
