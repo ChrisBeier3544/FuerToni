@@ -887,33 +887,42 @@
   /* ===========================================================
      10. Mistelzweig: zwei Daumen an den Rändern
      =========================================================== */
+  // Über Touch-Ereignisse statt Pointer-Ereignisse: bei zwei Fingern bricht der Browser
+  // Pointer-Ereignisse oft ab (er hält es für Zoomen), Touch-Ereignisse laufen weiter.
   const finger = new Map();
   let mistelTimer = null, mistelSperre = false, klickSperre = 0;
-  function pruefeMistel() {
+  const TOLERANZ = 36;
+  function pruefeMistel(touches) {
     clearTimeout(mistelTimer);
-    if (mistelSperre || finger.size !== 2) return;
+    if (mistelSperre || touches.length !== 2) return;
     const W = window.innerWidth;
-    const xs = [...finger.values()].map((f) => f.x);
-    const links = xs.some((x) => x < W * 0.2), rechts = xs.some((x) => x > W * 0.8);
+    const xs = [...touches].map((t) => t.clientX);
+    const links = xs.some((x) => x < W * 0.25), rechts = xs.some((x) => x > W * 0.75);
     if (!links || !rechts) return;
     mistelTimer = setTimeout(() => {
       if (finger.size === 2) { klickSperre = Date.now() + 1500; mistelzweig(); }
-    }, 700);
+    }, 450);
   }
-  document.addEventListener("pointerdown", (e) => {
-    if (e.pointerType !== "touch") return;
-    finger.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY });
-    pruefeMistel();
-  }, true);
-  document.addEventListener("pointermove", (e) => {
-    const f = finger.get(e.pointerId);
-    if (!f) return;
-    f.x = e.clientX; f.y = e.clientY;
-    if (Math.hypot(f.x - f.x0, f.y - f.y0) > 24) { finger.delete(e.pointerId); clearTimeout(mistelTimer); }
-  }, true);
-  const fingerWeg = (e) => { finger.delete(e.pointerId); clearTimeout(mistelTimer); };
-  document.addEventListener("pointerup", fingerWeg, true);
-  document.addEventListener("pointercancel", fingerWeg, true);
+  document.addEventListener("touchstart", (e) => {
+    for (const t of e.changedTouches) finger.set(t.identifier, { x0: t.clientX, y0: t.clientY });
+    // nur Finger zählen, die wirklich noch auf dem Bildschirm sind
+    for (const id of [...finger.keys()]) if (![...e.touches].some((t) => t.identifier === id)) finger.delete(id);
+    pruefeMistel(e.touches);
+  }, { capture: true, passive: true });
+  document.addEventListener("touchmove", (e) => {
+    for (const t of e.changedTouches) {
+      const f = finger.get(t.identifier);
+      if (f && Math.hypot(t.clientX - f.x0, t.clientY - f.y0) > TOLERANZ) { finger.delete(t.identifier); clearTimeout(mistelTimer); }
+    }
+  }, { capture: true, passive: true });
+  const fingerWeg = (e) => {
+    for (const t of e.changedTouches) finger.delete(t.identifier);
+    if (e.touches.length < 2) clearTimeout(mistelTimer);
+  };
+  document.addEventListener("touchend", fingerWeg, { capture: true, passive: true });
+  // touchcancel heißt nur, dass das Handy selbst etwas übernimmt (Zoomen, Zurückwischen,
+  // Textauswahl). Die Daumen liegen dann meist noch, deshalb zählt das nicht als Loslassen.
+  // Beim nächsten touchstart werden verwaiste Finger aufgeräumt.
   // nach der Geste kein Türchen o. Ä. aus Versehen öffnen
   document.addEventListener("click", (e) => { if (Date.now() < klickSperre) { e.stopPropagation(); e.preventDefault(); } }, true);
   function mistelzweig() {

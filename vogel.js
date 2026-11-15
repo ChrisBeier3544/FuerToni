@@ -269,7 +269,7 @@
     const b = blase.getBoundingClientRect();
     const intro = document.getElementById("intro");
     const sel = intro && !intro.hidden
-      ? "#intro .umschlag-name, #intro .countdown-ziffern, #intro .countdown-titel, #intro .siegel, #intro .countdown-gruss, #intro .intro-hinweis"
+      ? "#intro .umschlag-name, #intro .countdown-ziffern, #intro .countdown-titel, #intro .siegel, #intro .countdown-gruss, #intro .intro-hinweis, #intro .special-knopf, #intro .intro-spiel"
       : ".polaroid img, .lightbox-figur img, #titel, .heute-karte .status, .zaehler-zahl";
     let summe = 0;
     // Siegel, Countdown-Ziffern und Name dürfen gar nicht verdeckt werden (zählt so stark, dass der Vogel lieber schweigt)
