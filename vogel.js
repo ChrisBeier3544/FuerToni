@@ -542,7 +542,153 @@
     "Darf meine Liebste auch dazukommen? 🥺",
     "Darf ich meine Partnerin dazuholen? 🥺",
   ];
+  // Sätze des Tages vom 16. bis 25.11. (je Vogel: 2 morgens, 1 mittags, 2 abends)
+  const TAGESSAETZE = {
+    16: {
+      m: ["Guten Morgen, Toni! Ich hab extra früh angefangen zu zwitschern, damit du gut gelaunt aufwachst ☀️",
+        "Toni, weißt du, was das Schönste an meinem Morgen ist? Wenn du hier vorbeischaust 🥰",
+        "Ich hab heute schon drei Wolken gezählt. Alle sahen aus wie ein Herz, Toni ♥️",
+        "Toni, ich hab gehört, dass Chris den ganzen Tag an dich denkt. Ich übrigens auch 🐦",
+        "Psst, Toni… der Umschlag hat heute ganz leise gekichert. Ich glaube, er freut sich auf dich ✉️"],
+      w: ["Guten Morgen, Toni! Er hat schon im Morgengrauen angefangen zu zwitschern. Er freut sich einfach so, dich zu sehen 😅",
+        "Toni, ich hab heute meine schönste Schleife aufgesetzt. Für dich 🎀",
+        "Weißt du, Toni, er redet den ganzen Tag nur von dir. Ich bin fast ein bisschen eifersüchtig 😜",
+        "Toni, ich finde, du und Chris seid fast so süß wie wir zwei. Fast 😌",
+        "Ich hab ihm beigebracht, wie man ein Herz in die Luft fliegt. Er übt noch, Toni ♥️"],
+    },
+    17: {
+      m: ["Morgen, Toni! Ich hab dir einen Sonnenstrahl auf den Umschlag gelegt ☀️",
+        "Toni, wenn du lächelst, muss ich jedes Mal mitzwitschern. Ich kann nicht anders 🎶",
+        "Die Capys haben mich gefragt, ob du wirklich so lieb bist, wie alle sagen. Ich hab gesagt: noch viel lieber, Toni 🐹",
+        "Noch 9 Mal schlafen, Toni. Ich zähle schon auf meinen Federn mit 🪶",
+        "Toni, ich hab Chris heute heimlich beobachtet. Er hat ganz verliebt gegrinst 😏"],
+      w: ["Morgen, Toni! Ich hab mir mit Morgentau das Gesicht gewaschen. Man will ja hübsch sein für dich ✨",
+        "Toni, du hast so ein schönes Lächeln. Das sagen sogar die Capys 🐹",
+        "Psst, Toni… ich weiß, was am 26. passiert. Aber ich bin viel besser im Schweigen als er 🤐",
+        "Toni, danke, dass ich hier sein darf. Bei dir ist es so gemütlich 🥰",
+        "Er hat mir erzählt, dass Chris dich die Allerschönste nennt. Recht hat er, Toni 😊"],
+    },
+    18: {
+      m: ["Guten Morgen, Toni! Ich hab mein schönstes Federkleid angezogen, nur für dich ✨",
+        "Toni, du bist der Grund, warum ich morgens so gerne hier sitze 🥰",
+        "Das Siegel glänzt heute besonders, Toni. Ich glaube, es weiß schon, was an deinem Geburtstag passiert 🤫",
+        "Toni, ich hab ein Lied für dich gedichtet. Es geht nur „Piep piep Toni piep“, aber es kommt von Herzen 🎶",
+        "Weißt du, Toni, die Sterne über dem Umschlag leuchten heller, wenn du da bist 🌟"],
+      w: ["Guten Morgen, Toni! Ich hab ihm Frühstück ans Nest gebracht. Rate mal, wer zuerst nach dir gefragt hat 🐦",
+        "Toni, man sieht dir an, dass du geliebt wirst. Du strahlst richtig ☀️",
+        "Toni, ich hab heute eine Feder verloren. Wenn du sie findest, darfst du dir was wünschen 🪶",
+        "Weißt du, Toni, die schönsten Abende sind die, an denen jemand an einen denkt. Und Chris denkt gerade an dich ♥️",
+        "Ich bin heute extra länger geblieben, Toni. Ich wollte noch ein bisschen bei dir sein 🌙"],
+    },
+    19: {
+      m: ["Morgen, Toni! Ich hab geträumt, wir fliegen zusammen über den Rhein. Du warst schneller 😄",
+        "Toni, falls dir heute jemand sagt, dass du toll bist: Das war ich, ich hab es überall herumgezwitschert 🐦",
+        "Die Capys proben irgendwas, Toni. Ich darf nicht verraten was, aber es wird fröhlich 🥁",
+        "Noch eine Woche, Toni! Ich bin so aufgeregt, dass ich kaum stillsitzen kann 🪶",
+        "Toni, ich hab heute einen Brief gesehen, auf dem nur dein Name steht. Rate mal, wo 😏"],
+      w: ["Morgen, Toni! Ich hab mir die Wangen extra rosa gepustet. Steht mir doch, oder? 😊",
+        "Toni, ein guter Tag fängt mit dir an. Das sag ich ihm jeden Morgen 🥰",
+        "Toni, die Capys wollten wissen, was du dir zum Geburtstag wünschst. Ich hab gesagt, das weiß nur einer 😏",
+        "Noch eine Woche, Toni! Ich überlege schon, welche Schleife ich an deinem Geburtstag trage 🎀",
+        "Toni, ich glaube, er übt heimlich ein Ständchen für dich. Ich hör ihn nachts piepsen 🎶"],
+    },
+    20: {
+      m: ["Guten Morgen, Toni! Ich hab dir die Fensterbank schon schön warm gesessen 🐦",
+        "Toni, du bist wie der erste Sonnenstrahl am Morgen. Nur viel hübscher ☀️",
+        "Weißt du, was ich an dir mag, Toni? Alles. Die Liste war zu lang zum Aufzählen 📜",
+        "Toni, der Umschlag hat geflüstert: „Nur noch ein paar Tage.“ Er kann es auch kaum erwarten ✉️",
+        "Wenn du gleich schlafen gehst, Toni: Ich pass auf, dass niemand vor dir in den Umschlag guckt 🛡️"],
+      w: ["Guten Morgen, Toni! Weißt du, dass du die Lieblingsperson von zwei kleinen Vögeln bist? 🐦🐦",
+        "Toni, ich wünsch dir heute einen Tag so weich wie meine Brustfedern 🪶",
+        "Toni, er ist heute ganz aufgeregt herumgeflattert. Er sagt, bald wird es hier richtig schön ✨",
+        "Toni, wenn du müde bist, denk dran: Irgendwo sitzen zwei Munkelvögel und haben dich lieb ♥️",
+        "Er behauptet, er hätte das schönere Gefieder. Was meinst du, Toni? 😏"],
+    },
+    21: {
+      m: ["Guten Morgen, Toni! Wochenende! Ich hab beschlossen, heute nur nette Sachen zu zwitschern 🥰",
+        "Toni, Chris hat mir verraten, dass er beim Aufwachen zuerst an dich denkt. Ich hab nicht gelauscht, ehrlich 🙈",
+        "Toni, ich übe gerade „Happy Birthday“ zu pfeifen. Es klingt noch schief, aber bis zum 26. sitzt es 🎶",
+        "Noch 5 Mal schlafen, Toni. Meine Federn kribbeln schon vor Vorfreude 🪶",
+        "Toni, an deinem Geburtstag wird es hier ein bisschen voller als sonst. Mehr verrate ich nicht 🤫"],
+      w: ["Guten Morgen, Toni! Samstag! Heute wird nur gekuschelt und gezwitschert ☺️",
+        "Toni, Chris hat so ein Glück mit dir. Und du mit ihm. Ich seh doch, wie ihr euch anguckt 🥰",
+        "Toni, ich hab gesehen, wie die Capys Luftballons aufgepustet haben. Einer ist geplatzt, alle haben sich erschrocken 😂",
+        "Noch 5 Mal schlafen, Toni. Ich zähl mit, er zählt mit, sogar die Capys zählen mit 🐹",
+        "Toni, ich wünsch dir einen kuscheligen Samstagabend. Am besten mit ganz viel Decke und Chris 🛋️"],
+    },
+    22: {
+      m: ["Guten Morgen, Toni! Heute ist ein perfekter Tag zum Kuscheln. Sag das ruhig Chris ☺️",
+        "Toni, ich hab heute Nacht von dir geträumt. Du hattest eine Krone auf und alle Capys haben applaudiert 👑",
+        "Toni, egal was morgen kommt: Du bist klug und stark, und ich bin unglaublich stolz auf dich 🍀",
+        "Toni, ich hab dir eine Glücksfeder hingelegt. Nimm sie morgen in Gedanken mit 🪶",
+        "Toni, die Capys haben heute heimlich Girlanden gezählt. Ich glaube, die planen was für den 26. 🎉"],
+      w: ["Guten Morgen, Toni! Sonntagmorgen ist zum Ausschlafen da. Ich hab extra leise gepiepst 🤫",
+        "Toni, ich hab ihm gesagt, dass du die tollste Toni der Welt bist. Er hat genickt, bis ihm schwindlig wurde 😄",
+        "Toni, für morgen drück ich dir alle Krallen. Du schaffst das 🍀",
+        "Toni, mach dir heute Abend keinen Stress mehr. Du bist bestens vorbereitet ♥️",
+        "Ich leg dir eine Feder unters Kopfkissen, Toni. Die bringt gute Träume 🪶"],
+    },
+    23: {
+      m: ["Guten Morgen, Toni! Ich hab extra leise gezwitschert, damit du entspannt in den Tag startest 🍀",
+        "Toni, du weißt mehr, als du denkst. Und ich weiß, dass du das kannst 💪",
+        "Ich bin so stolz auf dich, Toni. Egal wie es läuft 🥰",
+        "Toni, heute Abend darfst du einfach nur durchatmen. Den Rest erledige ich mit Zwitschern 🎶",
+        "Noch 3 Mal schlafen, Toni! Ich hab schon angefangen, mein Gefieder zu bürsten ✨"],
+      w: ["Guten Morgen, Toni! Ich hab ein Kleeblatt gesucht und gefunden. Es ist für dich 🍀",
+        "Toni, tief durchatmen. Wir zwei sitzen hier und drücken dir die Daumen, äh, die Flügel 🐦",
+        "Toni, egal was heute war: Wir zwei sind stolz auf dich 🥰",
+        "Toni, nach so einem Tag hast du dir ganz viel Kuscheln verdient. Ich hab Chris schon Bescheid gegeben 😌",
+        "Noch 3 Mal schlafen, Toni. Ich glaub, er platzt bald vor Vorfreude 🎈"],
+    },
+    24: {
+      m: ["Guten Morgen, Toni! Nur noch zwei Mal schlafen. Ich bin ganz zappelig 🪶",
+        "Toni, wenn so ein kleiner Vogel wie ich schon so viel Liebe in sich hat, wie viel steckt dann erst in Chris? 🥰",
+        "Toni, die Munkelvogeline hat gesagt, ich soll dir heute was Liebes sagen. Also: Du bist wundervoll ♥️",
+        "Toni, morgen schreibst du Englisch. You are amazing! Siehst du, ich kann auch Englisch 🐦",
+        "Toni, der Umschlag ist schon ganz unruhig. Er weiß, dass es bald so weit ist ✉️"],
+      w: ["Guten Morgen, Toni! Er hat heute Nacht im Schlaf deinen Namen gepiepst. Süß, oder? 🥰",
+        "Toni, nur noch zwei Mal schlafen. Ich hab schon meine schönste Schleife rausgesucht 🎀",
+        "Toni, die Capys haben gerade eine sehr geheime Besprechung. Ich durfte nicht mit rein 🤫",
+        "Toni, morgen Englisch und dann Geburtstag. Was für eine Woche! Du schaffst das 🍀",
+        "Toni, ich bin so froh, dass du mich eingeladen hast. Ohne dich wär er hier ganz allein 🥺"],
+    },
+    25: {
+      m: ["Guten Morgen, Toni! Heute noch Englisch, und morgen ist DEIN Tag 🎂",
+        "Toni, ich male mir schon aus, wie du morgen strahlst. Allein der Gedanke macht mich glücklich ☀️",
+        "Bald ist Englisch geschafft, Toni, und dann wird nur noch gefeiert 🎉",
+        "Nur noch einmal schlafen, Toni! Ich bin so aufgeregt, ich mach heute bestimmt kein Auge zu 🥳",
+        "Toni, um Mitternacht wird es hier ganz besonders. Vielleicht bleibst du ja ein bisschen wach 🤫"],
+      w: ["Guten Morgen, Toni! Letzter Tag vor deinem großen Tag. Ich bin ganz kribbelig ✨",
+        "Toni, viel Glück heute! Danach darfst du dich nur noch freuen 🍀",
+        "Toni, ich hab heimlich in den Umschlag geschielt. Ich sag nur: Du wirst lächeln 🤭",
+        "Nur noch einmal schlafen, Toni! Er hat sich schon die Federn gekämmt 🪶",
+        "Toni, morgen bist du ein Jahr älter und noch genauso süß. Das ist so sicher wie mein Piepsen 🥰"],
+    },
+  };
+  // Wundertüte: jeder Satz kommt einmal, in zufälliger Reihenfolge.
+  // Morgens (ab 5 Uhr) sind 2 freigeschaltet, ab 12 Uhr 3, ab 17 Uhr alle 5.
+  const SAETZE_SCHLUESSEL = "toni-wz-vogelsaetze";
+  function naechsterTagessatz(wer) {
+    const d = ak.intro.datum();
+    if (d.jahr !== KALENDER.jahr || d.monat !== 11 || !TAGESSAETZE[d.tag] || (ak.zeitreise && ak.zeitreise.aktiv())) return null;
+    const anzahl = d.stunde < 5 ? 0 : d.stunde < 12 ? 2 : d.stunde < 17 ? 3 : 5;
+    let gesagt = {};
+    try { gesagt = JSON.parse(localStorage.getItem(SAETZE_SCHLUESSEL) || "{}") || {}; } catch (_) { gesagt = {}; }
+    const key = d.tag + wer;
+    const schon = Array.isArray(gesagt[key]) ? gesagt[key] : [];
+    const frei = [];
+    // ein übrig gebliebener „Guten Morgen“ passt ab 12 Uhr nicht mehr
+    const morgengruss = (i) => d.stunde >= 12 && /^(Guten )?Morgen\b/.test(TAGESSAETZE[d.tag][wer][i]);
+    for (let i = 0; i < anzahl; i++) if (!schon.includes(i) && !morgengruss(i)) frei.push(i);
+    if (!frei.length) return null;
+    const i = wahl(frei);
+    gesagt[key] = schon.concat(i);
+    try { localStorage.setItem(SAETZE_SCHLUESSEL, JSON.stringify(gesagt)); } catch (_) { /* egal */ }
+    return TAGESSAETZE[d.tag][wer][i];
+  }
   function saetzeMaennchen() {
+    // ab dem zweiten Mal Sprechen: erst die Sätze des Tages
+    if (maennchen.hatGesprochen) { const satz = naechsterTagessatz("m"); if (satz) return [satz]; }
     if (vorGeburtstag()) {
       // Hinweise auf die Entdeckungen des Tages (wartezeit.js), sonst ein Geheimnis
       let h = null;
@@ -556,6 +702,7 @@
     return liste;
   }
   function saetzeWeibchen() {
+    if (weibchen && weibchen.hatGesprochen) { const satz = naechsterTagessatz("w"); if (satz) return [satz]; }
     if (vorGeburtstag() || weibchenEingeladen) return [wahl(DANKE)];
     const d = ak.intro.datum();
     if (d.monat === 11 && d.tag === 26) return ["Happy Birthday, Toni! Wir zwei feiern heute mit dir 🎂"];
