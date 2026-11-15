@@ -50,7 +50,8 @@
     mittag: () => stunde() >= 14 && stunde() < 18,
     abend: () => stunde() >= 17 && stunde() < 23,
   };
-  const istNacht = () => stunde() >= 23 || stunde() < 5;
+  // die Zahlen schlafen von 22:30 bis 5 Uhr
+  const istNacht = () => { const d = datum(), m = d.stunde * 60 + d.minute; return m >= 22 * 60 + 30 || m < 5 * 60; };
 
   // Wann gibt es was? (mittags 14 bis 18 Uhr, abends 17 bis 23 Uhr)
   const PLAN = {
