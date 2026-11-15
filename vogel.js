@@ -37,7 +37,7 @@
       (weiblich ? '<path d="M17 23.5l-2-2M19.5 22.6l-.8-2.6M38.5 22.6l.8-2.6M41 23.5l2-2" stroke="#2a1a12" stroke-width="1.1" stroke-linecap="round"/>' : "") +
       '<rect class="augenlid" x="16.5" y="23" width="11" height="11" rx="5.5" fill="' + ruecken + '"/><rect class="augenlid" x="30.5" y="23" width="11" height="11" rx="5.5" fill="' + ruecken + '"/>' +
       '<path d="M27 33l2.5 4 2.5-4z" fill="#f3b23c"/>' +
-      '<g class="kruemel"><path d="M32.6 36.4l2.4-.7 1 1.8-1.7 1.2-1.9-.7z" fill="#e2a84a"/><circle cx="25.4" cy="38.6" r="1" fill="#e9b65a"/><circle cx="38.2" cy="40" r=".8" fill="#d99a3c"/></g>' +
+      '<g class="kruemel"><path d="M32.6 36.4l2.4-.7 1 1.8-1.7 1.2-1.9-.7z" fill="#b8763f"/><path d="M33.4 36.6l1.4-.3" stroke="#fff4e6" stroke-width=".7" stroke-linecap="round"/><circle cx="25.4" cy="38.6" r="1" fill="#a0612e"/><circle cx="38.2" cy="40" r=".8" fill="#c98a4f"/></g>' +
       '<circle cx="17" cy="35" r="3" fill="#ff9fb4" opacity=".7"/><circle cx="41" cy="35" r="3" fill="#ff9fb4" opacity=".7"/>' +
       (weiblich && !a.deko ? '<g transform="translate(36 14) rotate(18)"><path d="M0 0-6-4v8zM0 0l6-4v8z" fill="#ff7aa2"/><circle r="2" fill="#ffd0dc"/></g>' : "") +
       (a.deko ? DEKO[a.deko](a.farbe || "#d6304f") : "") +
@@ -815,9 +815,9 @@
     await bild(v).animate([{ rotate: "0deg" }, { rotate: "-14deg", offset: 0.25 }, { rotate: "9deg", offset: 0.55 }, { rotate: "-4deg", offset: 0.8 }, { rotate: "0deg" }],
       { duration: 1000, easing: "ease-in-out" }).finished.catch(() => {});
     await pause(500);
-    await sagUndWarte(v, "Hi Toni! Ich war heimlich mit beim Brunch 🥐", 3600);
+    await sagUndWarte(v, "Hi Toni! Ich war heimlich mit beim Brunch 🤭", 3600);
     await pause(300);
-    await sagUndWarte(v, "Ich hab nur ein kleines Croissant mitgenommen… es waren sieben 😋", 4400);
+    await sagUndWarte(v, "Ich hab nur eine kleine Zimtschnecke mitgenommen… es waren sieben 😋", 4400);
     await pause(400);
     await abhebenVersuch(v, false);
     await pause(500);
@@ -827,7 +827,7 @@
     // jetzt darf Toni ihn anstupsen
     let stupser = 0, fertig;
     const getippt = new Promise((r) => (fertig = r));
-    const SAETZE = ["Hicks! 🥐", "Hicks! Oh, da war noch ein Krümel 😳", "Bitte nicht mehr pieksen, Toni, sonst platz ich 😵"];
+    const SAETZE = ["Hicks! 🤭", "Hicks! Oh, da war noch ein Krümel 😳", "Bitte nicht mehr pieksen, Toni, sonst platz ich 😵"];
     let sprichtBis = 0;
     zeigeBlase(v, "Stups mich mal an, vielleicht hilft das 🥺");
     v.nachholen = null;
@@ -884,19 +884,19 @@
     // sie schüttelt den Kopf
     const kopf = () => bild(w).animate([{ rotate: "0deg" }, { rotate: "-11deg", offset: 0.15 }, { rotate: "11deg", offset: 0.35 }, { rotate: "-10deg", offset: 0.55 }, { rotate: "9deg", offset: 0.75 }, { rotate: "0deg" }],
       { duration: 1000, easing: "ease-in-out" }).finished.catch(() => {});
-    zeigeBlase(w, "Da bist du ja! Sieben Croissants?! 🙈");
+    zeigeBlase(w, "Da bist du ja! Sieben Zimtschnecken?! 🙈");
     await kopf();
     await pause(2900);
     w.blase.hidden = true; el.classList.remove("redet");
     await pause(250);
     v.blick = w.pos.x > v.pos.x ? 1 : -1; setzePosition(v, v.pos);
-    await sagUndWarte(v, "Es waren sehr kleine Croissants… 😇", 3200);
+    await sagUndWarte(v, "Es waren sehr kleine Zimtschnecken… 😇", 3200);
     await pause(250);
     zeigeBlase(w, "Na komm, ich bring dich nach Hause, du kleiner Vielfraß 😄");
     await pause(3800);
     w.blase.hidden = true; el.classList.remove("redet");
     await pause(250);
-    await sagUndWarte(v, "Tschüss, Toni! Nie wieder sieben… höchstens sechs 🥐", 3800);
+    await sagUndWarte(v, "Tschüss, Toni! Nie wieder sieben… höchstens sechs 😋", 3800);
     // sie flattert über ihn und packt ihn
     mitgehen = false;
     const s = { x: v.pos.x, y: v.pos.y };
