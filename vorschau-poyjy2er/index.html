@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Lora:ital,wght@1,500;1,600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.min.css?v=9f51cf5f70">
+  <link rel="stylesheet" href="style.min.css?v=809e825513">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
   <meta name="theme-color" content="#e85d7e">
@@ -252,13 +252,18 @@
       <button class="schliessen spiel-zu" type="button" aria-label="Spiel schließen">×</button>
       <div id="spiel-menue" class="spiel-menue">
         <h2 id="spiel-titel">Capy fängt Schneeflocken</h2>
-        <p id="spiel-text">Fang Schneeflocken und Herzen mit dem Capybara. Weich den Eiszapfen aus!</p>
+        <p id="spiel-text">Fang Schneeflocken, Herzen und Sterne. Weich Eis und Eiszapfen aus und schnapp dir die Extras!</p>
         <ul class="spiel-legende">
           <li><span>❄️</span> 1 Punkt</li>
           <li><span>♥️</span> 3 Punkte</li>
           <li><span>⭐</span> 10 Punkte</li>
-          <li><span>🧊</span> kostet ein Leben</li>
+          <li><span>🧊</span> Eis kostet ein Leben</li>
+          <li><span>☕</span> Kakao schützt dich</li>
+          <li><span>🧲</span> Magnet zieht alles an</li>
+          <li><span>⏳</span> Sanduhr: Zeitlupe</li>
+          <li><span>🍀</span> Klee: ein Leben</li>
         </ul>
+        <p class="spiel-tipp">15 Treffer in Folge bringen den Liebesregen ♥️</p>
         <p id="spiel-rekord" class="spiel-rekord"></p>
         <button id="spiel-start" class="spiel-start" type="button">Los geht's</button>
         <p class="spiel-steuerung">Mit dem Finger nach links und rechts wischen<br>oder die Pfeiltasten benutzen</p>
@@ -288,7 +293,7 @@
   <canvas id="konfetti-regen" class="konfetti-regen" popover="manual" aria-hidden="true"></canvas>
 
   <script src="inhalte.js"></script>
-  <script src="vorschau-poyjy2er/kalender.min.js?v=3c6cc0f2d8"></script>
+  <script src="vorschau-poyjy2er/kalender.min.js?v=a317ac5511"></script>
 <style>
   .testleiste {
     position: fixed; left: 8px; bottom: 8px; z-index: 90; max-width: min(560px, calc(100vw - 16px)); border-radius: 16px;

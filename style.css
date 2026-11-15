@@ -3878,3 +3878,9 @@ html[data-abend] .wz-note { color: #ffd0dc; }
 .brunch-staub { position: absolute; width: 15px; height: 15px; border-radius: 50%; background: radial-gradient(circle, #fff 30%, rgba(255, 244, 236, 0.85) 70%); box-shadow: 0 0 10px rgba(255, 255, 255, 0.9); pointer-events: none; z-index: 1; }
 .brunch-kruemel { position: absolute; width: 9px; height: 6px; border-radius: 55% 40% 50% 45%; background: radial-gradient(circle at 35% 30%, #fff4e6 0 22%, #c98a4f 30%, #8f5427 78%); box-shadow: 0 1px 1px rgba(90, 45, 15, 0.35); pointer-events: none; z-index: 2; }
 .brunch-schweiss { position: absolute; font-size: 12px; line-height: 1; pointer-events: none; z-index: 2; }
+
+/* ---------- Capy-Spiel: Knopf auf der Seite mit dem Umschlag, Tipp im Menü ---------- */
+.intro-spiel { display: inline-flex; align-items: center; gap: 7px; margin-top: -14px; }
+.intro-spiel .ui-icon { width: 1.2em; height: 1.2em; color: var(--beere-dunkel); }
+.intro-spiel[hidden] { display: none; }
+.spiel-tipp { font-size: 0.85rem; font-weight: 700; color: var(--beere); }
