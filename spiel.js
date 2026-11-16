@@ -568,8 +568,10 @@
   introKnopf.hidden = true;
   introKnopf.innerHTML = '<svg class="ui-icon" aria-hidden="true"><use href="#i-spiel"/></svg> Capy-Spiel';
   if (intro) {
-    const sk = intro.querySelector(".special-knopf");
-    if (sk) sk.after(introKnopf); else intro.appendChild(introKnopf);
+    // eine Reihe für Capy-Spiel und Umstylen
+    let reihe = intro.querySelector(".intro-knoepfe");
+    if (!reihe) { reihe = document.createElement("div"); reihe.className = "intro-knoepfe"; const sk = intro.querySelector(".special-knopf"); if (sk) sk.after(reihe); else intro.appendChild(reihe); }
+    reihe.prepend(introKnopf);
   }
   introKnopf.addEventListener("click", oeffnen);
   setInterval(() => {

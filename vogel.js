@@ -17,11 +17,13 @@
   const GROESSE = 52;
 
   /* ---------- Aussehen ---------- */
-  function vogelSvg(weiblich, aussehen) {
+  function vogelSvg(weiblich, aussehen, kleidung) {
     const a = aussehen || {};
+    // Kleidung aus dem Ankleidezimmer (nur für die beiden Munkelvögel, nicht für die Gäste)
+    const L = !aussehen && ak.styling ? ak.styling.schichten(weiblich, kleidung) : { kopf: "", hals: "", augen: "", fuesse: "", extra: "" };
     const ruecken = a.ruecken || (weiblich ? "#a0704b" : "#8a5a3a"), brust = a.brust || (weiblich ? "#f6877a" : "#f26b5b"), fluegel = a.fluegel || (weiblich ? "#86593b" : "#6b4632");
     return '<svg viewBox="0 0 60 60" aria-hidden="true">' +
-      '<g class="beine"><path d="M24 50l-3 6M30 50l3 6M21 56h-4M21 56l-2 3M33 56h4M33 56l2 3" stroke="#e39a3b" stroke-width="2.2" stroke-linecap="round"/></g>' +
+      '<g class="beine"><path d="M24 50l-3 6M30 50l3 6M21 56h-4M21 56l-2 3M33 56h4M33 56l2 3" stroke="#e39a3b" stroke-width="2.2" stroke-linecap="round"/>' + L.fuesse + '</g>' +
       '<g class="vogel-koerper">' +
       '<path class="fluegel-hinten" d="M30 26q-18-18-26-6q8 2 14 10z" fill="' + fluegel + '"/>' +
       '<path d="M8 34q-8 2-6 9q6-1 10-6z" fill="' + fluegel + '"/>' +
@@ -29,7 +31,7 @@
       '<ellipse cx="30" cy="38" rx="15" ry="13" fill="' + brust + '"/>' +
       '<ellipse cx="31" cy="42" rx="10" ry="8" fill="#fff2e4"/>' +
       '<ellipse class="bauch" cx="30.5" cy="44" rx="13.5" ry="10.5" fill="#fff2e4"/><ellipse class="bauch" cx="25.5" cy="40.5" rx="4.2" ry="2.4" fill="#fff" opacity=".7"/>' +
-      '<path class="fluegel-vorne" d="M14 30q-4 10 6 14q-4-8-6-14z" fill="' + fluegel + '"/>' +
+      '<path class="fluegel-vorne" d="M14 30q-4 10 6 14q-4-8-6-14z" fill="' + fluegel + '"/>' + L.hals +
       '<path d="M26 13q2-6 6-5q-3 1-3 5z" fill="' + ruecken + '"/>' +
       '<circle cx="22" cy="28" r="5" fill="#fff"/><circle cx="36" cy="28" r="5" fill="#fff"/>' +
       '<circle cx="23" cy="29" r="3.2" fill="#2a1a12"/><circle cx="37" cy="29" r="3.2" fill="#2a1a12"/>' +
@@ -39,8 +41,9 @@
       '<path d="M27 33l2.5 4 2.5-4z" fill="#f3b23c"/>' +
       '<g class="kruemel"><path d="M32.6 36.4l2.4-.7 1 1.8-1.7 1.2-1.9-.7z" fill="#b8763f"/><path d="M33.4 36.6l1.4-.3" stroke="#fff4e6" stroke-width=".7" stroke-linecap="round"/><circle cx="25.4" cy="38.6" r="1" fill="#a0612e"/><circle cx="38.2" cy="40" r=".8" fill="#c98a4f"/></g>' +
       '<circle cx="17" cy="35" r="3" fill="#ff9fb4" opacity=".7"/><circle cx="41" cy="35" r="3" fill="#ff9fb4" opacity=".7"/>' +
-      (weiblich && !a.deko ? '<g transform="translate(36 14) rotate(18)"><path d="M0 0-6-4v8zM0 0l6-4v8z" fill="#ff7aa2"/><circle r="2" fill="#ffd0dc"/></g>' : "") +
-      (a.deko ? DEKO[a.deko](a.farbe || "#d6304f") : "") +
+      L.augen + (L.extra ? L.extra + '<path d="M44.5 31.5q5 9.5 -5.5 14q3.5 -7.5 5.5 -14z" fill="' + fluegel + '"/>' : "") +
+      (weiblich && !a.deko && !L.kopf ? '<g transform="translate(36 14) rotate(18)"><path d="M0 0-6-4v8zM0 0l6-4v8z" fill="#ff7aa2"/><circle r="2" fill="#ffd0dc"/></g>' : "") +
+      (a.deko ? DEKO[a.deko](a.farbe || "#d6304f") : "") + L.kopf +
       "</g></svg>";
   }
   // Weihnachtliche Deko für die Freunde der Munkelvogeline
@@ -204,7 +207,8 @@
     liste.forEach((satz, i) => v.timer.push(setTimeout(() => zeigeBlase(v, satz), i * 5600)));
     v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, liste.length * 5600 - 600));
   }
-  function zeigeBlase(v, satz) {
+  // anhang: Knöpfe, die schon beim Ausmessen in der Blase stecken müssen
+  function zeigeBlase(v, satz, anhang) {
     if (v.zustand !== "sitzt") return;
     // nur sprechen, wenn der Vogel gerade zu sehen ist
     const sicht = v.el.getBoundingClientRect();
@@ -212,6 +216,7 @@
     // die Blase des anderen Vogels ausblenden, damit sie sich nicht überlappen
     voegel.forEach((a) => { if (a !== v) { a.blase.hidden = true; a.el.classList.remove("redet"); } });
     v.blase.textContent = satz;
+    if (anhang) { v.blase.appendChild(anhang); v.blase.classList.add("mit-wahl"); } else v.blase.classList.remove("mit-wahl");
     v.blase.classList.remove("seitlich", "rechts-vom-vogel");
     v.blase.classList.toggle("unten", v.pos && v.pos.y < 140);
     v.blase.style.left = "0px"; v.blase.style.right = "auto";
@@ -334,7 +339,8 @@
       while (!v.partner.ziel && v.partner.zustand !== "sitzt") await new Promise((r) => setTimeout(r, 200));
       await new Promise((r) => setTimeout(r, 600));
     } else {
-      await new Promise((r) => setTimeout(r, 2500 + Math.random() * 3000));
+      // setzt er nur für eine Frage um, kommt er gleich zurück
+      await new Promise((r) => setTimeout(r, v.frageNachLandung ? 700 : 2500 + Math.random() * 3000));
     }
     lande(v, false);
   }
@@ -382,6 +388,10 @@
     v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.ziel = null;
     v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
     v.gelandet = (v.gelandet || 0) + 1;
+    if (v.frageNachLandung) {
+      v.frageNachLandung = false;
+      setTimeout(() => { if (v.zustand === "sitzt" && !v.fragt && !v.auftrag && !weibchen && !frageBeantwortet) frage(v); }, 900);
+    }
     if (v.nachholen) {
       const satz = v.nachholen;
       setTimeout(() => { if (v.zustand === "sitzt" && v.nachholen === satz) { zeigeBlase(v, satz); setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); }, 5000); } }, 1200);
@@ -542,7 +552,153 @@
     "Darf meine Liebste auch dazukommen? 🥺",
     "Darf ich meine Partnerin dazuholen? 🥺",
   ];
+  // Sätze des Tages vom 16. bis 25.11. (je Vogel: 2 morgens, 1 mittags, 2 abends)
+  const TAGESSAETZE = {
+    16: {
+      m: ["Guten Morgen, Toni! Ich hab extra früh angefangen zu zwitschern, damit du gut gelaunt aufwachst ☀️",
+        "Toni, weißt du, was das Schönste an meinem Morgen ist? Wenn du hier vorbeischaust 🥰",
+        "Ich hab heute schon drei Wolken gezählt. Alle sahen aus wie ein Herz, Toni ♥️",
+        "Toni, ich hab gehört, dass Chris den ganzen Tag an dich denkt. Ich übrigens auch 🐦",
+        "Psst, Toni… der Umschlag hat heute ganz leise gekichert. Ich glaube, er freut sich auf dich ✉️"],
+      w: ["Guten Morgen, Toni! Er hat schon im Morgengrauen angefangen zu zwitschern. Er freut sich einfach so, dich zu sehen 😅",
+        "Toni, ich hab heute meine schönste Schleife aufgesetzt. Für dich 🎀",
+        "Weißt du, Toni, er redet den ganzen Tag nur von dir. Ich bin fast ein bisschen eifersüchtig 😜",
+        "Toni, ich finde, du und Chris seid fast so süß wie wir zwei. Fast 😌",
+        "Ich hab ihm beigebracht, wie man ein Herz in die Luft fliegt. Er übt noch, Toni ♥️"],
+    },
+    17: {
+      m: ["Morgen, Toni! Ich hab dir einen Sonnenstrahl auf den Umschlag gelegt ☀️",
+        "Toni, wenn du lächelst, muss ich jedes Mal mitzwitschern. Ich kann nicht anders 🎶",
+        "Die Capys haben mich gefragt, ob du wirklich so lieb bist, wie alle sagen. Ich hab gesagt: noch viel lieber, Toni 🐹",
+        "Noch 9 Mal schlafen, Toni. Ich zähle schon auf meinen Federn mit 🪶",
+        "Toni, ich hab Chris heute heimlich beobachtet. Er hat ganz verliebt gegrinst 😏"],
+      w: ["Morgen, Toni! Ich hab mir mit Morgentau das Gesicht gewaschen. Man will ja hübsch sein für dich ✨",
+        "Toni, du hast so ein schönes Lächeln. Das sagen sogar die Capys 🐹",
+        "Psst, Toni… ich weiß, was am 26. passiert. Aber ich bin viel besser im Schweigen als er 🤐",
+        "Toni, danke, dass ich hier sein darf. Bei dir ist es so gemütlich 🥰",
+        "Er hat mir erzählt, dass Chris dich die Allerschönste nennt. Recht hat er, Toni 😊"],
+    },
+    18: {
+      m: ["Guten Morgen, Toni! Ich hab mein schönstes Federkleid angezogen, nur für dich ✨",
+        "Toni, du bist der Grund, warum ich morgens so gerne hier sitze 🥰",
+        "Das Siegel glänzt heute besonders, Toni. Ich glaube, es weiß schon, was an deinem Geburtstag passiert 🤫",
+        "Toni, ich hab ein Lied für dich gedichtet. Es geht nur „Piep piep Toni piep“, aber es kommt von Herzen 🎶",
+        "Weißt du, Toni, die Sterne über dem Umschlag leuchten heller, wenn du da bist 🌟"],
+      w: ["Guten Morgen, Toni! Ich hab ihm Frühstück ans Nest gebracht. Rate mal, wer zuerst nach dir gefragt hat 🐦",
+        "Toni, man sieht dir an, dass du geliebt wirst. Du strahlst richtig ☀️",
+        "Toni, ich hab heute eine Feder verloren. Wenn du sie findest, darfst du dir was wünschen 🪶",
+        "Weißt du, Toni, die schönsten Abende sind die, an denen jemand an einen denkt. Und Chris denkt gerade an dich ♥️",
+        "Ich bin heute extra länger geblieben, Toni. Ich wollte noch ein bisschen bei dir sein 🌙"],
+    },
+    19: {
+      m: ["Morgen, Toni! Ich hab geträumt, wir fliegen zusammen über den Rhein. Du warst schneller 😄",
+        "Toni, falls dir heute jemand sagt, dass du toll bist: Das war ich, ich hab es überall herumgezwitschert 🐦",
+        "Die Capys proben irgendwas, Toni. Ich darf nicht verraten was, aber es wird fröhlich 🥁",
+        "Noch eine Woche, Toni! Ich bin so aufgeregt, dass ich kaum stillsitzen kann 🪶",
+        "Toni, ich hab heute einen Brief gesehen, auf dem nur dein Name steht. Rate mal, wo 😏"],
+      w: ["Morgen, Toni! Ich hab mir die Wangen extra rosa gepustet. Steht mir doch, oder? 😊",
+        "Toni, ein guter Tag fängt mit dir an. Das sag ich ihm jeden Morgen 🥰",
+        "Toni, die Capys wollten wissen, was du dir zum Geburtstag wünschst. Ich hab gesagt, das weiß nur einer 😏",
+        "Noch eine Woche, Toni! Ich überlege schon, welche Schleife ich an deinem Geburtstag trage 🎀",
+        "Toni, ich glaube, er übt heimlich ein Ständchen für dich. Ich hör ihn nachts piepsen 🎶"],
+    },
+    20: {
+      m: ["Guten Morgen, Toni! Ich hab dir die Fensterbank schon schön warm gesessen 🐦",
+        "Toni, du bist wie der erste Sonnenstrahl am Morgen. Nur viel hübscher ☀️",
+        "Weißt du, was ich an dir mag, Toni? Alles. Die Liste war zu lang zum Aufzählen 📜",
+        "Toni, der Umschlag hat geflüstert: „Nur noch ein paar Tage.“ Er kann es auch kaum erwarten ✉️",
+        "Wenn du gleich schlafen gehst, Toni: Ich pass auf, dass niemand vor dir in den Umschlag guckt 🛡️"],
+      w: ["Guten Morgen, Toni! Weißt du, dass du die Lieblingsperson von zwei kleinen Vögeln bist? 🐦🐦",
+        "Toni, ich wünsch dir heute einen Tag so weich wie meine Brustfedern 🪶",
+        "Toni, er ist heute ganz aufgeregt herumgeflattert. Er sagt, bald wird es hier richtig schön ✨",
+        "Toni, wenn du müde bist, denk dran: Irgendwo sitzen zwei Munkelvögel und haben dich lieb ♥️",
+        "Er behauptet, er hätte das schönere Gefieder. Was meinst du, Toni? 😏"],
+    },
+    21: {
+      m: ["Guten Morgen, Toni! Wochenende! Ich hab beschlossen, heute nur nette Sachen zu zwitschern 🥰",
+        "Toni, Chris hat mir verraten, dass er beim Aufwachen zuerst an dich denkt. Ich hab nicht gelauscht, ehrlich 🙈",
+        "Toni, ich übe gerade „Happy Birthday“ zu pfeifen. Es klingt noch schief, aber bis zum 26. sitzt es 🎶",
+        "Noch 5 Mal schlafen, Toni. Meine Federn kribbeln schon vor Vorfreude 🪶",
+        "Toni, an deinem Geburtstag wird es hier ein bisschen voller als sonst. Mehr verrate ich nicht 🤫"],
+      w: ["Guten Morgen, Toni! Samstag! Heute wird nur gekuschelt und gezwitschert ☺️",
+        "Toni, Chris hat so ein Glück mit dir. Und du mit ihm. Ich seh doch, wie ihr euch anguckt 🥰",
+        "Toni, ich hab gesehen, wie die Capys Luftballons aufgepustet haben. Einer ist geplatzt, alle haben sich erschrocken 😂",
+        "Noch 5 Mal schlafen, Toni. Ich zähl mit, er zählt mit, sogar die Capys zählen mit 🐹",
+        "Toni, ich wünsch dir einen kuscheligen Samstagabend. Am besten mit ganz viel Decke und Chris 🛋️"],
+    },
+    22: {
+      m: ["Guten Morgen, Toni! Heute ist ein perfekter Tag zum Kuscheln. Sag das ruhig Chris ☺️",
+        "Toni, ich hab heute Nacht von dir geträumt. Du hattest eine Krone auf und alle Capys haben applaudiert 👑",
+        "Toni, egal was morgen kommt: Du bist klug und stark, und ich bin unglaublich stolz auf dich 🍀",
+        "Toni, ich hab dir eine Glücksfeder hingelegt. Nimm sie morgen in Gedanken mit 🪶",
+        "Toni, die Capys haben heute heimlich Girlanden gezählt. Ich glaube, die planen was für den 26. 🎉"],
+      w: ["Guten Morgen, Toni! Sonntagmorgen ist zum Ausschlafen da. Ich hab extra leise gepiepst 🤫",
+        "Toni, ich hab ihm gesagt, dass du die tollste Toni der Welt bist. Er hat genickt, bis ihm schwindlig wurde 😄",
+        "Toni, für morgen drück ich dir alle Krallen. Du schaffst das 🍀",
+        "Toni, mach dir heute Abend keinen Stress mehr. Du bist bestens vorbereitet ♥️",
+        "Ich leg dir eine Feder unters Kopfkissen, Toni. Die bringt gute Träume 🪶"],
+    },
+    23: {
+      m: ["Guten Morgen, Toni! Ich hab extra leise gezwitschert, damit du entspannt in den Tag startest 🍀",
+        "Toni, du weißt mehr, als du denkst. Und ich weiß, dass du das kannst 💪",
+        "Ich bin so stolz auf dich, Toni. Egal wie es läuft 🥰",
+        "Toni, heute Abend darfst du einfach nur durchatmen. Den Rest erledige ich mit Zwitschern 🎶",
+        "Noch 3 Mal schlafen, Toni! Ich hab schon angefangen, mein Gefieder zu bürsten ✨"],
+      w: ["Guten Morgen, Toni! Ich hab ein Kleeblatt gesucht und gefunden. Es ist für dich 🍀",
+        "Toni, tief durchatmen. Wir zwei sitzen hier und drücken dir die Daumen, äh, die Flügel 🐦",
+        "Toni, egal was heute war: Wir zwei sind stolz auf dich 🥰",
+        "Toni, nach so einem Tag hast du dir ganz viel Kuscheln verdient. Ich hab Chris schon Bescheid gegeben 😌",
+        "Noch 3 Mal schlafen, Toni. Ich glaub, er platzt bald vor Vorfreude 🎈"],
+    },
+    24: {
+      m: ["Guten Morgen, Toni! Nur noch zwei Mal schlafen. Ich bin ganz zappelig 🪶",
+        "Toni, wenn so ein kleiner Vogel wie ich schon so viel Liebe in sich hat, wie viel steckt dann erst in Chris? 🥰",
+        "Toni, die Munkelvogeline hat gesagt, ich soll dir heute was Liebes sagen. Also: Du bist wundervoll ♥️",
+        "Toni, morgen schreibst du Englisch. You are amazing! Siehst du, ich kann auch Englisch 🐦",
+        "Toni, der Umschlag ist schon ganz unruhig. Er weiß, dass es bald so weit ist ✉️"],
+      w: ["Guten Morgen, Toni! Er hat heute Nacht im Schlaf deinen Namen gepiepst. Süß, oder? 🥰",
+        "Toni, nur noch zwei Mal schlafen. Ich hab schon meine schönste Schleife rausgesucht 🎀",
+        "Toni, die Capys haben gerade eine sehr geheime Besprechung. Ich durfte nicht mit rein 🤫",
+        "Toni, morgen Englisch und dann Geburtstag. Was für eine Woche! Du schaffst das 🍀",
+        "Toni, ich bin so froh, dass du mich eingeladen hast. Ohne dich wär er hier ganz allein 🥺"],
+    },
+    25: {
+      m: ["Guten Morgen, Toni! Heute noch Englisch, und morgen ist DEIN Tag 🎂",
+        "Toni, ich male mir schon aus, wie du morgen strahlst. Allein der Gedanke macht mich glücklich ☀️",
+        "Bald ist Englisch geschafft, Toni, und dann wird nur noch gefeiert 🎉",
+        "Nur noch einmal schlafen, Toni! Ich bin so aufgeregt, ich mach heute bestimmt kein Auge zu 🥳",
+        "Toni, um Mitternacht wird es hier ganz besonders. Vielleicht bleibst du ja ein bisschen wach 🤫"],
+      w: ["Guten Morgen, Toni! Letzter Tag vor deinem großen Tag. Ich bin ganz kribbelig ✨",
+        "Toni, viel Glück heute! Danach darfst du dich nur noch freuen 🍀",
+        "Toni, ich hab heimlich in den Umschlag geschielt. Ich sag nur: Du wirst lächeln 🤭",
+        "Nur noch einmal schlafen, Toni! Er hat sich schon die Federn gekämmt 🪶",
+        "Toni, morgen bist du ein Jahr älter und noch genauso süß. Das ist so sicher wie mein Piepsen 🥰"],
+    },
+  };
+  // Wundertüte: jeder Satz kommt einmal, in zufälliger Reihenfolge.
+  // Morgens (ab 5 Uhr) sind 2 freigeschaltet, ab 12 Uhr 3, ab 17 Uhr alle 5.
+  const SAETZE_SCHLUESSEL = "toni-wz-vogelsaetze";
+  function naechsterTagessatz(wer) {
+    const d = ak.intro.datum();
+    if (d.jahr !== KALENDER.jahr || d.monat !== 11 || !TAGESSAETZE[d.tag] || (ak.zeitreise && ak.zeitreise.aktiv())) return null;
+    const anzahl = d.stunde < 5 ? 0 : d.stunde < 12 ? 2 : d.stunde < 17 ? 3 : 5;
+    let gesagt = {};
+    try { gesagt = JSON.parse(localStorage.getItem(SAETZE_SCHLUESSEL) || "{}") || {}; } catch (_) { gesagt = {}; }
+    const key = d.tag + wer;
+    const schon = Array.isArray(gesagt[key]) ? gesagt[key] : [];
+    const frei = [];
+    // ein übrig gebliebener „Guten Morgen“ passt ab 12 Uhr nicht mehr
+    const morgengruss = (i) => d.stunde >= 12 && /^(Guten )?Morgen\b/.test(TAGESSAETZE[d.tag][wer][i]);
+    for (let i = 0; i < anzahl; i++) if (!schon.includes(i) && !morgengruss(i)) frei.push(i);
+    if (!frei.length) return null;
+    const i = wahl(frei);
+    gesagt[key] = schon.concat(i);
+    try { localStorage.setItem(SAETZE_SCHLUESSEL, JSON.stringify(gesagt)); } catch (_) { /* egal */ }
+    return TAGESSAETZE[d.tag][wer][i];
+  }
   function saetzeMaennchen() {
+    // ab dem zweiten Mal Sprechen: erst die Sätze des Tages
+    if (maennchen.hatGesprochen) { const satz = naechsterTagessatz("m"); if (satz) return [satz]; }
     if (vorGeburtstag()) {
       // Hinweise auf die Entdeckungen des Tages (wartezeit.js), sonst ein Geheimnis
       let h = null;
@@ -556,6 +712,7 @@
     return liste;
   }
   function saetzeWeibchen() {
+    if (weibchen && weibchen.hatGesprochen) { const satz = naechsterTagessatz("w"); if (satz) return [satz]; }
     if (vorGeburtstag() || weibchenEingeladen) return [wahl(DANKE)];
     const d = ak.intro.datum();
     if (d.monat === 11 && d.tag === 26) return ["Happy Birthday, Toni! Wir zwei feiern heute mit dir 🎂"];
@@ -575,26 +732,25 @@
     v.timer.forEach(clearTimeout); v.timer = [];
     clearTimeout(v.flugTimer);
     v.fragt = true;
-    zeigeBlase(v, wahl(FRAGE));
-    if (v.blase.hidden) { v.fragt = false; planeAbflug(v); return; }
     const knoepfe = document.createElement("span");
     knoepfe.className = "vogel-wahlen";
     knoepfe.innerHTML = '<span class="vogel-wahl ja" role="button" tabindex="0" data-antwort="ja">Ja 🥰</span><span class="vogel-wahl nein" role="button" tabindex="0" data-antwort="nein">Nein</span>';
-    v.blase.appendChild(knoepfe);
-    v.blase.classList.add("mit-wahl");
-    // Lage der Blase mit den Knöpfen neu prüfen
-    zeigeBlaseNeuLegen(v);
+    // die Knöpfe sind beim Ausmessen schon drin, damit die Blase nie auf Siegel oder Ziffern rutscht
+    zeigeBlase(v, wahl(FRAGE), knoepfe);
+    if (v.blase.hidden) {
+      v.fragt = false; v.nachholen = null; v.blase.classList.remove("mit-wahl");
+      // kein freier Platz für die Frage: woanders hinfliegen und dort fragen (höchstens dreimal)
+      if ((v.frageVersuche || 0) < 3) { v.frageVersuche = (v.frageVersuche || 0) + 1; v.frageNachLandung = true; clearTimeout(v.flugTimer); fliegeWeg(v); }
+      else planeAbflug(v);
+      return;
+    }
+    v.frageVersuche = 0;
     clearTimeout(frageTimer);
     frageTimer = setTimeout(() => { if (v.fragt) { v.fragt = false; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); planeAbflug(v); } }, 20000);
   }
-  function zeigeBlaseNeuLegen(v) {
-    const inhalt = [...v.blase.childNodes];
-    const text = v.blase.firstChild && v.blase.firstChild.nodeType === 3 ? v.blase.firstChild.nodeValue : "";
-    zeigeBlase(v, text);
-    inhalt.filter((k) => k.nodeType === 1).forEach((k) => v.blase.appendChild(k));
-  }
   function antworte(v, antwort) {
     if (!v.fragt) return;
+    if (v.fragtArt === "styling") { antworteStyling(v, antwort); return; }
     v.fragt = false;
     clearTimeout(frageTimer);
     frageBeantwortet = true;
@@ -705,6 +861,88 @@
     gaeste.forEach((g) => g.el.remove());
   }
 
+
+  /* ---------- Umstyling: der Munkelvogel fragt nach einem neuen Look ---------- */
+  let stylingGefragt = false, stylingRuhig = 0, stylingTimer = null, stylingWarteBisLandung = null;
+  setInterval(() => {
+    if (stylingGefragt || !ak.styling || !maennchen) return;
+    // war kein Platz für die Blase, erst nach der nächsten Landung wieder fragen
+    if (stylingWarteBisLandung !== null && (maennchen.gelandet || 0) === stylingWarteBisLandung) return;
+    const text = ak.styling.frageText();
+    if (!text) return;
+    const v = maennchen;
+    const r = v.el.getBoundingClientRect();
+    const frei = v.zustand === "sitzt" && !v.el.hidden && v.hatGesprochen && !v.fragt && !v.auftrag && kontext() &&
+      voegel.every((x) => x.blase.hidden) && !document.querySelector(".special-buehne, .aufbau-buehne, .vogel.gast, dialog[open], .wz-fenster-huelle") &&
+      !document.hidden && r.top > 40 && r.bottom < window.innerHeight - 20;
+    if (!frei) { stylingRuhig = 0; return; }
+    stylingRuhig = stylingRuhig || performance.now();
+    if (performance.now() - stylingRuhig < 3500) return;
+    stylingGefragt = true;
+    stylingFrage(v, text);
+  }, 500);
+  function stylingFrage(v, text) {
+    const knoepfe = document.createElement("span");
+    knoepfe.className = "vogel-wahlen";
+    knoepfe.innerHTML = '<span class="vogel-wahl ja" role="button" tabindex="0" data-antwort="ja">Ja ✨</span><span class="vogel-wahl nein" role="button" tabindex="0" data-antwort="nein">Später</span>';
+    zeigeBlase(v, text, knoepfe);
+    // keine freie Stelle für die Blase: nichts verändern und nach der nächsten Landung noch einmal versuchen
+    if (v.blase.hidden) { v.nachholen = null; v.blase.classList.remove("mit-wahl"); stylingGefragt = false; stylingWarteBisLandung = v.gelandet || 0; return; }
+    stylingWarteBisLandung = null;
+    v.timer.forEach(clearTimeout); v.timer = [];
+    clearTimeout(v.flugTimer);
+    v.fragt = true; v.fragtArt = "styling";
+    clearTimeout(stylingTimer);
+    stylingTimer = setTimeout(() => { if (v.fragt && v.fragtArt === "styling") { v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); planeAbflug(v); } }, 20000);
+  }
+  function antworteStyling(v, antwort) {
+    v.fragt = false; v.fragtArt = null;
+    clearTimeout(stylingTimer);
+    v.blase.classList.remove("mit-wahl");
+    if (antwort === "ja") {
+      v.blase.hidden = true; v.el.classList.remove("redet");
+      if (ak.styling) ak.styling.oeffnen();
+      planeAbflug(v);
+    } else {
+      zeigeBlase(v, wahl(["Okay, Toni! Ich warte hier ganz geduldig 🐦", "Kein Problem, Toni. Der Knopf zum Umstylen wartet auf dich 👗"]));
+      v.nachholen = null;
+      v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, 4200));
+    }
+  }
+  const LOB_M = ["Danke, Toni! Ich seh ja richtig schick aus 😎", "Wow, Toni! Du hast echt einen guten Geschmack ✨", "Das gefällt mir, Toni! Ich fühl mich wie ein Model 🕺"];
+  const LOB_W = ["Toni, ich fühl mich wunderschön! Danke 🥰", "Wie hübsch! Du hast so einen guten Geschmack, Toni ✨", "Danke, Toni! Darin dreh ich mich gleich noch mal 💃"];
+  // neue Kleidung anziehen; nach dem Ankleidezimmer mit einer kleinen Drehung und Glitzer
+  function einkleiden(mitFreude) {
+    const aktive = voegel.filter((v) => v.el.isConnected);
+    for (const v of aktive) {
+      const alt = v.el.querySelector("svg");
+      if (!alt) continue;
+      const tmp = document.createElement("span");
+      tmp.innerHTML = vogelSvg(v.weiblich);
+      alt.replaceWith(tmp.firstChild);
+      if (v.pos) setzePosition(v, v.pos);
+    }
+    if (!mitFreude || ruhig) return;
+    aktive.forEach((v, i) => {
+      if (v.zustand !== "sitzt" || v.el.hidden || v.auftrag || !v.seite) return;
+      setTimeout(() => {
+        if (v.zustand !== "sitzt") return;
+        const bild = v.el.querySelector("svg");
+        bild.animate([{ rotate: "y 0deg", translate: "0 0" }, { rotate: "y 180deg", translate: "0 -12px", offset: 0.5 }, { rotate: "y 360deg", translate: "0 0" }], { duration: 900, easing: "ease-in-out" });
+        for (let k = 0; k < 8; k++) {
+          const w = (k / 8) * Math.PI * 2, t = teilchen("ankleide-glitzer", v.seite.x, v.seite.y - 26, k % 2 ? "✨" : "⭐");
+          t.animate([{ transform: "translate(-50%,-50%) scale(.3)", opacity: 0 }, { transform: "translate(calc(-50% + " + (Math.cos(w) * 34).toFixed(1) + "px), calc(-50% + " + (Math.sin(w) * 30).toFixed(1) + "px)) scale(1)", opacity: 1, offset: 0.6 },
+            { transform: "translate(calc(-50% + " + (Math.cos(w) * 44).toFixed(1) + "px), calc(-50% + " + (Math.sin(w) * 38).toFixed(1) + "px)) scale(.6)", opacity: 0 }], { duration: 1100, easing: "ease-out", fill: "forwards" }).onfinish = () => t.remove();
+        }
+        setTimeout(() => {
+          if (v.zustand !== "sitzt" || v.fragt || v.auftrag) return;
+          v.timer.forEach(clearTimeout); v.timer = []; clearTimeout(v.flugTimer);
+          zeigeBlase(v, wahl(v.weiblich ? LOB_W : LOB_M)); v.nachholen = null;
+          v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); if (!v.partner) planeAbflug(v); }, 4400));
+        }, 950);
+      }, 350 + i * 4800);
+    });
+  }
 
   /* ---------- Spontanes Special am 15.11. (14 bis 17 Uhr): der Munkelvogel war heimlich mit beim Brunch ---------- */
   const pause = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1019,7 +1257,7 @@
   // Der Munkelvogel ist frei für einen Auftrag: gelandet, hat gesprochen, keine Frage offen, alle Vögel still
   const istDa = () => maennchen.zustand === "sitzt" && !maennchen.el.hidden && maennchen.hatGesprochen && !maennchen.fragt &&
     voegel.every((v) => v.blase.hidden) && (!weibchen || (weibchen.zustand === "sitzt" && weibchen.hatGesprochen)) && !document.querySelector(".vogel.gast");
-  window.adventkalender.voegel = { voegel, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
+  window.adventkalender.voegel = { voegel, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
     // erst wenn er gelandet ist und seine Sätze gesagt hat (höchstens 30 Sekunden warten)
     let n = 0;
     const los = () => {

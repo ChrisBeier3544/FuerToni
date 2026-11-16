@@ -3884,3 +3884,115 @@ html[data-abend] .wz-note { color: #ffd0dc; }
 .intro-spiel .ui-icon { width: 1.2em; height: 1.2em; color: var(--beere-dunkel); }
 .intro-spiel[hidden] { display: none; }
 .spiel-tipp { font-size: 0.85rem; font-weight: 700; color: var(--beere); }
+
+/* ---------- Umstyling der Munkelvögel ---------- */
+.intro-knoepfe { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: -14px; }
+.intro-knoepfe .intro-spiel { margin-top: 0; }
+.intro-knoepfe:not(:has(> :not([hidden]))) { display: none; }
+.intro-umstylen[hidden] { display: none; }
+.intro-umstylen.neu, .sammlung-knopf.neu { animation: umstylen-funkeln 2.2s ease-in-out infinite; }
+@keyframes umstylen-funkeln { 0%, 100% { box-shadow: 0 6px 16px rgba(157, 36, 73, 0.15); } 50% { box-shadow: 0 0 0 4px rgba(243, 200, 75, 0.45), 0 6px 18px rgba(157, 36, 73, 0.25); } }
+/* Text auf einem Teil (Fähnchen) bleibt lesbar, wenn der Vogel in die andere Richtung schaut */
+.vogel svg[style*="scaleX(-1)"] .ankleide-text { transform: scaleX(-1); transform-box: fill-box; transform-origin: center; }
+.ankleide-funkeln { transform-box: fill-box; transform-origin: center; animation: ankleide-funkeln 0.5s ease-in-out infinite alternate; }
+@keyframes ankleide-funkeln { from { opacity: 0.7; scale: 0.85; } to { opacity: 1; scale: 1.1; } }
+.ankleide-glitzer { position: absolute; font-size: 13px; line-height: 1; pointer-events: none; z-index: 3; }
+
+.ankleide {
+  width: min(520px, calc(100vw - 20px));
+  max-height: min(92vh, 92dvh);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #fff8f3, #fdeef3);
+  color: var(--text);
+  box-shadow: 0 24px 60px rgba(60, 10, 30, 0.45);
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+}
+.ankleide[open] { display: flex; animation: aufpoppen 0.4s cubic-bezier(0.3, 1.4, 0.5, 1); }
+.ankleide::backdrop { background: rgba(40, 8, 24, 0.6); backdrop-filter: blur(3px); }
+.ankleide-kopf { position: relative; padding: 18px 54px 6px 20px; text-align: left; }
+.ankleide-kopf h2 { margin: 0; font: 700 1.9rem/1.1 "Dancing Script", cursive; color: var(--beere); }
+.ankleide-unter { margin: 4px 0 0; font-size: 0.85rem; font-weight: 700; color: var(--beere-dunkel); opacity: 0.8; }
+.ankleide .ankleide-zu { top: 12px; right: 12px; }
+.ankleide-buehne {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  padding: 14px 16px 6px;
+  background: radial-gradient(ellipse 70% 90% at 50% 100%, rgba(255, 211, 107, 0.35), transparent 70%);
+}
+.ankleide-figur {
+  position: relative;
+  width: 118px;
+  padding: 22px 8px 8px;
+  border: 0;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+.ankleide-figur svg { display: block; width: 82px; height: 82px; margin: 0 auto; overflow: visible; }
+.ankleide-figur.aktiv { background: #fff; box-shadow: 0 0 0 3px var(--gold), 0 8px 20px rgba(157, 36, 73, 0.18); transform: translateY(-2px); }
+.ankleide-name { display: block; margin-top: 8px; font: 800 0.78rem "Nunito", sans-serif; color: var(--beere-dunkel); }
+.ankleide-reiter { display: flex; justify-content: center; gap: 8px; padding: 8px 16px 4px; }
+.ankleide-reiter button {
+  padding: 6px 14px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--beere-dunkel);
+  font: 700 0.85rem "Nunito", sans-serif;
+  cursor: pointer;
+}
+.ankleide-reiter button.aktiv { background: linear-gradient(135deg, var(--rose-500), var(--beere)); border-color: transparent; color: #fff; }
+.ankleide-liste { flex: 1; min-height: 0; overflow-y: auto; padding: 4px 16px 10px; overscroll-behavior: contain; }
+.ankleide-reihe h3 { margin: 12px 0 6px; font: 800 0.9rem "Nunito", sans-serif; color: var(--beere-dunkel); }
+.ankleide-kacheln { display: flex; gap: 8px; overflow-x: auto; padding: 3px 3px 8px; scroll-snap-type: x proximity; }
+.ankleide-kachel {
+  flex: 0 0 auto;
+  width: 92px;
+  padding: 6px 3px 6px;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fff, #fff1f5);
+  box-shadow: 0 3px 10px rgba(157, 36, 73, 0.1);
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.ankleide-kachel svg { display: block; width: 52px; height: 52px; margin: 0 auto; overflow: visible; }
+.ankleide-kachel.an { border-color: var(--beere); box-shadow: 0 0 0 3px rgba(232, 93, 126, 0.2), 0 4px 12px rgba(157, 36, 73, 0.18); }
+.ankleide-kachel.bisher { background: #fffaf0; }
+.ankleide-ohne { display: flex; align-items: center; justify-content: center; width: 52px; height: 52px; margin: 0 auto; font-size: 1.8rem; color: #c9b8c0; }
+.ankleide-titel { display: block; margin-top: 4px; font: 700 0.6rem/1.2 "Nunito", sans-serif; color: var(--beere-dunkel); hyphens: none; overflow-wrap: normal; word-break: normal; }
+.ankleide-kachel:focus-visible, .ankleide-figur:focus-visible, .ankleide-reiter button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.ankleide-fuss { padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(232, 93, 126, 0.15); background: rgba(255, 255, 255, 0.7); }
+.ankleide-fertig {
+  width: 100%;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--rose-500), var(--beere));
+  color: #fff;
+  font: 800 1.05rem "Nunito", sans-serif;
+  cursor: pointer;
+  box-shadow: 0 8px 18px rgba(157, 36, 73, 0.3);
+}
+@media (prefers-reduced-motion: reduce) { .ankleide-funkeln, .intro-umstylen.neu, .sammlung-knopf.neu { animation: none; } }
+/* die Vorschau im Ankleidezimmer sieht aus wie der Vogel auf der Seite */
+.ankleide-figur .augenlid { transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); animation: blinzeln 5s infinite; }
+.ankleide-figur .fluegel-hinten, .ankleide-figur .bauch, .ankleide-figur .kruemel { display: none; }
+.ankleide-figur .vogel-koerper { transform-box: fill-box; transform-origin: 50% 100%; animation: atmen 3s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .ankleide-figur .augenlid, .ankleide-figur .vogel-koerper { animation: none; } }
+@media (max-height: 780px) {
+  .ankleide-kopf { padding-top: 12px; }
+  .ankleide-kopf h2 { font-size: 1.6rem; }
+  .ankleide-buehne { padding-top: 8px; }
+  .ankleide-figur { width: 104px; padding: 12px 6px 6px; }
+  .ankleide-figur svg { width: 62px; height: 62px; }
+  .ankleide-reiter { padding-top: 6px; }
+}
