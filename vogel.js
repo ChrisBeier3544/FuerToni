@@ -17,11 +17,13 @@
   const GROESSE = 52;
 
   /* ---------- Aussehen ---------- */
-  function vogelSvg(weiblich, aussehen) {
+  function vogelSvg(weiblich, aussehen, kleidung) {
     const a = aussehen || {};
+    // Kleidung aus dem Ankleidezimmer (nur für die beiden Munkelvögel, nicht für die Gäste)
+    const L = !aussehen && ak.styling ? ak.styling.schichten(weiblich, kleidung) : { kopf: "", hals: "", augen: "", fuesse: "", extra: "" };
     const ruecken = a.ruecken || (weiblich ? "#a0704b" : "#8a5a3a"), brust = a.brust || (weiblich ? "#f6877a" : "#f26b5b"), fluegel = a.fluegel || (weiblich ? "#86593b" : "#6b4632");
     return '<svg viewBox="0 0 60 60" aria-hidden="true">' +
-      '<g class="beine"><path d="M24 50l-3 6M30 50l3 6M21 56h-4M21 56l-2 3M33 56h4M33 56l2 3" stroke="#e39a3b" stroke-width="2.2" stroke-linecap="round"/></g>' +
+      '<g class="beine"><path d="M24 50l-3 6M30 50l3 6M21 56h-4M21 56l-2 3M33 56h4M33 56l2 3" stroke="#e39a3b" stroke-width="2.2" stroke-linecap="round"/>' + L.fuesse + '</g>' +
       '<g class="vogel-koerper">' +
       '<path class="fluegel-hinten" d="M30 26q-18-18-26-6q8 2 14 10z" fill="' + fluegel + '"/>' +
       '<path d="M8 34q-8 2-6 9q6-1 10-6z" fill="' + fluegel + '"/>' +
@@ -29,7 +31,7 @@
       '<ellipse cx="30" cy="38" rx="15" ry="13" fill="' + brust + '"/>' +
       '<ellipse cx="31" cy="42" rx="10" ry="8" fill="#fff2e4"/>' +
       '<ellipse class="bauch" cx="30.5" cy="44" rx="13.5" ry="10.5" fill="#fff2e4"/><ellipse class="bauch" cx="25.5" cy="40.5" rx="4.2" ry="2.4" fill="#fff" opacity=".7"/>' +
-      '<path class="fluegel-vorne" d="M14 30q-4 10 6 14q-4-8-6-14z" fill="' + fluegel + '"/>' +
+      '<path class="fluegel-vorne" d="M14 30q-4 10 6 14q-4-8-6-14z" fill="' + fluegel + '"/>' + L.hals +
       '<path d="M26 13q2-6 6-5q-3 1-3 5z" fill="' + ruecken + '"/>' +
       '<circle cx="22" cy="28" r="5" fill="#fff"/><circle cx="36" cy="28" r="5" fill="#fff"/>' +
       '<circle cx="23" cy="29" r="3.2" fill="#2a1a12"/><circle cx="37" cy="29" r="3.2" fill="#2a1a12"/>' +
@@ -39,8 +41,9 @@
       '<path d="M27 33l2.5 4 2.5-4z" fill="#f3b23c"/>' +
       '<g class="kruemel"><path d="M32.6 36.4l2.4-.7 1 1.8-1.7 1.2-1.9-.7z" fill="#b8763f"/><path d="M33.4 36.6l1.4-.3" stroke="#fff4e6" stroke-width=".7" stroke-linecap="round"/><circle cx="25.4" cy="38.6" r="1" fill="#a0612e"/><circle cx="38.2" cy="40" r=".8" fill="#c98a4f"/></g>' +
       '<circle cx="17" cy="35" r="3" fill="#ff9fb4" opacity=".7"/><circle cx="41" cy="35" r="3" fill="#ff9fb4" opacity=".7"/>' +
-      (weiblich && !a.deko ? '<g transform="translate(36 14) rotate(18)"><path d="M0 0-6-4v8zM0 0l6-4v8z" fill="#ff7aa2"/><circle r="2" fill="#ffd0dc"/></g>' : "") +
-      (a.deko ? DEKO[a.deko](a.farbe || "#d6304f") : "") +
+      L.augen + (L.extra ? L.extra + '<path d="M44.5 31.5q5 9.5 -5.5 14q3.5 -7.5 5.5 -14z" fill="' + fluegel + '"/>' : "") +
+      (weiblich && !a.deko && !L.kopf ? '<g transform="translate(36 14) rotate(18)"><path d="M0 0-6-4v8zM0 0l6-4v8z" fill="#ff7aa2"/><circle r="2" fill="#ffd0dc"/></g>' : "") +
+      (a.deko ? DEKO[a.deko](a.farbe || "#d6304f") : "") + L.kopf +
       "</g></svg>";
   }
   // Weihnachtliche Deko für die Freunde der Munkelvogeline
@@ -204,7 +207,8 @@
     liste.forEach((satz, i) => v.timer.push(setTimeout(() => zeigeBlase(v, satz), i * 5600)));
     v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, liste.length * 5600 - 600));
   }
-  function zeigeBlase(v, satz) {
+  // anhang: Knöpfe, die schon beim Ausmessen in der Blase stecken müssen
+  function zeigeBlase(v, satz, anhang) {
     if (v.zustand !== "sitzt") return;
     // nur sprechen, wenn der Vogel gerade zu sehen ist
     const sicht = v.el.getBoundingClientRect();
@@ -212,6 +216,7 @@
     // die Blase des anderen Vogels ausblenden, damit sie sich nicht überlappen
     voegel.forEach((a) => { if (a !== v) { a.blase.hidden = true; a.el.classList.remove("redet"); } });
     v.blase.textContent = satz;
+    if (anhang) { v.blase.appendChild(anhang); v.blase.classList.add("mit-wahl"); } else v.blase.classList.remove("mit-wahl");
     v.blase.classList.remove("seitlich", "rechts-vom-vogel");
     v.blase.classList.toggle("unten", v.pos && v.pos.y < 140);
     v.blase.style.left = "0px"; v.blase.style.right = "auto";
@@ -722,26 +727,18 @@
     v.timer.forEach(clearTimeout); v.timer = [];
     clearTimeout(v.flugTimer);
     v.fragt = true;
-    zeigeBlase(v, wahl(FRAGE));
-    if (v.blase.hidden) { v.fragt = false; planeAbflug(v); return; }
     const knoepfe = document.createElement("span");
     knoepfe.className = "vogel-wahlen";
     knoepfe.innerHTML = '<span class="vogel-wahl ja" role="button" tabindex="0" data-antwort="ja">Ja 🥰</span><span class="vogel-wahl nein" role="button" tabindex="0" data-antwort="nein">Nein</span>';
-    v.blase.appendChild(knoepfe);
-    v.blase.classList.add("mit-wahl");
-    // Lage der Blase mit den Knöpfen neu prüfen
-    zeigeBlaseNeuLegen(v);
+    // die Knöpfe sind beim Ausmessen schon drin, damit die Blase nie auf Siegel oder Ziffern rutscht
+    zeigeBlase(v, wahl(FRAGE), knoepfe);
+    if (v.blase.hidden) { v.fragt = false; v.nachholen = null; v.blase.classList.remove("mit-wahl"); planeAbflug(v); return; }
     clearTimeout(frageTimer);
     frageTimer = setTimeout(() => { if (v.fragt) { v.fragt = false; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); planeAbflug(v); } }, 20000);
   }
-  function zeigeBlaseNeuLegen(v) {
-    const inhalt = [...v.blase.childNodes];
-    const text = v.blase.firstChild && v.blase.firstChild.nodeType === 3 ? v.blase.firstChild.nodeValue : "";
-    zeigeBlase(v, text);
-    inhalt.filter((k) => k.nodeType === 1).forEach((k) => v.blase.appendChild(k));
-  }
   function antworte(v, antwort) {
     if (!v.fragt) return;
+    if (v.fragtArt === "styling") { antworteStyling(v, antwort); return; }
     v.fragt = false;
     clearTimeout(frageTimer);
     frageBeantwortet = true;
@@ -852,6 +849,88 @@
     gaeste.forEach((g) => g.el.remove());
   }
 
+
+  /* ---------- Umstyling: der Munkelvogel fragt nach einem neuen Look ---------- */
+  let stylingGefragt = false, stylingRuhig = 0, stylingTimer = null, stylingWarteBisLandung = null;
+  setInterval(() => {
+    if (stylingGefragt || !ak.styling || !maennchen) return;
+    // war kein Platz für die Blase, erst nach der nächsten Landung wieder fragen
+    if (stylingWarteBisLandung !== null && (maennchen.gelandet || 0) === stylingWarteBisLandung) return;
+    const text = ak.styling.frageText();
+    if (!text) return;
+    const v = maennchen;
+    const r = v.el.getBoundingClientRect();
+    const frei = v.zustand === "sitzt" && !v.el.hidden && v.hatGesprochen && !v.fragt && !v.auftrag && kontext() &&
+      voegel.every((x) => x.blase.hidden) && !document.querySelector(".special-buehne, .aufbau-buehne, .vogel.gast, dialog[open], .wz-fenster-huelle") &&
+      !document.hidden && r.top > 40 && r.bottom < window.innerHeight - 20;
+    if (!frei) { stylingRuhig = 0; return; }
+    stylingRuhig = stylingRuhig || performance.now();
+    if (performance.now() - stylingRuhig < 3500) return;
+    stylingGefragt = true;
+    stylingFrage(v, text);
+  }, 500);
+  function stylingFrage(v, text) {
+    const knoepfe = document.createElement("span");
+    knoepfe.className = "vogel-wahlen";
+    knoepfe.innerHTML = '<span class="vogel-wahl ja" role="button" tabindex="0" data-antwort="ja">Ja ✨</span><span class="vogel-wahl nein" role="button" tabindex="0" data-antwort="nein">Später</span>';
+    zeigeBlase(v, text, knoepfe);
+    // keine freie Stelle für die Blase: nichts verändern und nach der nächsten Landung noch einmal versuchen
+    if (v.blase.hidden) { v.nachholen = null; v.blase.classList.remove("mit-wahl"); stylingGefragt = false; stylingWarteBisLandung = v.gelandet || 0; return; }
+    stylingWarteBisLandung = null;
+    v.timer.forEach(clearTimeout); v.timer = [];
+    clearTimeout(v.flugTimer);
+    v.fragt = true; v.fragtArt = "styling";
+    clearTimeout(stylingTimer);
+    stylingTimer = setTimeout(() => { if (v.fragt && v.fragtArt === "styling") { v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); planeAbflug(v); } }, 20000);
+  }
+  function antworteStyling(v, antwort) {
+    v.fragt = false; v.fragtArt = null;
+    clearTimeout(stylingTimer);
+    v.blase.classList.remove("mit-wahl");
+    if (antwort === "ja") {
+      v.blase.hidden = true; v.el.classList.remove("redet");
+      if (ak.styling) ak.styling.oeffnen();
+      planeAbflug(v);
+    } else {
+      zeigeBlase(v, wahl(["Okay, Toni! Ich warte hier ganz geduldig 🐦", "Kein Problem, Toni. Der Knopf zum Umstylen wartet auf dich 👗"]));
+      v.nachholen = null;
+      v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, 4200));
+    }
+  }
+  const LOB_M = ["Danke, Toni! Ich seh ja richtig schick aus 😎", "Wow, Toni! Du hast echt einen guten Geschmack ✨", "Das gefällt mir, Toni! Ich fühl mich wie ein Model 🕺"];
+  const LOB_W = ["Toni, ich fühl mich wunderschön! Danke 🥰", "Wie hübsch! Du hast so einen guten Geschmack, Toni ✨", "Danke, Toni! Darin dreh ich mich gleich noch mal 💃"];
+  // neue Kleidung anziehen; nach dem Ankleidezimmer mit einer kleinen Drehung und Glitzer
+  function einkleiden(mitFreude) {
+    const aktive = voegel.filter((v) => v.el.isConnected);
+    for (const v of aktive) {
+      const alt = v.el.querySelector("svg");
+      if (!alt) continue;
+      const tmp = document.createElement("span");
+      tmp.innerHTML = vogelSvg(v.weiblich);
+      alt.replaceWith(tmp.firstChild);
+      if (v.pos) setzePosition(v, v.pos);
+    }
+    if (!mitFreude || ruhig) return;
+    aktive.forEach((v, i) => {
+      if (v.zustand !== "sitzt" || v.el.hidden || v.auftrag || !v.seite) return;
+      setTimeout(() => {
+        if (v.zustand !== "sitzt") return;
+        const bild = v.el.querySelector("svg");
+        bild.animate([{ rotate: "y 0deg", translate: "0 0" }, { rotate: "y 180deg", translate: "0 -12px", offset: 0.5 }, { rotate: "y 360deg", translate: "0 0" }], { duration: 900, easing: "ease-in-out" });
+        for (let k = 0; k < 8; k++) {
+          const w = (k / 8) * Math.PI * 2, t = teilchen("ankleide-glitzer", v.seite.x, v.seite.y - 26, k % 2 ? "✨" : "⭐");
+          t.animate([{ transform: "translate(-50%,-50%) scale(.3)", opacity: 0 }, { transform: "translate(calc(-50% + " + (Math.cos(w) * 34).toFixed(1) + "px), calc(-50% + " + (Math.sin(w) * 30).toFixed(1) + "px)) scale(1)", opacity: 1, offset: 0.6 },
+            { transform: "translate(calc(-50% + " + (Math.cos(w) * 44).toFixed(1) + "px), calc(-50% + " + (Math.sin(w) * 38).toFixed(1) + "px)) scale(.6)", opacity: 0 }], { duration: 1100, easing: "ease-out", fill: "forwards" }).onfinish = () => t.remove();
+        }
+        setTimeout(() => {
+          if (v.zustand !== "sitzt" || v.fragt || v.auftrag) return;
+          v.timer.forEach(clearTimeout); v.timer = []; clearTimeout(v.flugTimer);
+          zeigeBlase(v, wahl(v.weiblich ? LOB_W : LOB_M)); v.nachholen = null;
+          v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); if (!v.partner) planeAbflug(v); }, 4400));
+        }, 950);
+      }, 350 + i * 4800);
+    });
+  }
 
   /* ---------- Spontanes Special am 15.11. (14 bis 17 Uhr): der Munkelvogel war heimlich mit beim Brunch ---------- */
   const pause = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1166,7 +1245,7 @@
   // Der Munkelvogel ist frei für einen Auftrag: gelandet, hat gesprochen, keine Frage offen, alle Vögel still
   const istDa = () => maennchen.zustand === "sitzt" && !maennchen.el.hidden && maennchen.hatGesprochen && !maennchen.fragt &&
     voegel.every((v) => v.blase.hidden) && (!weibchen || (weibchen.zustand === "sitzt" && weibchen.hatGesprochen)) && !document.querySelector(".vogel.gast");
-  window.adventkalender.voegel = { voegel, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
+  window.adventkalender.voegel = { voegel, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
     // erst wenn er gelandet ist und seine Sätze gesagt hat (höchstens 30 Sekunden warten)
     let n = 0;
     const los = () => {
