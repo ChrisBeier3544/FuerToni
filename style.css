@@ -4104,3 +4104,5 @@ html:has(.wz-fenster-huelle:not(.geht)) .wz-sprech-ebene, html:has(.special-bueh
 /* In der Wartezeit geht der Umschlag nie auf: ohne 3D-Raum, sonst legt Safari Teile des Umschlags über die Blasen */
 .intro[data-phase="warten"] .umschlag { perspective: none; }
 .intro[data-phase="warten"] .umschlag * { backface-visibility: visible; }
+/* sobald irgendein Fenster offen ist, sind Munkelvögel und kleine Blasen sofort weg */
+html:has(dialog[open]) .vogel-ebene, html:has(dialog[open]) .wz-sprech-ebene, html:has(.mistel-ebene) .vogel-ebene { visibility: hidden; }
