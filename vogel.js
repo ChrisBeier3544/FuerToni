@@ -750,6 +750,7 @@
   }
   function antworte(v, antwort) {
     if (!v.fragt) return;
+    if (v.fragtArt === "vorab") return;
     if (v.fragtArt === "styling") { antworteStyling(v, antwort); return; }
     v.fragt = false;
     clearTimeout(frageTimer);
@@ -863,13 +864,23 @@
 
 
   /* ---------- Umstyling: der Munkelvogel fragt nach einem neuen Look ---------- */
+  // Fragen mit Ja und Später: erst die Fashion Show, dann das Umstyling (jede höchstens einmal pro Besuch)
+  const schonGefragt = new Set(), vorabGesagt = new Set();
+  function naechsteAnfrage() {
+    const show = ak.modenschau && !schonGefragt.has("show") ? ak.modenschau.frageText() : null;
+    if (show) return { art: "show", text: show, vorab: vorabGesagt.has("show") ? null : ak.modenschau.vorabText() };
+    const styling = ak.styling && !schonGefragt.has("styling") ? ak.styling.frageText() : null;
+    if (styling) return { art: "styling", text: styling };
+    return null;
+  }
   let stylingGefragt = false, stylingRuhig = 0, stylingTimer = null, stylingWarteBisLandung = null;
   setInterval(() => {
-    if (stylingGefragt || !ak.styling || !maennchen) return;
+    if (stylingGefragt || !maennchen) return;
     // war kein Platz für die Blase, erst nach der nächsten Landung wieder fragen
     if (stylingWarteBisLandung !== null && (maennchen.gelandet || 0) === stylingWarteBisLandung) return;
-    const text = ak.styling.frageText();
-    if (!text) return;
+    const anfrage = naechsteAnfrage();
+    if (!anfrage) return;
+    const text = anfrage.text;
     const v = maennchen;
     const r = v.el.getBoundingClientRect();
     const frei = v.zustand === "sitzt" && !v.el.hidden && v.hatGesprochen && !v.fragt && !v.auftrag && kontext() &&
@@ -879,9 +890,23 @@
     stylingRuhig = stylingRuhig || performance.now();
     if (performance.now() - stylingRuhig < 3500) return;
     stylingGefragt = true;
-    stylingFrage(v, text);
+    stylingFrage(v, text, anfrage.art, anfrage.vorab);
   }, 500);
-  function stylingFrage(v, text) {
+  function stylingFrage(v, text, art, vorab) {
+    // erst der erzählende Satz in einer eigenen Blase, danach die Frage mit den Knöpfen
+    if (vorab) {
+      zeigeBlase(v, vorab);
+      if (v.blase.hidden) { v.nachholen = null; stylingGefragt = false; stylingWarteBisLandung = v.gelandet || 0; return; }
+      vorabGesagt.add(art);
+      v.timer.forEach(clearTimeout); v.timer = [];
+      clearTimeout(v.flugTimer);
+      v.fragt = true; v.fragtArt = "vorab";
+      v.timer.push(setTimeout(() => {
+        v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.el.classList.remove("redet");
+        if (v.zustand === "sitzt" && !v.auftrag) stylingFrage(v, text, art, null); else { stylingGefragt = false; planeAbflug(v); }
+      }, 6200));
+      return;
+    }
     const knoepfe = document.createElement("span");
     knoepfe.className = "vogel-wahlen";
     knoepfe.innerHTML = '<span class="vogel-wahl ja" role="button" tabindex="0" data-antwort="ja">Ja ✨</span><span class="vogel-wahl nein" role="button" tabindex="0" data-antwort="nein">Später</span>';
@@ -889,9 +914,11 @@
     // keine freie Stelle für die Blase: nichts verändern und nach der nächsten Landung noch einmal versuchen
     if (v.blase.hidden) { v.nachholen = null; v.blase.classList.remove("mit-wahl"); stylingGefragt = false; stylingWarteBisLandung = v.gelandet || 0; return; }
     stylingWarteBisLandung = null;
+    schonGefragt.add(art);
+    if (art === "show" && ak.modenschau) ak.modenschau.angeboten();
     v.timer.forEach(clearTimeout); v.timer = [];
     clearTimeout(v.flugTimer);
-    v.fragt = true; v.fragtArt = "styling";
+    v.fragt = true; v.fragtArt = "styling"; v.anfrageArt = art;
     clearTimeout(stylingTimer);
     stylingTimer = setTimeout(() => { if (v.fragt && v.fragtArt === "styling") { v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); planeAbflug(v); } }, 20000);
   }
@@ -899,12 +926,18 @@
     v.fragt = false; v.fragtArt = null;
     clearTimeout(stylingTimer);
     v.blase.classList.remove("mit-wahl");
+    const show = v.anfrageArt === "show";
+    // nach dieser Frage darf später im Besuch noch die nächste kommen
+    stylingGefragt = false; stylingRuhig = 0;
     if (antwort === "ja") {
       v.blase.hidden = true; v.el.classList.remove("redet");
-      if (ak.styling) ak.styling.oeffnen();
+      if (show) { if (ak.modenschau) ak.modenschau.oeffnen(); }
+      else if (ak.styling) ak.styling.oeffnen();
       planeAbflug(v);
     } else {
-      zeigeBlase(v, wahl(["Okay, Toni! Ich warte hier ganz geduldig 🐦", "Kein Problem, Toni. Der Knopf zum Umstylen wartet auf dich 👗"]));
+      zeigeBlase(v, show
+        ? wahl(["Okay, Toni! Ich lauf erst, wenn du zuschaust 😎 Der Knopf zur Fashion Show wartet auf dich ✨", "Kein Problem, Toni! Ich übe so lange meinen Laufstegblick 😎"])
+        : wahl(["Okay, Toni! Ich warte hier ganz geduldig 🐦", "Kein Problem, Toni. Der Knopf zum Umstylen wartet auf dich 👗"]));
       v.nachholen = null;
       v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, 4200));
     }

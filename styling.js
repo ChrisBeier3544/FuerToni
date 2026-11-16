@@ -618,6 +618,7 @@
       if (r.nr === 1) return "Toni, ich brauch einen neuen Look! Suchst du uns was Schönes zum Anziehen aus? 👗";
       return "Toni, Zeit für ein Umstyling! Suchst du uns was Neues zum Anziehen aus? 👗";
     },
+    gewaehlt: (nr) => stand.runden.includes(nr),
     KLEIDUNG: K,
     KATEGORIEN,
   };
