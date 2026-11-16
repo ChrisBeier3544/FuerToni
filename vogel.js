@@ -920,7 +920,8 @@
     clearTimeout(v.flugTimer);
     v.fragt = true; v.fragtArt = "styling"; v.anfrageArt = art;
     clearTimeout(stylingTimer);
-    stylingTimer = setTimeout(() => { if (v.fragt && v.fragtArt === "styling") { v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); planeAbflug(v); } }, 20000);
+    // keine Antwort: Frage ausblenden, die nächste darf später kommen
+    stylingTimer = setTimeout(() => { if (v.fragt && v.fragtArt === "styling") { v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); stylingGefragt = false; stylingRuhig = 0; planeAbflug(v); } }, 20000);
   }
   // Nie zwei Dinge auf einmal: öffnet sich etwas anderes, während der Munkelvogel fragt,
   // nimmt er die Frage zurück und stellt sie später noch einmal
