@@ -274,11 +274,11 @@
     const b = blase.getBoundingClientRect();
     const intro = document.getElementById("intro");
     const sel = intro && !intro.hidden
-      ? "#intro .umschlag-name, #intro .countdown-ziffern, #intro .countdown-titel, #intro .siegel, #intro .countdown-gruss, #intro .intro-hinweis, #intro .special-knopf, #intro .intro-spiel"
+      ? "#intro .umschlag-name, #intro .countdown-ziffern, #intro .countdown-titel, #intro .siegel, #intro .countdown-gruss, #intro .intro-hinweis, #intro .special-knopf, #intro .intro-spiel, .wz-sprech-ebene .wz-sprech"
       : ".polaroid img, .lightbox-figur img, #titel, .heute-karte .status, .zaehler-zahl";
     let summe = 0;
     // Siegel, Countdown-Ziffern und Name dürfen gar nicht verdeckt werden (zählt so stark, dass der Vogel lieber schweigt)
-    const streng = "#intro .siegel, #intro .countdown-ziffern, #intro .umschlag-name";
+    const streng = "#intro .siegel, #intro .countdown-ziffern, #intro .umschlag-name, .wz-sprech-ebene .wz-sprech";
     document.querySelectorAll(sel).forEach((e) => {
       const r = e.getBoundingClientRect();
       if (!r.width) return;
@@ -900,7 +900,7 @@
       vorabGesagt.add(art);
       v.timer.forEach(clearTimeout); v.timer = [];
       clearTimeout(v.flugTimer);
-      v.fragt = true; v.fragtArt = "vorab";
+      v.fragt = true; v.fragtArt = "vorab"; v.anfrageArt = art;
       v.timer.push(setTimeout(() => {
         v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.el.classList.remove("redet");
         if (v.zustand === "sitzt" && !v.auftrag) stylingFrage(v, text, art, null); else { stylingGefragt = false; planeAbflug(v); }
@@ -922,6 +922,20 @@
     clearTimeout(stylingTimer);
     stylingTimer = setTimeout(() => { if (v.fragt && v.fragtArt === "styling") { v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); planeAbflug(v); } }, 20000);
   }
+  // Nie zwei Dinge auf einmal: öffnet sich etwas anderes, während der Munkelvogel fragt,
+  // nimmt er die Frage zurück und stellt sie später noch einmal
+  const stoerung = () => document.querySelector("dialog[open], .special-buehne, .aufbau-buehne, .wz-fenster-huelle:not(.geht), .mistel-ebene");
+  setInterval(() => {
+    const v = maennchen;
+    if (!v || !v.fragt || !stoerung()) return;
+    const art = v.fragtArt;
+    v.fragt = false; v.fragtArt = null;
+    clearTimeout(stylingTimer); clearTimeout(frageTimer);
+    v.timer.forEach(clearTimeout); v.timer = [];
+    v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet");
+    if (art === "styling" || art === "vorab") { schonGefragt.delete(v.anfrageArt); stylingGefragt = false; stylingRuhig = 0; }
+    planeAbflug(v);
+  }, 250);
   function antworteStyling(v, antwort) {
     v.fragt = false; v.fragtArt = null;
     clearTimeout(stylingTimer);

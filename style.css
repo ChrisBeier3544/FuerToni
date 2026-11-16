@@ -3065,7 +3065,7 @@ dialog { overscroll-behavior: contain; }
 html:has(.special-buehne) .vogel-ebene { visibility: hidden; }
 
 /* Solange der Brief verschlossen ist, ist hinter ihm nichts zu sehen, auch nicht beim Herauszoomen */
-html:has(#intro:not([hidden]):not(.weg)) body > *:not(#intro):not(.vogel-ebene):not(.testleiste):not(script):not(dialog):not(.zr-banner):not(.zr-karte):not(.zr-ring):not(.entdecken-chip) { visibility: hidden !important; }
+html:has(#intro:not([hidden]):not(.weg)) body > *:not(#intro):not(.vogel-ebene):not(.wz-sprech-ebene):not(.testleiste):not(script):not(dialog):not(.zr-banner):not(.zr-karte):not(.zr-ring):not(.entdecken-chip) { visibility: hidden !important; }
 html:has(#intro:not([hidden]):not(.weg)), html:has(#intro:not([hidden]):not(.weg)) body { overflow: hidden; background: linear-gradient(160deg, var(--rose-50), var(--rose-200)) fixed; }
 
 /* Munkelvogel fragt nach seiner Partnerin (vor dem Geburtstag) */
@@ -4092,3 +4092,15 @@ img, svg { -webkit-user-drag: none; user-drag: none; }
   .ls-logo, .ls-lichter i, .ls-spot, .ls-glitzer, .ls-zuschauer, .ls-model .ls-geh, .ls-model .ls-dreh, .ls-model.klein, .ls-model.star, .ls-model .augenlid { animation: none !important; }
 }
 .ls-buehne:focus { outline: none; }
+
+/* ---------- Sprechblasen immer oben ---------- */
+/* Die kurzen Blasen (Siegel, Ziffern, Tasse ...) liegen über Umschlag und Munkelvögeln */
+.wz-sprech-ebene { position: fixed; inset: 0; z-index: 67; pointer-events: none; }
+.wz-sprech-ebene > * { pointer-events: none; }
+html:has(#intro[hidden]) .wz-sprech-ebene, html:has(.intro.geoeffnet) .wz-sprech-ebene, html:has(.intro.weg) .wz-sprech-ebene,
+html:has(.wz-fenster-huelle:not(.geht)) .wz-sprech-ebene, html:has(.special-buehne) .wz-sprech-ebene { visibility: hidden; }
+/* Wer spricht, steht vorne: sonst kann der andere Vogel die Blase verdecken */
+.vogel.redet, .vogel:has(.vogel-blase:not([hidden])) { z-index: 3; }
+/* In der Wartezeit geht der Umschlag nie auf: ohne 3D-Raum, sonst legt Safari Teile des Umschlags über die Blasen */
+.intro[data-phase="warten"] .umschlag { perspective: none; }
+.intro[data-phase="warten"] .umschlag * { backface-visibility: visible; }
