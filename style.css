@@ -4002,3 +4002,93 @@ html, body, body * { -webkit-user-select: none; user-select: none; -webkit-touch
 /* Eingabefelder bleiben benutzbar */
 input, textarea, [contenteditable="true"] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
 img, svg { -webkit-user-drag: none; user-drag: none; }
+
+/* ---------- Fashion Show „Haute Capyture“ ---------- */
+.intro-show[hidden] { display: none; }
+.laufsteg { width: 100vw; height: 100vh; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: #12081c; color: #fff; overflow: hidden; }
+.laufsteg::backdrop { background: #12081c; }
+.ls-buehne { position: relative; width: 100%; height: 100%; overflow: hidden; background: radial-gradient(ellipse 80% 55% at 50% 22%, #4a1f5a, #1d0c2a 70%, #12081c); }
+.ls-wand { position: absolute; left: 0; right: 0; top: calc(16px + env(safe-area-inset-top, 0px)); text-align: center; }
+.ls-logo { margin: 0; font: 700 clamp(2rem, 9vw, 3.4rem)/1 "Dancing Script", cursive; color: #ffe9f2; text-shadow: 0 0 8px #ff4d8d, 0 0 22px #ff4d8d, 0 0 40px rgba(255, 77, 141, 0.6); animation: ls-neon 3.2s ease-in-out infinite; }
+@keyframes ls-neon { 0%, 100% { opacity: 1; } 46% { opacity: 1; } 48% { opacity: 0.55; } 50% { opacity: 1; } 52% { opacity: 0.7; } 54% { opacity: 1; } }
+.ls-unter { margin: 6px 0 0; font: 700 0.72rem "Nunito", sans-serif; letter-spacing: 0.22em; text-transform: uppercase; color: #f7d77c; }
+.ls-lichter { position: absolute; left: 4%; right: 4%; top: calc(108px + env(safe-area-inset-top, 0px)); display: flex; justify-content: space-between; }
+.ls-lichter i { width: 7px; height: 7px; border-radius: 50%; background: #ffe7a0; box-shadow: 0 0 8px 2px rgba(255, 220, 140, 0.8); animation: ls-funkeln 1.6s ease-in-out infinite; animation-delay: calc(var(--i) * -0.2s); }
+@keyframes ls-funkeln { 50% { opacity: 0.35; } }
+.ls-spot { position: absolute; top: -10%; width: 60%; height: 120%; pointer-events: none; background: linear-gradient(180deg, rgba(255, 240, 220, 0.22), rgba(255, 240, 220, 0)); mix-blend-mode: screen; }
+.ls-spot.links { left: -8%; clip-path: polygon(10% 0, 22% 0, 95% 100%, 45% 100%); animation: ls-schwenk-l 6s ease-in-out infinite alternate; transform-origin: 15% 0; }
+.ls-spot.rechts { right: -8%; clip-path: polygon(78% 0, 90% 0, 55% 100%, 5% 100%); animation: ls-schwenk-r 7s ease-in-out infinite alternate; transform-origin: 85% 0; }
+@keyframes ls-schwenk-l { from { transform: rotate(-6deg); } to { transform: rotate(6deg); } }
+@keyframes ls-schwenk-r { from { transform: rotate(6deg); } to { transform: rotate(-6deg); } }
+.ls-steg { position: absolute; left: 0; right: 0; top: 34%; bottom: 0; clip-path: polygon(41% 0, 59% 0, 96% 100%, 4% 100%); background: linear-gradient(180deg, #3a1840, #8a2f5f 55%, #c9567f); }
+.ls-steg::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; transform: translateX(-50%); background: repeating-linear-gradient(180deg, rgba(255, 231, 160, 0.9) 0 6px, transparent 6px 22px); opacity: 0.6; }
+.ls-glitzer { position: absolute; inset: 0; background: radial-gradient(circle, rgba(255, 255, 255, 0.85) 0 0.8px, transparent 1.4px) 0 0 / 23px 19px, radial-gradient(circle, rgba(255, 215, 140, 0.8) 0 0.7px, transparent 1.3px) 9px 7px / 31px 27px; opacity: 0.55; animation: ls-glitzer 4s linear infinite; }
+@keyframes ls-glitzer { to { background-position: 0 38px, 9px 61px; } }
+.ls-models { position: absolute; inset: 0; pointer-events: none; }
+.ls-model { position: absolute; left: 50%; top: 0; width: min(62vw, 50vh, 300px); transform-origin: 50% 100%; will-change: transform; }
+.ls-model svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ls-schatten { position: absolute; left: 18%; right: 18%; bottom: -2%; height: 7%; border-radius: 50%; background: rgba(0, 0, 0, 0.35); filter: blur(3px); z-index: -1; }
+.ls-geh { transform-origin: 50% 100%; }
+.ls-model.geht .ls-geh { animation: ls-gang 0.52s ease-in-out infinite alternate; }
+.ls-model.vogel.geht .ls-geh, .ls-model.vogeline.geht .ls-geh { animation: ls-huepf 0.34s ease-in-out infinite alternate; }
+@keyframes ls-gang { from { transform: rotate(-4deg) translateY(0); } to { transform: rotate(4deg) translateY(-3%); } }
+@keyframes ls-huepf { from { transform: translateY(0) rotate(-3deg); } to { transform: translateY(-7%) rotate(3deg); } }
+.ls-model.zurueck .ls-dreh { transform: scaleX(-1); }
+.ls-dreh { transition: transform 0.35s ease; }
+.ls-model.posiert.pose-a .ls-dreh { animation: ls-pose-a 2.4s ease-in-out both; }
+.ls-model.posiert.pose-b .ls-dreh { animation: ls-pose-b 2.4s ease-in-out both; }
+.ls-model.posiert.pose-c .ls-dreh { animation: ls-pose-c 2.4s ease-in-out both; }
+@keyframes ls-pose-a { 15% { transform: rotate(-8deg); } 35% { transform: rotate(-8deg) scale(1.04); } 55% { transform: rotateY(180deg); } 75% { transform: rotateY(360deg); } 100% { transform: none; } }
+@keyframes ls-pose-b { 20% { transform: translateY(-9%) scale(1.03); } 30% { transform: translateY(0) scale(1.06, 0.95); } 40% { transform: none; } 60% { transform: rotate(7deg); } 80% { transform: rotate(-7deg); } }
+@keyframes ls-pose-c { 20% { transform: scaleX(-1); } 45% { transform: scaleX(-1) rotate(6deg); } 65% { transform: scaleX(1) rotate(-6deg); } 85% { transform: scale(1.05); } }
+/* Augen und Flügel wie beim echten Vogel */
+.ls-model .augenlid, .ls-vogue .augenlid { transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); animation: blinzeln 5s infinite; }
+.ls-model .fluegel-hinten, .ls-model .bauch, .ls-model .kruemel { display: none; }
+.ls-publikum { position: absolute; bottom: 0; width: 34%; height: 22%; display: grid; grid-template-columns: repeat(5, 1fr); align-content: end; gap: 0 2px; padding: 0 2%; }
+.ls-publikum.links { left: 0; }
+.ls-publikum.rechts { right: 0; }
+.ls-zuschauer { position: relative; display: block; transform: translateY(calc(var(--r) * -40%)); animation: ls-wippen 1.4s ease-in-out infinite alternate; animation-delay: var(--d); }
+.ls-zuschauer svg { display: block; width: 100%; height: auto; }
+@keyframes ls-wippen { to { translate: 0 -3px; } }
+.ls-blitz { position: absolute; left: 50%; top: 10%; width: 22px; height: 22px; margin-left: -11px; border-radius: 50%; background: radial-gradient(circle, #fff 20%, rgba(255, 255, 255, 0.6) 40%, transparent 70%); pointer-events: none; }
+.ls-vogue { position: absolute; left: 50%; bottom: 0; width: min(18vw, 90px); transform: translateX(-50%) translateY(28%); }
+.ls-vogue svg { width: 100%; height: auto; display: block; }
+.ls-magazin { position: absolute; left: 56%; top: 52%; padding: 1px 4px; border-radius: 2px; background: #fff; color: #14141c; font: 900 0.55rem "Nunito", sans-serif; letter-spacing: 0.08em; transform: rotate(-8deg); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35); }
+.ls-karte { position: absolute; left: 50%; bottom: calc(23% + 6px); width: min(86vw, 360px); padding: 8px 14px; border-radius: 14px; text-align: center; background: rgba(20, 8, 28, 0.62); border: 1px solid rgba(247, 215, 124, 0.45); backdrop-filter: blur(4px); transform: translate(-50%, 12px); opacity: 0; transition: opacity 0.4s ease, transform 0.4s ease; pointer-events: none; z-index: 3; }
+.ls-karte.an { opacity: 1; transform: translate(-50%, 0); }
+.ls-karte p { margin: 0; }
+.ls-nr { font: 800 0.66rem "Nunito", sans-serif; letter-spacing: 0.18em; text-transform: uppercase; color: #f7d77c; }
+.ls-marke { font: 700 1.7rem/1.15 "Dancing Script", cursive; color: #fff; text-shadow: 0 0 10px rgba(255, 77, 141, 0.7); }
+.ls-motto { font: 600 0.82rem "Nunito", sans-serif; color: #ffd6e6; }
+.ls-titel { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at center, rgba(40, 10, 50, 0.85), #12081c 75%); z-index: 4; transition: opacity 0.9s ease; }
+.ls-titel p { margin: 0; font: 700 clamp(2.6rem, 12vw, 4.4rem)/1 "Dancing Script", cursive; color: #fff; text-shadow: 0 0 14px #ff4d8d, 0 0 34px rgba(255, 77, 141, 0.7); animation: aufpoppen 1s ease both; }
+.ls-titel span { margin-top: 10px; font: 700 0.8rem "Nunito", sans-serif; letter-spacing: 0.24em; text-transform: uppercase; color: #f7d77c; animation: einblenden 1.4s ease 0.5s both; }
+.ls-buehne.titel-weg .ls-titel { opacity: 0; pointer-events: none; }
+.ls-parade { position: absolute; left: 0; right: 0; top: 24%; bottom: 36%; display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; justify-items: center; padding: 0 6%; }
+.ls-model.klein { position: relative; left: auto; top: auto; width: 82%; opacity: 0; animation: ls-parade-ein 0.6s cubic-bezier(.3,1.4,.5,1) both, 0s; animation-delay: calc(var(--i) * 0.22s); }
+.ls-model.klein .ls-geh { animation: ls-huepf 0.4s ease-in-out infinite alternate; animation-delay: calc(var(--i) * -0.13s); }
+@keyframes ls-parade-ein { from { opacity: 0; transform: translateY(30%) scale(0.6); } to { opacity: 1; transform: none; } }
+.ls-model.star { top: auto; bottom: 34%; width: min(58vw, 50vh, 290px); transform: translateX(-50%); z-index: 2; animation: ls-star 4s ease both; }
+@keyframes ls-star { from { opacity: 0; transform: translateX(-50%) translateY(12%) scale(0.7); } 18% { opacity: 1; transform: translateX(-50%) scale(1.05); } 30% { transform: translateX(-50%) scale(1); } 100% { transform: translateX(-50%) scale(1); opacity: 1; } }
+.ls-model.star .ls-dreh { animation: ls-verbeugen 1.6s ease-in-out 1.3s 2 both; transform-origin: 50% 100%; }
+@keyframes ls-verbeugen { 40% { transform: rotate(-4deg) scaleY(0.86) translateY(4%); } 60% { transform: rotate(-4deg) scaleY(0.86) translateY(4%); } }
+.ls-buehne:has(.ls-model.star) .ls-parade { opacity: 0.35; transition: opacity 0.6s ease; }
+.ls-konfetti { position: absolute; top: 0; width: 7px; height: 11px; border-radius: 2px; pointer-events: none; z-index: 5; }
+.ls-ende { position: absolute; left: 50%; top: 50%; width: min(88vw, 380px); padding: 22px 20px 18px; border-radius: 22px; text-align: center; background: rgba(255, 250, 246, 0.97); color: var(--text); translate: -50% -50%; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5); z-index: 6; animation: aufpoppen 0.5s ease both; }
+.ls-ende[hidden] { display: none; }
+.ls-ende-titel { margin: 0; font: 700 2.2rem/1.1 "Dancing Script", cursive; color: var(--beere); }
+.ls-ende-text { margin: 8px 0 14px; line-height: 1.45; font-weight: 600; }
+.ls-ende-knoepfe { display: flex; gap: 10px; }
+.ls-ende-knoepfe button { flex: 1; padding: 11px 12px; border-radius: 14px; font: 800 0.95rem "Nunito", sans-serif; cursor: pointer; }
+.ls-nochmal { border: 1px solid var(--gold); background: #fff; color: var(--beere-dunkel); }
+.ls-fertig { border: 0; background: linear-gradient(135deg, var(--rose-500), var(--beere)); color: #fff; }
+.ls-applaus { position: absolute; right: max(14px, env(safe-area-inset-right, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px)); width: 56px; height: 56px; border: 0; border-radius: 50%; background: linear-gradient(135deg, #ff76a6, #d6304f); font-size: 1.6rem; box-shadow: 0 8px 20px rgba(214, 48, 79, 0.45); cursor: pointer; z-index: 7; }
+.ls-applaus.klatscht { animation: ls-klatsch 0.35s ease; }
+@keyframes ls-klatsch { 50% { transform: scale(1.18) rotate(-8deg); } }
+.ls-herz { position: absolute; font-size: 1.3rem; pointer-events: none; z-index: 7; }
+.laufsteg .ls-zu { position: absolute !important; top: calc(10px + env(safe-area-inset-top, 0px)) !important; right: max(12px, env(safe-area-inset-right, 0px)) !important; z-index: 8; }
+.ls-applaus:focus-visible, .ls-ende-knoepfe button:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .ls-logo, .ls-lichter i, .ls-spot, .ls-glitzer, .ls-zuschauer, .ls-model .ls-geh, .ls-model .ls-dreh, .ls-model.klein, .ls-model.star, .ls-model .augenlid { animation: none !important; }
+}
+.ls-buehne:focus { outline: none; }
