@@ -339,7 +339,8 @@
       while (!v.partner.ziel && v.partner.zustand !== "sitzt") await new Promise((r) => setTimeout(r, 200));
       await new Promise((r) => setTimeout(r, 600));
     } else {
-      await new Promise((r) => setTimeout(r, 2500 + Math.random() * 3000));
+      // setzt er nur für eine Frage um, kommt er gleich zurück
+      await new Promise((r) => setTimeout(r, v.frageNachLandung ? 700 : 2500 + Math.random() * 3000));
     }
     lande(v, false);
   }
