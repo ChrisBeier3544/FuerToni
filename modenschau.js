@@ -1,7 +1,7 @@
 /*
  * ===========================================================
  *  FASHION SHOW „HAUTE CAPYTURE“
- *  Ab dem 17.11. fragt der Munkelvogel, ob Toni seine Show
+ *  Am 17.11. fragt der Munkelvogel, ob Toni seine Show
  *  sehen will. 10 Capys und 10 Munkelvögel laufen in 20 Looks
  *  über den Laufsteg, zusammen tragen sie alle 120 Teile aus
  *  dem Ankleidezimmer genau einmal. Zum Schluss läuft der
@@ -101,7 +101,8 @@
     const s = lies();
     if (s.gesehen) return null;
     const d = ak.intro.datum();
-    if (!(d.jahr === KALENDER.jahr && d.monat === 11 && d.tag <= 25)) return null;
+    // nur am 17.11. erzählt der Munkelvogel von seiner Show
+    if (!(d.jahr === KALENDER.jahr && d.monat === 11 && d.tag === 17)) return null;
     return "Ich laufe für Louis Vogel 😎 Willst du sehen, bei was für einem Hochkaräter ich mitlaufe?";
   }
   // vor der Frage erzählt der Munkelvogel, wie es dazu kam (eigene Blase, damit beide gut Platz finden)
