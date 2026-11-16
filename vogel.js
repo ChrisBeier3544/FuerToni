@@ -387,6 +387,10 @@
     v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.ziel = null;
     v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
     v.gelandet = (v.gelandet || 0) + 1;
+    if (v.frageNachLandung) {
+      v.frageNachLandung = false;
+      setTimeout(() => { if (v.zustand === "sitzt" && !v.fragt && !v.auftrag && !weibchen && !frageBeantwortet) frage(v); }, 900);
+    }
     if (v.nachholen) {
       const satz = v.nachholen;
       setTimeout(() => { if (v.zustand === "sitzt" && v.nachholen === satz) { zeigeBlase(v, satz); setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); }, 5000); } }, 1200);
@@ -732,7 +736,14 @@
     knoepfe.innerHTML = '<span class="vogel-wahl ja" role="button" tabindex="0" data-antwort="ja">Ja 🥰</span><span class="vogel-wahl nein" role="button" tabindex="0" data-antwort="nein">Nein</span>';
     // die Knöpfe sind beim Ausmessen schon drin, damit die Blase nie auf Siegel oder Ziffern rutscht
     zeigeBlase(v, wahl(FRAGE), knoepfe);
-    if (v.blase.hidden) { v.fragt = false; v.nachholen = null; v.blase.classList.remove("mit-wahl"); planeAbflug(v); return; }
+    if (v.blase.hidden) {
+      v.fragt = false; v.nachholen = null; v.blase.classList.remove("mit-wahl");
+      // kein freier Platz für die Frage: woanders hinfliegen und dort fragen (höchstens dreimal)
+      if ((v.frageVersuche || 0) < 3) { v.frageVersuche = (v.frageVersuche || 0) + 1; v.frageNachLandung = true; clearTimeout(v.flugTimer); fliegeWeg(v); }
+      else planeAbflug(v);
+      return;
+    }
+    v.frageVersuche = 0;
     clearTimeout(frageTimer);
     frageTimer = setTimeout(() => { if (v.fragt) { v.fragt = false; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); planeAbflug(v); } }, 20000);
   }
