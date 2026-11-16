@@ -3996,3 +3996,9 @@ html[data-abend] .wz-note { color: #ffd0dc; }
   .ankleide-figur svg { width: 62px; height: 62px; }
   .ankleide-reiter { padding-top: 6px; }
 }
+
+/* ---------- Nichts markieren oder kopieren: kein blaues Markieren, kein Menü beim langen Drücken ---------- */
+html, body, body * { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; }
+/* Eingabefelder bleiben benutzbar */
+input, textarea, [contenteditable="true"] { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+img, svg { -webkit-user-drag: none; user-drag: none; }

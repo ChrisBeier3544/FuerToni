@@ -2035,4 +2035,12 @@
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") synchronisiereZeit().then(aktualisiere);
   });
+
+  /* Kopierschutz light */
+  // Nichts markieren, kopieren oder Bilder ziehen; Eingabefelder bleiben benutzbar
+  (function () {
+    const frei = (e) => e.target && e.target.closest && e.target.closest("input, textarea, [contenteditable=\"true\"]");
+    ["copy", "cut", "selectstart", "dragstart"].forEach((art) => document.addEventListener(art, (e) => { if (!frei(e)) e.preventDefault(); }, true));
+    document.addEventListener("contextmenu", (e) => { if (!frei(e)) e.preventDefault(); }, true);
+  })();
 })();
