@@ -936,9 +936,7 @@
   // Nie zwei Dinge auf einmal: öffnet sich etwas anderes, während der Munkelvogel fragt,
   // nimmt er die Frage zurück und stellt sie später noch einmal
   const stoerung = () => document.querySelector("dialog[open], .special-buehne, .aufbau-buehne, .wz-fenster-huelle:not(.geht), .mistel-ebene");
-  setInterval(() => {
-    const v = voegel.find((x) => x.fragt);
-    if (!v || !stoerung()) return;
+  function frageZuruecknehmen(v) {
     const art = v.fragtArt;
     v.fragt = false; v.fragtArt = null;
     clearTimeout(stylingTimer); clearTimeout(frageTimer);
@@ -946,7 +944,25 @@
     v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet");
     if (art === "styling" || art === "vorab") { schonGefragt.delete(v.anfrageArt); stylingGefragt = false; stylingRuhig = 0; }
     planeAbflug(v);
+  }
+  setInterval(() => {
+    const v = voegel.find((x) => x.fragt);
+    if (v && stoerung()) frageZuruecknehmen(v);
   }, 250);
+  // Wächter: sollte eine Blase je doch Siegel, Ziffern oder Namen berühren (etwa weil das Handy kurz ruckelt),
+  // verschwindet sie sofort; eine Frage wird zurückgenommen und später neu gestellt
+  setInterval(() => {
+    if (intro.hidden) return;
+    const wichtig = [...document.querySelectorAll("#intro .siegel, #intro .countdown-ziffern, #intro .umschlag-name")].map((e) => e.getBoundingClientRect()).filter((r) => r.width);
+    for (const v of voegel) {
+      if (v.blase.hidden || v.zustand !== "sitzt") continue;
+      const b = v.blase.getBoundingClientRect();
+      const trifft = wichtig.some((r) => Math.max(0, Math.min(b.right, r.right) - Math.max(b.left, r.left)) * Math.max(0, Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top)) > 30);
+      if (!trifft) continue;
+      if (v.fragt) frageZuruecknehmen(v);
+      else { v.blase.hidden = true; v.el.classList.remove("redet"); }
+    }
+  }, 300);
   function antworteStyling(v, antwort) {
     v.fragt = false; v.fragtArt = null;
     clearTimeout(stylingTimer);
