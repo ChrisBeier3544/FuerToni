@@ -93,7 +93,7 @@
     const d = ak.intro.datum();
     // nur am 17.11. erzählt der Munkelvogel von seiner Show
     if (!(d.jahr === KALENDER.jahr && d.monat === 11 && d.tag === 17)) return null;
-    return "Ich laufe für Louis Vogel 😎 Willst du sehen, bei was für einem Hochkaräter ich mitlaufe?";
+    return "Ich laufe für das berühmte Modehaus Louis Vogel 😎 Willst du zuschauen?";
   }
   // vor der Frage erzählt der Munkelvogel, wie es dazu kam (eigene Blase, damit beide gut Platz finden)
   function vorabText() {
