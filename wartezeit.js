@@ -86,6 +86,14 @@
   }
 
   /* ---------- Ebenen ---------- */
+  // die Höhe der Fensterbank mit den Schubladen, damit der Inhalt der Seite darüber bleibt
+  function merkeMoebelHoehe() {
+    const m = intro.querySelector(".wz-moebel");
+    if (!m || !m.offsetHeight) return;
+    intro.style.setProperty("--wz-moebel-hoehe", Math.round(m.getBoundingClientRect().height) + "px");
+  }
+  window.addEventListener("resize", merkeMoebelHoehe);
+  setInterval(merkeMoebelHoehe, 1500);
   const ebene = el("div", "wz-ebene");
   intro.appendChild(ebene);
   // Fensterbank unten: der Himmel ist der Blick aus dem Fenster, die Dinge stehen darauf
