@@ -235,16 +235,18 @@
     const andere = voegel.find((a) => a !== v && a.zustand === "sitzt" && a.pos && Math.abs(a.pos.x - v.pos.x) < 80);
     const platzLinks = vogelLinks - 4 - rand, platzRechts = W() - rand - (vogelLinks + GROESSE + 4);
     const lege = (art) => {
-      v.blase.classList.remove("seitlich", "rechts-vom-vogel", "unten");
+      v.blase.classList.remove("seitlich", "rechts-vom-vogel", "unten", "tief");
       v.blase.style.maxWidth = "";
       if (art === "oben" || art === "unten") {
         v.blase.classList.toggle("unten", art === "unten");
         v.blase.style.left = links.toFixed(0) + "px";
         return;
       }
-      const linksDavon = art === "links";
+      // „Tief“: neben dem Vogel, aber nach unten wachsend (passt oben am Umschlag neben das Siegel)
+      const linksDavon = art === "links" || art === "linksTief";
       const platz = linksDavon ? platzLinks : platzRechts;
       v.blase.classList.add("seitlich");
+      v.blase.classList.toggle("tief", art.endsWith("Tief"));
       v.blase.classList.toggle("rechts-vom-vogel", !linksDavon);
       v.blase.style.maxWidth = Math.max(110, Math.min(250, platz)) + "px";
       const b2 = v.blase.offsetWidth;
@@ -253,7 +255,8 @@
     const vorne = v.pos && v.pos.y < 140 ? ["unten", "oben"] : ["oben", "unten"];
     // seitlich zuerst weg vom Partner, sonst dorthin, wo mehr Platz ist
     const seiten = (andere ? andere.pos.x > v.pos.x : platzLinks >= platzRechts) ? ["links", "rechts"] : ["rechts", "links"];
-    const reihe = [vorne[0], ...seiten.filter((x) => (x === "links" ? platzLinks : platzRechts) >= 110), vorne[1]];
+    const seitenFrei = seiten.filter((x) => (x === "links" ? platzLinks : platzRechts) >= 110);
+    const reihe = [vorne[0], ...seitenFrei, ...seitenFrei.map((x) => x + "Tief"), vorne[1]];
     let beste = null;
     for (const art of reihe) {
       lege(art);
@@ -283,7 +286,7 @@
       const r = e.getBoundingClientRect();
       if (!r.width) return;
       // Siegel und Vogel bewegen sich leicht, deshalb um wichtige Schrift einen Sicherheitsabstand halten
-      const wichtig = e.matches(streng), m = wichtig ? -14 : 4;
+      const wichtig = e.matches(streng), m = wichtig ? -10 : 4;
       const w = Math.min(b.right, r.right - m) - Math.max(b.left, r.left + m), h = Math.min(b.bottom, r.bottom - m) - Math.max(b.top, r.top + m);
       if (w > 0 && h > 0) summe += w * h * (wichtig ? 100 : 1);
     });

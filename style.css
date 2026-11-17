@@ -2621,6 +2621,8 @@ html[data-wetter="diesig"] .h2-wolke svg path { fill: #f3eef2; }
 .vogel .vogel-blase.seitlich { bottom: 8px; top: auto; }
 .vogel .vogel-blase.seitlich::after { top: auto; bottom: 10px; left: 100%; border-top-color: transparent; border-left-color: #fff; }
 .vogel .vogel-blase.seitlich.rechts-vom-vogel::after { left: auto; right: 100%; border-left-color: transparent; border-right-color: #fff; }
+.vogel .vogel-blase.seitlich.tief { top: 4px; bottom: auto; }
+.vogel .vogel-blase.seitlich.tief::after { top: 12px; bottom: auto; }
 /* Im Foto-Herz keine Vögel über den Fotos */
 html:has(#finale:not([hidden])) .vogel-ebene { visibility: hidden; }
 /* Polaroids oben weniger überlappen, damit alle Gesichter frei sind */
@@ -4109,3 +4111,4 @@ html:has(dialog[open]) .vogel-ebene, html:has(dialog[open]) .wz-sprech-ebene, ht
 /* Fragen mit Knöpfen dürfen breiter sein, damit sie flacher werden und auch auf kleinen Handys Platz finden */
 .vogel .vogel-blase.mit-wahl { max-width: min(330px, calc(100vw - 20px)); font-size: 0.8rem; line-height: 1.35; }
 .vogel .vogel-blase.mit-wahl .vogel-wahlen { margin-top: 6px; }
+.vogel-wahl { white-space: nowrap; }
