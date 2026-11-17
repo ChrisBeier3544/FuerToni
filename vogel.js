@@ -235,16 +235,18 @@
     const andere = voegel.find((a) => a !== v && a.zustand === "sitzt" && a.pos && Math.abs(a.pos.x - v.pos.x) < 80);
     const platzLinks = vogelLinks - 4 - rand, platzRechts = W() - rand - (vogelLinks + GROESSE + 4);
     const lege = (art) => {
-      v.blase.classList.remove("seitlich", "rechts-vom-vogel", "unten");
+      v.blase.classList.remove("seitlich", "rechts-vom-vogel", "unten", "tief");
       v.blase.style.maxWidth = "";
       if (art === "oben" || art === "unten") {
         v.blase.classList.toggle("unten", art === "unten");
         v.blase.style.left = links.toFixed(0) + "px";
         return;
       }
-      const linksDavon = art === "links";
+      // „Tief“: neben dem Vogel, aber nach unten wachsend (passt oben am Umschlag neben das Siegel)
+      const linksDavon = art === "links" || art === "linksTief";
       const platz = linksDavon ? platzLinks : platzRechts;
       v.blase.classList.add("seitlich");
+      v.blase.classList.toggle("tief", art.endsWith("Tief"));
       v.blase.classList.toggle("rechts-vom-vogel", !linksDavon);
       v.blase.style.maxWidth = Math.max(110, Math.min(250, platz)) + "px";
       const b2 = v.blase.offsetWidth;
@@ -253,7 +255,8 @@
     const vorne = v.pos && v.pos.y < 140 ? ["unten", "oben"] : ["oben", "unten"];
     // seitlich zuerst weg vom Partner, sonst dorthin, wo mehr Platz ist
     const seiten = (andere ? andere.pos.x > v.pos.x : platzLinks >= platzRechts) ? ["links", "rechts"] : ["rechts", "links"];
-    const reihe = [vorne[0], ...seiten.filter((x) => (x === "links" ? platzLinks : platzRechts) >= 110), vorne[1]];
+    const seitenFrei = seiten.filter((x) => (x === "links" ? platzLinks : platzRechts) >= 110);
+    const reihe = [vorne[0], ...seitenFrei, ...seitenFrei.map((x) => x + "Tief"), vorne[1]];
     let beste = null;
     for (const art of reihe) {
       lege(art);
@@ -274,16 +277,16 @@
     const b = blase.getBoundingClientRect();
     const intro = document.getElementById("intro");
     const sel = intro && !intro.hidden
-      ? "#intro .umschlag-name, #intro .countdown-ziffern, #intro .countdown-titel, #intro .siegel, #intro .countdown-gruss, #intro .intro-hinweis, #intro .special-knopf, #intro .intro-spiel"
+      ? "#intro .umschlag-name, #intro .countdown-ziffern, #intro .countdown-titel, #intro .siegel, #intro .countdown-gruss, #intro .intro-hinweis, #intro .special-knopf, #intro .intro-spiel, .wz-sprech-ebene .wz-sprech"
       : ".polaroid img, .lightbox-figur img, #titel, .heute-karte .status, .zaehler-zahl";
     let summe = 0;
     // Siegel, Countdown-Ziffern und Name dürfen gar nicht verdeckt werden (zählt so stark, dass der Vogel lieber schweigt)
-    const streng = "#intro .siegel, #intro .countdown-ziffern, #intro .umschlag-name";
+    const streng = "#intro .siegel, #intro .countdown-ziffern, #intro .umschlag-name, .wz-sprech-ebene .wz-sprech";
     document.querySelectorAll(sel).forEach((e) => {
       const r = e.getBoundingClientRect();
       if (!r.width) return;
       // Siegel und Vogel bewegen sich leicht, deshalb um wichtige Schrift einen Sicherheitsabstand halten
-      const wichtig = e.matches(streng), m = wichtig ? -14 : 4;
+      const wichtig = e.matches(streng), m = wichtig ? -10 : 4;
       const w = Math.min(b.right, r.right - m) - Math.max(b.left, r.left + m), h = Math.min(b.bottom, r.bottom - m) - Math.max(b.top, r.top + m);
       if (w > 0 && h > 0) summe += w * h * (wichtig ? 100 : 1);
     });
@@ -900,7 +903,7 @@
       vorabGesagt.add(art);
       v.timer.forEach(clearTimeout); v.timer = [];
       clearTimeout(v.flugTimer);
-      v.fragt = true; v.fragtArt = "vorab";
+      v.fragt = true; v.fragtArt = "vorab"; v.anfrageArt = art;
       v.timer.push(setTimeout(() => {
         v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.el.classList.remove("redet");
         if (v.zustand === "sitzt" && !v.auftrag) stylingFrage(v, text, art, null); else { stylingGefragt = false; planeAbflug(v); }
@@ -920,8 +923,23 @@
     clearTimeout(v.flugTimer);
     v.fragt = true; v.fragtArt = "styling"; v.anfrageArt = art;
     clearTimeout(stylingTimer);
-    stylingTimer = setTimeout(() => { if (v.fragt && v.fragtArt === "styling") { v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); planeAbflug(v); } }, 20000);
+    // keine Antwort: Frage ausblenden, die nächste darf später kommen
+    stylingTimer = setTimeout(() => { if (v.fragt && v.fragtArt === "styling") { v.fragt = false; v.fragtArt = null; v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet"); stylingGefragt = false; stylingRuhig = 0; planeAbflug(v); } }, 20000);
   }
+  // Nie zwei Dinge auf einmal: öffnet sich etwas anderes, während der Munkelvogel fragt,
+  // nimmt er die Frage zurück und stellt sie später noch einmal
+  const stoerung = () => document.querySelector("dialog[open], .special-buehne, .aufbau-buehne, .wz-fenster-huelle:not(.geht), .mistel-ebene");
+  setInterval(() => {
+    const v = maennchen;
+    if (!v || !v.fragt || !stoerung()) return;
+    const art = v.fragtArt;
+    v.fragt = false; v.fragtArt = null;
+    clearTimeout(stylingTimer); clearTimeout(frageTimer);
+    v.timer.forEach(clearTimeout); v.timer = [];
+    v.blase.hidden = true; v.blase.classList.remove("mit-wahl"); v.el.classList.remove("redet");
+    if (art === "styling" || art === "vorab") { schonGefragt.delete(v.anfrageArt); stylingGefragt = false; stylingRuhig = 0; }
+    planeAbflug(v);
+  }, 250);
   function antworteStyling(v, antwort) {
     v.fragt = false; v.fragtArt = null;
     clearTimeout(stylingTimer);

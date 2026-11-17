@@ -1,11 +1,10 @@
 /*
  * ===========================================================
  *  FASHION SHOW „HAUTE CAPYTURE“
- *  Ab dem 17.11. fragt der Munkelvogel, ob Toni seine Show
- *  sehen will. 10 Capys und 10 Munkelvögel laufen in 20 Looks
- *  über den Laufsteg, zusammen tragen sie alle 120 Teile aus
- *  dem Ankleidezimmer genau einmal. Zum Schluss läuft der
- *  Munkelvogel selbst für Louis Vogel.
+ *  Am 17.11. fragt der Munkelvogel, ob Toni seine Show
+ *  sehen will. 5 Capys und 5 Munkelvögel laufen in 10 Looks
+ *  mit Teilen aus dem Ankleidezimmer über den Laufsteg.
+ *  Zum Schluss läuft der Munkelvogel selbst für Louis Vogel.
  * ===========================================================
  */
 (function () {
@@ -15,30 +14,21 @@
   if (!ak || !ak.intro) return;
   const ruhig = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---------- Die 20 Looks ---------- */
+  /* ---------- Die Looks ---------- */
   // art: "capy", "vogel" (Munkelvogel) oder "vogeline"
   // Bei den Capys: das zweite Teil einer Kategorie wird dazu getragen
   // (Socken in Schuhen, Wimpern unter der Brille, Brille am Kragen, Extra in der anderen Pfote)
+  // 10 Looks: 5 Capys und 5 Munkelvögel, abwechselnd; zum Schluss der Munkelvogel selbst
   const LOOKS = [
     { art: "capy", marke: "Dolce & Capybana", motto: "Zuckerstangenzauber", t: { kopf: ["rentierreif", "partyhut_pink"], hals: ["glueckband"], augen: ["herzbrille"], fuesse: ["ballerinas"], extra: ["zuckerstange", "toertchen"] } },
     { art: "vogeline", marke: "Schnanel", motto: "Mademoiselle Noël", t: { kopf: "barett_rosa", hals: "perlenkette", augen: "katzenaugen", fuesse: "high_heels", extra: "handtasche" } },
     { art: "capy", marke: "Herr Kappi", motto: "Gentleman im Schnee", t: { kopf: ["zylinder_schnee"], hals: ["karoschal"], augen: ["professorenbrille"], fuesse: ["ringelsocken", "lackschuhe_gold"], extra: ["buch", "kaffeebecher"] } },
-    { art: "vogel", marke: "Munkler", motto: "Après Ski Rockstar", t: { kopf: "skimuetze", hals: "rollkragen", augen: "skibrille", fuesse: "skier", extra: "thermoskanne" } },
-    { art: "capy", marke: "Max Capara", motto: "Winterwunder in Weiß", t: { kopf: ["stirnband_pompons"], hals: ["flockenkette"], augen: ["flockenbrille", "sternchenwimpern"], fuesse: ["kuschelsocken", "fellstiefel"], extra: ["schneeball"] } },
-    { art: "vogeline", marke: "Vogelentino", motto: "Eisprinzessin", t: { kopf: "eiskroenchen", hals: "federboa_weiss", augen: "glitzerwimpern", fuesse: "schlittschuhe_weiss", extra: "muff" } },
-    { art: "capy", marke: "Balencapy", motto: "Oversize auf der Piste", t: { kopf: ["ohrenschuetzer", "strickmuetze"], hals: ["schal_flocken"], augen: ["fliegerbrille"], fuesse: ["ringelsocken_w", "schneestiefel"], extra: ["schneekugel"] } },
-    { art: "vogel", marke: "Tommy Hilfeder", motto: "Kapitän auf Eis", t: { kopf: "kapitaensmuetze", hals: "halstuch_streifen", augen: "sonnenbrille", fuesse: "schlittschuhe", extra: "laterne" } },
-    { art: "capy", marke: "Capyberry", motto: "Herbstspaziergang in London", t: { kopf: ["herbstreif", "schiebermuetze"], hals: ["schal_creme", "hufeisenkette"], augen: ["brille_rund_w"], fuesse: ["gummistiefel_punkte"], extra: ["herzballon"] } },
-    { art: "vogeline", marke: "Bottega Vogeleta", motto: "Glückskind in Grün", t: { kopf: "kleespange", hals: "halstuch_gruen", augen: "kleeblattbrille", fuesse: "stiefeletten", extra: "gluecksschwein" } },
-    { art: "capy", marke: "Piepada", motto: "Cheerleaderin des Glücks", t: { kopf: ["marienkaeferreif"], hals: ["kleeblattkette", "luftschlangen"], augen: ["regenbogenbrille"], fuesse: ["glueckssocken", "leuchtsneaker"], extra: ["pompons"] } },
     { art: "vogel", marke: "Yves Saint Laupiep", motto: "Detektiv im Schneegestöber", t: { kopf: "detektivmuetze", hals: "krawatte", augen: "monokel", fuesse: "gummistiefel", extra: "regenschirm" } },
-    { art: "capy", marke: "Karl Capyfeld", motto: "Avantgarde", t: { kopf: ["doktorhut"], hals: ["fliege_punkte"], augen: ["taucherbrille", "brille_3d"], fuesse: ["turnschuhe"], extra: ["bleistift", "pokal"] } },
-    { art: "vogeline", marke: "Givenpiep", motto: "Blütenball", t: { kopf: "bluetenkrone", hals: "diamantkette", augen: "wimpern", fuesse: "glitzerballerinas", extra: "blumenstrauss" } },
-    { art: "capy", marke: "Gucapy", motto: "Gartengala", t: { kopf: ["strohhut", "blumenkranz"], hals: ["seidentuch"], augen: ["herzbrille_gold"], fuesse: ["glitzerschuhe"], extra: ["wunderkerze", "geschenk"] } },
-    { art: "vogel", marke: "Federsace", motto: "Disco Inferno", t: { kopf: "glitzerzylinder", hals: "fliege_gold", augen: "discobrille", fuesse: "tanzschuhe", extra: "troete" } },
-    { art: "capy", marke: "Federmani", motto: "Maskenball in der Backstube", t: { kopf: ["kochmuetze"], hals: ["lebkuchenkette", "medaille"], augen: ["partymaske", "glitzerbrille"], fuesse: ["pantoffeln"], extra: ["faehnchen"] } },
+    { art: "capy", marke: "Balencapy", motto: "Oversize auf der Piste", t: { kopf: ["ohrenschuetzer", "strickmuetze"], hals: ["schal_flocken"], augen: ["fliegerbrille"], fuesse: ["ringelsocken_w", "schneestiefel"], extra: ["schneekugel"] } },
     { art: "vogeline", marke: "Piep Piep", motto: "Popstar in Pink", t: { kopf: "diadem", hals: "federboa_pink", augen: "sternsonnenbrille", fuesse: "rollschuhe_pink", extra: "mikrofon" } },
-    { art: "capy", marke: "Capy Klein", motto: "Silvester Countdown", t: { kopf: ["partyhut"], hals: ["konfettischal", "partykette"], augen: ["glitzermaske", "sternenbrille"], fuesse: ["rollschuhe"], extra: ["luftballon"] } },
+    { art: "capy", marke: "Karl Capyfeld", motto: "Avantgarde", t: { kopf: ["doktorhut"], hals: ["fliege_punkte"], augen: ["taucherbrille", "brille_3d"], fuesse: ["turnschuhe"], extra: ["bleistift", "pokal"] } },
+    { art: "vogel", marke: "Federsace", motto: "Disco Inferno", t: { kopf: "glitzerzylinder", hals: "fliege_gold", augen: "discobrille", fuesse: "tanzschuhe", extra: "troete" } },
+    { art: "capy", marke: "Gucapy", motto: "Gartengala", t: { kopf: ["strohhut", "blumenkranz"], hals: ["seidentuch"], augen: ["herzbrille_gold"], fuesse: ["glitzerschuhe"], extra: ["wunderkerze", "geschenk"] } },
     { art: "vogel", marke: "Louis Vogel", motto: "Le Petit Parisien", star: true, t: { kopf: "barett", hals: "strickschal", augen: "brille_rund", fuesse: "lackschuhe", extra: "croissant" } },
   ];
   const KAT = ["kopf", "hals", "augen", "fuesse", "extra"];
@@ -101,7 +91,8 @@
     const s = lies();
     if (s.gesehen) return null;
     const d = ak.intro.datum();
-    if (!(d.jahr === KALENDER.jahr && d.monat === 11 && d.tag <= 25)) return null;
+    // nur am 17.11. erzählt der Munkelvogel von seiner Show
+    if (!(d.jahr === KALENDER.jahr && d.monat === 11 && d.tag === 17)) return null;
     return "Ich laufe für Louis Vogel 😎 Willst du sehen, bei was für einem Hochkaräter ich mitlaufe?";
   }
   // vor der Frage erzählt der Munkelvogel, wie es dazu kam (eigene Blase, damit beide gut Platz finden)
@@ -217,16 +208,16 @@
   }
   async function finale(id) {
     karte.classList.remove("an");
-    // alle 20 noch einmal als Parade
+    // alle noch einmal als Parade
     const reihe = document.createElement("div");
     reihe.className = "ls-parade";
     LOOKS.forEach((look, i) => { const f = figur(look, "klein"); f.style.setProperty("--i", String(i)); reihe.appendChild(f); });
     models.appendChild(reihe);
     karte.querySelector(".ls-nr").textContent = "Finale";
     karte.querySelector(".ls-marke").textContent = "Haute Capyture";
-    karte.querySelector(".ls-motto").textContent = "Alle 20 Looks der Winterkollektion";
+    karte.querySelector(".ls-motto").textContent = "Alle " + LOOKS.length + " Looks der Winterkollektion";
     karte.classList.add("an");
-    if (!(await warte(ruhig ? 2500 : 7200, id))) return;
+    if (!(await warte(ruhig ? 2500 : 5200, id))) return;
     // der Star kommt nach vorne und verbeugt sich
     const star = figur(LOOKS[LOOKS.length - 1], "star");
     models.appendChild(star);

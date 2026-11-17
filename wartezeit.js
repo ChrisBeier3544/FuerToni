@@ -157,17 +157,44 @@
   const aufUmschlag = el("div", "wz-auf-umschlag");
   umschlag.appendChild(aufUmschlag);
 
+  // Eigene Ebene für die kurzen Sprechblasen, damit sie über Umschlag und Munkelvögeln liegen
+  let sprechEbeneEl = null;
+  function sprechEbene() {
+    if (!sprechEbeneEl || !sprechEbeneEl.isConnected) {
+      sprechEbeneEl = el("div", "wz-sprech-ebene");
+      sprechEbeneEl.setAttribute("aria-live", "polite");
+      document.body.appendChild(sprechEbeneEl);
+    }
+    return sprechEbeneEl;
+  }
   // Kurze Sprechblase an einem Element
   function blase(ziel, text, ms, oben) {
     const r = ziel.getBoundingClientRect();
     if (ziel._wzBlase) ziel._wzBlase.remove();
     const b = el("div", "wz-sprech", text);
     ziel._wzBlase = b;
-    ebene.appendChild(b);
+    // über den Vögeln und dem Umschlag; nur in einem offenen Fenster bleibt sie dort
+    (ziel.closest(".wz-fenster-huelle") ? ebene : sprechEbene()).appendChild(b);
     const bw = b.offsetWidth;
     b.style.left = Math.max(8, Math.min(window.innerWidth - bw - 8, r.left + r.width / 2 - bw / 2)) + "px";
-    const y = oben === false ? r.bottom + 10 : r.top - b.offsetHeight - 10;
-    b.style.top = Math.max(8, y) + "px";
+    const setze = (unten) => { b.style.top = Math.max(8, unten ? r.bottom + 10 : r.top - b.offsetHeight - 10) + "px"; };
+    setze(oben === false);
+    // nie über einer Blase der Munkelvögel: erst die andere Seite probieren, sonst hat diese Blase Vorrang
+    const vogelBlasen = () => [...document.querySelectorAll(".vogel-blase:not([hidden])")].filter((v) => {
+      const a = v.getBoundingClientRect(), c = b.getBoundingClientRect();
+      return a.width && a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
+    });
+    // eine neue kleine Blase verdrängt ältere, mit denen sie sich überschneiden würde
+    const c0 = b.getBoundingClientRect();
+    b.parentElement.querySelectorAll(".wz-sprech").forEach((x) => {
+      if (x === b || x.classList.contains("weg")) return;
+      const a = x.getBoundingClientRect();
+      if (a.left < c0.right && a.right > c0.left && a.top < c0.bottom && a.bottom > c0.top) { x.classList.add("weg"); setTimeout(() => x.remove(), 350); }
+    });
+    if (vogelBlasen().length) {
+      setze(oben !== false);
+      vogelBlasen().forEach((v) => { if (!v.classList.contains("mit-wahl")) { v.hidden = true; const vo = v.closest(".vogel"); if (vo) vo.classList.remove("redet"); } });
+    }
     setTimeout(() => { b.classList.add("weg"); setTimeout(() => b.remove(), 400); }, ms || 2600);
     return b;
   }
