@@ -184,6 +184,13 @@
       const a = v.getBoundingClientRect(), c = b.getBoundingClientRect();
       return a.width && a.left < c.right && a.right > c.left && a.top < c.bottom && a.bottom > c.top;
     });
+    // eine neue kleine Blase verdrängt ältere, mit denen sie sich überschneiden würde
+    const c0 = b.getBoundingClientRect();
+    b.parentElement.querySelectorAll(".wz-sprech").forEach((x) => {
+      if (x === b || x.classList.contains("weg")) return;
+      const a = x.getBoundingClientRect();
+      if (a.left < c0.right && a.right > c0.left && a.top < c0.bottom && a.bottom > c0.top) { x.classList.add("weg"); setTimeout(() => x.remove(), 350); }
+    });
     if (vogelBlasen().length) {
       setze(oben !== false);
       vogelBlasen().forEach((v) => { if (!v.classList.contains("mit-wahl")) { v.hidden = true; const vo = v.closest(".vogel"); if (vo) vo.classList.remove("redet"); } });

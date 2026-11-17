@@ -4106,3 +4106,6 @@ html:has(.wz-fenster-huelle:not(.geht)) .wz-sprech-ebene, html:has(.special-bueh
 .intro[data-phase="warten"] .umschlag * { backface-visibility: visible; }
 /* sobald irgendein Fenster offen ist, sind Munkelvögel und kleine Blasen sofort weg */
 html:has(dialog[open]) .vogel-ebene, html:has(dialog[open]) .wz-sprech-ebene, html:has(.mistel-ebene) .vogel-ebene { visibility: hidden; }
+/* Fragen mit Knöpfen dürfen breiter sein, damit sie flacher werden und auch auf kleinen Handys Platz finden */
+.vogel .vogel-blase.mit-wahl { max-width: min(330px, calc(100vw - 20px)); font-size: 0.8rem; line-height: 1.35; }
+.vogel .vogel-blase.mit-wahl .vogel-wahlen { margin-top: 6px; }
