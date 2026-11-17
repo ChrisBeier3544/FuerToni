@@ -307,7 +307,7 @@
   introKnopf.type = "button"; introKnopf.className = "special-knopf intro-show"; introKnopf.hidden = true; introKnopf.innerHTML = '<span aria-hidden="true">✨</span> Show'; introKnopf.setAttribute("aria-label", "Fashion Show ansehen");
   introKnopf.addEventListener("click", oeffnen);
   const kalenderKnopf = document.createElement("button");
-  kalenderKnopf.type = "button"; kalenderKnopf.className = "sammlung-knopf"; kalenderKnopf.hidden = true; kalenderKnopf.innerHTML = knopfHtml;
+  kalenderKnopf.type = "button"; kalenderKnopf.className = "sammlung-knopf knopf-show"; kalenderKnopf.hidden = true; kalenderKnopf.innerHTML = knopfHtml;
   kalenderKnopf.addEventListener("click", oeffnen);
   setInterval(() => {
     if (!ak.intro.bereit()) return;
@@ -327,6 +327,7 @@
     frageText,
     vorabText,
     oeffnen,
+    verfuegbar: () => { const st = lies(); return abHeute() && !!(st.angeboten || st.gesehen); },
     angeboten: () => merke("angeboten"),
     LOOKS,
   };

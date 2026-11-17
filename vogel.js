@@ -210,6 +210,8 @@
   // anhang: Knöpfe, die schon beim Ausmessen in der Blase stecken müssen
   function zeigeBlase(v, satz, anhang) {
     if (v.zustand !== "sitzt") return;
+    // erst den Vogel exakt auf seinen Platz setzen (die Seite kann gerade verschoben worden sein), dann messen
+    if (v.platz && v.kontext && !v.auftrag) { const p = sitzpunkt(v, v.kontext, v.platz); if (p) setzePosition(v, p); }
     // nur sprechen, wenn der Vogel gerade zu sehen ist
     const sicht = v.el.getBoundingClientRect();
     if (sicht.bottom < 20 || sicht.top > window.innerHeight - 20) { v.blase.hidden = true; return; }
@@ -327,6 +329,7 @@
 
   async function fliegeWeg(v) {
     if (v.auftrag) return;
+    if (voegel.some((a) => a !== v && a.fragt)) { planeAbflug(v); return; }
     if (v.zustand !== "sitzt" || document.hidden) { planeAbflug(v); return; }
     v.blase.hidden = true; v.el.classList.remove("redet");
     v.zustand = "fliegt";
@@ -872,6 +875,9 @@
   function naechsteAnfrage() {
     const show = ak.modenschau && !schonGefragt.has("show") ? ak.modenschau.frageText() : null;
     if (show) return { art: "show", text: show, vorab: vorabGesagt.has("show") ? null : ak.modenschau.vorabText() };
+    // am 18.11. fragt die Munkelvogeline nach dem Einrichten, aber nur wenn sie da ist und Danke gesagt hat
+    if (ak.raum && !schonGefragt.has("raum") && weibchen && weibchen.el.isConnected && ak.raum.frageAktiv())
+      return { art: "raum", text: ak.raum.frage(), vorab: vorabGesagt.has("raum") ? null : ak.raum.vorab(), vogel: weibchen };
     const styling = ak.styling && !schonGefragt.has("styling") ? ak.styling.frageText() : null;
     if (styling) return { art: "styling", text: styling };
     return null;
@@ -884,7 +890,7 @@
     const anfrage = naechsteAnfrage();
     if (!anfrage) return;
     const text = anfrage.text;
-    const v = maennchen;
+    const v = anfrage.vogel || maennchen;
     const r = v.el.getBoundingClientRect();
     const frei = v.zustand === "sitzt" && !v.el.hidden && v.hatGesprochen && !v.fragt && !v.auftrag && kontext() &&
       voegel.every((x) => x.blase.hidden) && !document.querySelector(".special-buehne, .aufbau-buehne, .vogel.gast, dialog[open], .wz-fenster-huelle") &&
@@ -919,6 +925,7 @@
     stylingWarteBisLandung = null;
     schonGefragt.add(art);
     if (art === "show" && ak.modenschau) ak.modenschau.angeboten();
+    if (art === "raum" && ak.raum) ak.raum.angeboten();
     v.timer.forEach(clearTimeout); v.timer = [];
     clearTimeout(v.flugTimer);
     v.fragt = true; v.fragtArt = "styling"; v.anfrageArt = art;
@@ -930,8 +937,8 @@
   // nimmt er die Frage zurück und stellt sie später noch einmal
   const stoerung = () => document.querySelector("dialog[open], .special-buehne, .aufbau-buehne, .wz-fenster-huelle:not(.geht), .mistel-ebene");
   setInterval(() => {
-    const v = maennchen;
-    if (!v || !v.fragt || !stoerung()) return;
+    const v = voegel.find((x) => x.fragt);
+    if (!v || !stoerung()) return;
     const art = v.fragtArt;
     v.fragt = false; v.fragtArt = null;
     clearTimeout(stylingTimer); clearTimeout(frageTimer);
@@ -944,17 +951,19 @@
     v.fragt = false; v.fragtArt = null;
     clearTimeout(stylingTimer);
     v.blase.classList.remove("mit-wahl");
-    const show = v.anfrageArt === "show";
+    const show = v.anfrageArt === "show", raum = v.anfrageArt === "raum";
     // nach dieser Frage darf später im Besuch noch die nächste kommen
     stylingGefragt = false; stylingRuhig = 0;
     if (antwort === "ja") {
       v.blase.hidden = true; v.el.classList.remove("redet");
       if (show) { if (ak.modenschau) ak.modenschau.oeffnen(); }
+      else if (raum) { if (ak.raum) ak.raum.oeffnen(); }
       else if (ak.styling) ak.styling.oeffnen();
       planeAbflug(v);
     } else {
       zeigeBlase(v, show
         ? wahl(["Okay, Toni! Ich lauf erst, wenn du zuschaust 😎 Der Knopf zur Fashion Show wartet auf dich ✨", "Kein Problem, Toni! Ich übe so lange meinen Laufstegblick 😎"])
+        : raum ? wahl(["Okay, Toni! In Tonis Ecke kannst du jederzeit einrichten 🛋️", "Kein Problem, Toni. Vielleicht hast du später Lust 🥰"])
         : wahl(["Okay, Toni! Ich warte hier ganz geduldig 🐦", "Kein Problem, Toni. Der Knopf zum Umstylen wartet auf dich 👗"]));
       v.nachholen = null;
       v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, 4200));
@@ -1308,7 +1317,20 @@
   // Der Munkelvogel ist frei für einen Auftrag: gelandet, hat gesprochen, keine Frage offen, alle Vögel still
   const istDa = () => maennchen.zustand === "sitzt" && !maennchen.el.hidden && maennchen.hatGesprochen && !maennchen.fragt &&
     voegel.every((v) => v.blase.hidden) && (!weibchen || (weibchen.zustand === "sitzt" && weibchen.hatGesprochen)) && !document.querySelector(".vogel.gast");
-  window.adventkalender.voegel = { voegel, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
+  function raumFertig(erstesMal) {
+    const v = weibchen && weibchen.zustand === "sitzt" && !weibchen.el.hidden ? weibchen : maennchen.zustand === "sitzt" && !maennchen.el.hidden ? maennchen : null;
+    if (!v || v.fragt || v.auftrag) return;
+    setTimeout(() => {
+      if (v.zustand !== "sitzt" || v.fragt) return;
+      v.timer.forEach(clearTimeout); v.timer = [];
+      zeigeBlase(v, v.weiblich
+        ? wahl(erstesMal ? ["Wie schön es hier jetzt ist, Toni! Danke 🥰", "Toni, das ist ja wunderschön geworden! Ich fühl mich wie in einem neuen Zuhause 🥰"] : ["Hübsch, Toni! Gefällt mir sehr 🥰"])
+        : wahl(["Wow, Toni! Hier sieht es jetzt richtig gemütlich aus 🥰", "Toni, das hast du wunderschön eingerichtet ✨"]));
+      v.nachholen = null;
+      v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); if (!v.partner) planeAbflug(v); }, 4600));
+    }, 1300);
+  }
+  window.adventkalender.voegel = { voegel, raumFertig, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
     // erst wenn er gelandet ist und seine Sätze gesagt hat (höchstens 30 Sekunden warten)
     let n = 0;
     const los = () => {

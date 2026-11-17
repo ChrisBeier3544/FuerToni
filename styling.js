@@ -582,7 +582,7 @@
   // im Kalender neben den anderen Knöpfen
   const kalenderKnopf = document.createElement("button");
   kalenderKnopf.type = "button";
-  kalenderKnopf.className = "sammlung-knopf";
+  kalenderKnopf.className = "sammlung-knopf knopf-umstylen";
   kalenderKnopf.hidden = true;
   kalenderKnopf.innerHTML = knopfHtml;
   kalenderKnopf.addEventListener("click", oeffnen);
@@ -619,6 +619,7 @@
       return "Toni, Zeit für ein Umstyling! Suchst du uns was Neues zum Anziehen aus? 👗";
     },
     gewaehlt: (nr) => stand.runden.includes(nr),
+    offen: () => !!aktuelleRunde(),
     KLEIDUNG: K,
     KATEGORIEN,
   };

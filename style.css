@@ -4132,3 +4132,250 @@ html:has(dialog[open]) .vogel-ebene, html:has(dialog[open]) .wz-sprech-ebene, ht
   .intro.wz-aktiv .special-knopf { padding: 6px 10px; font-size: 0.78rem; }
 }
 @media (max-width: 350px) { .intro-knoepfe .special-knopf { padding: 6px 9px; font-size: 0.74rem; } }
+
+/* =================================================================
+   RAUM EINRICHTEN
+   Jede Variante hängt an einem Attribut (data-raum-…) am #intro
+   oder an einer Vorschaukachel; dieselben Regeln für beide.
+   ================================================================= */
+
+/* ---------- 1. Briefrand ---------- */
+.raum-rand { position: absolute; inset: 0; z-index: 4; pointer-events: none; transition: opacity 0.4s ease; }
+.raum-rand svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.umschlag.offen .raum-rand { opacity: 0; }
+.raum-birne { animation: raum-birne 2.4s ease-in-out infinite; }
+.raum-birne.b2 { animation-delay: -0.8s; }
+.raum-birne.b3 { animation-delay: -1.6s; }
+@keyframes raum-birne { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+.raum-funkel { transform-box: fill-box; transform-origin: center; animation: raum-funkel 2.2s ease-in-out infinite; }
+.raum-funkel.f1 { animation-delay: -0.7s; }
+.raum-funkel.f2 { animation-delay: -1.4s; }
+@keyframes raum-funkel { 0%, 100% { opacity: 1; scale: 1; } 50% { opacity: 0.5; scale: 0.7; } }
+
+/* ---------- 2. Kommode ---------- */
+/* Rustikale Eiche: Maserung, Nägel, Eisenringe */
+:root [data-raum-moebel="eiche"] .wz-schrank { background: repeating-linear-gradient(90deg, rgba(50, 25, 8, 0.1) 0 2px, transparent 2px 11px), linear-gradient(180deg, #8a5a34, #6b4223); }
+:root [data-raum-moebel="eiche"] .wz-lade-front {
+  background:
+    radial-gradient(circle at 7px 7px, #3a3430 0 1.7px, transparent 2.2px), radial-gradient(circle at calc(100% - 7px) 7px, #3a3430 0 1.7px, transparent 2.2px),
+    radial-gradient(circle at 7px calc(100% - 7px), #3a3430 0 1.7px, transparent 2.2px), radial-gradient(circle at calc(100% - 7px) calc(100% - 7px), #3a3430 0 1.7px, transparent 2.2px),
+    repeating-linear-gradient(178deg, rgba(60, 30, 10, 0.16) 0 1px, transparent 1px 6px), repeating-linear-gradient(92deg, rgba(255, 225, 190, 0.07) 0 4px, transparent 4px 17px),
+    linear-gradient(180deg, #ad7a4b, #8d5d36);
+  box-shadow: inset 0 0 0 2px rgba(40, 18, 5, 0.4), inset 0 0 0 4px rgba(255, 220, 180, 0.1), 0 2px 3px rgba(40, 18, 5, 0.45);
+}
+:root [data-raum-moebel="eiche"] .wz-griff { width: 16px; height: 16px; top: 56%; border-radius: 50%; background: transparent; border: 3px solid #2e2926; box-shadow: 0 1px 1px rgba(255, 255, 255, 0.15), inset 0 1px 1px rgba(255, 255, 255, 0.1); }
+:root [data-raum-moebel="eiche"] .wz-griff::before { content: ""; position: absolute; left: 50%; top: -9px; width: 10px; height: 6px; transform: translateX(-50%); border-radius: 2px; background: #2e2926; }
+:root [data-raum-moebel="eiche"] .wz-bank-oben { background: repeating-linear-gradient(90deg, rgba(60, 30, 10, 0.08) 0 1px, transparent 1px 14px), linear-gradient(180deg, #b98a5c, #a2744a); }
+:root [data-raum-moebel="eiche"] .wz-bank-vorne { background: #6b4223; }
+:root [data-raum-moebel="eiche"] .wz-lade-boden { background: linear-gradient(180deg, #5a3820, #7a5030 40%, #8a5d38); }
+
+/* Landhaus Weiß: gestrichenes Holz, Kassette, Porzellanknäufe */
+:root [data-raum-moebel="landhaus"] .wz-schrank { background: repeating-linear-gradient(90deg, rgba(150, 140, 125, 0.12) 0 1px, transparent 1px 26px), linear-gradient(180deg, #ebe6dd, #ddd5c8); }
+:root [data-raum-moebel="landhaus"] .wz-lade-front {
+  background: linear-gradient(180deg, #fbf8f2, #eee8dd);
+  box-shadow: inset 0 0 0 5px #fbf8f2, inset 0 0 0 6px #cfc5b5, inset 0 0 0 9px #f4efe6, 0 2px 3px rgba(110, 95, 75, 0.3);
+}
+:root [data-raum-moebel="landhaus"] .wz-griff { width: 15px; height: 15px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #e8eef5 50%, #b9c6d6); box-shadow: 0 2px 2px rgba(80, 70, 60, 0.35), inset 0 0 0 4px transparent; }
+:root [data-raum-moebel="landhaus"] .wz-griff::after { content: ""; position: absolute; inset: 4px; border-radius: 50%; background: radial-gradient(circle, #6f8fb8 0 25%, transparent 30%); }
+:root [data-raum-moebel="landhaus"] .wz-bank-oben { background: linear-gradient(180deg, #fbf8f2, #efe9df); }
+:root [data-raum-moebel="landhaus"] .wz-bank-vorne { background: #d8cfc1; }
+:root [data-raum-moebel="landhaus"] .wz-lade-boden { background: linear-gradient(180deg, #c9bfae, #ddd4c5 40%, #e6dfd2); }
+
+/* Pastellrosa mit Gold */
+:root [data-raum-moebel="rosa"] .wz-schrank { background: linear-gradient(180deg, #ec9fb4, #dc8099); box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), inset 0 3px 6px rgba(150, 50, 80, 0.2); }
+:root [data-raum-moebel="rosa"] .wz-lade-front {
+  background: linear-gradient(180deg, #fbd0dc, #f0a9bd);
+  box-shadow: inset 0 0 0 2px #e0b04e, inset 0 0 0 4px #fde9ee, inset 0 0 0 5px rgba(224, 176, 78, 0.6), 0 2px 4px rgba(160, 60, 90, 0.3);
+}
+:root [data-raum-moebel="rosa"] .wz-griff { width: 34px; height: 9px; border-radius: 2px 2px 12px 12px; background: linear-gradient(180deg, #fff3c4, #e0b04e 50%, #b8862f); }
+:root [data-raum-moebel="rosa"] .wz-bank-oben { background: linear-gradient(180deg, #fff2f5, #fbdbe3); }
+:root [data-raum-moebel="rosa"] .wz-bank-vorne { background: #e0b04e; }
+:root [data-raum-moebel="rosa"] .wz-lade-boden { background: linear-gradient(180deg, #d98aa0, #eaa9bb 40%, #f2bccb); }
+
+/* Dunkle Nuss mit Messing */
+:root [data-raum-moebel="nuss"] .wz-schrank { background: repeating-linear-gradient(90deg, rgba(0, 0, 0, 0.12) 0 1px, transparent 1px 15px), linear-gradient(180deg, #4b2f20, #362015); }
+:root [data-raum-moebel="nuss"] .wz-lade-front {
+  background: linear-gradient(170deg, rgba(255, 255, 255, 0.14), transparent 40%), repeating-linear-gradient(176deg, rgba(0, 0, 0, 0.14) 0 1px, transparent 1px 8px), linear-gradient(180deg, #6a4330, #4e2f20);
+  box-shadow: inset 0 0 0 1px rgba(255, 220, 170, 0.18), inset 0 -3px 5px rgba(0, 0, 0, 0.3), 0 2px 3px rgba(20, 10, 5, 0.5);
+}
+:root [data-raum-moebel="nuss"] .wz-griff { width: 46px; height: 5px; border-radius: 3px; background: linear-gradient(180deg, #fff0b8, #d9a73c 60%, #9c7020); }
+:root [data-raum-moebel="nuss"] .wz-griff::before, :root [data-raum-moebel="nuss"] .wz-griff::after { content: ""; position: absolute; top: -2px; width: 6px; height: 9px; border-radius: 2px; background: linear-gradient(180deg, #f7dc8a, #b8862f); }
+:root [data-raum-moebel="nuss"] .wz-griff::before { left: -1px; }
+:root [data-raum-moebel="nuss"] .wz-griff::after { right: -1px; }
+:root [data-raum-moebel="nuss"] .wz-bank-oben { background: linear-gradient(180deg, #6a4330, #553424); }
+:root [data-raum-moebel="nuss"] .wz-bank-vorne { background: #2e1b11; }
+:root [data-raum-moebel="nuss"] .wz-lade-boden { background: linear-gradient(180deg, #2a180e, #432a1c 40%, #563726); }
+
+/* Bemalter Bauernschrank: Rot mit gemalten Blumen, grüner Rahmen */
+:root [data-raum-moebel="bauern"] .wz-schrank { background: linear-gradient(180deg, #2f5a45, #244836); }
+:root [data-raum-moebel="bauern"] .wz-lade-front {
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 40'%3E%3Cg fill='none' stroke='%23f3c84b' stroke-width='1.6'%3E%3Cpath d='M20 30 Q30 16 44 22'/%3E%3Cpath d='M100 30 Q90 16 76 22'/%3E%3C/g%3E%3Cg fill='%23fff3d6'%3E%3Ccircle cx='18' cy='28' r='4'/%3E%3Ccircle cx='102' cy='28' r='4'/%3E%3C/g%3E%3Cg fill='%233f8a5a'%3E%3Cellipse cx='32' cy='17' rx='5' ry='2.2' transform='rotate(-30 32 17)'/%3E%3Cellipse cx='88' cy='17' rx='5' ry='2.2' transform='rotate(30 88 17)'/%3E%3C/g%3E%3Cg fill='%23f6c3d0'%3E%3Ccircle cx='44' cy='22' r='3.4'/%3E%3Ccircle cx='76' cy='22' r='3.4'/%3E%3C/g%3E%3C/svg%3E") center / auto 100% no-repeat,
+    linear-gradient(180deg, #b23a3f, #93282f);
+  box-shadow: inset 0 0 0 3px #2f5a45, inset 0 0 0 5px #f3c84b, inset 0 -3px 5px rgba(60, 10, 10, 0.25), 0 2px 3px rgba(30, 20, 10, 0.4);
+}
+:root [data-raum-moebel="bauern"] .wz-griff { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #5a5a5a, #1f1f1f 70%); box-shadow: 0 2px 2px rgba(0, 0, 0, 0.4); }
+:root [data-raum-moebel="bauern"] .wz-bank-oben { background: linear-gradient(180deg, #3f7058, #2f5a45); }
+:root [data-raum-moebel="bauern"] .wz-bank-vorne { background: #f3c84b; }
+:root [data-raum-moebel="bauern"] .wz-lade-boden { background: linear-gradient(180deg, #5a1a1e, #7a2a2f 40%, #8a3036); }
+
+/* abends wird jede Kommode nur gedimmt, statt in die braune Abendfarbe zu wechseln */
+html[data-abend] #intro[data-raum-moebel] :is(.wz-schrank, .wz-lade-front, .wz-bank-oben, .wz-bank-vorne) { filter: brightness(0.74) saturate(0.92); }
+/* ---------- 3. Countdown ---------- */
+[data-raum-countdown] .cd-feld { transition: background 0.3s ease; }
+/* Holzklötzchen */
+[data-raum-countdown="holz"] .cd-feld {
+  border: 0 !important; border-radius: 8px;
+  background: repeating-linear-gradient(92deg, rgba(120, 70, 30, 0.12) 0 2px, transparent 2px 9px), linear-gradient(160deg, #f0cf9e, #d9a96f) !important;
+  box-shadow: 0 4px 0 #a2723f, 0 7px 10px rgba(90, 50, 20, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+[data-raum-countdown="holz"] .cd-feld b { color: #5a3218; text-shadow: 0 1px 0 rgba(255, 240, 210, 0.6); }
+[data-raum-countdown="holz"] .cd-feld small { color: #6b4223; opacity: 0.8; }
+/* Lebkuchen mit Zuckerguss */
+[data-raum-countdown="lebkuchen"] .cd-feld {
+  border: 3px dotted #fff4e6 !important; border-radius: 18px; outline: 3px solid #a85f2c; outline-offset: -1px;
+  background: radial-gradient(circle at 30% 25%, #c57a40, #a35c28 70%) !important; box-shadow: 0 6px 12px rgba(110, 55, 20, 0.35);
+}
+[data-raum-countdown="lebkuchen"] .cd-feld b { color: #fff6ea; text-shadow: 0 2px 0 rgba(90, 40, 10, 0.4); }
+[data-raum-countdown="lebkuchen"] .cd-feld small { color: #ffe3c4; opacity: 0.95; }
+/* Christbaumkugeln */
+[data-raum-countdown="kugeln"] .cd-feld {
+  min-width: 64px; aspect-ratio: 1; align-content: center; justify-items: center; padding: 6px; border: 0 !important; border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.85) 0 6%, transparent 18%), radial-gradient(circle at 40% 35%, #ff7a8c, #d6304f 50%, #8e1534 85%) !important;
+  box-shadow: 0 6px 12px rgba(120, 20, 40, 0.35); margin-top: 6px;
+}
+[data-raum-countdown="kugeln"] .cd-feld:nth-child(2) { background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.85) 0 6%, transparent 18%), radial-gradient(circle at 40% 35%, #ffe08a, #e0b04e 50%, #9c7020 85%) !important; }
+[data-raum-countdown="kugeln"] .cd-feld:nth-child(3) { background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.85) 0 6%, transparent 18%), radial-gradient(circle at 40% 35%, #8fe0a0, #3f9a55 50%, #1f5a30 85%) !important; }
+[data-raum-countdown="kugeln"] .cd-feld:nth-child(4) { background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.85) 0 6%, transparent 18%), radial-gradient(circle at 40% 35%, #9fd0ff, #3f7fd0 50%, #1f3f80 85%) !important; }
+[data-raum-countdown="kugeln"] .cd-feld b { color: #fff; font-size: 1.6rem; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); }
+[data-raum-countdown="kugeln"] .cd-feld small { color: #fff; opacity: 0.9; font-size: 0.56rem; margin-top: 1px; }
+/* die kleine Kappe oben an der Kugel (nur tagsüber, nachts sitzt dort die Schlafmütze) */
+.intro:not(.wz-nacht)[data-raum-countdown="kugeln"] .cd-feld::before, .raum-mini[data-raum-countdown="kugeln"] .cd-feld::before {
+  content: ""; position: absolute; left: 50%; top: -7px; width: 16px; height: 8px; transform: translateX(-50%); border-radius: 2px 2px 1px 1px;
+  background: linear-gradient(90deg, #b8862f, #f7d77c, #b8862f); box-shadow: 0 -4px 0 -1px transparent;
+}
+.intro:not(.wz-nacht)[data-raum-countdown="kugeln"] .cd-feld::after, .raum-mini[data-raum-countdown="kugeln"] .cd-feld::after {
+  content: ""; position: absolute; left: 50%; top: -14px; width: 7px; height: 7px; transform: translateX(-50%); border-radius: 50%; border: 1.6px solid #b8862f; background: transparent;
+}
+/* Klappzahlen wie an einer alten Bahnhofsanzeige */
+[data-raum-countdown="klapp"] .cd-feld {
+  border: 1px solid #0d0d12 !important; border-radius: 8px;
+  background: linear-gradient(180deg, transparent calc(50% - 1px), rgba(0, 0, 0, 0.85) calc(50% - 1px) calc(50% + 1px), transparent calc(50% + 1px)), linear-gradient(180deg, #34343e 0 50%, #26262f 50% 100%) !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+[data-raum-countdown="klapp"] .cd-feld b { color: #f4f1e8; font-weight: 800; letter-spacing: 0.02em; }
+[data-raum-countdown="klapp"] .cd-feld small { color: #f3c84b; opacity: 0.9; }
+/* Eisblumen */
+[data-raum-countdown="frost"] .cd-feld {
+  border: 1px solid #fff !important; border-radius: 14px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cg stroke='%23ffffff' stroke-width='1.2' stroke-linecap='round' opacity='.8'%3E%3Cpath d='M8 4v12M2 10h12M4 6l8 8M12 6l-8 8'/%3E%3Cpath d='M50 44v10M45 49h10M46.5 45.5l7 7M53.5 45.5l-7 7'/%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat,
+    linear-gradient(160deg, rgba(240, 250, 255, 0.97), rgba(196, 228, 248, 0.92)) !important;
+  box-shadow: 0 0 0 2px rgba(124, 196, 240, 0.45), 0 6px 16px rgba(60, 120, 170, 0.22);
+}
+[data-raum-countdown="frost"] .cd-feld b { color: #2f6f9e; }
+[data-raum-countdown="frost"] .cd-feld small { color: #4a7fa6; opacity: 0.9; }
+
+/* ---------- 4. Fenster ---------- */
+.raum-fenster { position: absolute; left: 0; right: 0; top: 0; bottom: var(--wz-moebel-hoehe, 78px); pointer-events: none; z-index: 0; }
+.intro:not(.wz-aktiv) .raum-fenster { bottom: 0; }
+.raum-vorhang { position: absolute; top: 0; bottom: 0; width: clamp(26px, 8vw, 96px); height: 100%; filter: drop-shadow(0 4px 6px rgba(80, 20, 40, 0.18)); }
+.raum-vorhang.links { left: 0; }
+.raum-vorhang.rechts { right: 0; transform: scaleX(-1); }
+.raum-lichtvorhang { position: absolute; top: 0; bottom: 6%; width: clamp(24px, 7vw, 80px); display: flex; justify-content: space-around; }
+.raum-lichtvorhang.links { left: 4px; }
+.raum-lichtvorhang.rechts { right: 4px; }
+.raum-lichtvorhang i {
+  width: 12px; height: 100%; display: block;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 34'%3E%3Cpath d='M6 0v34' stroke='%238a7560' stroke-width='.9'/%3E%3Ccircle cx='6' cy='17' r='6' fill='%23ffc94d' opacity='.45'/%3E%3Ccircle cx='6' cy='17' r='3' fill='%23ffe08a' stroke='%23e0a83a' stroke-width='.7'/%3E%3Ccircle cx='5.2' cy='16.2' r='.9' fill='%23fff'/%3E%3C/svg%3E") top center / 12px 34px repeat-y; filter: drop-shadow(0 0 3px rgba(255, 200, 80, 0.6));
+  animation: raum-lichter 2.6s ease-in-out infinite;
+}
+.raum-lichtvorhang i:nth-child(2) { background-position: center 12px; height: 88%; animation-delay: -0.9s; }
+.raum-lichtvorhang i:nth-child(3) { height: 72%; animation-delay: -1.7s; }
+@keyframes raum-lichter { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+.raum-oben { position: absolute; left: 0; right: 0; top: calc(env(safe-area-inset-top, 0px)); height: 46px; }
+.raum-wimpel {
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 46'%3E%3Cpath d='M0 6 Q60 22 120 6' fill='none' stroke='%23b08a6a' stroke-width='1.4'/%3E%3Cpath d='M6 8.4 L20 12.8 L12 32Z' fill='%23ff8fab'/%3E%3Cpath d='M30 14.2 L46 16.4 L37 36Z' fill='%23f7d77c'/%3E%3Cpath d='M58 17 L74 16.2 L66 37Z' fill='%239fd8f2'/%3E%3Cpath d='M86 14.8 L102 11.2 L95 31Z' fill='%23b8e6b0'/%3E%3Cpath d='M110 9 L120 6.2 L120 22Z' fill='%23d9c2ff'/%3E%3Cg fill='%23fff' opacity='.7'%3E%3Ccircle cx='13' cy='17' r='1.4'/%3E%3Ccircle cx='38' cy='22' r='1.4'/%3E%3Ccircle cx='66' cy='22' r='1.4'/%3E%3Ccircle cx='94' cy='18' r='1.4'/%3E%3C/g%3E%3C/svg%3E") top left / 120px 46px repeat-x;
+  filter: drop-shadow(0 2px 2px rgba(80, 20, 40, 0.15));
+}
+.raum-girlande {
+  height: 52px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 140 52'%3E%3Cpath d='M0 8 Q70 34 140 8' fill='none' stroke='%232f6b45' stroke-width='12' stroke-linecap='round'/%3E%3Cpath d='M0 8 Q70 34 140 8' fill='none' stroke='%234f9a66' stroke-width='6' stroke-dasharray='2 5' stroke-linecap='round'/%3E%3Cpath d='M0 6 Q70 30 140 6' fill='none' stroke='%233f8a55' stroke-width='3' stroke-dasharray='1 4' stroke-linecap='round'/%3E%3Cpath d='M70 20 v10' stroke='%23b8862f' stroke-width='1'/%3E%3Ccircle cx='70' cy='36' r='6' fill='%23d6304f'/%3E%3Ccircle cx='68' cy='34' r='1.6' fill='%23fff' opacity='.7'/%3E%3Cpath d='M30 15 v8' stroke='%23b8862f' stroke-width='1'/%3E%3Ccircle cx='30' cy='27' r='4.6' fill='%23e0b04e'/%3E%3Cpath d='M110 15 v8' stroke='%23b8862f' stroke-width='1'/%3E%3Ccircle cx='110' cy='27' r='4.6' fill='%233f7fd0'/%3E%3Cpath d='M0 4 l-6 -4 v8z M0 4 l6 -4 v8z' fill='%23d6304f'/%3E%3Cpath d='M140 4 l-6 -4 v8z M140 4 l6 -4 v8z' fill='%23d6304f'/%3E%3C/svg%3E") top left / 140px 52px repeat-x;
+  filter: drop-shadow(0 3px 3px rgba(20, 50, 30, 0.2));
+}
+
+/* ---------- 5. Fensterbank ---------- */
+.raum-flackern { animation: raum-flackern 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes raum-flackern { 0%, 100% { opacity: 1; scale: 1; } 30% { opacity: 0.8; scale: 0.95 1.05; } 60% { opacity: 0.95; scale: 1.04 0.97; } }
+
+/* ---------- Menü zum Einrichten ---------- */
+.raum-menue {
+  position: fixed; left: 50%; top: auto; bottom: 0; margin: 0; width: min(560px, 100vw); max-height: min(52vh, 420px); padding: 0; border: 0;
+  border-radius: 22px 22px 0 0; background: rgba(255, 250, 246, 0.98); color: var(--text); transform: translateX(-50%);
+  box-shadow: 0 -12px 40px rgba(60, 10, 30, 0.35); overflow: hidden; display: none; flex-direction: column;
+  transition: top 0.35s ease, bottom 0.35s ease, border-radius 0.35s ease;
+}
+.raum-menue[open] { display: flex; animation: raum-hoch 0.35s cubic-bezier(.3, 1.2, .5, 1); }
+.raum-menue.oben { top: 0; bottom: auto; border-radius: 0 0 22px 22px; box-shadow: 0 12px 40px rgba(60, 10, 30, 0.35); }
+@keyframes raum-hoch { from { transform: translate(-50%, 30px); opacity: 0; } }
+.raum-menue::backdrop { background: rgba(40, 8, 24, 0.12); }
+.raum-kopf { position: relative; padding: 12px 52px 2px 18px; }
+.raum-kopf h2 { margin: 0; font: 700 1.6rem/1.1 "Dancing Script", cursive; color: var(--beere); }
+.raum-kopf p { margin: 2px 0 0; font-size: 0.78rem; font-weight: 700; color: var(--beere-dunkel); opacity: 0.75; }
+.raum-menue .raum-zu { top: 10px; right: 12px; }
+.raum-reiter { display: flex; gap: 6px; padding: 8px 14px 6px; overflow-x: auto; scrollbar-width: none; }
+.raum-reiter::-webkit-scrollbar { display: none; }
+.raum-reiter button { flex: 0 0 auto; padding: 6px 11px; border: 1px solid var(--gold); border-radius: 999px; background: #fff; color: var(--beere-dunkel); font: 700 0.8rem "Nunito", sans-serif; cursor: pointer; white-space: nowrap; }
+.raum-reiter button.aktiv { background: linear-gradient(135deg, var(--rose-500), var(--beere)); border-color: transparent; color: #fff; }
+.raum-kacheln { display: flex; gap: 8px; padding: 4px 14px 10px; overflow-x: auto; scroll-snap-type: x proximity; }
+.raum-kachel { flex: 0 0 auto; width: 104px; padding: 6px 5px 6px; border: 2px solid transparent; border-radius: 14px; background: linear-gradient(180deg, #fff, #fff1f5); box-shadow: 0 3px 10px rgba(157, 36, 73, 0.1); cursor: pointer; scroll-snap-align: start; }
+.raum-kachel.an { border-color: var(--beere); box-shadow: 0 0 0 3px rgba(232, 93, 126, 0.2), 0 4px 12px rgba(157, 36, 73, 0.18); }
+.raum-kachel:focus-visible, .raum-reiter button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.raum-titel { display: block; margin-top: 5px; font: 700 0.64rem/1.2 "Nunito", sans-serif; color: var(--beere-dunkel); }
+.raum-fuss { padding: 8px 14px calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(232, 93, 126, 0.15); }
+.raum-menue.oben .raum-fuss { padding-bottom: 10px; }
+.raum-fertig { width: 100%; padding: 10px 16px; border: 0; border-radius: 14px; background: linear-gradient(135deg, var(--rose-500), var(--beere)); color: #fff; font: 800 1rem "Nunito", sans-serif; cursor: pointer; box-shadow: 0 6px 14px rgba(157, 36, 73, 0.28); }
+.raum-glitzer { position: fixed; z-index: 99; font-size: 18px; pointer-events: none; }
+/* Vorschaubilder in den Kacheln */
+.raum-mini { position: relative; height: 66px; display: grid; place-items: center; overflow: hidden; border-radius: 10px; background: linear-gradient(180deg, #fdeef3, #f9dbe4); }
+.raum-mini-skala { transform: scale(0.5); transform-origin: center; }
+.raum-mini-moebel .raum-mini-skala { width: 190px; }
+.raum-mini-moebel .wz-schrank { padding: 6px 8px; gap: 6px; }
+.raum-mini-moebel .wz-schublade { flex: 1 1 0; height: 40px; }
+.raum-mini-moebel .wz-bank { height: 14px; }
+.raum-mini-countdown .countdown-ziffern { gap: 8px; }
+.raum-mini-countdown .raum-mini-skala { transform: scale(0.72); }
+.raum-mini-countdown .cd-feld { cursor: inherit; }
+.raum-mini-umschlag { position: relative; width: 78px; aspect-ratio: 3 / 2; }
+.raum-mini-umschlag i { position: absolute; inset: 0; border-radius: 4px; }
+.raum-mini-umschlag .h { background: #e98aa2; }
+.raum-mini-umschlag .v { background: linear-gradient(170deg, #f6b3c4, #ef9bb0); clip-path: polygon(0 0, 50% 56%, 100% 0, 100% 100%, 0 100%); }
+.raum-mini-umschlag .k { background: linear-gradient(180deg, #f9c6d3, #f2a7ba); clip-path: polygon(0 0, 100% 0, 50% 60%); }
+.raum-mini-umschlag .s { left: 42%; top: 48%; width: 16%; height: auto; aspect-ratio: 1; inset: auto; border-radius: 50%; background: #9d2449; }
+.raum-mini-umschlag .raum-rand { z-index: 5; }
+.raum-mini-fenster { position: relative; width: 92px; height: 60px; border-radius: 6px; overflow: hidden; background: linear-gradient(180deg, #ffd9b8, #fbe6ee); }
+.raum-mini-fenster .raum-fenster { bottom: 10px; }
+.raum-mini-fenster .raum-vorhang { width: 18px; }
+.raum-mini-fenster .raum-lichtvorhang { width: 16px; }
+.raum-mini-fenster .raum-oben { transform: scale(0.5); transform-origin: 0 0; width: 200%; }
+.raum-mini-fenster .u { position: absolute; left: 0; right: 0; bottom: 0; height: 10px; background: linear-gradient(180deg, #ecd3b6, #c99c74); }
+.raum-mini-deko svg { width: 32px; height: 52px; }
+
+/* ---------- Tonis Ecke ---------- */
+.intro-ecke[hidden], .kalender-ecke[hidden] { display: none; }
+html.ecke-gebuendelt .intro-knoepfe > :not(.intro-ecke),
+html.ecke-gebuendelt #spiel-knopf, html.ecke-gebuendelt .knopf-umstylen, html.ecke-gebuendelt .knopf-show { display: none !important; }
+.ecke-menue { width: min(380px, calc(100vw - 28px)); padding: 0; border: 0; border-radius: 22px; background: #fffaf6; color: var(--text); box-shadow: 0 24px 60px rgba(60, 10, 30, 0.4); }
+.ecke-menue[open] { animation: aufpoppen 0.35s cubic-bezier(.3, 1.3, .5, 1); }
+.ecke-menue::backdrop { background: rgba(40, 8, 24, 0.45); }
+.ecke-kopf { position: relative; padding: 16px 52px 6px 20px; }
+.ecke-kopf h2 { margin: 0; font: 700 1.9rem/1.1 "Dancing Script", cursive; color: var(--beere); }
+.ecke-menue .ecke-zu { top: 12px; right: 12px; }
+.ecke-liste { display: grid; gap: 8px; padding: 6px 16px 18px; }
+.ecke-eintrag { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border: 1px solid rgba(224, 176, 78, 0.6); border-radius: 16px; background: linear-gradient(135deg, #fffaf0, #fff1e0); color: var(--beere-dunkel); text-align: left; cursor: pointer; font: inherit; }
+.ecke-eintrag:hover { background: linear-gradient(135deg, #fff6e6, #ffe9cc); }
+.ecke-eintrag:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.ecke-symbol { font-size: 1.6rem; width: 1.6em; text-align: center; }
+.ecke-eintrag b { display: block; font: 800 1rem "Nunito", sans-serif; }
+.ecke-eintrag small { display: block; margin-top: 1px; font-size: 0.78rem; opacity: 0.75; }
+@media (prefers-reduced-motion: reduce) { .raum-birne, .raum-funkel, .raum-lichtvorhang i, .raum-flackern { animation: none; } }
