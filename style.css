@@ -4112,3 +4112,23 @@ html:has(dialog[open]) .vogel-ebene, html:has(dialog[open]) .wz-sprech-ebene, ht
 .vogel .vogel-blase.mit-wahl { max-width: min(330px, calc(100vw - 20px)); font-size: 0.8rem; line-height: 1.35; }
 .vogel .vogel-blase.mit-wahl .vogel-wahlen { margin-top: 6px; }
 .vogel-wahl { white-space: nowrap; }
+
+/* ---------- Umschlagseite: alles bleibt über den Schubladen ---------- */
+/* die kleinen Knöpfe in einer Reihe und etwas kompakter */
+.intro-knoepfe { flex-wrap: nowrap; gap: 8px; max-width: calc(100vw - 24px); }
+.intro-knoepfe .special-knopf { padding: 7px 12px; font-size: 0.82rem; white-space: nowrap; }
+.intro-knoepfe .special-knopf .ui-icon { width: 1.1em; height: 1.1em; }
+/* unten Platz für die Fensterbank mit den Schubladen lassen */
+.intro.wz-aktiv { padding-bottom: calc(var(--wz-moebel-hoehe, 78px) + 10px); }
+/* auf niedrigen Bildschirmen (auch Safari mit eingeblendeter Leiste) etwas enger */
+@media (max-height: 760px) {
+  .intro.wz-aktiv { gap: 16px; }
+  .intro.wz-aktiv .umschlag { width: min(80vw, 380px); }
+  .intro.wz-aktiv .intro-knoepfe { margin-top: -8px; }
+}
+@media (max-height: 660px) {
+  .intro.wz-aktiv { gap: 12px; }
+  .intro.wz-aktiv .umschlag { width: min(70vw, 330px); }
+  .intro.wz-aktiv .special-knopf { padding: 6px 10px; font-size: 0.78rem; }
+}
+@media (max-width: 350px) { .intro-knoepfe .special-knopf { padding: 6px 9px; font-size: 0.74rem; } }

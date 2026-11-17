@@ -888,7 +888,7 @@
     const r = v.el.getBoundingClientRect();
     const frei = v.zustand === "sitzt" && !v.el.hidden && v.hatGesprochen && !v.fragt && !v.auftrag && kontext() &&
       voegel.every((x) => x.blase.hidden) && !document.querySelector(".special-buehne, .aufbau-buehne, .vogel.gast, dialog[open], .wz-fenster-huelle") &&
-      !document.hidden && r.top > 40 && r.bottom < window.innerHeight - 20;
+      !document.hidden && r.top > -8 && r.bottom < window.innerHeight - 10;
     if (!frei) { stylingRuhig = 0; return; }
     stylingRuhig = stylingRuhig || performance.now();
     if (performance.now() - stylingRuhig < 3500) return;

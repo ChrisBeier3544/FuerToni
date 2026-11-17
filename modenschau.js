@@ -304,7 +304,7 @@
   /* ---------- Knöpfe zum erneuten Ansehen ---------- */
   const knopfHtml = '<span aria-hidden="true">✨</span> Fashion Show';
   const introKnopf = document.createElement("button");
-  introKnopf.type = "button"; introKnopf.className = "special-knopf intro-show"; introKnopf.hidden = true; introKnopf.innerHTML = knopfHtml;
+  introKnopf.type = "button"; introKnopf.className = "special-knopf intro-show"; introKnopf.hidden = true; introKnopf.innerHTML = '<span aria-hidden="true">✨</span> Show'; introKnopf.setAttribute("aria-label", "Fashion Show ansehen");
   introKnopf.addEventListener("click", oeffnen);
   const kalenderKnopf = document.createElement("button");
   kalenderKnopf.type = "button"; kalenderKnopf.className = "sammlung-knopf"; kalenderKnopf.hidden = true; kalenderKnopf.innerHTML = knopfHtml;
