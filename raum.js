@@ -349,6 +349,7 @@
     { id: "spiel", symbol: "🎮", name: "Capy-Spiel", text: "Schneeflocken fangen", da: () => !!(ak.spiel && ak.spiel.oeffnen), los: () => ak.spiel.oeffnen() },
     { id: "styling", symbol: "👗", name: "Vögel umstylen", text: "Neue Outfits aussuchen", da: () => !!(ak.styling && ak.styling.offen && ak.styling.offen()), los: () => ak.styling.oeffnen() },
     { id: "raum", symbol: "🛋️", name: "Raum einrichten", text: "Brief, Kommode und mehr", da: () => ak.intro.phase() === "warten", los: oeffnen },
+    { id: "nest", symbol: "🪺", name: "Nest umbauen", text: "Für die Munkelvögel", da: () => !!(ak.nest && ak.nest.angebotenOderDa() && ak.intro.phase() === "warten"), los: () => ak.nest.oeffnen() },
     { id: "show", symbol: "✨", name: "Fashion Show", text: "Haute Capyture ansehen", da: () => !!(ak.modenschau && ak.modenschau.verfuegbar && ak.modenschau.verfuegbar()), los: () => ak.modenschau.oeffnen() },
   ];
   function eckeOeffnen() {
@@ -383,7 +384,7 @@
     // gebündelt, sobald die Munkelvogeline das Einrichten angeboten hat
     // (auch wenn Toni beim ersten Mal „Später“ gesagt hat, damit sie jederzeit einrichten kann)
     stand = lies();
-    const gebuendelt = !!(stand.fertig || stand.angeboten);
+    const gebuendelt = !!(stand.fertig || stand.angeboten || (ak.nest && ak.nest.angebotenOderDa()));
     document.documentElement.classList.toggle("ecke-gebuendelt", gebuendelt);
     const phase = ak.intro.phase();
     introEcke.hidden = !(gebuendelt && !intro.hidden && (phase === "warten" || phase === "geburtstag")) || !!document.querySelector(".special-buehne");

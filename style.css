@@ -4379,3 +4379,36 @@ html.ecke-gebuendelt #spiel-knopf, html.ecke-gebuendelt .knopf-umstylen, html.ec
 .ecke-eintrag b { display: block; font: 800 1rem "Nunito", sans-serif; }
 .ecke-eintrag small { display: block; margin-top: 1px; font-size: 0.78rem; opacity: 0.75; }
 @media (prefers-reduced-motion: reduce) { .raum-birne, .raum-funkel, .raum-lichtvorhang i, .raum-flackern { animation: none; } }
+
+/* ---------- Winternest ---------- */
+.nest { position: absolute; right: calc(max(8%, calc(50% - 290px)) + 44px); bottom: 5px; width: 78px; z-index: 2; pointer-events: none; }
+.nest svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 3px 2px rgba(90, 50, 30, 0.25)); }
+.nest .augenlid, .nest-menue .augenlid { transform-box: fill-box; transform-origin: 50% 0; transform: scaleY(0); animation: blinzeln 5s infinite; }
+.nest .fluegel-hinten, .nest .bauch, .nest .kruemel, .nest-menue .fluegel-hinten, .nest-menue .bauch, .nest-menue .kruemel { display: none; }
+/* nachts: Augen zu, kleine Zzz */
+.nest.schlaeft .augenlid { transform: scaleY(1); animation: none; }
+.nest-z { animation: wz-zzz 2.6s ease-in-out infinite; transform-box: fill-box; }
+.nest-z.z2 { animation-delay: -1.3s; }
+.nest-licht { animation: raum-birne 2.2s ease-in-out infinite; }
+.nest-licht.b { animation-delay: -1.1s; }
+.nest-menue { width: min(460px, calc(100vw - 20px)); max-height: min(92vh, 92dvh); padding: 0; border: 0; border-radius: 24px; background: linear-gradient(180deg, #fff8f3, #f3ece2); color: var(--text); box-shadow: 0 24px 60px rgba(60, 30, 10, 0.45); overflow: hidden; display: none; flex-direction: column; }
+.nest-menue[open] { display: flex; animation: aufpoppen 0.4s cubic-bezier(0.3, 1.4, 0.5, 1); }
+.nest-menue::backdrop { background: rgba(40, 20, 10, 0.55); backdrop-filter: blur(3px); }
+.nest-kopf { position: relative; padding: 16px 52px 4px 20px; }
+.nest-kopf h2 { margin: 0; font: 700 1.8rem/1.1 "Dancing Script", cursive; color: var(--beere); }
+.nest-kopf p { margin: 2px 0 0; font-size: 0.82rem; font-weight: 700; color: var(--beere-dunkel); opacity: 0.75; }
+.nest-menue .nest-zu { top: 12px; right: 12px; }
+.nest-vorschau { display: grid; place-items: center; padding: 6px 20px 2px; background: radial-gradient(ellipse 70% 80% at 50% 100%, rgba(255, 211, 107, 0.3), transparent 70%); }
+.nest-vorschau svg { width: min(260px, 70vw); height: auto; overflow: visible; }
+.nest-reiter { display: flex; justify-content: center; gap: 6px; padding: 8px 14px 4px; flex-wrap: wrap; }
+.nest-reiter button { padding: 6px 12px; border: 1px solid var(--gold); border-radius: 999px; background: #fff; color: var(--beere-dunkel); font: 700 0.82rem "Nunito", sans-serif; cursor: pointer; }
+.nest-reiter button.aktiv { background: linear-gradient(135deg, var(--rose-500), var(--beere)); border-color: transparent; color: #fff; }
+.nest-kacheln { display: flex; gap: 8px; padding: 6px 14px 10px; overflow-x: auto; scroll-snap-type: x proximity; }
+.nest-kachel { flex: 0 0 auto; width: 96px; padding: 6px 4px; border: 2px solid transparent; border-radius: 14px; background: linear-gradient(180deg, #fff, #f6eee4); box-shadow: 0 3px 10px rgba(110, 60, 30, 0.12); cursor: pointer; scroll-snap-align: start; }
+.nest-kachel.an { border-color: var(--beere); box-shadow: 0 0 0 3px rgba(232, 93, 126, 0.2), 0 4px 12px rgba(157, 36, 73, 0.18); }
+.nest-mini svg { display: block; width: 80px; height: auto; margin: 0 auto; overflow: visible; }
+.nest-titel { display: block; margin-top: 4px; font: 700 0.64rem/1.2 "Nunito", sans-serif; color: var(--beere-dunkel); }
+.nest-kachel:focus-visible, .nest-reiter button:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.nest-fuss { padding: 10px 16px calc(14px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid rgba(160, 100, 60, 0.15); }
+.nest-fertig { width: 100%; padding: 12px 18px; border: 0; border-radius: 14px; background: linear-gradient(135deg, var(--rose-500), var(--beere)); color: #fff; font: 800 1.05rem "Nunito", sans-serif; cursor: pointer; box-shadow: 0 8px 18px rgba(157, 36, 73, 0.3); }
+@media (prefers-reduced-motion: reduce) { .nest .augenlid, .nest-z, .nest-licht { animation: none; } }

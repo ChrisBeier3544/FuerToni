@@ -105,6 +105,8 @@
     umschlagLinks: () => ankerPunkt("34px", "oben", 3),
     umschlagRechts: () => ankerPunkt("calc(100% - 34px)", "oben", 3),
     siegel: () => { const e = document.querySelector("#umschlag .siegel"); if (!sichtbar(e)) return null; return ankerPunkt("50%", e.offsetTop + "px", 4); },
+    // im Winternest auf der Fensterbank (nur wenn Toni es gebaut hat, nachts nicht)
+    nest: () => (ak.nest && ak.nest.platz ? ak.nest.platz() : null),
     hinweis: () => { const e = document.getElementById("intro-hinweis"); if (!sichtbar(e) || !e.textContent) return null; const r = e.getBoundingClientRect(); return { x: Math.min(window.innerWidth - 30, r.right + 26), y: r.top + 14 }; },
   };
   // Unsichtbare Punkte im Umschlag. Weil sie im Brief stecken, folgen sie seinem
@@ -129,6 +131,7 @@
   }
   function kontext() {
     const phase = ak.intro.phase();
+    if (ak.nest && ak.nest.schlafen && ak.nest.schlafen()) return null;
     if (!intro.hidden && (phase === "warten" || phase === "geburtstag")) return "countdown";
     if (intro.hidden) return "kalender";
     return null; // Umschlag zu, aber noch nicht geöffnet: kein Vogel
@@ -878,6 +881,9 @@
     // am 18.11. fragt die Munkelvogeline nach dem Einrichten, aber nur wenn sie da ist und Danke gesagt hat
     if (ak.raum && !schonGefragt.has("raum") && weibchen && weibchen.el.isConnected && ak.raum.frageAktiv())
       return { art: "raum", text: ak.raum.frage(), vorab: vorabGesagt.has("raum") ? null : ak.raum.vorab(), vogel: weibchen };
+    // am 19.11. fragt die Munkelvogeline nach dem Winternest (nur wenn sie da ist)
+    if (ak.nest && !schonGefragt.has("nest") && weibchen && weibchen.el.isConnected && ak.nest.frageAktiv())
+      return { art: "nest", text: ak.nest.frage(), vorab: vorabGesagt.has("nest") ? null : ak.nest.vorab(), vogel: weibchen };
     const styling = ak.styling && !schonGefragt.has("styling") ? ak.styling.frageText() : null;
     if (styling) return { art: "styling", text: styling };
     return null;
@@ -926,6 +932,7 @@
     schonGefragt.add(art);
     if (art === "show" && ak.modenschau) ak.modenschau.angeboten();
     if (art === "raum" && ak.raum) ak.raum.angeboten();
+    if (art === "nest" && ak.nest) ak.nest.angeboten();
     v.timer.forEach(clearTimeout); v.timer = [];
     clearTimeout(v.flugTimer);
     v.fragt = true; v.fragtArt = "styling"; v.anfrageArt = art;
@@ -967,19 +974,21 @@
     v.fragt = false; v.fragtArt = null;
     clearTimeout(stylingTimer);
     v.blase.classList.remove("mit-wahl");
-    const show = v.anfrageArt === "show", raum = v.anfrageArt === "raum";
+    const show = v.anfrageArt === "show", raum = v.anfrageArt === "raum", nest = v.anfrageArt === "nest";
     // nach dieser Frage darf später im Besuch noch die nächste kommen
     stylingGefragt = false; stylingRuhig = 0;
     if (antwort === "ja") {
       v.blase.hidden = true; v.el.classList.remove("redet");
       if (show) { if (ak.modenschau) ak.modenschau.oeffnen(); }
       else if (raum) { if (ak.raum) ak.raum.oeffnen(); }
+      else if (nest) { if (ak.nest) ak.nest.oeffnen(); }
       else if (ak.styling) ak.styling.oeffnen();
       planeAbflug(v);
     } else {
       zeigeBlase(v, show
         ? wahl(["Okay, Toni! Ich lauf erst, wenn du zuschaust 😎 Der Knopf zur Fashion Show wartet auf dich ✨", "Kein Problem, Toni! Ich übe so lange meinen Laufstegblick 😎"])
         : raum ? wahl(["Okay, Toni! In Tonis Ecke kannst du jederzeit einrichten 🛋️", "Kein Problem, Toni. Vielleicht hast du später Lust 🥰"])
+        : nest ? wahl(["Okay, Toni! Dann kuscheln wir uns so lange aneinander 🥰", "Kein Problem, Toni. In Tonis Ecke kannst du uns später ein Nest bauen 🪺"])
         : wahl(["Okay, Toni! Ich warte hier ganz geduldig 🐦", "Kein Problem, Toni. Der Knopf zum Umstylen wartet auf dich 👗"]));
       v.nachholen = null;
       v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); planeAbflug(v); }, 4200));
@@ -1346,7 +1355,20 @@
       v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); if (!v.partner) planeAbflug(v); }, 4600));
     }, 1300);
   }
-  window.adventkalender.voegel = { voegel, raumFertig, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
+  function nestFertig(erstesMal) {
+    const v = weibchen && weibchen.zustand === "sitzt" && !weibchen.el.hidden ? weibchen : maennchen.zustand === "sitzt" && !maennchen.el.hidden ? maennchen : null;
+    if (!v || v.fragt || v.auftrag) return;
+    setTimeout(() => {
+      if (v.zustand !== "sitzt" || v.fragt) return;
+      v.timer.forEach(clearTimeout); v.timer = [];
+      zeigeBlase(v, v.weiblich
+        ? (erstesMal ? wahl(["Danke, Toni! Wie gemütlich 🥰 Da kuscheln wir uns heute Nacht rein", "Toni, das ist das schönste Nest der Welt! Danke 🥰"]) : "Noch gemütlicher, Toni! Danke 🥰")
+        : wahl(["Wow, Toni, so ein schönes Nest! Danke 🥰", "Toni, da schlafen wir heute Nacht wie im Himmel 🌙"]));
+      v.nachholen = null;
+      v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); if (!v.partner) planeAbflug(v); }, 4600));
+    }, 1200);
+  }
+  window.adventkalender.voegel = { voegel, raumFertig, nestFertig, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
     // erst wenn er gelandet ist und seine Sätze gesagt hat (höchstens 30 Sekunden warten)
     let n = 0;
     const los = () => {
