@@ -197,11 +197,13 @@
       vogelBlasen().forEach((v) => { if (!v.classList.contains("mit-wahl")) { v.hidden = true; const vo = v.closest(".vogel"); if (vo) vo.classList.remove("redet"); } });
     }
     // erst wenn die Lage feststeht: ältere kleine Blasen, die sich überschneiden würden, sofort weg
-    const c0 = b.getBoundingClientRect();
+    // (gemessen ohne die Einblend-Animation, die die neue Blase anfangs kleiner macht)
+    const box = (e) => ({ l: e.offsetLeft, t: e.offsetTop, r: e.offsetLeft + e.offsetWidth, u: e.offsetTop + e.offsetHeight });
+    const c0 = box(b);
     b.parentElement.querySelectorAll(".wz-sprech").forEach((x) => {
       if (x === b) return;
-      const a = x.getBoundingClientRect();
-      if (a.left < c0.right && a.right > c0.left && a.top < c0.bottom && a.bottom > c0.top) x.remove();
+      const a = box(x);
+      if (a.l < c0.r && a.r > c0.l && a.t < c0.u && a.u > c0.t) x.remove();
     });
     setTimeout(() => { b.classList.add("weg"); setTimeout(() => b.remove(), 400); }, ms || 2600);
     return b;
