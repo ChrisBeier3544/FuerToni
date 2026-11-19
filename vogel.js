@@ -287,7 +287,7 @@
       : ".polaroid img, .lightbox-figur img, #titel, .heute-karte .status, .zaehler-zahl";
     let summe = 0;
     // Siegel, Countdown-Ziffern und Name dürfen gar nicht verdeckt werden (zählt so stark, dass der Vogel lieber schweigt)
-    const streng = "#intro .siegel, #intro .countdown-ziffern, #intro .umschlag-name, .wz-sprech-ebene .wz-sprech";
+    const streng = "#intro .siegel, #intro .countdown-ziffern, #intro .umschlag-name, .wz-sprech-ebene .wz-sprech, .munkel-buehne .munkel-zu, .munkel-buehne .munkel-hinweis";
     document.querySelectorAll(sel).forEach((e) => {
       const r = e.getBoundingClientRect();
       if (!r.width) return;

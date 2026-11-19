@@ -195,7 +195,10 @@
           fehl++;
           // nach ein paar Versuchen hilft die Munkelvogeline, sonst wackelt kurz der Schwanz
           if (fehl === 4 || fehl === 8) {
-            if (w && w.zustand === "sitzt" && !geguckt++) I.sag(w, "Psst, Toni … " + (versteck.id.startsWith("lade") ? "schau mal bei den Schubladen 🤭" : versteck.id.startsWith("umschlag") ? "schau mal beim Umschlag 🤭" : versteck.id === "nest" ? "schau mal beim Nest 🤭" : versteck.id === "zahlen" ? "schau mal bei den Zahlen 🤭" : versteck.id === "baeumchen" ? "schau mal beim Bäumchen 🤭" : "schau mal genau hin 🤭"), 2800);
+            if (w && w.zustand === "sitzt" && !geguckt++) {
+              hinweis(b, ""); clearTimeout(hinweisWeg);
+              I.sag(w, "Psst, Toni … " + (versteck.id.startsWith("lade") ? "schau mal bei den Schubladen 🤭" : versteck.id.startsWith("umschlag") ? "schau mal beim Umschlag 🤭" : versteck.id === "nest" ? "schau mal beim Nest 🤭" : versteck.id === "zahlen" ? "schau mal bei den Zahlen 🤭" : versteck.id === "baeumchen" ? "schau mal beim Bäumchen 🤭" : "schau mal genau hin 🤭"), 2800);
+            }
             else zeigeSchwanz(fehl >= 8 ? 0 : 1600);
           }
         };
@@ -203,6 +206,7 @@
       });
       gefundenFn = null;
       clearTimeout(hinweisWeg);
+      hinweis(b, "");
       if (!gefunden || ende) return;
       // gefunden: er hüpft aus dem Versteck
       schwanz.classList.remove("guckt");
@@ -486,6 +490,8 @@
       '<div class="munkel-knoepfe"><button type="button" class="munkel-knopf" data-wahl="fertig">Fertig ♥️</button></div>';
     b.appendChild(tablett);
     tablett.querySelector('[data-wahl="fertig"]').addEventListener("click", () => schluss());
+    let zuletztGefuettert = performance.now();
+    const muede = setInterval(() => { if (ende || schlussLaeuft) { clearInterval(muede); return; } if (performance.now() - zuletztGefuettert > 45000) { clearInterval(muede); schluss(); } }, 1000);
     const vogelBei = (x, y) => [m, w].find((v) => { const r = v.el.getBoundingClientRect(); return x > r.left - 26 && x < r.right + 26 && y > r.top - 30 && y < r.bottom + 20; });
     [m, w].forEach((v) => { v.beimKlick = () => { if (gewaehlt && !beschaeftigt) { const k = gewaehlt; waehle(null); gib(v, k, tablett.querySelector('[data-futter="' + k + '"]').getBoundingClientRect()); } else if (!beschaeftigt) hinweis(b, "Tipp erst auf ein Futter 🍓"); return true; }; });
     function waehle(k) {
@@ -557,6 +563,7 @@
       I.kruemelFliegt(v); setTimeout(() => I.kruemelFliegt(v), 260);
       ton(1100, 0.06, "triangle", 0.025); setTimeout(() => ton(1200, 0.06, "triangle", 0.025), 180);
       gefuettert++;
+      zuletztGefuettert = performance.now();
       let satz;
       if (wer === "m" && art === "zimt") { satz = REAKTION.m.zimt[Math.min(2, zimt)]; zimt++; if (zimt === 3) { v.el.classList.add("satt"); I.bild(v).animate([{ scale: "1 1" }, { scale: "1.25 .8", offset: 0.4 }, { scale: ".95 1.06", offset: 0.7 }, { scale: "1 1" }], { duration: 700 }); } }
       else satz = wahl(REAKTION[wer][art]);
