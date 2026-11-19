@@ -66,13 +66,17 @@
     const spiegel = blick < 0 ? ' transform="translate(' + f1(2 * x + groesse) + ' 0) scale(-1 1)"' : "";
     return "<g" + spiegel + ">" + svg.replace("<svg ", '<svg x="' + x + '" y="2" width="' + groesse + '" height="' + groesse + '" ') + "</g>";
   }
-  function nestSvg(w, mitVoegeln) {
+  // Zusätze anderer Teile (Ei, Glücksfedern): je ein Stück SVG für die Mulde und für vorne
+  const ZUSATZ = [];
+  const zusatz = (wo, art) => ZUSATZ.map((f) => { try { return f(wo, art || "bank") || ""; } catch (_) { return ""; } }).join("");
+  function nestSvg(w, mitVoegeln, mitZusatz) {
     const z = ZWEIGE[w.zweige] || ZWEIGE.hasel, p = POLSTER[w.polster] || POLSTER.moos;
     let s = '<svg viewBox="0 0 120 78" aria-hidden="true" class="nest-bild">';
     // Rückseite und Mulde
     s += '<ellipse cx="60" cy="42" rx="53" ry="14" fill="' + z.dunkel + '"/><ellipse cx="60" cy="42" rx="45" ry="9" fill="#3a2418"/>';
     // Polster innen (oben sichtbar)
     for (let k = 0; k < 13; k++) { const x = 18 + k * 7, y = 36.5 + Math.sin(k * 1.7) * 1.2; s += '<circle cx="' + x + '" cy="' + f1(y) + '" r="' + (p.wolle ? 3.6 : 3.2) + '" fill="' + (k % 2 ? p.f : p.f2) + '"/>'; }
+    if (mitZusatz) s += zusatz("mulde", mitZusatz === "gross" ? "gross" : "bank");
     // die Vögel sitzen im Nest
     if (mitVoegeln) s += vogelIm(false, 16, 44, 1) + vogelIm(true, 58, 44, -1);
     // Vorderseite aus Zweigen
@@ -125,6 +129,7 @@
         s += herzPfad(Math.round(x * 10) / 10, Math.round((y + 3) * 10) / 10, 2.6, k % 2 ? "#ff76a6" : "#e8455a");
       }
     }
+    if (mitZusatz) s += zusatz("vorne", mitZusatz === "gross" ? "gross" : "bank");
     // schlafende Vögel: Zzz
     if (mitVoegeln === "schlaf") s += '<text class="nest-z z1" x="40" y="12" font-size="7" font-weight="800" fill="#e6dcff">z</text><text class="nest-z z2" x="86" y="10" font-size="6" font-weight="800" fill="#e6dcff">z</text>';
     return s + "</svg>";
@@ -141,13 +146,16 @@
   const nachts = () => intro.classList.contains("wz-nacht");
   function zeige() {
     stand = lies();
+    // ab dem 20.11. liegt ein Ei im Nest: hat Toni keins gebaut, bauen die Vögel sich selbst ein schlichtes
+    if (!stand.wahl && ak.ei && ak.ei.brauchtNest && ak.ei.brauchtNest()) { stand.wahl = Object.assign({}, STANDARD); stand.vonVoegeln = true; schreib(stand); }
     const bank = intro.querySelector(".wz-bank");
     const da = !!(stand.wahl && bank && intro.classList.contains("wz-aktiv"));
     if (!da) { if (nestEl) { nestEl.remove(); nestEl = null; zuletzt = ""; } return; }
     if (!nestEl || !nestEl.isConnected) { nestEl = document.createElement("div"); nestEl.className = "nest"; nestEl.setAttribute("aria-hidden", "true"); bank.appendChild(nestEl); zuletzt = ""; }
     const schlaf = nachts();
-    const schluessel = JSON.stringify(stand.wahl) + (schlaf ? "|schlaf" : "") + (schlaf && ak.styling ? JSON.stringify(ak.styling.schichten ? [ak.styling.schichten(false), ak.styling.schichten(true)].map((x) => Object.values(x).join("").length) : "") : "");
-    if (schluessel !== zuletzt) { zuletzt = schluessel; nestEl.innerHTML = nestSvg(stand.wahl, schlaf ? "schlaf" : false); }
+    const extra = zusatz("mulde") + zusatz("vorne");
+    const schluessel = JSON.stringify(stand.wahl) + (schlaf ? "|schlaf" : "") + extra.length + extra.slice(0, 80) + (schlaf && ak.styling ? JSON.stringify(ak.styling.schichten ? [ak.styling.schichten(false), ak.styling.schichten(true)].map((x) => Object.values(x).join("").length) : "") : "");
+    if (schluessel !== zuletzt) { zuletzt = schluessel; nestEl.innerHTML = nestSvg(stand.wahl, schlaf ? "schlaf" : false, true); }
     nestEl.classList.toggle("schlaeft", schlaf);
   }
   setInterval(zeige, 1000);
@@ -209,7 +217,7 @@
   function fertig() {
     if (!dialog.open) return;
     const erstesMal = !stand.wahl;
-    stand.wahl = entwurf; stand.angeboten = true;
+    stand.wahl = entwurf; stand.angeboten = true; delete stand.vonVoegeln;
     schreib(stand);
     dialog.close();
     zuletzt = ""; zeige();
@@ -223,6 +231,12 @@
   /* ---------- Schnittstelle ---------- */
   window.adventkalender.nest = {
     oeffnen,
+    svg: (w, mitVoegeln, mitZusatz) => nestSvg(w || lies().wahl || STANDARD, mitVoegeln, mitZusatz),
+    zusatz: (f) => { ZUSATZ.push(f); zuletzt = ""; },
+    neuZeichnen: () => { zuletzt = ""; zeige(); },
+    element: () => (nestEl && nestEl.isConnected ? nestEl : null),
+    wahl: () => lies().wahl || null,
+    vonVoegeln: () => !!lies().vonVoegeln,
     // die Munkelvogeline fragt nur am 19.11. (wenn sie da ist), bis das Nest gebaut ist
     frageAktiv: () => {
       stand = lies();
@@ -243,7 +257,9 @@
       if (!nestEl || !nestEl.isConnected || nachts()) return null;
       const r = nestEl.getBoundingClientRect();
       if (!r.width) return null;
-      return { x: r.left + r.width * 0.5, y: r.top + r.height * 0.56 };
+      // liegt das Ei im Nest, sitzt der Vogel daneben, damit man es noch sieht
+      const ei = ak.ei && ak.ei.imNestSichtbar && ak.ei.imNestSichtbar();
+      return { x: r.left + r.width * (ei ? 0.3 : 0.5), y: r.top + r.height * 0.56 };
     },
   };
 })();

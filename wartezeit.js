@@ -30,7 +30,7 @@
   const zufall = (a, b) => a + Math.random() * (b - a);
   const wahl = (l) => l[Math.floor(Math.random() * l.length)];
   const el = (tag, cls, html) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html !== undefined) e.innerHTML = html; return e; };
-  const szeneLaeuft = () => !!document.querySelector(".special-buehne");
+  const szeneLaeuft = () => !!document.querySelector(".special-buehne, .munkel-buehne");
   const vogelRedet = () => [...document.querySelectorAll(".vogel-blase")].some((b) => !b.hidden);
   const NAMEN = ["mein Schatz", "Maus", "Toni", "Baby"];
   const melde = (id) => { if (ak.entdeckt) ak.entdeckt(id); };
@@ -1840,6 +1840,9 @@
   // Für das Entdeckerbuch: einzelne Dinge direkt vorspielen
   window.adventkalender.wartezeit = {
     schublade,
+    blase,
+    plopp,
+    kerze: (t) => kerzenStand(t),
     vorspielen(id) {
       if (!heute()) return false;
       const r = umschlag.getBoundingClientRect();
