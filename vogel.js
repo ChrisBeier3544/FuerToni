@@ -228,8 +228,9 @@
     v.blase.hidden = false;
     v.el.classList.add("redet");
     // Blase so legen, dass die Spitze genau auf den Kopf zeigt, und im Bild halten
-    const breite = v.blase.offsetWidth, kopf = GROESSE / 2, rand = 10;
-    const vogelLinks = v.pos.x - GROESSE / 2;
+    const g = v.el.offsetWidth || GROESSE;
+    const breite = v.blase.offsetWidth, kopf = g / 2, rand = 10;
+    const vogelLinks = v.pos.x - g / 2;
     let links = kopf + 22 - breite;
     if (vogelLinks + links < rand) links = rand - vogelLinks;
     if (vogelLinks + links + breite > W() - rand) links = W() - rand - breite - vogelLinks;
@@ -238,7 +239,7 @@
     // Gesichter und wichtige Schrift nie verdecken: oben, seitlich oder unten probieren
     // und die erste Lage nehmen, die nichts verdeckt (sonst die mit der kleinsten Überdeckung)
     const andere = voegel.find((a) => a !== v && a.zustand === "sitzt" && a.pos && Math.abs(a.pos.x - v.pos.x) < 80);
-    const platzLinks = vogelLinks - 4 - rand, platzRechts = W() - rand - (vogelLinks + GROESSE + 4);
+    const platzLinks = vogelLinks - 4 - rand, platzRechts = W() - rand - (vogelLinks + g + 4);
     const lege = (art) => {
       v.blase.classList.remove("seitlich", "rechts-vom-vogel", "unten", "tief");
       v.blase.style.maxWidth = "";
@@ -255,7 +256,7 @@
       v.blase.classList.toggle("rechts-vom-vogel", !linksDavon);
       v.blase.style.maxWidth = Math.max(110, Math.min(250, platz)) + "px";
       const b2 = v.blase.offsetWidth;
-      v.blase.style.left = (linksDavon ? -b2 - 4 : GROESSE + 4).toFixed(0) + "px";
+      v.blase.style.left = (linksDavon ? -b2 - 4 : g + 4).toFixed(0) + "px";
     };
     const vorne = v.pos && v.pos.y < 140 ? ["unten", "oben"] : ["oben", "unten"];
     // seitlich zuerst weg vom Partner, sonst dorthin, wo mehr Platz ist
@@ -282,11 +283,11 @@
     const b = blase.getBoundingClientRect();
     const intro = document.getElementById("intro");
     const sel = intro && !intro.hidden
-      ? "#intro .umschlag-name, #intro .countdown-ziffern, #intro .countdown-titel, #intro .siegel, #intro .countdown-gruss, #intro .intro-hinweis, #intro .special-knopf, #intro .intro-spiel, .wz-sprech-ebene .wz-sprech"
+      ? "#intro .umschlag-name, #intro .countdown-ziffern, #intro .countdown-titel, #intro .siegel, #intro .countdown-gruss, #intro .intro-hinweis, #intro .special-knopf, #intro .intro-spiel, .wz-sprech-ebene .wz-sprech, .munkel-buehne .munkel-zu, .munkel-buehne .munkel-hinweis, .munkel-buehne .munkel-karte"
       : ".polaroid img, .lightbox-figur img, #titel, .heute-karte .status, .zaehler-zahl";
     let summe = 0;
     // Siegel, Countdown-Ziffern und Name dürfen gar nicht verdeckt werden (zählt so stark, dass der Vogel lieber schweigt)
-    const streng = "#intro .siegel, #intro .countdown-ziffern, #intro .umschlag-name, .wz-sprech-ebene .wz-sprech";
+    const streng = "#intro .siegel, #intro .countdown-ziffern, #intro .umschlag-name, .wz-sprech-ebene .wz-sprech, .munkel-buehne .munkel-zu, .munkel-buehne .munkel-hinweis";
     document.querySelectorAll(sel).forEach((e) => {
       const r = e.getBoundingClientRect();
       if (!r.width) return;
@@ -338,8 +339,7 @@
     v.zustand = "fliegt";
     v.el.classList.add("fliegt");
     const route = ROUTEN[Math.floor(Math.random() * ROUTEN.length)](v.pos);
-    const folger = voegel.find((a) => a.partner === v && a.zustand === "sitzt");
-    if (folger) setTimeout(() => fliegeWeg(folger), 700);
+    voegel.filter((a) => a.partner === v && a.zustand === "sitzt").forEach((a, i) => setTimeout(() => fliegeWeg(a), 700 + i * 450));
     await animiere(v, route, 2400 + Math.random() * 900);
     if (v.zustand !== "fliegt" || v.auftrag) return;
     v.el.hidden = true;
@@ -361,7 +361,12 @@
     if (!p) return null;
     if (!v.partner) return p;
     const rechts = p.x + 50 < W() - 20;
-    return { x: p.x + (rechts ? 46 : -46), y: p.y };
+    if (!v.kueken) return { x: p.x + (rechts ? 46 : -46), y: p.y };
+    // das Küken sitzt auf der anderen Seite des Munkelvogels, sonst außen neben der Munkelvogeline
+    const mitMama = weibchen && weibchen.el.isConnected && weibchen.zustand !== "weg";
+    const seite = mitMama ? (rechts ? -1 : 1) : (rechts ? 1 : -1);
+    if (p.x + seite * 40 > 20 && p.x + seite * 40 < W() - 20) return { x: p.x + seite * 40, y: p.y };
+    return { x: p.x - seite * (mitMama ? 84 : 40), y: p.y };
   }
   function freierPlatz(v, k) {
     if (v.partner) return v.partner.ziel || v.partner.platz;
@@ -413,6 +418,12 @@
     for (const v of voegel) {
       if (v.zustand !== "sitzt") continue;
       const k = kontext();
+      // bei einem Auftrag (Spiel, Kerze, Brunch) führt der Auftrag selbst: nur am Zielpunkt festhalten
+      if (v.auftrag) {
+        const p = v.folge ? v.folge() : v.platz && v.kontext === k ? sitzpunkt(v, k, v.platz) : null;
+        if (p && v.seite && (Math.abs(p.x + window.scrollX - v.seite.x) > 0.2 || Math.abs(p.y + window.scrollY - v.seite.y) > 0.2)) setzePosition(v, p);
+        continue;
+      }
       if (k !== v.kontext && v.partner) { v.zustand = "weg"; v.el.hidden = true; v.platz = null; v.blase.hidden = true; setTimeout(() => lande(v, false), 1800); continue; }
       if (k !== v.kontext) { v.zustand = "weg"; v.el.hidden = true; clearTimeout(v.flugTimer); v.timer.forEach(clearTimeout); v.blase.hidden = true; v.platz = null; lande(v, true).then(() => { if (v === voegel[0] || v.weiblich) setTimeout(() => sprich(v), 2000); }); continue; }
       // nur nachführen, wenn sich der Platz auf der Seite wirklich verschoben hat
@@ -637,9 +648,9 @@
     },
     22: {
       m: ["Guten Morgen, Toni! Heute ist ein perfekter Tag zum Kuscheln. Sag das ruhig Chris ☺️",
-        "Toni, ich hab heute Nacht von dir geträumt. Du hattest eine Krone auf und alle Capys haben applaudiert 👑",
+        "Toni, heute Abend hab ich noch was ganz Besonderes für dich. Es hat mit Glück zu tun 🪶",
         "Toni, egal was morgen kommt: Du bist klug und stark, und ich bin unglaublich stolz auf dich 🍀",
-        "Toni, ich hab dir eine Glücksfeder hingelegt. Nimm sie morgen in Gedanken mit 🪶",
+        "Toni, ich hab heute Nacht von dir geträumt. Du hattest eine Krone auf und alle Capys haben applaudiert 👑",
         "Toni, die Capys haben heute heimlich Girlanden gezählt. Ich glaube, die planen was für den 26. 🎉"],
       w: ["Guten Morgen, Toni! Sonntagmorgen ist zum Ausschlafen da. Ich hab extra leise gepiepst 🤫",
         "Toni, ich hab ihm gesagt, dass du die tollste Toni der Welt bist. Er hat genickt, bis ihm schwindlig wurde 😄",
@@ -884,10 +895,23 @@
     // am 19.11. fragt die Munkelvogeline nach dem Winternest (nur wenn sie da ist)
     if (ak.nest && !schonGefragt.has("nest") && weibchen && weibchen.el.isConnected && ak.nest.frageAktiv())
       return { art: "nest", text: ak.nest.frage(), vorab: vorabGesagt.has("nest") ? null : ak.nest.vorab(), vogel: weibchen };
+    // weitere Fragen der Munkelvögel (Glücksfeder, Ei, Verstecken, Wettfliegen, Füttern), in ihrer Reihenfolge
+    for (const e of ANFRAGEN) {
+      if (schonGefragt.has(e.art)) continue;
+      let aktiv = false;
+      try { aktiv = e.aktiv(); } catch (_) { aktiv = false; }
+      if (!aktiv) continue;
+      const wDa = weibchen && weibchen.el.isConnected && weibchen.zustand === "sitzt";
+      if (e.vogel === "w" && !wDa) continue;
+      return { art: e.art, text: e.frage(), vorab: vorabGesagt.has(e.art) ? null : (e.vorab ? e.vorab() : null), vogel: e.vogel === "m" ? maennchen : wDa ? weibchen : maennchen, eintrag: e };
+    }
     const styling = ak.styling && !schonGefragt.has("styling") ? ak.styling.frageText() : null;
     if (styling) return { art: "styling", text: styling };
     return null;
   }
+  // Einträge: { art, aktiv(), vorab(), frage(), vogel: "m" | "w" | "beide" (lieber sie, sonst er), knoepfe, ja(v), spaeter, angeboten() }
+  const ANFRAGEN = [];
+  const anfrage = (art) => ANFRAGEN.find((e) => e.art === art);
   let stylingGefragt = false, stylingRuhig = 0, stylingTimer = null, stylingWarteBisLandung = null;
   setInterval(() => {
     if (stylingGefragt || !maennchen) return;
@@ -899,7 +923,7 @@
     const v = anfrage.vogel || maennchen;
     const r = v.el.getBoundingClientRect();
     const frei = v.zustand === "sitzt" && !v.el.hidden && v.hatGesprochen && !v.fragt && !v.auftrag && kontext() &&
-      voegel.every((x) => x.blase.hidden) && !document.querySelector(".special-buehne, .aufbau-buehne, .vogel.gast, dialog[open], .wz-fenster-huelle") &&
+      voegel.every((x) => x.blase.hidden) && !voegel.some((x) => x.auftrag) && !document.querySelector(".special-buehne, .aufbau-buehne, .munkel-buehne, .vogel.gast, dialog[open], .wz-fenster-huelle, .wz-klausur-frage, .mistel-ebene") &&
       !document.hidden && r.top > -8 && r.bottom < window.innerHeight - 10;
     if (!frei) { stylingRuhig = 0; return; }
     stylingRuhig = stylingRuhig || performance.now();
@@ -924,7 +948,8 @@
     }
     const knoepfe = document.createElement("span");
     knoepfe.className = "vogel-wahlen";
-    knoepfe.innerHTML = '<span class="vogel-wahl ja" role="button" tabindex="0" data-antwort="ja">Ja ✨</span><span class="vogel-wahl nein" role="button" tabindex="0" data-antwort="nein">Später</span>';
+    const eintrag = anfrage(art), worte = (eintrag && eintrag.knoepfe) || ["Ja ✨", "Später"];
+    knoepfe.innerHTML = '<span class="vogel-wahl ja" role="button" tabindex="0" data-antwort="ja">' + worte[0] + '</span><span class="vogel-wahl nein" role="button" tabindex="0" data-antwort="nein">' + worte[1] + "</span>";
     zeigeBlase(v, text, knoepfe);
     // keine freie Stelle für die Blase: nichts verändern und nach der nächsten Landung noch einmal versuchen
     if (v.blase.hidden) { v.nachholen = null; v.blase.classList.remove("mit-wahl"); stylingGefragt = false; stylingWarteBisLandung = v.gelandet || 0; return; }
@@ -933,6 +958,7 @@
     if (art === "show" && ak.modenschau) ak.modenschau.angeboten();
     if (art === "raum" && ak.raum) ak.raum.angeboten();
     if (art === "nest" && ak.nest) ak.nest.angeboten();
+    if (eintrag && eintrag.angeboten) eintrag.angeboten();
     v.timer.forEach(clearTimeout); v.timer = [];
     clearTimeout(v.flugTimer);
     v.fragt = true; v.fragtArt = "styling"; v.anfrageArt = art;
@@ -942,7 +968,7 @@
   }
   // Nie zwei Dinge auf einmal: öffnet sich etwas anderes, während der Munkelvogel fragt,
   // nimmt er die Frage zurück und stellt sie später noch einmal
-  const stoerung = () => document.querySelector("dialog[open], .special-buehne, .aufbau-buehne, .wz-fenster-huelle:not(.geht), .mistel-ebene");
+  const stoerung = () => document.querySelector("dialog[open], .special-buehne, .aufbau-buehne, .munkel-buehne, .wz-fenster-huelle:not(.geht), .mistel-ebene");
   function frageZuruecknehmen(v) {
     const art = v.fragtArt;
     v.fragt = false; v.fragtArt = null;
@@ -977,6 +1003,19 @@
     const show = v.anfrageArt === "show", raum = v.anfrageArt === "raum", nest = v.anfrageArt === "nest";
     // nach dieser Frage darf später im Besuch noch die nächste kommen
     stylingGefragt = false; stylingRuhig = 0;
+    const eintrag = anfrage(v.anfrageArt);
+    if (eintrag) {
+      if (antwort === "ja") {
+        v.blase.hidden = true; v.el.classList.remove("redet");
+        try { eintrag.ja(v); } catch (fehler) { console.error(fehler); }
+        if (!v.partner) planeAbflug(v);
+      } else {
+        zeigeBlase(v, wahl(eintrag.spaeter || ["Okay, Toni! Vielleicht später 🥰"]));
+        v.nachholen = null;
+        v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); if (!v.partner) planeAbflug(v); }, 4200));
+      }
+      return;
+    }
     if (antwort === "ja") {
       v.blase.hidden = true; v.el.classList.remove("redet");
       if (show) { if (ak.modenschau) ak.modenschau.oeffnen(); }
@@ -998,7 +1037,7 @@
   const LOB_W = ["Toni, ich fühl mich wunderschön! Danke 🥰", "Wie hübsch! Du hast so einen guten Geschmack, Toni ✨", "Danke, Toni! Darin dreh ich mich gleich noch mal 💃"];
   // neue Kleidung anziehen; nach dem Ankleidezimmer mit einer kleinen Drehung und Glitzer
   function einkleiden(mitFreude) {
-    const aktive = voegel.filter((v) => v.el.isConnected);
+    const aktive = voegel.filter((v) => v.el.isConnected && !v.kueken);
     for (const v of aktive) {
       const alt = v.el.querySelector("svg");
       if (!alt) continue;
@@ -1257,6 +1296,7 @@
         weibchen.partner = maennchen;
         setTimeout(() => lande(weibchen, false).then(() => setTimeout(() => { if (weibchen.zustand === "sitzt") sprich(weibchen); }, 5200)), 3800);
       }
+      if (kuekenErlaubt()) setTimeout(kuekenDazu, zuZweit() ? 5600 : 3200);
     });
   }, 250);
 
@@ -1301,7 +1341,7 @@
   // Zu einem Punkt fliegen und dort sitzen bleiben
   async function fliegeZu(zielFn) {
     const v = maennchen, z0 = zielFn();
-    if (!z0) return false;
+    if (!z0 || v.auftrag) return false;
     v.auftrag = true;
     v.timer.forEach(clearTimeout); v.timer = []; clearTimeout(v.flugTimer);
     v.blase.hidden = true; v.el.classList.remove("redet"); v.fragt = false;
@@ -1309,6 +1349,7 @@
     v.zustand = "fliegt"; v.el.hidden = false; v.el.classList.add("fliegt");
     await animiere(v, [start, { x: (start.x + z0.x) / 2, y: Math.min(start.y, z0.y) - 70 }, { x: z0.x + 26, y: z0.y - 24 }, z0], 2000, zielFn);
     v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.platz = null; v.ziel = null;
+    v.kontext = kontext(); v.folge = zielFn;
     v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
     return true;
   }
@@ -1338,9 +1379,9 @@
     v.auftrag = false; v.zustand = "weg";
     setTimeout(() => lande(v, false), 5000);
   }
-  function weiter() { maennchen.auftrag = false; maennchen.hatGesprochen = true; planeAbflug(maennchen); }
+  function weiter() { maennchen.auftrag = false; maennchen.folge = null; maennchen.hatGesprochen = true; planeAbflug(maennchen); }
   // Der Munkelvogel ist frei für einen Auftrag: gelandet, hat gesprochen, keine Frage offen, alle Vögel still
-  const istDa = () => maennchen.zustand === "sitzt" && !maennchen.el.hidden && maennchen.hatGesprochen && !maennchen.fragt &&
+  const istDa = () => maennchen.zustand === "sitzt" && !maennchen.el.hidden && maennchen.hatGesprochen && !maennchen.fragt && !voegel.some((x) => x.auftrag) && !document.querySelector(".munkel-buehne") &&
     voegel.every((v) => v.blase.hidden) && (!weibchen || (weibchen.zustand === "sitzt" && weibchen.hatGesprochen)) && !document.querySelector(".vogel.gast");
   function raumFertig(erstesMal) {
     const v = weibchen && weibchen.zustand === "sitzt" && !weibchen.el.hidden ? weibchen : maennchen.zustand === "sitzt" && !maennchen.el.hidden ? maennchen : null;
@@ -1368,7 +1409,165 @@
       v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); if (!v.partner) planeAbflug(v); }, 4600));
     }, 1200);
   }
-  window.adventkalender.voegel = { voegel, raumFertig, nestFertig, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
+
+  /* ---------- Das Küken (ab dem 26.11. im Kalender, wenn es geschlüpft ist) ---------- */
+  function kuekenSvg(hut) {
+    let flaum = "";
+    for (let k = 0; k < 14; k++) { const w = (k / 14) * Math.PI * 2; flaum += '<circle cx="' + (30 + Math.cos(w) * 17).toFixed(1) + '" cy="' + (35 + Math.sin(w) * 17).toFixed(1) + '" r="3.3" fill="#e8b27a"/>'; }
+    return '<svg viewBox="0 0 60 60" aria-hidden="true">' +
+      '<g class="beine"><path d="M25 51l-2 6M35 51l2 6M23 57h-3.5M37 57h3.5" stroke="#e39a3b" stroke-width="2.4" stroke-linecap="round"/></g>' +
+      '<g class="vogel-koerper">' +
+      '<path class="fluegel-hinten" d="M30 30q-16-14-24-4q8 2 12 9z" fill="#c98552"/>' +
+      '<path d="M28 18q-2-8 2-10q0 5 2 9zM31 18q3-7 8-6q-4 3-5 7z" fill="#d99a62"/>' +
+      flaum + '<circle cx="30" cy="35" r="17.5" fill="#e8b27a"/>' +
+      '<ellipse cx="30" cy="43" rx="11" ry="8.5" fill="#fbe3c4"/><ellipse cx="30" cy="38.5" rx="8.5" ry="5" fill="#f6a07f" opacity=".5"/>' +
+      '<path class="fluegel-vorne" d="M13.5 33q-5 8 3 12q-1.5-7-3-12z" fill="#c98552"/><path d="M46.5 33q5 8-3 12q1.5-7 3-12z" fill="#c98552"/>' +
+      '<circle cx="23.5" cy="30.5" r="4.6" fill="#2a1a12"/><circle cx="36.5" cy="30.5" r="4.6" fill="#2a1a12"/>' +
+      '<circle cx="25.2" cy="28.8" r="1.7" fill="#fff"/><circle cx="38.2" cy="28.8" r="1.7" fill="#fff"/><circle cx="22.4" cy="32.2" r=".7" fill="#fff"/><circle cx="35.4" cy="32.2" r=".7" fill="#fff"/>' +
+      '<rect class="augenlid" x="18.4" y="25.5" width="10.2" height="10.2" rx="5.1" fill="#e8b27a"/><rect class="augenlid" x="31.4" y="25.5" width="10.2" height="10.2" rx="5.1" fill="#e8b27a"/>' +
+      '<path d="M27 35.2l3 3.8 3-3.8q-3-1.6-6 0z" fill="#f3b23c"/>' +
+      '<circle cx="18.2" cy="37" r="2.6" fill="#ff9fb4" opacity=".75"/><circle cx="41.8" cy="37" r="2.6" fill="#ff9fb4" opacity=".75"/>' +
+      (hut ? '<g transform="translate(35 8) rotate(18)"><path d="M-7 12L0-8 7 12z" fill="#ff7aa2"/><path d="M-4.4 5h8.8M-2.2-1h4.4" stroke="#fff3b0" stroke-width="2"/><circle cy="-8.6" r="2.7" fill="#f3c84b"/><ellipse cy="12" rx="8" ry="2" fill="#e85d7e"/></g>' : "") +
+      "</g></svg>";
+  }
+  const geburtstagHeute = () => { const d = ak.intro.datum(); return d.jahr === KALENDER.jahr && d.monat === 11 && d.tag === 26; };
+  function kuekenErlaubt() {
+    const d = ak.intro.datum();
+    if (d.jahr !== KALENDER.jahr || !(d.monat === 12 || (d.monat === 11 && d.tag >= 26))) return false;
+    return !!(ak.ei && ak.ei.geschluepft && ak.ei.geschluepft());
+  }
+  let kueken = null;
+  const PIEP = () => {
+    const name = ak.ei && ak.ei.name ? ak.ei.name() : "";
+    return geburtstagHeute()
+      ? ["Piep! Happy Birthday, Toni! 🎂", "Piep piep! Ich hab dich lieb, Toni ♥️", name ? "Piep! Ich bin " + name + " 🐣" : "Piep! 🐣"]
+      : ["Piep! 🐣", "Piep piep, Toni! ♥️", "Piep! Ich kann schon fast fliegen 🪶", "Piep! Mama sagt, du hast mich ganz lieb warm gehalten 🥰", name ? "Piep! Ich bin " + name + " 🐣" : "Piep piep! 🐣"];
+  };
+  function kuekenDazu() {
+    if (kueken && kueken.el.isConnected) return kueken;
+    kueken = erstelleVogel(false, () => []);
+    kueken.kueken = true;
+    kueken.partner = maennchen;
+    kueken.hatGesprochen = true;
+    kueken.el.classList.add("kueken");
+    kueken.el.setAttribute("aria-label", "Küken antippen");
+    const tmp = document.createElement("span");
+    tmp.innerHTML = kuekenSvg(geburtstagHeute());
+    kueken.el.querySelector("svg").replaceWith(tmp.firstChild);
+    let spricht = 0;
+    kueken.beimKlick = () => {
+      const t = performance.now();
+      if (t < spricht || kueken.auftrag) return true;
+      spricht = t + 2600;
+      kueken.el.classList.remove("hopst"); void kueken.el.offsetWidth; kueken.el.classList.add("hopst");
+      kueken.timer.forEach(clearTimeout); kueken.timer = [];
+      zeigeBlase(kueken, wahl(PIEP())); kueken.nachholen = null;
+      kueken.timer.push(setTimeout(() => { kueken.blase.hidden = true; kueken.el.classList.remove("redet"); }, 3000));
+      return true;
+    };
+    lande(kueken, false);
+    return kueken;
+  }
+
+  /* ---------- Werkzeuge für die Spiele mit den Munkelvögeln (munkelspiele.js, ei.js) ---------- */
+  // die Munkelvogeline dazuholen, ohne dass sie gleich redet oder Freunde mitbringt
+  function neuesWeibchen() {
+    if (weibchen && weibchen.el.isConnected) return weibchen;
+    weibchen = erstelleVogel(true, saetzeWeibchen);
+    weibchen.partner = maennchen;
+    weibchen.hatGesprochen = true;
+    weibchenEingeladen = true; frageBeantwortet = true;
+    return weibchen;
+  }
+  // ein Vogel fliegt zu einem Punkt (von dort, wo er gerade ist, sonst von außerhalb) und bleibt dort für einen Auftrag
+  async function holeHer(v, zielFn, dauer) {
+    const z0 = zielFn();
+    if (!z0) return false;
+    v.auftrag = true; v.folge = null;
+    v.timer.forEach(clearTimeout); v.timer = []; clearTimeout(v.flugTimer);
+    v.blase.hidden = true; v.el.classList.remove("redet", "hopst"); v.fragt = false; v.fragtArt = null;
+    const da = v.zustand !== "weg" && !v.el.hidden && v.pos;
+    const vonLinks = z0.x > W() / 2 ? false : true;
+    const start = da ? v.pos : { x: vonLinks ? -80 : W() + 80, y: Math.max(-60, z0.y - 220) };
+    v.zustand = "fliegt"; v.el.hidden = false; v.el.classList.add("fliegt");
+    v.platz = null; v.ziel = null;
+    await animiere(v, [start, { x: (start.x + z0.x) / 2, y: Math.min(start.y, z0.y) - 60 }, { x: z0.x + (start.x < z0.x ? -24 : 24), y: z0.y - 24 }, z0], dauer || 1900, zielFn);
+    if (!v.auftrag) return false;
+    v.zustand = "sitzt"; v.el.classList.remove("fliegt");
+    v.kontext = kontext(); v.folge = zielFn;
+    setzePosition(v, zielFn() || z0);
+    v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
+    return true;
+  }
+  // nach einem Auftrag zurück auf einen normalen Platz
+  async function heimfliegen(v) {
+    v.auftrag = false; v.folge = null; v.beimKlick = v.kueken ? v.beimKlick : null; v.fragt = false; v.fragtArt = null;
+    v.timer.forEach(clearTimeout); v.timer = [];
+    v.blase.hidden = true; v.el.classList.remove("redet", "zappelt");
+    const k = kontext();
+    let name = null;
+    if (k && v.pos && !v.el.hidden) {
+      if (v.partner) {
+        for (let i = 0; i < 40 && !(v.partner.ziel || (v.partner.zustand === "sitzt" && v.partner.platz)); i++) await pause(150);
+        if (v.auftrag) return;
+        name = v.partner.ziel || v.partner.platz;
+      } else name = freierPlatz(v, k);
+    }
+    if (!name || !sitzpunkt(v, k, name)) {
+      // kein Platz frei: kurz wegfliegen und wie sonst wiederkommen
+      if (v.pos && !v.el.hidden) {
+        v.zustand = "fliegt"; v.el.classList.add("fliegt");
+        const s = v.pos;
+        await animiere(v, [s, { x: s.x + 50, y: s.y - 90 }, { x: W() + 90, y: s.y - 200 }], 1700);
+        if (v.auftrag) return;
+      }
+      v.el.hidden = true; v.zustand = "weg"; v.platz = null;
+      setTimeout(() => { if (!v.auftrag) lande(v, false); }, 1600);
+      return;
+    }
+    v.ziel = name; v.platz = name; v.kontext = k;
+    v.el.classList.toggle("im-countdown", k === "countdown");
+    const zielFn = () => sitzpunkt(v, k, name), s = v.pos, z = zielFn();
+    v.zustand = "fliegt"; v.el.classList.add("fliegt"); v.el.hidden = false;
+    await animiere(v, [s, { x: (s.x + z.x) / 2, y: Math.min(s.y, z.y) - 60 }, { x: z.x + (s.x < z.x ? -26 : 26), y: z.y - 26 }, z], 1800, zielFn);
+    if (v.zustand !== "fliegt" || v.auftrag) return;
+    v.zustand = "sitzt"; v.el.classList.remove("fliegt"); v.ziel = null;
+    v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst");
+    v.gelandet = (v.gelandet || 0) + 1;
+    planeAbflug(v);
+  }
+  // Etwas sagen (ohne Knöpfe) und warten, bis die Blase wieder weg ist
+  async function sag(v, text, ms) {
+    if (!v || v.zustand !== "sitzt") { await pause(ms || 3600); return false; }
+    v.timer.forEach(clearTimeout); v.timer = [];
+    zeigeBlase(v, text);
+    v.nachholen = null;
+    const da = !v.blase.hidden;
+    await pause(ms || 3600);
+    v.blase.hidden = true; v.el.classList.remove("redet");
+    return da;
+  }
+  // Ein Vogel kommentiert etwas, wenn er gerade frei ist (lieber die Munkelvogeline). true, wenn einer gesprochen hat
+  function kommentiere(text, lieberSie, ms) {
+    const frei = (v) => v && v.el.isConnected && v.zustand === "sitzt" && !v.el.hidden && !v.fragt && !v.auftrag && !v.kueken;
+    const liste = lieberSie ? [weibchen, maennchen] : [maennchen, weibchen];
+    const v = liste.find(frei);
+    if (!v || voegel.some((x) => x.fragt)) return false;
+    v.timer.forEach(clearTimeout); v.timer = []; clearTimeout(v.flugTimer);
+    zeigeBlase(v, text); v.nachholen = null;
+    if (v.blase.hidden) { planeAbflug(v); return false; }
+    v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); if (!v.partner) planeAbflug(v); }, ms || 4600));
+    return true;
+  }
+  const intern = {
+    get maennchen() { return maennchen; },
+    get weibchen() { return weibchen && weibchen.el.isConnected ? weibchen : null; },
+    get kueken() { return kueken && kueken.el.isConnected ? kueken : null; },
+    neuesWeibchen, holeHer, heimfliegen, sag, animiere, setzePosition, zeigeBlase, pause, teilchen, kruemelFliegt, amVogel, bild, ankerPunkt, kontext, W, H, ruhig,
+    hops: (v) => { v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst"); },
+    still: (v) => { v.blase.hidden = true; v.el.classList.remove("redet"); },
+  };
+  window.adventkalender.voegel = { voegel, raumFertig, nestFertig, kommentiere, intern, kuekenDazu, kuekenSvg, registriere: (e) => { ANFRAGEN.push(e); ANFRAGEN.sort((x, y) => (x.prio || 9) - (y.prio || 9)); }, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
     // erst wenn er gelandet ist und seine Sätze gesagt hat (höchstens 30 Sekunden warten)
     let n = 0;
     const los = () => {

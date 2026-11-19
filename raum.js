@@ -352,6 +352,13 @@
     { id: "nest", symbol: "🪺", name: "Nest umbauen", text: "Für die Munkelvögel", da: () => !!(ak.nest && ak.nest.angebotenOderDa() && ak.intro.phase() === "warten"), los: () => ak.nest.oeffnen() },
     { id: "show", symbol: "✨", name: "Fashion Show", text: "Haute Capyture ansehen", da: () => !!(ak.modenschau && ak.modenschau.verfuegbar && ak.modenschau.verfuegbar()), los: () => ak.modenschau.oeffnen() },
   ];
+  // weitere Einträge aus anderen Teilen (Ei, Verstecken, Wettfliegen, Füttern, Küken)
+  window.adventkalender.ecke = {
+    eintrag: (e) => {
+      const i = e.nach ? EINTRAEGE.findIndex((x) => x.id === e.nach) : -1;
+      if (i >= 0) EINTRAEGE.splice(i + 1, 0, e); else EINTRAEGE.push(e);
+    },
+  };
   function eckeOeffnen() {
     eckeListe.innerHTML = "";
     for (const e of EINTRAEGE) {
@@ -387,7 +394,7 @@
     const gebuendelt = !!(stand.fertig || stand.angeboten || (ak.nest && ak.nest.angebotenOderDa()));
     document.documentElement.classList.toggle("ecke-gebuendelt", gebuendelt);
     const phase = ak.intro.phase();
-    introEcke.hidden = !(gebuendelt && !intro.hidden && (phase === "warten" || phase === "geburtstag")) || !!document.querySelector(".special-buehne");
+    introEcke.hidden = !(gebuendelt && !intro.hidden && (phase === "warten" || phase === "geburtstag")) || !!document.querySelector(".special-buehne, .munkel-buehne");
     kalenderEcke.hidden = !(gebuendelt && phase === "offen");
   }, 500);
 
