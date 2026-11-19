@@ -111,19 +111,22 @@
   // Verstecke: Schwanzspitze (x, y, Drehung) und wo er dann herauskommt
   const rechteck = (s) => { const e = document.querySelector(s); if (!e || !e.offsetParent) return null; const r = e.getBoundingClientRect(); return r.width && r.bottom > 0 && r.top < H() ? r : null; };
   const VERSTECKE = [
-    { id: "umschlagLinks", text: "Hinter dem Umschlag war ich doch so gut versteckt 😆", wo: () => { const r = rechteck("#umschlag"); return r && r.left > 26 ? { x: r.left - 6, y: r.top + r.height * 0.66, dreh: 180, fuss: { x: r.left + 30, y: r.top + 3 } } : null; } },
-    { id: "umschlagRechts", text: "Fast hättest du mich nicht gefunden, Toni 😆", wo: () => { const r = rechteck("#umschlag"); return r && W() - r.right > 26 ? { x: r.right + 6, y: r.top + r.height * 0.5, dreh: 0, fuss: { x: r.right - 30, y: r.top + 3 } } : null; } },
+    { id: "umschlagLinks", text: "Hinter dem Umschlag war ich doch so gut versteckt 😆", wo: (streng) => { const r = rechteck("#umschlag"); return r && (!streng || r.left > 26) ? { x: r.left - 6, y: r.top + r.height * 0.66, dreh: 180, fuss: { x: r.left + 30, y: r.top + 3 } } : null; } },
+    { id: "umschlagRechts", text: "Fast hättest du mich nicht gefunden, Toni 😆", wo: (streng) => { const r = rechteck("#umschlag"); return r && (!streng || W() - r.right > 26) ? { x: r.right + 6, y: r.top + r.height * 0.5, dreh: 0, fuss: { x: r.right - 30, y: r.top + 3 } } : null; } },
     { id: "ladeLinks", text: "In der Schublade war es ganz schön eng 😆", wo: () => { const r = rechteck('.wz-schublade[data-seite="links"] .wz-lade-front'); const b = rechteck(".wz-bank"); return r && b ? { x: r.left + r.width * 0.72, y: r.top + 3, dreh: -70, fuss: { x: r.left + r.width * 0.72, y: b.top + 4 } } : null; } },
     { id: "ladeRechts", text: "Zwischen dem Lippenstift und der Spange war noch Platz 😆", wo: () => { const r = rechteck('.wz-schublade[data-seite="rechts"] .wz-lade-front'); const b = rechteck(".wz-bank"); return r && b ? { x: r.left + r.width * 0.28, y: r.top + 3, dreh: -110, fuss: { x: r.left + r.width * 0.28, y: b.top + 4 } } : null; } },
     { id: "nest", text: "Im Nest ist es halt am gemütlichsten 😆", wo: () => { const n = ak.nest && ak.nest.element && ak.nest.element(); if (!n) return null; const r = n.getBoundingClientRect(); return r.width ? { x: r.left + r.width * 0.36, y: r.top + r.height * 0.32, dreh: -150, fuss: { x: r.left + r.width * 0.3, y: r.top + r.height * 0.56 } } : null; } },
-    { id: "zahlen", text: "Ich hab mich hinter den Zahlen versteckt. Die haben gekichert 😆", wo: () => { const r = rechteck("#countdown-ziffern"); return r && W() - r.right > 24 ? { x: r.right + 4, y: r.top + r.height * 0.55, dreh: 10, fuss: { x: r.right - 22, y: r.top + 1 } } : null; } },
+    { id: "zahlen", text: "Ich hab mich hinter den Zahlen versteckt. Die haben gekichert 😆", wo: (streng) => { const r = rechteck("#countdown-ziffern"); return r && (!streng || W() - r.right > 24) ? { x: r.right + 4, y: r.top + r.height * 0.55, dreh: 10, fuss: { x: r.right - 22, y: r.top + 1 } } : null; } },
     { id: "baeumchen", text: "Das Bäumchen hat mich verraten, oder? 😆", wo: () => { const r = rechteck(".wz-bank .wz-baeumchen"); const b = rechteck(".wz-bank"); return r && b ? { x: r.left + r.width * 0.5 + 8, y: r.top + r.height * 0.5, dreh: -30, fuss: { x: r.left + r.width / 2, y: r.top + 9 } } : null; } },
   ];
   const TEMP = [[95, "🔥 Heiß!", "heiss"], [175, "☀️ Warm", "warm"], [285, "🌤️ Lauwarm", "lau"], [Infinity, "❄️ Kalt", "kalt"]];
+  let aktuellesVersteck = null;
   async function verstecken() {
     if (!frei()) return;
     const m = I.maennchen, w = I.weibchen;
     const b = neueBuehne("versteck-buehne");
+    // die Munkelvogeline schaut von oben auf dem Umschlag zu (dort ist kein Versteck), Tipps gehen durch sie hindurch
+    if (w) { w.el.classList.add("schaut-zu"); I.holeHer(w, () => I.ankerPunkt("50%", "oben", 3)); }
     let ende = false, gefundenFn = null;
     const schwanz = el("div", "versteck-schwanz", SCHWANZ_SVG);
     b.appendChild(schwanz);
@@ -138,6 +141,7 @@
       if (gefundenFn) gefundenFn(false);
       // er kommt aus seinem Versteck zurück
       if (m.el.hidden || m.zustand !== "sitzt") { m.folge = null; I.setzePosition(m, { x: W() + 60, y: 90 }); m.el.hidden = false; m.zustand = "sitzt"; }
+      if (w) { w.el.classList.remove("schaut-zu"); setTimeout(() => I.heimfliegen(w), 400); }
       I.heimfliegen(m).then(() => setTimeout(() => {
         if (ak.voegel.kommentiere) ak.voegel.kommentiere(grund === "nacht" ? "Gähn … für heute ist Schluss mit Verstecken, Toni 😴" : "Okay, Toni! Ein andermal verstecke ich mich wieder 🥰");
       }, 900));
@@ -159,10 +163,11 @@
       for (const n of ["3", "2", "1"]) { if (ende) return; zahl.textContent = n; zahl.classList.remove("tick"); void zahl.offsetWidth; zahl.classList.add("tick"); ton(520, 0.12, "triangle", 0.03); await pause(750); }
       if (ende) return;
       // ein Versteck aussuchen, das gerade zu sehen ist
-      const moeglich = VERSTECKE.filter((v) => !benutzt.includes(v.id) && v.wo());
-      const versteck = moeglich.length ? wahl(moeglich) : VERSTECKE.find((v) => v.wo());
+      const moeglich = VERSTECKE.filter((v) => !benutzt.includes(v.id) && v.wo(true));
+      const versteck = moeglich.length ? wahl(moeglich) : VERSTECKE.find((v) => v.wo(true));
       if (!versteck) { aufhoeren("zu"); return; }
       benutzt.push(versteck.id);
+      aktuellesVersteck = versteck;
       zahl.textContent = "👀";
       await pause(400);
       vorhang.classList.remove("zu"); vorhang.classList.add("auf");
@@ -218,7 +223,11 @@
       m.el.hidden = false; m.zustand = "sitzt";
       I.hops(m); plopp();
       herzenBei(p.fuss.x, p.fuss.y - 30, 6, ["✨", "⭐"]);
-      await I.sag(m, runde < 3 ? "Gefunden! " + versteck.text : versteck.text, 3200);
+      const fundText = runde < 3 ? "Gefunden! " + versteck.text : versteck.text;
+      // findet seine Blase dort keinen Platz, steht der Satz im Hinweis oben
+      setTimeout(() => { if (!ende && m.blase.hidden) hinweis(b, fundText); }, 250);
+      await I.sag(m, fundText, 3200);
+      hinweis(b, "");
       if (ende) return;
       if (runde < 3) { await I.sag(m, runde === 1 ? "Noch mal! Augen zu 🙈" : "Letzte Runde! Augen zu 🙈", 2000); }
     }
@@ -232,6 +241,7 @@
     if (w && w.zustand === "sitzt") await I.sag(w, "Er war aber auch nicht schwer zu finden 😄", 3000);
     buehneWeg(b);
     I.heimfliegen(m);
+    if (w) { w.el.classList.remove("schaut-zu"); setTimeout(() => I.heimfliegen(w), 400); }
   }
 
   /* =========================================================
@@ -825,5 +835,5 @@
     ak.ecke.eintrag({ id: "fuettern", symbol: "🍓", name: "Füttern", text: "Was schmeckt wem?", da: () => !!lies().fuettern && frei(), los: () => fuettern() });
   }
 
-  window.adventkalender.munkelspiele = { verstecken, wettfliegen, fuettern, feder, laeuft: () => !!buehne };
+  window.adventkalender.munkelspiele = { versteckJetzt: () => (aktuellesVersteck ? Object.assign({ id: aktuellesVersteck.id }, aktuellesVersteck.wo()) : null), verstecken, wettfliegen, fuettern, feder, laeuft: () => !!buehne };
 })();

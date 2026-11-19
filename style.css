@@ -4467,6 +4467,7 @@ html.ecke-gebuendelt #spiel-knopf, html.ecke-gebuendelt .knopf-umstylen, html.ec
 
 /* Küken bei den Munkelvögeln */
 .vogel.kueken { width: 34px; }
+.vogel.schaut-zu { pointer-events: none; }
 
 /* =========================================================
    Spiele mit den Munkelvögeln (munkelspiele.js)
