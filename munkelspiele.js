@@ -785,6 +785,279 @@
     I.heimfliegen(m);
   }
 
+  /* =========================================================
+     5. KAFFEE ZUM SCHULWEG (24.11. morgens)
+     Der Munkelvogel holt eine kleine Tasse und stellt sie
+     auf die Fensterbank. Sie dampft bis zum Mittag.
+     ========================================================= */
+  const TASSE_SVG = '<svg viewBox="0 0 40 40" aria-hidden="true"><g class="kaffee-dampf"><path d="M14 12q-3-4 0-8M20 12q-3-4 0-8M26 12q-3-4 0-8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".85"/></g>' +
+    '<ellipse cx="20" cy="37" rx="15" ry="2.6" fill="rgba(60,30,20,.2)"/><path d="M9 16h22l-2.5 17q-.5 3-3.5 3h-10q-3 0-3.5-3z" fill="#fff6f0"/><path d="M9 16h22l-.6 4H9.6z" fill="#e85d7e"/>' +
+    '<path d="M30.5 20q6 0 5 6t-6.5 5" stroke="#fff6f0" stroke-width="3" fill="none"/><ellipse cx="20" cy="16" rx="11" ry="2.6" fill="#8a5a3a"/><ellipse cx="17" cy="15.4" rx="5" ry="1.4" fill="#fff8ee"/>' +
+    '<path d="M18 26c-1.6-1.2-3-2.4-3-3.6 0-.9.7-1.6 1.5-1.6.7 0 1.2.3 1.5.9.3-.6.8-.9 1.5-.9.8 0 1.5.7 1.5 1.6 0 1.2-1.4 2.4-3 3.6z" fill="#e85d7e"/></svg>';
+  let tasse = null;
+  const kaffeeTag = () => tag() === 24;
+  function tasseZustand() {
+    const soll = kaffeeTag() && lies().kaffee === 24 && stunde() < 14 && !intro.hidden;
+    const bank = intro.querySelector(".wz-bank");
+    if (soll && bank && (!tasse || !tasse.isConnected)) {
+      tasse = el("button", "kaffee-tasse", TASSE_SVG);
+      tasse.type = "button";
+      tasse.setAttribute("aria-label", "Tasse");
+      tasse.addEventListener("click", () => { if (ak.wartezeit && ak.wartezeit.blase) ak.wartezeit.blase(tasse, wahl(["Mmh, Kakao mit Sahne 😋", "Noch schön warm ☕ Trink schön aus, Toni", "Mit Liebe gerührt ♥️"]), 2400); });
+      bank.appendChild(tasse);
+    }
+    if (!soll && tasse) { tasse.remove(); tasse = null; }
+  }
+  setInterval(tasseZustand, 1000);
+  const tassenPunkt = () => { const b = intro.querySelector(".wz-bank"); if (!b) return null; const r = b.getBoundingClientRect(); return r.width ? { x: r.left + Math.max(r.width * 0.09, r.width / 2 - 250) + 15, y: r.top + 6 } : null; };
+  async function kaffee() {
+    const m = I.maennchen;
+    if (!tassenPunkt()) return;
+    merke("kaffee", 24);
+    m.auftrag = true;
+    m.timer.forEach(clearTimeout); m.timer = []; clearTimeout(m.flugTimer);
+    await I.sag(m, "Moment, Toni, ich hol dir schnell was ☕", 2600);
+    // kurz wegfliegen …
+    if (m.pos && !m.el.hidden) {
+      m.zustand = "fliegt"; m.el.classList.add("fliegt");
+      const s = m.pos;
+      await I.animiere(m, [s, { x: s.x + 40, y: s.y - 70 }, { x: W() + 90, y: Math.max(-40, s.y - 160) }], 1500);
+    }
+    m.el.hidden = true; m.zustand = "weg";
+    await pause(1600);
+    // … und mit der Tasse unter den Füßen wiederkommen
+    const getragen = el("span", "kaffee-getragen", TASSE_SVG);
+    document.body.appendChild(getragen);
+    let tragen = true;
+    const mit = () => { if (!tragen) return; if (m.pos) { getragen.style.left = m.pos.x + "px"; getragen.style.top = m.pos.y + 6 + "px"; } requestAnimationFrame(mit); };
+    const ziel = () => { const p = tassenPunkt(); return p && { x: p.x, y: p.y - 26 }; };
+    m.el.hidden = true; m.pos = null;
+    requestAnimationFrame(mit);
+    const da = await I.holeHer(m, ziel, 2400);
+    if (!da) { tragen = false; getragen.remove(); I.heimfliegen(m); return; }
+    // abstellen und auf der Fensterbank daneben landen
+    tragen = false;
+    getragen.remove();
+    tasseZustand();
+    plopp();
+    const neben = () => { const p = tassenPunkt(); return p && { x: p.x + 34, y: p.y }; };
+    await I.holeHer(m, neben, 600);
+    if (tasse) { const r = tasse.getBoundingClientRect(); herzenBei(r.left + r.width / 2, r.top, 6, ["☕", "♥️", "✨"]); }
+    await I.sag(m, wahl(["Für den Schulweg, Toni ☕ Vorsichtig, ganz heiß!", "Ein warmer Kakao für dich, Toni ☕ Hab einen schönen Schultag!"]), 4200);
+    I.heimfliegen(m);
+  }
+
+  /* =========================================================
+     6. FOTOBOX (25.11. nachmittags, danach in Tonis Ecke)
+     ========================================================= */
+  const POSEN = [
+    { id: "herz", satz: "Wir machen ein Herz 🥰" },
+    { id: "huete", satz: "Partyhüte auf, morgen wird gefeiert 🥳" },
+    { id: "brillen", satz: "Ganz cool gucken 😎" },
+    { id: "schild", satz: "Wir halten ein Schild für dich hoch ♥️" },
+    { id: "kuss", satz: "Küsschen! 😘" },
+  ];
+  const FOTO_SCHLUESSEL = "toni-wz-fotos";
+  const fotos = () => { try { const l = JSON.parse(localStorage.getItem(FOTO_SCHLUESSEL) || "[]"); return Array.isArray(l) ? l : []; } catch (_) { return []; } };
+  function vogelImFoto(weiblich, x, y, g, spiegeln) {
+    const svg = ak.voegel.svg ? ak.voegel.svg(weiblich) : "";
+    const inner = svg.replace("<svg ", '<svg x="' + x + '" y="' + y + '" width="' + g + '" height="' + g + '" ');
+    return spiegeln ? '<g transform="translate(' + (2 * x + g) + ' 0) scale(-1 1)">' + inner + "</g>" : inner;
+  }
+  let fotoNr = 0;
+  function fotoSvg(pose) {
+    const id = "fotoHimmel" + ++fotoNr, nah = pose === "kuss" ? 18 : 0;
+    let s = '<svg viewBox="0 0 200 150" aria-hidden="true"><defs><linearGradient id="' + id + '" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe4ea"/><stop offset="1" stop-color="#fff6ec"/></linearGradient></defs>' +
+      '<rect width="200" height="150" fill="url(#' + id + ')"/>';
+    for (let k = 0; k < 9; k++) s += '<circle cx="' + (12 + k * 23) + '" cy="' + (18 + (k % 3) * 9) + '" r="' + (2 + (k % 2)) + '" fill="#fff" opacity=".7"/>';
+    s += '<rect y="118" width="200" height="32" fill="#ecd3b6"/><rect y="116" width="200" height="4" fill="#c99c74"/>';
+    s += vogelImFoto(false, 36 + nah, 52, 66, false) + vogelImFoto(true, 98 - nah, 52, 66, true);
+    const herz = (x, y, g, f) => '<path d="M' + x + " " + (y + g * 0.85) + "C" + (x - g * 1.25) + " " + y + " " + (x - g * 0.6) + " " + (y - g) + " " + x + " " + (y - g * 0.35) + "C" + (x + g * 0.6) + " " + (y - g) + " " + (x + g * 1.25) + " " + y + " " + x + " " + (y + g * 0.85) + 'Z" fill="' + f + '"/>';
+    if (pose === "herz") s += herz(100, 34, 16, "#e8455a") + herz(70, 24, 6, "#ff8fab") + herz(132, 26, 5, "#ff8fab");
+    if (pose === "kuss") s += herz(100, 50, 7, "#e8455a") + herz(88, 34, 4, "#ff8fab") + herz(113, 30, 5, "#ff8fab");
+    if (pose === "huete") for (const x of [69, 131]) s += '<path d="M' + (x - 9) + ' 64L' + x + ' 38l9 26z" fill="' + (x < 100 ? "#5aa9e6" : "#ff7aa2") + '"/><circle cx="' + x + '" cy="38" r="3.4" fill="#f3c84b"/><path d="M' + (x - 5) + " 54h10M" + (x - 3) + ' 47h6" stroke="#fff3b0" stroke-width="2"/>';
+    if (pose === "brillen") for (const x of [36, 98]) {
+      const k = (sx) => (x === 98 ? x + 66 - sx * 1.1 : x + sx * 1.1);
+      s += '<g fill="#2b2b33"><rect x="' + (Math.min(k(17), k(29)) ) + '" y="81" width="13" height="9" rx="3"/><rect x="' + (Math.min(k(32), k(44))) + '" y="81" width="13" height="9" rx="3"/></g>';
+    }
+    if (pose === "schild") s += '<g transform="rotate(-4 100 112)"><rect x="64" y="100" width="72" height="26" rx="5" fill="#fff" stroke="#e85d7e" stroke-width="2"/><text x="100" y="118" text-anchor="middle" font-family="Dancing Script, cursive" font-size="16" font-weight="700" fill="#9d2449">Toni ♥️</text></g>';
+    return s + "</svg>";
+  }
+  async function fotobox() {
+    if (!frei()) return;
+    const m = I.maennchen;
+    const b = neueBuehne("foto-buehne");
+    let ende = false, wahlFn = null;
+    const karte = el("div", "munkel-karte foto-karte");
+    const sucher = el("div", "foto-sucher", "<i></i><i></i><i></i><i></i>");
+    function aufhoeren() {
+      if (ende) return;
+      ende = true;
+      SPIEL_ABBRUCH.delete(aufhoeren);
+      if (wahlFn) wahlFn(null);
+      buehneWeg(b);
+      const w = I.weibchen;
+      [m, w].forEach((v, i) => { if (v) setTimeout(() => I.heimfliegen(v), i * 350); });
+    }
+    SPIEL_ABBRUCH.add(aufhoeren);
+    b.querySelector(".munkel-zu").addEventListener("click", aufhoeren);
+    m.auftrag = true;
+    m.timer.forEach(clearTimeout); m.timer = []; clearTimeout(m.flugTimer);
+    let w = I.weibchen;
+    if (!w) {
+      if (m.zustand === "sitzt" && !m.el.hidden) await I.sag(m, "Ich hol schnell meine Liebste, ohne sie ist es kein schönes Foto 🥰", 2600);
+      if (ende) return;
+      w = I.neuesWeibchen();
+    }
+    w.auftrag = true;
+    const platzM = () => I.ankerPunkt("calc(50% - 27px)", "oben", 3), platzW = () => I.ankerPunkt("calc(50% + 27px)", "oben", 3);
+    const [a, c] = await Promise.all([I.holeHer(m, platzM), pause(300).then(() => I.holeHer(w, platzW))]);
+    if (ende || !a || !c) { if (!ende) aufhoeren(); return; }
+    m.blick = 1; w.blick = -1; I.setzePosition(m, platzM()); I.setzePosition(w, platzW());
+    while (!ende) {
+      const pose = wahl(POSEN);
+      // Sucher um die beiden legen
+      const rm = m.el.getBoundingClientRect(), rw = w.el.getBoundingClientRect();
+      const l = Math.min(rm.left, rw.left) - 22, r = Math.max(rm.right, rw.right) + 22, o = Math.min(rm.top, rw.top) - 26, u = Math.max(rm.bottom, rw.bottom) + 12;
+      Object.assign(sucher.style, { left: l + "px", top: o + "px", width: r - l + "px", height: u - o + "px" });
+      b.appendChild(sucher);
+      sucher.classList.remove("weg");
+      await I.sag(w, pose.satz, 2400);
+      if (ende) return;
+      [m, w].forEach((v) => I.hops(v));
+      if (pose.id === "huete") { I.hut(m, true); I.hut(w, true); }
+      karte.innerHTML = '<button type="button" class="foto-ausloeser" aria-label="Foto machen"><span>📸</span></button><p>Tipp auf den Auslöser</p>';
+      b.appendChild(karte);
+      karte.classList.remove("weg");
+      const los = await new Promise((fertig) => { wahlFn = fertig; karte.querySelector(".foto-ausloeser").addEventListener("click", () => fertig(true)); });
+      wahlFn = null;
+      if (!los || ende) return;
+      // Blitz und Klick
+      ton(1800, 0.05, "square", 0.03); setTimeout(() => ton(900, 0.06, "square", 0.02), 60);
+      const blitz = el("div", "wettflug-blitz");
+      b.appendChild(blitz);
+      setTimeout(() => blitz.remove(), 700);
+      sucher.classList.add("weg");
+      I.hut(m, false); I.hut(w, false);
+      const d = ak.intro.datum();
+      const liste = fotos().concat({ pose: pose.id, tag: d.tag + "." + d.monat + "." }).slice(-12);
+      try { localStorage.setItem(FOTO_SCHLUESSEL, JSON.stringify(liste)); } catch (_) { /* egal */ }
+      await pause(500);
+      karte.innerHTML = '<div class="foto-polaroid">' + fotoSvg(pose.id) + '<p>' + d.tag + "." + d.monat + ". · Wir zwei ♥️</p></div>" +
+        (liste.length > 1 ? '<div class="foto-album" aria-label="Fotoalbum">' + liste.slice(0, -1).reverse().slice(0, 5).map((f) => '<span>' + fotoSvg(f.pose) + "</span>").join("") + "</div>" : "") +
+        "<p>" + (liste.length > 1 ? liste.length + " Fotos im Album. Du findest sie in Tonis Ecke 📸" : "Das kommt ins Album. Du findest es in Tonis Ecke 📸") + "</p>" +
+        '<div class="munkel-knoepfe"><button type="button" class="munkel-knopf zweit" data-wahl="nochmal">Noch eins 📸</button><button type="button" class="munkel-knopf" data-wahl="fertig">Fertig ♥️</button></div>';
+      b.classList.add("gedimmt");
+      const weiter = await new Promise((fertig) => { wahlFn = fertig; karte.querySelectorAll("[data-wahl]").forEach((k) => k.addEventListener("click", () => fertig(k.dataset.wahl))); });
+      wahlFn = null;
+      b.classList.remove("gedimmt");
+      if (!weiter || ende) return;
+      karte.classList.add("weg");
+      if (weiter === "fertig") break;
+      await pause(300);
+    }
+    if (ende) return;
+    await I.sag(m, "Das ist unser neues Lieblingsfoto, Toni 🥰", 2800);
+    ende = true;
+    SPIEL_ABBRUCH.delete(aufhoeren);
+    buehneWeg(b);
+    I.heimfliegen(m);
+    setTimeout(() => I.heimfliegen(w), 400);
+  }
+  // Fotoalbum in Tonis Ecke ansehen (ohne Vögel)
+  function album() {
+    const liste = fotos();
+    if (!liste.length) return;
+    const b = neueBuehne("foto-buehne album");
+    b.classList.add("gedimmt");
+    const karte = el("div", "munkel-karte foto-karte", "<h3>Fotoalbum 📸</h3><div class=\"foto-album gross\">" + liste.slice().reverse().map((f) => '<figure>' + fotoSvg(f.pose) + "<figcaption>" + f.tag + "</figcaption></figure>").join("") + '</div><div class="munkel-knoepfe"><button type="button" class="munkel-knopf" data-wahl="fertig">Schließen</button></div>');
+    b.appendChild(karte);
+    const zu = () => buehneWeg(b);
+    karte.querySelector("[data-wahl]").addEventListener("click", zu);
+    b.querySelector(".munkel-zu").addEventListener("click", zu);
+  }
+
+  /* =========================================================
+     7. GUTE-NACHT-GESCHICHTE (ab 22:30 Uhr, Nest antippen)
+     ========================================================= */
+  const GESCHICHTEN = {
+    21: ["Gähn … Es war einmal ein kleiner Munkelvogel, der wollte unbedingt einen Stern fangen 🌟", "Er flog die ganze Nacht, aber der Stern war immer ein Stückchen weiter weg.", "Am Morgen merkte er: Der schönste Stern saß die ganze Zeit neben ihm im Nest. Das war ich 😌", "Gute Nacht, Toni 💤"],
+    22: ["Mmh … Weißt du, wie wir zwei uns kennengelernt haben? 🥱", "Er hat mir eine Beere gebracht. Sie war viel zu sauer, und er hat sich so geschämt.", "Ich hab sie trotzdem gegessen. Seitdem teilen wir alles, sogar saure Beeren ♥️", "Schlaf schön, Toni 💤"],
+    23: ["Psst … Heute erzähl ich dir von einer kleinen Schneeflocke ❄️", "Sie wollte nicht auf irgendein Dach fallen, sondern auf eine Nase, die sie anlächelt.", "Sie hat lange gesucht und ist heute auf deiner gelandet. Darum war heute so ein guter Tag 🍀", "Träum was Schönes, Toni 💤"],
+    24: ["Gähn … Unser Ei hat heute ganz leise geklopft 🥚", "Ich glaube, es wollte wissen, wem die liebe Stimme da draußen gehört.", "Ich hab gesagt: Das ist Toni. Bald lernst du sie kennen ♥️", "Gute Nacht, Toni 💤"],
+    25: ["Mmh … Die letzte Geschichte vor deinem Geburtstag 🥹", "Es war einmal ein Mädchen, das so lieb war, dass sogar zwei kleine Vögel bei ihm einziehen wollten.", "Und bald feiern alle zusammen: das Ei, die Capys, Chris und wir zwei 🎂", "Schlaf schön, Geburtstagskind 💤"],
+  };
+  let erzaehlt = false;
+  function geschichte(nestEl) {
+    if (erzaehlt || !nestEl || !ak.wartezeit || !ak.wartezeit.blase) return;
+    const d = ak.intro.datum();
+    const nacht = d.stunde < 5 ? d.tag - 1 : d.tag;
+    const g = GESCHICHTEN[nacht];
+    if (!g) return;
+    const s = lies(), gehoert = Array.isArray(s.geschichten) ? s.geschichten : [];
+    if (gehoert.includes(nacht)) { ak.wartezeit.blase(nestEl, wahl(["Psst … die zwei schlafen schon tief und fest 😴", "Zzz … Gute Nacht, Toni 💤"]), 2800); return; }
+    erzaehlt = true;
+    merke("geschichten", gehoert.concat(nacht));
+    g.forEach((satz, i) => setTimeout(() => {
+      const n = ak.nest && ak.nest.element && ak.nest.element();
+      if (n && ak.nest.schlafen && ak.nest.schlafen()) ak.wartezeit.blase(n, satz, i === g.length - 1 ? 3600 : 5400);
+      if (i === g.length - 1) setTimeout(() => { erzaehlt = false; }, 3600);
+    }, i * 5700));
+  }
+
+  /* =========================================================
+     8. MITTERNACHT (25. auf 26.11.)
+     Ab 23:58 Uhr sind beide wach, setzen Partyhüte auf und
+     zählen die letzten zehn Sekunden mit.
+     ========================================================= */
+  let party = false;
+  const vorMitternacht = () => { const d = ak.intro.datum(); return d.jahr === KALENDER.jahr && d.monat === 11 && d.tag === 25 && d.stunde === 23 && d.minute >= 58 && ak.intro.phase() === "warten" && !reise(); };
+  setInterval(() => { if (!party && ak.intro.bereit() && vorMitternacht() && !intro.hidden) mitternacht(); }, 400);
+  async function mitternacht() {
+    party = true;
+    // warten, bis der Munkelvogel frei ist (höchstens 20 Sekunden)
+    for (let i = 0; i < 50 && (I.maennchen.auftrag || document.querySelector(".munkel-buehne")); i++) await pause(400);
+    const m = I.maennchen;
+    let w = I.weibchen || I.neuesWeibchen();
+    m.auftrag = true; w.auftrag = true;
+    const platzM = () => I.ankerPunkt("calc(50% - 40px)", "oben", 3), platzW = () => I.ankerPunkt("calc(50% + 40px)", "oben", 3);
+    await Promise.all([I.holeHer(m, platzM), pause(400).then(() => I.holeHer(w, platzW))]);
+    m.blick = 1; w.blick = -1;
+    I.hut(m, true); I.hut(w, true);
+    I.hops(m); I.hops(w);
+    const sek = () => { const d = ak.intro.datum(); return d.stunde === 23 && d.minute === 59 ? d.sekunde : d.stunde === 23 ? -1 : 60; };
+    if (sek() < 40) {
+      await I.sag(m, "Toni! Gleich ist es so weit 🥳", 3200);
+      await I.sag(w, "Wir haben uns extra schick gemacht 🎉", 3000);
+    }
+    while (sek() < 50) await pause(200);
+    let letzte = -1;
+    while (ak.intro.phase() === "warten") {
+      const s = sek();
+      if (s >= 50 && s < 60 && s !== letzte) {
+        letzte = s;
+        const v = s % 2 ? w : m;
+        I.still(s % 2 ? m : w);
+        I.zeigeBlase(v, s === 50 ? "Zehn! 🥳" : String(60 - s) + (60 - s <= 3 ? "! 🎉" : "!"));
+        v.nachholen = null;
+        I.hops(v);
+        if (s === 55 && ak.ei && ak.ei.klopf) ak.ei.klopf();
+      }
+      await pause(120);
+    }
+    I.still(m); I.still(w);
+    if (ak.konfetti) ak.konfetti("konfetti");
+    const r = umschlag.getBoundingClientRect();
+    herzenBei(r.left + r.width / 2, r.top, 18, ["🎉", "♥️", "✨", "🥳"]);
+    I.zeigeBlase(m, "Happy Birthday, Toni! 🎂🥳"); m.nachholen = null;
+    await pause(3400);
+    I.still(m);
+    await I.sag(w, "Alles Liebe zum Geburtstag, Toni ♥️", 3400);
+    I.heimfliegen(m);
+    setTimeout(() => I.heimfliegen(w), 400);
+    setTimeout(() => { I.hut(m, false); I.hut(w, false); }, 30 * 60000);
+  }
+
   /* ---------- Fragen der Munkelvögel ---------- */
   if (ak.voegel.registriere) {
     ak.voegel.registriere({
@@ -828,12 +1101,32 @@
     });
   }
 
+  if (ak.voegel.registriere) {
+    ak.voegel.registriere({
+      art: "kaffee", vogel: "m", prio: 7, ohneFrage: true,
+      aktiv: () => kaffeeTag() && stunde() >= 5 && stunde() < 12 && lies().kaffee !== 24 && frei() && !!tassenPunkt(),
+      frage: () => "", ja: () => kaffee(),
+    });
+    ak.voegel.registriere({
+      art: "fotobox", vogel: "m", prio: 6,
+      aktiv: () => tag() === 25 && stunde() >= 14 && stunde() < 17 && !lies().fotobox && frei(),
+      vorab: () => "Toni, wir haben uns heute so schick gemacht 🥰",
+      frage: () => "Machst du ein Foto von uns zwei? 📸",
+      knoepfe: ["Ja 📸", "Später"],
+      angeboten: () => merke("fotobox", true),
+      ja: () => fotobox(),
+      spaeter: ["Okay, Toni! In Tonis Ecke wartet die Fotobox auf dich 📸"],
+    });
+  }
+
   /* ---------- Tonis Ecke ---------- */
   if (ak.ecke) {
+    ak.ecke.eintrag({ id: "fotobox", symbol: "📸", name: "Fotobox", text: "Ein Foto von den Munkelvögeln", da: () => !!lies().fotobox && frei(), los: () => fotobox() });
+    ak.ecke.eintrag({ id: "album", symbol: "🖼️", name: "Fotoalbum", text: "Alle Fotos ansehen", da: () => fotos().length > 0 && !document.querySelector(".munkel-buehne"), los: () => album() });
     ak.ecke.eintrag({ id: "verstecken", symbol: "🙈", name: "Verstecken", text: "Such den Munkelvogel", da: () => !!lies().verstecken && frei(), los: () => verstecken() });
     ak.ecke.eintrag({ id: "wettflug", symbol: "🏁", name: "Wettfliegen", text: "Wer ist schneller?", da: () => !!lies().wettflug && frei(), los: () => wettfliegen() });
     ak.ecke.eintrag({ id: "fuettern", symbol: "🍓", name: "Füttern", text: "Was schmeckt wem?", da: () => !!lies().fuettern && frei(), los: () => fuettern() });
   }
 
-  window.adventkalender.munkelspiele = { versteckJetzt: () => (aktuellesVersteck ? Object.assign({ id: aktuellesVersteck.id }, aktuellesVersteck.wo()) : null), verstecken, wettfliegen, fuettern, feder, laeuft: () => !!buehne };
+  window.adventkalender.munkelspiele = { kaffee, fotobox, album, geschichte, mitternacht, versteckJetzt: () => (aktuellesVersteck ? Object.assign({ id: aktuellesVersteck.id }, aktuellesVersteck.wo()) : null), verstecken, wettfliegen, fuettern, feder, laeuft: () => !!buehne };
 })();

@@ -3067,7 +3067,7 @@ dialog { overscroll-behavior: contain; }
 html:has(.special-buehne) .vogel-ebene { visibility: hidden; }
 
 /* Solange der Brief verschlossen ist, ist hinter ihm nichts zu sehen, auch nicht beim Herauszoomen */
-html:has(#intro:not([hidden]):not(.weg)) body > *:not(#intro):not(.vogel-ebene):not(.wz-sprech-ebene):not(.testleiste):not(script):not(dialog):not(.zr-banner):not(.zr-karte):not(.zr-ring):not(.entdecken-chip):not(.munkel-buehne):not(.ei-effekte):not(.ei-herz):not(.futter-geist):not(.feder-fliegt) { visibility: hidden !important; }
+html:has(#intro:not([hidden]):not(.weg)) body > *:not(#intro):not(.vogel-ebene):not(.wz-sprech-ebene):not(.testleiste):not(script):not(dialog):not(.zr-banner):not(.zr-karte):not(.zr-ring):not(.entdecken-chip):not(.munkel-buehne):not(.ei-effekte):not(.ei-herz):not(.futter-geist):not(.feder-fliegt):not(.kaffee-getragen) { visibility: hidden !important; }
 html:has(#intro:not([hidden]):not(.weg)), html:has(#intro:not([hidden]):not(.weg)) body { overflow: hidden; background: linear-gradient(160deg, var(--rose-50), var(--rose-200)) fixed; }
 
 /* Munkelvogel fragt nach seiner Partnerin (vor dem Geburtstag) */
@@ -4645,3 +4645,56 @@ html:has(.schluepf-buehne) .vogel-ebene { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) {
   .nest-ei .ei-koerper, .nest-ei .ei-schnabel, .schluepf-ei .ei-koerper, .schluepf-licht, .versteck-haende, .versteck-schwanz svg, .feder-frei.schwebt svg { animation: none !important; }
 }
+
+/* =========================================================
+   Wecken, Gute-Nacht-Geschichte, Kaffee, Daumendrücken,
+   Lauschen, Fotobox, Mitternacht
+   ========================================================= */
+.nest-knopf { position: absolute; right: calc(max(8%, calc(50% - 290px)) + 40px); bottom: 2px; z-index: 3; width: 86px; height: 58px; padding: 0; border: 0; border-radius: 40%; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.nest-knopf[hidden] { display: none; }
+.nest-knopf:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.nest.geweckt svg { animation: nest-ruckeln 0.5s ease-in-out; transform-origin: 50% 100%; }
+@keyframes nest-ruckeln { 25% { transform: rotate(-4deg); } 50% { transform: rotate(3deg); } 75% { transform: rotate(-2deg); } }
+.kaffee-tasse { position: absolute; left: calc(max(9%, calc(50% - 250px)) + 2px); bottom: 6px; z-index: 2; width: 30px; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.kaffee-tasse svg, .kaffee-getragen svg { display: block; width: 100%; height: auto; overflow: visible; }
+.kaffee-dampf { animation: kaffee-dampf 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+@keyframes kaffee-dampf { 0% { opacity: 0; transform: translateY(3px) scaleY(.8); } 40% { opacity: 1; } 100% { opacity: 0; transform: translateY(-5px) scaleY(1.1); } }
+.kaffee-getragen { position: fixed; z-index: 66; width: 26px; transform: translate(-50%, 0); pointer-events: none; }
+.wz-daumen { position: absolute; left: -6px; bottom: 74px; z-index: 3; display: flex; align-items: center; gap: 5px; padding: 6px 12px; border: 1.5px solid var(--gold); border-radius: 999px; white-space: nowrap;
+  background: rgba(255, 255, 255, 0.94); color: var(--beere-dunkel); font: 800 0.8rem/1 "Nunito", sans-serif; box-shadow: 0 4px 12px rgba(107, 21, 50, 0.18); cursor: pointer; transform-origin: 20% 50%; }
+.wz-daumen span { font-size: 1rem; }
+.wz-daumen-klee { color: inherit; text-shadow: none; font-size: 1rem; }
+.ei-stetho { position: absolute; inset: 0; width: 100%; height: auto; pointer-events: none; display: none; overflow: visible; }
+.ei-menue.lauschen .ei-stetho { display: block; }
+.ei-gross.pocht .nest-ei .ei-koerper { animation: ei-pochen 0.4s ease-out; }
+@keyframes ei-pochen { 0% { transform: scale(1); } 20% { transform: scale(1.05); } 40% { transform: scale(1); } 60% { transform: scale(1.03); } 100% { transform: scale(1); } }
+.partyhut { position: absolute; left: 50%; top: -15px; width: 20px; transform: translateX(-30%) rotate(14deg); pointer-events: none; }
+.partyhut svg { display: block; width: 100%; height: auto; }
+.foto-sucher { position: absolute; z-index: 1; pointer-events: none; transition: opacity 0.3s ease; }
+.foto-sucher.weg { opacity: 0; }
+.foto-sucher i { position: absolute; width: 18px; height: 18px; border: 3px solid #fff; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3)); }
+.foto-sucher i:nth-child(1) { left: 0; top: 0; border-right: 0; border-bottom: 0; border-radius: 6px 0 0 0; }
+.foto-sucher i:nth-child(2) { right: 0; top: 0; border-left: 0; border-bottom: 0; border-radius: 0 6px 0 0; }
+.foto-sucher i:nth-child(3) { left: 0; bottom: 0; border-right: 0; border-top: 0; border-radius: 0 0 0 6px; }
+.foto-sucher i:nth-child(4) { right: 0; bottom: 0; border-left: 0; border-top: 0; border-radius: 0 0 6px 0; }
+.foto-ausloeser { display: grid; place-items: center; width: 64px; height: 64px; margin: 2px auto 6px; padding: 0; border: 4px solid #fff; border-radius: 50%; cursor: pointer;
+  background: linear-gradient(135deg, var(--rose-500), var(--beere)); box-shadow: 0 0 0 3px var(--rose-400), 0 8px 18px rgba(157, 36, 73, 0.3); font-size: 1.6rem; }
+.foto-ausloeser:active { transform: scale(0.94); }
+.foto-polaroid { width: min(240px, 70vw); margin: 0 auto 8px; padding: 8px 8px 4px; background: #fff; box-shadow: 0 6px 18px rgba(60, 10, 30, 0.22); rotate: -2deg; animation: foto-rein 0.6s cubic-bezier(.3, 1.3, .5, 1); }
+.foto-polaroid svg { display: block; width: 100%; height: auto; }
+.foto-polaroid p { margin: 4px 0 0 !important; font: 700 1.05rem "Dancing Script", cursive !important; color: var(--beere) !important; opacity: 1 !important; }
+@keyframes foto-rein { from { transform: translateY(30px) scale(0.8); opacity: 0; } }
+.foto-album { display: flex; gap: 6px; justify-content: center; margin: 2px 0 6px; }
+.foto-album span { width: 52px; padding: 3px 3px 7px; background: #fff; box-shadow: 0 2px 6px rgba(60, 10, 30, 0.18); }
+.foto-album span:nth-child(odd) { rotate: -4deg; } .foto-album span:nth-child(even) { rotate: 3deg; }
+.foto-album svg { display: block; width: 100%; height: auto; }
+.foto-album.gross { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; max-height: min(52vh, 420px); overflow-y: auto; padding: 6px 4px 10px; }
+.foto-album.gross figure { margin: 0; padding: 4px 4px 2px; background: #fff; box-shadow: 0 2px 8px rgba(60, 10, 30, 0.18); }
+.foto-album.gross figure:nth-child(odd) { rotate: -2deg; } .foto-album.gross figure:nth-child(even) { rotate: 2deg; }
+.foto-album.gross svg { display: block; width: 100%; height: auto; }
+.foto-album.gross figcaption { font: 700 0.9rem "Dancing Script", cursive; color: var(--beere); }
+.foto-buehne.album .munkel-karte { bottom: auto; top: 50%; transform: translate(-50%, -50%); }
+@media (prefers-reduced-motion: reduce) { .kaffee-dampf, .foto-polaroid { animation: none; } }
+
+/* die Fensterbank selbst lässt Tipps durch, ihre Knöpfe nicht */
+.wz-bank :is(.nest-knopf, .nest-ei-knopf, .kaffee-tasse, .wz-daumen) { pointer-events: auto; }

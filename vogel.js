@@ -928,6 +928,14 @@
     if (!frei) { stylingRuhig = 0; return; }
     stylingRuhig = stylingRuhig || performance.now();
     if (performance.now() - stylingRuhig < 3500) return;
+    // Dinge ohne Frage (der Munkelvogel macht einfach etwas, z. B. Kaffee bringen)
+    if (anfrage.eintrag && anfrage.eintrag.ohneFrage) {
+      schonGefragt.add(anfrage.art);
+      if (anfrage.eintrag.angeboten) anfrage.eintrag.angeboten();
+      try { anfrage.eintrag.ja(v); } catch (fehler) { console.error(fehler); }
+      stylingRuhig = 0;
+      return;
+    }
     stylingGefragt = true;
     stylingFrage(v, text, anfrage.art, anfrage.vorab);
   }, 500);
@@ -1281,10 +1289,14 @@
   /* ---------- Start ---------- */
   const maennchen = erstelleVogel(false, saetzeMaennchen);
   let weibchen = null;
+  let festhaltenLaeuft = false;
   const warten = setInterval(() => {
     if (!ak.intro.bereit() || !grussQuelle.textContent) return;
+    // morgens schlafen die zwei noch im Nest, bis Toni sie weckt
+    if (weckenHeute()) { clearInterval(warten); schlafenLassen(); return; }
     if (!kontext()) return;
     clearInterval(warten);
+    festhaltenLaeuft = true;
     requestAnimationFrame(festhalten);
     // Erst wenn die Animation des Tages vorbei ist (und noch 3 Sekunden mehr),
     // fliegt der Munkelvogel ins Bild
@@ -1408,6 +1420,66 @@
       v.nachholen = null;
       v.timer.push(setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); if (!v.partner) planeAbflug(v); }, 4600));
     }, 1200);
+  }
+
+
+  /* ---------- Wecken: beim ersten Besuch vor 9 Uhr schlafen beide noch im Nest ---------- */
+  const WECK_SCHLUESSEL = "toni-wz-geweckt";
+  const geweckt = () => { try { return JSON.parse(localStorage.getItem(WECK_SCHLUESSEL) || "[]"); } catch (_) { return []; } };
+  function weckenHeute() {
+    const d = ak.intro.datum();
+    if (d.jahr !== KALENDER.jahr || d.monat !== 11 || d.tag < 21 || d.tag > 25 || ak.intro.phase() !== "warten" || (ak.zeitreise && ak.zeitreise.aktiv())) return false;
+    if (d.stunde < 5 || d.stunde >= 9 || geweckt().includes(d.tag)) return false;
+    return !!(ak.nest && ak.nest.verschlafen && ak.nest.wahl && (ak.nest.wahl() || (ak.ei && ak.ei.brauchtNest && ak.ei.brauchtNest())));
+  }
+  const WECK_SAETZE = ["Gähn … 🥱 Oh, Toni! Danke fürs Wecken", "Huch, schon hell? 🥱", "Mmh … noch fünf Minuten … ach, du bist es, Toni! 🥰", "Gääähn 🥱 Ich hab gerade von dir geträumt, Toni"];
+  let weckTimer = [], weckHinweis = null;
+  function schlafenLassen() {
+    maennchen.vomNest = true;
+    ak.nest.verschlafen(true);
+    const nestDa = () => ak.nest.element && ak.nest.element();
+    // ein leiser Hinweis, sobald keine Szene mehr läuft; nach einer Weile kitzelt die Sonne sie wach
+    let ruhigSeit = 0, hinweise = 0, sichtbar = 0;
+    const t = setInterval(() => {
+      if (!maennchen.vomNest) { clearInterval(t); return; }
+      const ruhe = nestDa() && !document.querySelector(".special-buehne, dialog[open], .wz-fenster-huelle, .munkel-buehne") && !document.hidden;
+      if (!ruhe) { ruhigSeit = 0; return; }
+      ruhigSeit = ruhigSeit || performance.now();
+      sichtbar += 0.5;
+      const z = (performance.now() - ruhigSeit) / 1000;
+      if ((hinweise === 0 && z > 3) || (hinweise === 1 && z > 25)) {
+        hinweise++;
+        if (ak.wartezeit && ak.wartezeit.blase) weckHinweis = ak.wartezeit.blase(nestDa(), hinweise === 1 ? "Psst … die zwei schlafen noch. Tipp mal aufs Nest 😴" : "Tipp aufs Nest, dann wachen sie auf ☀️", 4200);
+      }
+      if (sichtbar > 60) { clearInterval(t); aufwachen(true); }
+    }, 500);
+    weckTimer.push(t);
+  }
+  function aufwachen(vonSelbst) {
+    if (!maennchen.vomNest) return;
+    maennchen.vomNest = false;
+    const d = ak.intro.datum();
+    try { localStorage.setItem(WECK_SCHLUESSEL, JSON.stringify(geweckt().concat(d.tag))); } catch (_) { /* egal */ }
+    weckTimer.forEach(clearInterval);
+    if (weckHinweis) { weckHinweis.remove(); weckHinweis = null; }
+    ak.nest.verschlafen(false);
+    if (!festhaltenLaeuft) { festhaltenLaeuft = true; requestAnimationFrame(festhalten); }
+    const v = maennchen, k = kontext();
+    const p = k && sitzpunkt(v, k, "nest");
+    if (!p) { lande(v, false, true).then(() => setTimeout(() => sprich(v), 2000)); return; }
+    // er krabbelt aus dem Nest, streckt sich und gähnt
+    v.platz = "nest"; v.kontext = k; v.ziel = null;
+    v.el.classList.add("im-countdown");
+    v.blick = p.x > W() / 2 ? -1 : 1;
+    v.zustand = "sitzt"; v.el.hidden = false; v.auftrag = true;
+    setzePosition(v, p);
+    if (!ruhig) bild(v).animate([{ translate: "0 14px", scale: "1 .7", opacity: 0 }, { translate: "0 -6px", scale: ".92 1.12", opacity: 1, offset: 0.45 }, { translate: "0 0", scale: "1.08 .94", offset: 0.7 }, { translate: "0 0", scale: "1 1", opacity: 1 }], { duration: 900, easing: "ease-out" });
+    setTimeout(() => {
+      v.el.classList.add("zappelt");
+      setTimeout(() => v.el.classList.remove("zappelt"), 700);
+      zeigeBlase(v, vonSelbst ? "Gähn … 🥱 Die Sonne hat mich wach gekitzelt" : wahl(WECK_SAETZE)); v.nachholen = null;
+    }, 950);
+    setTimeout(() => { v.blase.hidden = true; v.el.classList.remove("redet"); v.auftrag = false; sprich(v); }, 4800);
   }
 
   /* ---------- Das Küken (ab dem 26.11. im Kalender, wenn es geschlüpft ist) ---------- */
@@ -1564,10 +1636,19 @@
     get weibchen() { return weibchen && weibchen.el.isConnected ? weibchen : null; },
     get kueken() { return kueken && kueken.el.isConnected ? kueken : null; },
     neuesWeibchen, holeHer, heimfliegen, sag, animiere, setzePosition, zeigeBlase, pause, teilchen, kruemelFliegt, amVogel, bild, ankerPunkt, kontext, W, H, ruhig,
+    hut: (v, an) => {
+      let h = v.el.querySelector(".partyhut");
+      if (!an) { if (h) h.remove(); return; }
+      if (h) return;
+      h = document.createElement("span");
+      h.className = "partyhut";
+      h.innerHTML = '<svg viewBox="0 0 20 24" aria-hidden="true"><path d="M3 21L10 2l7 19z" fill="' + (v.weiblich ? "#ff7aa2" : "#5aa9e6") + '"/><path d="M6 13h8M8 7.5h4" stroke="#fff3b0" stroke-width="2"/><circle cx="10" cy="2" r="2.4" fill="#f3c84b"/><ellipse cx="10" cy="21" rx="8" ry="2" fill="' + (v.weiblich ? "#e85d7e" : "#3f7fc4") + '"/></svg>';
+      v.el.appendChild(h);
+    },
     hops: (v) => { v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst"); },
     still: (v) => { v.blase.hidden = true; v.el.classList.remove("redet"); },
   };
-  window.adventkalender.voegel = { voegel, raumFertig, nestFertig, kommentiere, intern, kuekenDazu, kuekenSvg, registriere: (e) => { ANFRAGEN.push(e); ANFRAGEN.sort((x, y) => (x.prio || 9) - (y.prio || 9)); }, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
+  window.adventkalender.voegel = { voegel, raumFertig, nestFertig, kommentiere, aufwachen: () => aufwachen(false), schlaeftNoch: () => !!maennchen.vomNest, intern, kuekenDazu, kuekenSvg, registriere: (e) => { ANFRAGEN.push(e); ANFRAGEN.sort((x, y) => (x.prio || 9) - (y.prio || 9)); }, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
     // erst wenn er gelandet ist und seine Sätze gesagt hat (höchstens 30 Sekunden warten)
     let n = 0;
     const los = () => {
