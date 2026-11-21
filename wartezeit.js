@@ -1071,6 +1071,7 @@
     const f = flieger;
     a.onfinish = () => {
       if (f !== flieger) return;
+      if (szeneLaeuft() || vogelRedet()) { f.remove(); flieger = null; return; }
       const b = el("div", "wz-sprech", "Zu langsam! 😜");
       ebene.appendChild(b);
       b.style.top = Math.max(8, y1 - 30) + "px";
@@ -1088,6 +1089,8 @@
       fenster("wz-luftpost", '<p class="wz-fakt-kopf">Luftpost für Toni ✈️</p><p class="wz-wunsch-text">' + FLIEGER_TEXT[t] + '</p><p class="wz-fakt-fuss">Dein Chris</p>');
     });
   }
+  // beginnt ein Spiel oder eine Szene, fliegt der Papierflieger leise davon
+  setInterval(() => { if (flieger && szeneLaeuft()) { flieger.remove(); flieger = null; } }, 400);
   function fliegerZustand(an) {
     if (an && !fliegerTimer) {
       setTimeout(starteFlieger, 9000);
