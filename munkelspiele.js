@@ -794,10 +794,10 @@
     '<ellipse cx="20" cy="37" rx="15" ry="2.6" fill="rgba(60,30,20,.2)"/><path d="M9 16h22l-2.5 17q-.5 3-3.5 3h-10q-3 0-3.5-3z" fill="#fff6f0"/><path d="M9 16h22l-.6 4H9.6z" fill="#e85d7e"/>' +
     '<path d="M30.5 20q6 0 5 6t-6.5 5" stroke="#fff6f0" stroke-width="3" fill="none"/><ellipse cx="20" cy="16" rx="11" ry="2.6" fill="#8a5a3a"/><ellipse cx="17" cy="15.4" rx="5" ry="1.4" fill="#fff8ee"/>' +
     '<path d="M18 26c-1.6-1.2-3-2.4-3-3.6 0-.9.7-1.6 1.5-1.6.7 0 1.2.3 1.5.9.3-.6.8-.9 1.5-.9.8 0 1.5.7 1.5 1.6 0 1.2-1.4 2.4-3 3.6z" fill="#e85d7e"/></svg>';
-  let tasse = null;
+  let tasse = null, kaffeeUnterwegs = false;
   const kaffeeTag = () => tag() === 24;
   function tasseZustand() {
-    const soll = kaffeeTag() && lies().kaffee === 24 && stunde() < 14 && !intro.hidden;
+    const soll = kaffeeTag() && lies().kaffee === 24 && !kaffeeUnterwegs && stunde() < 14 && !intro.hidden;
     const bank = intro.querySelector(".wz-bank");
     if (soll && bank && (!tasse || !tasse.isConnected)) {
       tasse = el("button", "kaffee-tasse", TASSE_SVG);
@@ -814,6 +814,7 @@
     const m = I.maennchen;
     if (!tassenPunkt()) return;
     merke("kaffee", 24);
+    kaffeeUnterwegs = true;
     m.auftrag = true;
     m.timer.forEach(clearTimeout); m.timer = []; clearTimeout(m.flugTimer);
     await I.sag(m, "Moment, Toni, ich hol dir schnell was ☕", 2600);
@@ -834,6 +835,7 @@
     m.el.hidden = true; m.pos = null;
     requestAnimationFrame(mit);
     const da = await I.holeHer(m, ziel, 2400);
+    kaffeeUnterwegs = false;
     if (!da) { tragen = false; getragen.remove(); I.heimfliegen(m); return; }
     // abstellen und auf der Fensterbank daneben landen
     tragen = false;

@@ -317,7 +317,7 @@
         const r = gross.getBoundingClientRect();
         herzen(r.left + r.width / 2, r.top + r.height * 0.35, 12);
         gross.classList.remove("freut"); void gross.offsetWidth; gross.classList.add("freut");
-        if (!lauschen) eiStatus.textContent = wahl(WARM_SAETZE[eiTag()]);
+        eiStatus.textContent = lauschen && herzTakt ? "Bumm bumm … bumm bumm 🥹" : wahl(WARM_SAETZE[eiTag()]);
       }
     },
     tipp: () => { if (lauschen) { eiStatus.textContent = "Länger drücken und lauschen 🩺"; return; } if (!heuteWarm()) { eiStatus.textContent = "Länger drücken, ganz sanft 🤲"; gross.classList.remove("freut"); void gross.offsetWidth; gross.classList.add("freut"); } },
