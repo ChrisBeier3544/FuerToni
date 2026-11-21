@@ -1451,7 +1451,7 @@
   function zeigeGutschein(neu) {
     const f = fenster("wz-gutschein",
       '<p class="wz-gs-kopf">Gutschein</p>' +
-      '<p class="wz-gs-text">Schokoerdbeeren im Phantasialand<br>am 29.11. ♥️</p>' +
+      '<p class="wz-gs-text">Ein Cocktail im Private Spa<br>bei Wellnest 🍹♥️</p>' +
       '<div class="wz-gs-schild">' + schildSvg() + "</div>" +
       '<p class="wz-fakt-fuss">Gültig, sobald du mir einen Screenshot davon per WhatsApp schickst 📸</p>');
     if (neu && ak.konfetti) setTimeout(() => ak.konfetti("konfetti"), 200);
