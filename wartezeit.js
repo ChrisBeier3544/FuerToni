@@ -51,7 +51,12 @@
     abend: () => stunde() >= 17 && stunde() < 23,
   };
   // die Zahlen schlafen von 22:30 bis 5 Uhr
-  const istNacht = () => { const d = datum(), m = d.stunde * 60 + d.minute; return m >= 22 * 60 + 30 || m < 5 * 60; };
+  const istNacht = () => {
+    const d = datum(), m = d.stunde * 60 + d.minute;
+    // kurz vor Mitternacht am 25.11. sind alle wach: gleich ist Geburtstag
+    if (d.monat === 11 && d.tag === 25 && m >= 23 * 60 + 58) return false;
+    return m >= 22 * 60 + 30 || m < 5 * 60;
+  };
 
   // Wann gibt es was? (mittags 14 bis 18 Uhr, abends 17 bis 23 Uhr)
   const PLAN = {
@@ -1066,6 +1071,7 @@
     const f = flieger;
     a.onfinish = () => {
       if (f !== flieger) return;
+      if (szeneLaeuft() || vogelRedet()) { f.remove(); flieger = null; return; }
       const b = el("div", "wz-sprech", "Zu langsam! 😜");
       ebene.appendChild(b);
       b.style.top = Math.max(8, y1 - 30) + "px";
@@ -1083,6 +1089,8 @@
       fenster("wz-luftpost", '<p class="wz-fakt-kopf">Luftpost für Toni ✈️</p><p class="wz-wunsch-text">' + FLIEGER_TEXT[t] + '</p><p class="wz-fakt-fuss">Dein Chris</p>');
     });
   }
+  // beginnt ein Spiel oder eine Szene, fliegt der Papierflieger leise davon
+  setInterval(() => { if (flieger && szeneLaeuft()) { flieger.remove(); flieger = null; } }, 400);
   function fliegerZustand(an) {
     if (an && !fliegerTimer) {
       setTimeout(starteFlieger, 9000);
@@ -1451,7 +1459,7 @@
   function zeigeGutschein(neu) {
     const f = fenster("wz-gutschein",
       '<p class="wz-gs-kopf">Gutschein</p>' +
-      '<p class="wz-gs-text">Schokoerdbeeren im Phantasialand<br>am 29.11. ♥️</p>' +
+      '<p class="wz-gs-text">Ein Cocktail im Private Spa<br>bei Wellnest 🍹♥️</p>' +
       '<div class="wz-gs-schild">' + schildSvg() + "</div>" +
       '<p class="wz-fakt-fuss">Gültig, sobald du mir einen Screenshot davon per WhatsApp schickst 📸</p>');
     if (neu && ak.konfetti) setTimeout(() => ak.konfetti("konfetti"), 200);
@@ -1539,7 +1547,7 @@
       const v = ak.voegel;
       // nie während einer Capy-Szene (dort ist der Vogel ausgeblendet)
       // die Wartezeit zählt erst ab dem Ende der Szene
-      if (szeneLaeuft()) { start = performance.now(); return; }
+      if (szeneLaeuft() || (v && v.schlaeftNoch && v.schlaeftNoch())) { start = performance.now(); return; }
       // erst wenn er ein paar Sekunden am Stück frei ist (Toni könnte ihn gerade antippen)
       if (v && v.istDa && v.istDa()) ruhigSeit = ruhigSeit || performance.now(); else ruhigSeit = 0;
       if ((ruhigSeit && performance.now() - ruhigSeit > 3000) || performance.now() - start > max) { clearInterval(t); fertig(); }
@@ -1598,6 +1606,8 @@
     const v = ak.voegel;
     const mitVogel = v && v.fliegeZu && (await v.fliegeZu(nebenKerze));
     if (mitVogel) await v.sagKurz("Geschafft! Ich bin so stolz auf dich, Toni 🎉 Dann puste ich die Kerze jetzt aus.", 4200);
+    const gedrueckt = lies("daumen-" + t, 0);
+    if (mitVogel && gedrueckt > 0) await v.sagKurz("Wir haben dir " + gedrueckt + " Mal" + " die Daumen gedrückt 🍀", 3400);
     // auspusten mit einem Rauchfaden
     kerze.classList.remove("an");
     kerze.classList.add("aus");
@@ -1619,6 +1629,37 @@
     }
     kerzeFertigLaeuft = false;
   }
+  // Während der Klausur (Kerze brennt, vor 14 Uhr): Daumen drücken, jeder Tipp zählt
+  let daumen = null;
+  const DAUMEN_SAETZE = ["Jaaa, weiter so! 🍀", "Toni, wir drücken alle mit! 🤞", "Das bringt ganz viel Glück 🍀", "Ich drück so fest, mir tun schon die Federn weh 😅", "Du schaffst das, Toni! 🤞"];
+  function daumenZustand() {
+    const t = heute();
+    const soll = !!(t && KLAUSUR[t] && kerzenPlatz && kerzenStand(t) === "an" && stunde() < 14 && !kerzeFertigLaeuft && !intro.classList.contains("wz-nacht"));
+    if (soll && !daumen) {
+      daumen = el("button", "wz-daumen", "");
+      daumen.type = "button";
+      const zeige = () => { const n = lies("daumen-" + t, 0); daumen.innerHTML = '<span aria-hidden="true">🤞</span> ' + (n ? n : "Daumen drücken"); daumen.setAttribute("aria-label", "Daumen drücken, schon " + n + " Mal"); };
+      zeige();
+      daumen.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const n = lies("daumen-" + t, 0) + 1;
+        schreib("daumen-" + t, n);
+        zeige();
+        plopp(true);
+        daumen.animate([{ transform: "scale(1)" }, { transform: "scale(1.12)" }, { transform: "scale(1)" }], { duration: 260 });
+        const r = daumen.getBoundingClientRect();
+        const f = el("span", "wz-funke wz-daumen-klee", wahl(["🍀", "🤞", "✨"]));
+        f.style.left = r.left + r.width / 2 + zufall(-20, 20) + "px"; f.style.top = r.top + "px";
+        ebene.appendChild(f);
+        f.animate([{ transform: "translate(-50%,-50%) scale(.5)", opacity: 1 }, { transform: "translate(-50%,-260%) scale(1.1)", opacity: 0 }], { duration: 900, easing: "ease-out", fill: "forwards" }).onfinish = () => f.remove();
+        const vg = ak.voegel;
+        if ((n === 1 || n % 6 === 0) && vg && vg.kommentiere) vg.kommentiere(n === 1 ? "Wir drücken alle mit, Toni! 🤞" : wahl(DAUMEN_SAETZE));
+      });
+      kerzenPlatz.appendChild(daumen);
+    }
+    if (!soll && daumen) { daumen.remove(); daumen = null; }
+  }
+  setInterval(daumenZustand, 1000);
   let kerzeGeprueft = false;
   function pruefeKerze() {
     if (kerzeGeprueft) return;

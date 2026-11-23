@@ -81,7 +81,7 @@
     return eiSvg(80, 16, 46, 22, stufe(), heuteWarm());
   }
   let grossStufe = 0, grossWarm = false;
-  const zeigeEi = () => !!(eiTag() && ak.nest && ak.nest.element && ak.nest.element() && !nachts());
+  const zeigeEi = () => !!(eiTag() && ak.nest && ak.nest.element && ak.nest.element() && !nachts() && !(ak.nest.verschlafen && ak.nest.verschlafen()));
   if (ak.nest && ak.nest.zusatz) ak.nest.zusatz(imNest);
 
   /* ---------- Töne (sehr leise, nur nach einem Tipp von Toni) ---------- */
@@ -235,7 +235,10 @@
   fensterEi.setAttribute("aria-label", "Das Ei");
   fensterEi.innerHTML =
     '<div class="nest-kopf"><h2>Ein Ei! 🥚</h2><p>Im Winternest auf der Fensterbank</p><button class="schliessen nest-zu" type="button" aria-label="Schließen">×</button></div>' +
-    '<div class="ei-gross" role="button" tabindex="0" aria-label="Ei lange gedrückt halten"><div class="ei-gross-bild"></div><span class="ei-gross-ring"></span></div>' +
+    '<div class="ei-gross" role="button" tabindex="0" aria-label="Ei lange gedrückt halten"><div class="ei-gross-bild"></div><span class="ei-gross-ring"></span>' +
+    '<svg class="ei-stetho" viewBox="0 0 120 78" aria-hidden="true"><path d="M78 30 C94 30 100 16 108 6" fill="none" stroke="#7d8696" stroke-width="2.2" stroke-linecap="round"/>' +
+    '<path d="M108 6 L101 2 M108 6 L113 1" stroke="#7d8696" stroke-width="1.8" stroke-linecap="round"/><circle cx="101" cy="2" r="1.6" fill="#3a3f4a"/><circle cx="113" cy="1" r="1.6" fill="#3a3f4a"/>' +
+    '<circle cx="77" cy="30" r="5" fill="#cfd6e2" stroke="#8a93a3" stroke-width="1.2"/><circle cx="77" cy="30" r="2.4" fill="#eef2f7"/></svg></div>' +
     '<p class="ei-text"></p><p class="ei-status" aria-live="polite"></p>' +
     '<div class="nest-fuss"><button type="button" class="nest-fertig ei-ok">Mach ich ♥️</button></div>';
   document.body.appendChild(fensterEi);
@@ -250,14 +253,54 @@
       ? (n > 1 ? "Heute schon schön warm ♥️ Schon " + n + " Tage gewärmt" : "Heute schon schön warm ♥️")
       : "Halt das Ei jetzt mal gedrückt 🤲";
   }
-  function oeffneEi(text, danach) {
+  let lauschen = false;
+  function oeffneEi(text, danach, modus) {
     if (!eiTag()) return;
+    lauschen = modus === "lauschen" || (!modus && !!lies().gelauscht && eiTag() >= 24);
+    fensterEi.classList.toggle("lauschen", lauschen);
+    fensterEi.querySelector("h2").textContent = lauschen ? "Lauschen 🩺" : "Ein Ei! 🥚";
+    fensterEi.querySelector(".ei-ok").textContent = lauschen ? "Wie schön 🥹" : "Mach ich ♥️";
+    if (lauschen && !text) text = "Halt das Ei gedrückt und lausch mal ganz genau 🩺";
     const s = lies(); s.gezeigt = true; s.angeboten = true; schreib(s);
     eiText.textContent = text || TEXT_INFO();
     nachSchliessen = danach || null;
     malGross();
+    if (lauschen) eiStatus.textContent = "Drück aufs Ei und hör mal hin 🩺";
     if (typeof fensterEi.showModal === "function") fensterEi.showModal(); else fensterEi.setAttribute("open", "");
   }
+  // Herzschlag beim Lauschen: Ton, Vibration und ein kleines Pochen
+  let herzTakt = null;
+  function herzTon() {
+    try {
+      audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.state === "suspended") audio.resume();
+      [0, 0.17].forEach((v, i) => {
+        const t = audio.currentTime + v, o = audio.createOscillator(), g = audio.createGain();
+        o.type = "sine"; o.frequency.setValueAtTime(75, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.12);
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(i ? 0.18 : 0.3, t + 0.015); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.14);
+        o.connect(g).connect(audio.destination); o.start(t); o.stop(t + 0.16);
+      });
+    } catch (_) { /* ohne Ton */ }
+  }
+  function herzschlag(an) {
+    clearInterval(herzTakt); herzTakt = null;
+    if (!an) return;
+    const schlag = () => {
+      herzTon();
+      if (navigator.vibrate) try { navigator.vibrate([22, 120, 16]); } catch (_) { /* egal */ }
+      gross.classList.remove("pocht"); void gross.offsetWidth; gross.classList.add("pocht");
+      const r = gross.getBoundingClientRect();
+      if (Math.random() < 0.5) herzen(r.left + r.width * 0.5, r.top + r.height * 0.25, 1);
+    };
+    schlag();
+    herzTakt = setInterval(schlag, 520);
+    eiStatus.textContent = "Bumm bumm … bumm bumm 🥹";
+  }
+  ["pointerup", "pointercancel", "pointerleave"].forEach((n) => gross.addEventListener(n, () => {
+    if (!herzTakt) return;
+    herzschlag(false);
+    eiStatus.textContent = "Das ist sein kleines Herz, Toni 🥹";
+  }));
   const TEXT_INFO = () => {
     const t = eiTag();
     if (t >= 25) return "Das Ei piept schon ganz laut, Toni! 🐣 Lange dauert es nicht mehr. Halt es heute noch einmal schön warm ♥️";
@@ -265,7 +308,7 @@
     return "Wir bekommen ein Küken, Toni! 🐣 Bis zu deinem Geburtstag muss das Ei schön warm bleiben. Halt es jeden Tag einmal lange gedrückt, dann hilfst du uns beim Brüten ♥️";
   };
   langDruck(gross, 1300, {
-    start: () => { if (!heuteWarm()) gross.classList.add("drueckt"); },
+    start: () => { if (!heuteWarm()) gross.classList.add("drueckt"); if (lauschen) herzschlag(true); },
     abbruch: () => gross.classList.remove("drueckt"),
     fertig: () => {
       gross.classList.remove("drueckt");
@@ -274,13 +317,14 @@
         const r = gross.getBoundingClientRect();
         herzen(r.left + r.width / 2, r.top + r.height * 0.35, 12);
         gross.classList.remove("freut"); void gross.offsetWidth; gross.classList.add("freut");
-        eiStatus.textContent = wahl(WARM_SAETZE[eiTag()]);
+        eiStatus.textContent = lauschen && herzTakt ? "Bumm bumm … bumm bumm 🥹" : wahl(WARM_SAETZE[eiTag()]);
       }
     },
-    tipp: () => { if (!heuteWarm()) { eiStatus.textContent = "Länger drücken, ganz sanft 🤲"; gross.classList.remove("freut"); void gross.offsetWidth; gross.classList.add("freut"); } },
+    tipp: () => { if (lauschen) { eiStatus.textContent = "Länger drücken und lauschen 🩺"; return; } if (!heuteWarm()) { eiStatus.textContent = "Länger drücken, ganz sanft 🤲"; gross.classList.remove("freut"); void gross.offsetWidth; gross.classList.add("freut"); } },
   });
   function schliesseEi() {
     if (!fensterEi.open) return;
+    herzschlag(false);
     fensterEi.close();
     const f = nachSchliessen; nachSchliessen = null;
     if (f) setTimeout(f, 500);
@@ -347,6 +391,17 @@
       angeboten: () => { const s = lies(); s.angeboten = true; schreib(s); },
       ja: () => oeffneEi(null, () => { if (ak.voegel.kommentiere) ak.voegel.kommentiere(wahl(["Wir freuen uns so, Toni 🥹", "Danke, Toni! Mit dir als Brüthilfe kann ja nichts schiefgehen ♥️"]), true); }),
       spaeter: ["Okay, Toni! Schau einfach mal ins Nest auf der Fensterbank 🪺", "Kein Problem, Toni. Es liegt im Nest und wartet auf dich 🥚"],
+    });
+    // 24.11. mittags: am Ei lauschen
+    ak.voegel.registriere({
+      art: "herzschlag", vogel: "beide", prio: 3.5,
+      aktiv: () => eiTag() === 24 && stunde() >= 12 && stunde() < 17 && !lies().gelauscht && zeigeEi(),
+      vorab: () => "Toni, ich hab da was gehört … ganz leise 🥹",
+      frage: () => "Willst du mal am Ei lauschen? 🩺",
+      knoepfe: ["Ja 🥹", "Später"],
+      angeboten: () => { const s = lies(); s.gelauscht = true; schreib(s); },
+      ja: () => oeffneEi(null, () => { if (ak.voegel.kommentiere) ak.voegel.kommentiere(wahl(["Hast du es gehört, Toni? Das ist unser Baby 🥹", "So ein kleines, schnelles Herz. Ich bin so glücklich 🥹"]), true); }, "lauschen"),
+      spaeter: ["Okay, Toni! In Tonis Ecke kannst du unter „Das Ei“ später lauschen 🩺"],
     });
     // 25.11. ab 17 Uhr: Name fürs Küken
     ak.voegel.registriere({
@@ -535,6 +590,14 @@
 
   window.adventkalender.ei = {
     brauchtNest: () => !!eiTag(),
+    // kurz vor Mitternacht klopft es im Ei
+    klopf: () => {
+      if (!zeigeEi()) return;
+      klopfTon(); setTimeout(klopfTon, 180); setTimeout(() => piepTon(true), 420);
+      nestKlasse("ei-freut", 900);
+      const r = knopf.getBoundingClientRect();
+      if (r.width) { piepWort(r.left + r.width / 2, r.top); herzen(r.left + r.width / 2, r.top + 10, 4); }
+    },
     imNestSichtbar: () => zeigeEi(),
     geschluepft,
     name: () => lies().name || "",

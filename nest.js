@@ -143,20 +143,36 @@
 
   /* ---------- Das Nest auf der Fensterbank ---------- */
   let nestEl = null, zuletzt = "";
-  const nachts = () => intro.classList.contains("wz-nacht");
+  // morgens vor dem Wecken schlafen die zwei auch noch im Nest
+  let verschlafen = false;
+  const nachts = () => intro.classList.contains("wz-nacht") || verschlafen;
+  // Antippen des schlafenden Nests: morgens wecken, abends eine Gute-Nacht-Geschichte
+  const nestKnopf = document.createElement("button");
+  nestKnopf.type = "button";
+  nestKnopf.className = "nest-knopf";
+  nestKnopf.hidden = true;
+  nestKnopf.addEventListener("click", () => {
+    if (!nestEl) return;
+    nestEl.classList.remove("geweckt"); void nestEl.offsetWidth; nestEl.classList.add("geweckt");
+    if (verschlafen) { if (ak.voegel && ak.voegel.aufwachen) ak.voegel.aufwachen(); }
+    else if (ak.munkelspiele && ak.munkelspiele.geschichte) ak.munkelspiele.geschichte(nestEl);
+  });
   function zeige() {
     stand = lies();
     // ab dem 20.11. liegt ein Ei im Nest: hat Toni keins gebaut, bauen die Vögel sich selbst ein schlichtes
     if (!stand.wahl && ak.ei && ak.ei.brauchtNest && ak.ei.brauchtNest()) { stand.wahl = Object.assign({}, STANDARD); stand.vonVoegeln = true; schreib(stand); }
     const bank = intro.querySelector(".wz-bank");
     const da = !!(stand.wahl && bank && intro.classList.contains("wz-aktiv"));
-    if (!da) { if (nestEl) { nestEl.remove(); nestEl = null; zuletzt = ""; } return; }
+    if (!da) { if (nestEl) { nestEl.remove(); nestEl = null; zuletzt = ""; } nestKnopf.hidden = true; return; }
     if (!nestEl || !nestEl.isConnected) { nestEl = document.createElement("div"); nestEl.className = "nest"; nestEl.setAttribute("aria-hidden", "true"); bank.appendChild(nestEl); zuletzt = ""; }
     const schlaf = nachts();
     const extra = zusatz("mulde") + zusatz("vorne");
     const schluessel = JSON.stringify(stand.wahl) + (schlaf ? "|schlaf" : "") + extra.length + extra.slice(0, 80) + (schlaf && ak.styling ? JSON.stringify(ak.styling.schichten ? [ak.styling.schichten(false), ak.styling.schichten(true)].map((x) => Object.values(x).join("").length) : "") : "");
     if (schluessel !== zuletzt) { zuletzt = schluessel; nestEl.innerHTML = nestSvg(stand.wahl, schlaf ? "schlaf" : false, true); }
     nestEl.classList.toggle("schlaeft", schlaf);
+    if (nestKnopf.parentNode !== bank) bank.appendChild(nestKnopf);
+    nestKnopf.hidden = !schlaf || !!document.querySelector(".munkel-buehne, .special-buehne");
+    nestKnopf.setAttribute("aria-label", verschlafen ? "Munkelvögel wecken" : "Geschichte zum Einschlafen hören");
   }
   setInterval(zeige, 1000);
 
@@ -234,6 +250,8 @@
     svg: (w, mitVoegeln, mitZusatz) => nestSvg(w || lies().wahl || STANDARD, mitVoegeln, mitZusatz),
     zusatz: (f) => { ZUSATZ.push(f); zuletzt = ""; },
     neuZeichnen: () => { zuletzt = ""; zeige(); },
+    verschlafen: (an) => { if (an === undefined) return verschlafen; verschlafen = !!an; zuletzt = ""; zeige(); },
+    knopf: () => nestKnopf,
     element: () => (nestEl && nestEl.isConnected ? nestEl : null),
     wahl: () => lies().wahl || null,
     vonVoegeln: () => !!lies().vonVoegeln,
