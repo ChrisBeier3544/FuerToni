@@ -425,8 +425,16 @@
   }
 
   /* ---------- Schlüpfen am 26.11. ---------- */
-  function geschluepft() { return !!lies().geschluepft; }
-  const geburtstag = () => { const d = ak.intro.datum(); return d.jahr === KALENDER.jahr && d.monat === 11 && d.tag === 26 && ak.intro.phase() === "offen"; };
+  // ab Dezember ist das Küken auf jeden Fall da (falls Toni den großen Moment verpasst hat)
+  function geschluepft() {
+    if (lies().geschluepft) return true;
+    if (!ak.intro.bereit()) return false;
+    const d = ak.intro.datum();
+    return d.jahr > KALENDER.jahr || (d.jahr === KALENDER.jahr && d.monat === 12);
+  }
+  // der große Moment am Geburtstag (oder beim ersten Besuch bis zum 30.11.)
+  const geburtstag = () => { const d = ak.intro.datum(); return d.jahr === KALENDER.jahr && d.monat === 11 && d.tag >= 26 && d.tag <= 30 && ak.intro.phase() === "offen"; };
+  const amGeburtstag = () => { const d = ak.intro.datum(); return d.monat === 11 && d.tag === 26; };
   let buehne = null;
   function schluepfen(nochmal) {
     if (buehne || document.querySelector(".munkel-buehne")) return;
@@ -536,7 +544,7 @@
       const r = eiEl.getBoundingClientRect();
       konfetti(r.left + r.width / 2, r.top + r.height * 0.3);
       await warte(1500);
-      await sag("k", "Piep! Happy Birthday, Toni! 🎂", 3400);
+      await sag("k", amGeburtstag() || nochmal ? "Piep! Happy Birthday, Toni! 🎂" : "Piep! Alles Liebe nachträglich zum Geburtstag, Toni! 🎂", 3400);
       await sag("w", "Toni, das ist unser Baby 🥹", 2800);
       const n = warmTage().length;
       await sag("m", n >= 5 ? "Du hast es jeden Tag gewärmt. Danke, Toni ♥️" : n >= 1 ? "Danke, dass du es so lieb gewärmt hast, Toni ♥️" : "Danke, Toni ♥️ Jetzt sind wir zu dritt", 3400);
@@ -600,7 +608,7 @@
     },
     imNestSichtbar: () => zeigeEi(),
     geschluepft,
-    name: () => lies().name || "",
+    name: () => lies().name || (geschluepft() ? "Krümel" : ""),
     oeffnen: () => oeffneEi(),
     schluepfen,
   };

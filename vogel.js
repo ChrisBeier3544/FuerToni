@@ -86,6 +86,8 @@
       const m = document.getElementById("momente-titel"); if (!sichtbar(m)) return null;
       const r = m.getBoundingClientRect(); return { x: r.left + r.width * 0.5 + 92, y: r.top + 17 };
     },
+    // im Dezember: im Nest auf dem Wandbrett der Munkelvögel
+    brett: () => (ak.dezember && ak.dezember.platz ? ak.dezember.platz() : null),
     regal: () => { const e = document.getElementById("kalender"); if (!sichtbar(e)) return null; const r = e.getBoundingClientRect(); return { x: r.left + r.width * 0.22, y: r.top + 2 }; },
   };
   const PLAETZE_COUNTDOWN = {
@@ -132,6 +134,7 @@
   function kontext() {
     const phase = ak.intro.phase();
     if (ak.nest && ak.nest.schlafen && ak.nest.schlafen()) return null;
+    if (intro.hidden && ak.dezember && ak.dezember.schlafen && ak.dezember.schlafen()) return null;
     if (!intro.hidden && (phase === "warten" || phase === "geburtstag")) return "countdown";
     if (intro.hidden) return "kalender";
     return null; // Umschlag zu, aber noch nicht geöffnet: kein Vogel
@@ -924,7 +927,7 @@
     const r = v.el.getBoundingClientRect();
     const frei = v.zustand === "sitzt" && !v.el.hidden && v.hatGesprochen && !v.fragt && !v.auftrag && kontext() &&
       voegel.every((x) => x.blase.hidden) && !voegel.some((x) => x.auftrag) && !document.querySelector(".special-buehne, .aufbau-buehne, .munkel-buehne, .vogel.gast, dialog[open], .wz-fenster-huelle, .wz-klausur-frage, .mistel-ebene") &&
-      !document.hidden && r.top > -8 && r.bottom < window.innerHeight - 10;
+      !document.hidden && ((anfrage.eintrag && anfrage.eintrag.ohneFrage && anfrage.eintrag.ueberall) || (r.top > -8 && r.bottom < window.innerHeight - 10));
     if (!frei) { stylingRuhig = 0; return; }
     stylingRuhig = stylingRuhig || performance.now();
     if (performance.now() - stylingRuhig < 3500) return;
@@ -1636,15 +1639,19 @@
     get weibchen() { return weibchen && weibchen.el.isConnected ? weibchen : null; },
     get kueken() { return kueken && kueken.el.isConnected ? kueken : null; },
     neuesWeibchen, holeHer, heimfliegen, sag, animiere, setzePosition, zeigeBlase, pause, teilchen, kruemelFliegt, amVogel, bild, ankerPunkt, kontext, W, H, ruhig,
-    hut: (v, an) => {
+    hut: (v, an, art) => {
       let h = v.el.querySelector(".partyhut");
       if (!an) { if (h) h.remove(); return; }
-      if (h) return;
+      if (h && h.dataset.art === (art || "party")) return;
+      if (h) h.remove();
       h = document.createElement("span");
-      h.className = "partyhut";
-      h.innerHTML = '<svg viewBox="0 0 20 24" aria-hidden="true"><path d="M3 21L10 2l7 19z" fill="' + (v.weiblich ? "#ff7aa2" : "#5aa9e6") + '"/><path d="M6 13h8M8 7.5h4" stroke="#fff3b0" stroke-width="2"/><circle cx="10" cy="2" r="2.4" fill="#f3c84b"/><ellipse cx="10" cy="21" rx="8" ry="2" fill="' + (v.weiblich ? "#e85d7e" : "#3f7fc4") + '"/></svg>';
+      h.className = "partyhut" + (v.kueken ? " klein" : "");
+      h.dataset.art = art || "party";
+      if (art === "weihnacht") h.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19C5 9 11 3 18 5c-2 2 0 6 2 8l-3 1C15 10 11 9 9 19z" fill="#d6304f"/><rect x="1.5" y="17" width="16" height="5" rx="2.5" fill="#fff"/><circle cx="20" cy="14" r="3" fill="#fff"/></svg>';
+      else h.innerHTML = '<svg viewBox="0 0 20 24" aria-hidden="true"><path d="M3 21L10 2l7 19z" fill="' + (v.weiblich ? "#ff7aa2" : "#5aa9e6") + '"/><path d="M6 13h8M8 7.5h4" stroke="#fff3b0" stroke-width="2"/><circle cx="10" cy="2" r="2.4" fill="#f3c84b"/><ellipse cx="10" cy="21" rx="8" ry="2" fill="' + (v.weiblich ? "#e85d7e" : "#3f7fc4") + '"/></svg>';
       v.el.appendChild(h);
     },
+    sitzpunkt: (v, k, name) => sitzpunkt(v, k, name),
     hops: (v) => { v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst"); },
     still: (v) => { v.blase.hidden = true; v.el.classList.remove("redet"); },
   };
