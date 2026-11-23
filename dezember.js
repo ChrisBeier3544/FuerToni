@@ -639,15 +639,18 @@
     const f = await familieHolen(true);
     const fotos = (() => { try { const l = JSON.parse(localStorage.getItem("toni-wz-fotos") || "[]"); return Array.isArray(l) ? l : []; } catch (_) { return []; } })();
     const mitte = () => ({ x: W() / 2, y: Math.max(140, H() * 0.42) });
+    // erst kommen beide ins Bild
+    await Promise.all([I.holeHer(f.m, () => ({ x: mitte().x - 34, y: mitte().y - 30 })), pause(300).then(() => I.holeHer(f.w, () => ({ x: mitte().x + 34, y: mitte().y - 30 })))]);
+    f.m.blick = 1; f.w.blick = -1;
     if (fotos.length && ak.munkelspiele && ak.munkelspiele.album) {
-      await I.sag(f.w, "Toni, guck mal, was wir alles erlebt haben 🥹", 3200);
+      await I.sag(f.w, "Heute vor einem Jahr ♥️ Toni, guck mal, was wir alles erlebt haben 🥹", 3600);
       ak.munkelspiele.album();
       // Toni schaut die Fotos an; schließt sie das Album nicht, macht es nach einer Minute von selbst zu
       for (let i = 0; i < 200 && document.querySelector(".munkel-buehne:not(.vorbei)"); i++) await pause(300);
       const offen = document.querySelector(".foto-buehne.album:not(.vorbei) [data-wahl]");
       if (offen) offen.click();
       await pause(600);
-    }
+    } else await I.sag(f.w, "Heute vor einem Jahr ♥️ Dafür fliegen wir dir was 🥹", 3200);
     // ein Herz in die Luft fliegen: er links herum, sie rechts herum
     const s = 6.2, c = mitte();
     const punkt = (t) => ({ x: c.x + 16 * Math.pow(Math.sin(t), 3) * s, y: c.y - (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) * s });
