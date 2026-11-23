@@ -642,7 +642,10 @@
     if (fotos.length && ak.munkelspiele && ak.munkelspiele.album) {
       await I.sag(f.w, "Toni, guck mal, was wir alles erlebt haben 🥹", 3200);
       ak.munkelspiele.album();
-      for (let i = 0; i < 300 && document.querySelector(".munkel-buehne:not(.vorbei)"); i++) await pause(300);
+      // Toni schaut die Fotos an; schließt sie das Album nicht, macht es nach einer Minute von selbst zu
+      for (let i = 0; i < 200 && document.querySelector(".munkel-buehne:not(.vorbei)"); i++) await pause(300);
+      const offen = document.querySelector(".foto-buehne.album:not(.vorbei) [data-wahl]");
+      if (offen) offen.click();
       await pause(600);
     }
     // ein Herz in die Luft fliegen: er links herum, sie rechts herum
