@@ -133,7 +133,7 @@
   }
   function kontext() {
     const phase = ak.intro.phase();
-    if (ak.nest && ak.nest.schlafen && ak.nest.schlafen()) return null;
+    if (ak.nest && ak.nest.schlafen && ak.nest.schlafen() && !gitarrenNacht()) return null;
     if (intro.hidden && ak.dezember && ak.dezember.schlafen && ak.dezember.schlafen()) return null;
     if (!intro.hidden && (phase === "warten" || phase === "geburtstag")) return "countdown";
     if (intro.hidden) return "kalender";
@@ -186,7 +186,7 @@
       if (v.beimKlick && v.beimKlick()) return;
       el.classList.remove("hopst"); void el.offsetWidth; el.classList.add("hopst");
       // vor dem Geburtstag fragt der Munkelvogel beim zweiten Antippen nach seiner Partnerin
-      if (!weiblich && vorGeburtstag() && v.hatGesprochen && !weibchen && !frageBeantwortet) { frage(v); return; }
+      if (!weiblich && vorGeburtstag() && v.hatGesprochen && !weibchen && !frageBeantwortet && !gitarrenNacht()) { frage(v); return; }
       sprich(v);
     });
     voegel.push(v);
@@ -378,9 +378,11 @@
     return liste[Math.floor(Math.random() * liste.length)];
   }
 
+  // in der Gitarrennacht schläft nur die Munkelvogeline im Nest, er bleibt wach
+  const kontextFuer = (v) => (v !== maennchen && gitarrenNacht() ? null : kontext());
   async function lande(v, sofort, ersterPlatz) {
     if (v.auftrag) return;
-    const k = kontext();
+    const k = kontextFuer(v);
     if (!k) { v.zustand = "weg"; v.el.hidden = true; v.platz = null; await new Promise((r) => setTimeout(r, 1000)); return lande(v, sofort, ersterPlatz); }
     let name = sofort || ersterPlatz ? (v.partner ? freierPlatz(v, k) : ERSTER_PLATZ[k]) : freierPlatz(v, k);
     // ist der Lieblingsplatz gerade nicht frei (zum Beispiel zu wenig Platz am Handy), einen anderen nehmen
@@ -420,7 +422,7 @@
   function festhalten() {
     for (const v of voegel) {
       if (v.zustand !== "sitzt") continue;
-      const k = kontext();
+      const k = kontextFuer(v);
       // bei einem Auftrag (Spiel, Kerze, Brunch) führt der Auftrag selbst: nur am Zielpunkt festhalten
       if (v.auftrag) {
         const p = v.folge ? v.folge() : v.platz && v.kontext === k ? sitzpunkt(v, k, v.platz) : null;
@@ -719,7 +721,75 @@
     try { localStorage.setItem(SAETZE_SCHLUESSEL, JSON.stringify(gesagt)); } catch (_) { /* egal */ }
     return TAGESSAETZE[d.tag][wer][i];
   }
+  /* ---------- 25.11. ab 20 Uhr: vor lauter Aufregung spielt er Gitarre ---------- */
+  function gitarrenZeit() {
+    if (!ak.intro.bereit() || (ak.zeitreise && ak.zeitreise.aktiv()) || ak.intro.phase() !== "warten") return false;
+    const d = ak.intro.datum();
+    return d.jahr === KALENDER.jahr && d.monat === 11 && d.tag === 25 && d.stunde >= 20;
+  }
+  function gitarrenNacht() {
+    if (!gitarrenZeit()) return false;
+    const d = ak.intro.datum(), m = d.stunde * 60 + d.minute;
+    return m >= 22 * 60 + 30 && m < 23 * 60 + 58;
+  }
+  const GITARRE = ["Toni, ich bin so aufgeregt, ich kann gar nicht mehr aufhören zu spielen 🎸",
+    "Morgen ist dein Geburtstag! Da muss ich einfach spielen 🎶",
+    "Ich hab versucht aufzuhören, Toni … meine Flügel spielen einfach weiter 🎸😅",
+    "Noch ein Lied! Und noch eins! Ich bin viel zu aufgeregt 🎶",
+    "Dieses Lied heißt: Morgen hat Toni Geburtstag 🎸"];
+  const GITARRE_NACHT = ["Schlafen? Heute? Unmöglich, Toni! Morgen ist dein Geburtstag 🎸",
+    "Psst … ich spiel ganz leise, damit meine Liebste nicht aufwacht 🎶",
+    "Ich bin viel zu aufgeregt zum Schlafen, Toni 🎸 Nur noch ein Lied …"];
+  const GITARRE_W = ["Er spielt schon den ganzen Abend 🙉 Er ist einfach so aufgeregt",
+    "Ich glaub, er hört erst an deinem Geburtstag wieder auf 😄",
+    "Ich hab ihm gesagt, er soll eine Pause machen. Er hat einfach weitergespielt 🎸"];
+  const GITARRE_SVG = '<svg viewBox="0 0 40 24" aria-hidden="true">' +
+    '<path d="M24 11.2 L39 8.6 L39.4 11 L24.4 13.6Z" fill="#6b4226"/><rect x="36" y="6.4" width="4" height="7" rx="1.2" transform="rotate(-10 38 10)" fill="#4a2c18"/>' +
+    '<circle cx="37" cy="7.4" r=".8" fill="#f3c84b"/><circle cx="38.8" cy="7.1" r=".8" fill="#f3c84b"/><circle cx="37.6" cy="12.6" r=".8" fill="#f3c84b"/><circle cx="39.3" cy="12.2" r=".8" fill="#f3c84b"/>' +
+    '<path d="M3 12.5c0-4.6 3.4-6.6 6.6-5.4 1.8.7 3.4.6 5-.4 3.6-2.2 9.2-.6 9.2 5.4s-5.6 7.6-9.2 5.4c-1.6-1-3.2-1.1-5-.4C6.4 19.1 3 17.1 3 12.5z" fill="#f0a24a"/>' +
+    '<path d="M3 12.5c0-4.6 3.4-6.6 6.6-5.4 1.8.7 3.4.6 5-.4 3.6-2.2 9.2-.6 9.2 5.4" fill="none" stroke="#d6304f" stroke-width="1.2"/>' +
+    '<path d="M3 12.5c0 4.6 3.4 6.6 6.6 5.4 1.8-.7 3.4-.6 5 .4 3.6 2.2 9.2.6 9.2-5.4" fill="none" stroke="#3f9a6a" stroke-width="1.2"/>' +
+    '<circle cx="13.6" cy="12.4" r="2.6" fill="#4a2c18"/><circle cx="13.6" cy="12.4" r="3.4" fill="none" stroke="#f3c84b" stroke-width=".7" stroke-dasharray="1 1"/>' +
+    '<rect x="6" y="11.2" width="2" height="2.6" rx=".5" fill="#6b4226"/><path d="M7 11.8 L39 7.6M7 12.6 L39.2 8.6M7 13.4 L39.3 9.6" stroke="#fff6e6" stroke-width=".35"/></svg>';
+  // Gitarre zeigen, solange er keinen anderen Auftrag hat; Noten steigen auf
+  let notenZeit = 0;
+  function gitarreZeigen() {
+    const v = maennchen;
+    const an = gitarrenZeit() && !v.auftrag && !v.vomNest && v.el.isConnected && !v.el.hidden;
+    let g = v.el.querySelector(".gitarre");
+    if (an && !g) { g = document.createElement("span"); g.className = "gitarre"; g.setAttribute("aria-hidden", "true"); g.innerHTML = GITARRE_SVG; v.el.appendChild(g); }
+    if (!an && g) g.remove();
+    v.el.classList.toggle("spielt", !!an && v.zustand === "sitzt");
+    if (g) g.style.setProperty("--blick", v.blick < 0 ? "-1" : "1");
+    const jetzt = performance.now();
+    if (an && !ruhig && v.zustand === "sitzt" && v.seite && jetzt > notenZeit) {
+      notenZeit = jetzt + 900 + Math.random() * 700;
+      const n = teilchen("gitarren-note", v.seite.x + (v.blick < 0 ? -18 : 18), v.seite.y - 34, wahl(["♪", "♫", "♩", "♬"]));
+      const dx = (v.blick < 0 ? -1 : 1) * (8 + Math.random() * 16);
+      n.animate([{ transform: "translate(-50%,-50%) scale(.6)", opacity: 0 }, { transform: "translate(calc(-50% + " + (dx * 0.4).toFixed(1) + "px), calc(-50% - 14px)) scale(1)", opacity: 1, offset: 0.25 },
+        { transform: "translate(calc(-50% + " + dx.toFixed(1) + "px), calc(-50% - 40px)) scale(.9) rotate(" + (dx > 0 ? 14 : -14) + "deg)", opacity: 0 }], { duration: 1700, easing: "ease-out", fill: "forwards" }).onfinish = () => n.remove();
+    }
+    requestAnimationFrame(gitarreZeigen);
+  }
+  // ein kleiner Akkord, wenn Toni ihn antippt (nur nach einem Tipp, so klingt es nur mit Ton)
+  let gitarrenAudio = null;
+  function akkord() {
+    try {
+      gitarrenAudio = gitarrenAudio || new (window.AudioContext || window.webkitAudioContext)();
+      if (gitarrenAudio.state === "suspended") gitarrenAudio.resume();
+      [392, 494, 587, 784].forEach((f, i) => {
+        const t = gitarrenAudio.currentTime + i * 0.035, o = gitarrenAudio.createOscillator(), g = gitarrenAudio.createGain();
+        o.type = "triangle"; o.frequency.setValueAtTime(f, t);
+        g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.035, t + 0.01); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.9);
+        o.connect(g).connect(gitarrenAudio.destination); o.start(t); o.stop(t + 0.95);
+      });
+    } catch (_) { /* ohne Ton */ }
+  }
   function saetzeMaennchen() {
+    if (gitarrenZeit()) {
+      if (maennchen.hatGesprochen) { akkord(); return [wahl(gitarrenNacht() ? GITARRE_NACHT : GITARRE)]; }
+      return [grussVogel(), wahl(gitarrenNacht() ? GITARRE_NACHT : GITARRE)];
+    }
     // ab dem zweiten Mal Sprechen: erst die Sätze des Tages
     if (maennchen.hatGesprochen) { const satz = naechsterTagessatz("m"); if (satz) return [satz]; }
     if (vorGeburtstag()) {
@@ -735,6 +805,7 @@
     return liste;
   }
   function saetzeWeibchen() {
+    if (gitarrenZeit() && weibchen && weibchen.hatGesprochen) return [wahl(GITARRE_W)];
     if (weibchen && weibchen.hatGesprochen) { const satz = naechsterTagessatz("w"); if (satz) return [satz]; }
     if (vorGeburtstag() || weibchenEingeladen) return [wahl(DANKE)];
     const d = ak.intro.datum();
@@ -927,7 +998,7 @@
     const r = v.el.getBoundingClientRect();
     const frei = v.zustand === "sitzt" && !v.el.hidden && v.hatGesprochen && !v.fragt && !v.auftrag && kontext() &&
       voegel.every((x) => x.blase.hidden) && !voegel.some((x) => x.auftrag) && !document.querySelector(".special-buehne, .aufbau-buehne, .munkel-buehne, .vogel.gast, dialog[open], .wz-fenster-huelle, .wz-klausur-frage, .mistel-ebene") &&
-      !document.hidden && ((anfrage.eintrag && anfrage.eintrag.ohneFrage && anfrage.eintrag.ueberall) || (r.top > -8 && r.bottom < window.innerHeight - 10));
+      !document.hidden && !gitarrenNacht() && ((anfrage.eintrag && anfrage.eintrag.ohneFrage && anfrage.eintrag.ueberall) || (r.top > -8 && r.bottom < window.innerHeight - 10));
     if (!frei) { stylingRuhig = 0; return; }
     stylingRuhig = stylingRuhig || performance.now();
     if (performance.now() - stylingRuhig < 3500) return;
@@ -1293,6 +1364,7 @@
   const maennchen = erstelleVogel(false, saetzeMaennchen);
   let weibchen = null;
   let festhaltenLaeuft = false;
+  requestAnimationFrame(gitarreZeigen);
   const warten = setInterval(() => {
     if (!ak.intro.bereit() || !grussQuelle.textContent) return;
     // morgens schlafen die zwei noch im Nest, bis Toni sie weckt
@@ -1652,6 +1724,7 @@
       v.el.appendChild(h);
     },
     sitzpunkt: (v, k, name) => sitzpunkt(v, k, name),
+    gitarrenNacht: () => gitarrenNacht(),
     hops: (v) => { v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst"); },
     still: (v) => { v.blase.hidden = true; v.el.classList.remove("redet"); },
   };
