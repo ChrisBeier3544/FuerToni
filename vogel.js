@@ -20,7 +20,9 @@
   function vogelSvg(weiblich, aussehen, kleidung) {
     const a = aussehen || {};
     // Kleidung aus dem Ankleidezimmer (nur für die beiden Munkelvögel, nicht für die Gäste)
-    const L = !aussehen && ak.styling ? ak.styling.schichten(weiblich, kleidung) : { kopf: "", hals: "", augen: "", fuesse: "", extra: "" };
+    // am 25.11. ab 20 Uhr trägt der Munkelvogel ein Gartenzwerg-Outfit
+    const L = !aussehen && !weiblich && kleidung === undefined && zwergAn() ? ZWERG
+      : !aussehen && ak.styling ? ak.styling.schichten(weiblich, kleidung) : { kopf: "", hals: "", augen: "", fuesse: "", extra: "" };
     const ruecken = a.ruecken || (weiblich ? "#a0704b" : "#8a5a3a"), brust = a.brust || (weiblich ? "#f6877a" : "#f26b5b"), fluegel = a.fluegel || (weiblich ? "#86593b" : "#6b4632");
     return '<svg viewBox="0 0 60 60" aria-hidden="true">' +
       '<g class="beine"><path d="M24 50l-3 6M30 50l3 6M21 56h-4M21 56l-2 3M33 56h4M33 56l2 3" stroke="#e39a3b" stroke-width="2.2" stroke-linecap="round"/>' + L.fuesse + '</g>' +
@@ -46,6 +48,18 @@
       (a.deko ? DEKO[a.deko](a.farbe || "#d6304f") : "") + L.kopf +
       "</g></svg>";
   }
+  // Gartenzwerg: rote Zipfelmütze, weißer Rauschebart, grüne Jacke mit Gürtel, braune Stiefel
+  const ZWERG = {
+    kopf: '<g class="zwerg-muetze"><path d="M8 19 Q10 8 22 3 Q32 -1 37 -8 Q41 -13 45 -17 Q43 -8 44 0 Q46 10 49 19 Q30 13 8 19Z" fill="#d6302f"/>' +
+      '<path d="M45 -17 Q43 -8 44 0 Q46 10 49 19 Q44 16 40 15 Q41 4 45 -17Z" fill="#a82224"/><path d="M8 19 Q30 13 49 19 Q30 16 8 19Z" fill="#8f1d22" opacity=".5"/></g>',
+    hals: '<path d="M7 36 Q5 53 18 55 L42 55 Q54 52 51 36 Q45 45 30 45 Q15 45 7 36Z" fill="#3f7f55"/><path d="M7 36 Q15 45 30 45 Q45 45 51 36" fill="none" stroke="#2f6243" stroke-width="1.4"/>' +
+      '<rect x="9" y="47" width="41" height="4" rx="1.6" fill="#5a3a24"/><rect x="26.5" y="46.2" width="6" height="5.6" rx="1" fill="none" stroke="#f3c84b" stroke-width="1.3"/>',
+    augen: '<path d="M14 36 Q15 50 23 54 Q30 58 37 54 Q45 50 46 36 Q40 41 30 40.5 Q20 41 14 36Z" fill="#fbfaf6"/>' +
+      '<path d="M18 42 q3 3 0 6 M24 44 q3 3 0 6 M30 45 q3 3 0 6 M36 44 q3 3 0 6 M42 42 q2 3 -1 6" fill="none" stroke="#dcd8ce" stroke-width="1" stroke-linecap="round"/>' +
+      '<path d="M22 37 Q26 39 30 38.4 Q34 39 38 37 Q36 41 30 41 Q24 41 22 37Z" fill="#fff"/>',
+    fuesse: '<path d="M17 54h7.5v3.4q0 1.6-1.6 1.6H15.4q-1.4 0-1-1.4z" fill="#5a3a24"/><path d="M30 54h7.5l2.2 3.6q.6 1.4-1 1.4H31.6q-1.6 0-1.6-1.6z" fill="#5a3a24"/>',
+    extra: "",
+  };
   // Weihnachtliche Deko für die Freunde der Munkelvogeline
   const DEKO = {
     muetze: (c) => '<path d="M14 18 C18 2 40 0 46 14 L40 18z" fill="' + c + '"/><rect x="12" y="15" width="34" height="6" rx="3" fill="#fff"/><circle cx="48" cy="12" r="4" fill="#fff"/>',
@@ -736,28 +750,40 @@
     "Morgen ist dein Geburtstag! Da muss ich einfach spielen 🎶",
     "Ich hab versucht aufzuhören, Toni … meine Flügel spielen einfach weiter 🎸😅",
     "Noch ein Lied! Und noch eins! Ich bin viel zu aufgeregt 🎶",
-    "Dieses Lied heißt: Morgen hat Toni Geburtstag 🎸"];
+    "Dieses Lied heißt: Morgen hat Toni Geburtstag 🎸",
+    "Ich hab mich extra als Gartenzwerg verkleidet. Für die richtige Stimmung 🎸",
+    "Gefällt dir meine Zipfelmütze, Toni? Damit spielt es sich gleich viel besser 🎶"];
   const GITARRE_NACHT = ["Schlafen? Heute? Unmöglich, Toni! Morgen ist dein Geburtstag 🎸",
     "Psst … ich spiel ganz leise, damit meine Liebste nicht aufwacht 🎶",
     "Ich bin viel zu aufgeregt zum Schlafen, Toni 🎸 Nur noch ein Lied …"];
   const GITARRE_W = ["Er spielt schon den ganzen Abend 🙉 Er ist einfach so aufgeregt",
     "Ich glaub, er hört erst an deinem Geburtstag wieder auf 😄",
     "Ich hab ihm gesagt, er soll eine Pause machen. Er hat einfach weitergespielt 🎸"];
-  const GITARRE_SVG = '<svg viewBox="0 0 40 24" aria-hidden="true">' +
-    '<path d="M24 11.2 L39 8.6 L39.4 11 L24.4 13.6Z" fill="#6b4226"/><rect x="36" y="6.4" width="4" height="7" rx="1.2" transform="rotate(-10 38 10)" fill="#4a2c18"/>' +
-    '<circle cx="37" cy="7.4" r=".8" fill="#f3c84b"/><circle cx="38.8" cy="7.1" r=".8" fill="#f3c84b"/><circle cx="37.6" cy="12.6" r=".8" fill="#f3c84b"/><circle cx="39.3" cy="12.2" r=".8" fill="#f3c84b"/>' +
-    '<path d="M3 12.5c0-4.6 3.4-6.6 6.6-5.4 1.8.7 3.4.6 5-.4 3.6-2.2 9.2-.6 9.2 5.4s-5.6 7.6-9.2 5.4c-1.6-1-3.2-1.1-5-.4C6.4 19.1 3 17.1 3 12.5z" fill="#f0a24a"/>' +
-    '<path d="M3 12.5c0-4.6 3.4-6.6 6.6-5.4 1.8.7 3.4.6 5-.4 3.6-2.2 9.2-.6 9.2 5.4" fill="none" stroke="#d6304f" stroke-width="1.2"/>' +
-    '<path d="M3 12.5c0 4.6 3.4 6.6 6.6 5.4 1.8-.7 3.4-.6 5 .4 3.6 2.2 9.2.6 9.2-5.4" fill="none" stroke="#3f9a6a" stroke-width="1.2"/>' +
-    '<circle cx="13.6" cy="12.4" r="2.6" fill="#4a2c18"/><circle cx="13.6" cy="12.4" r="3.4" fill="none" stroke="#f3c84b" stroke-width=".7" stroke-dasharray="1 1"/>' +
-    '<rect x="6" y="11.2" width="2" height="2.6" rx=".5" fill="#6b4226"/><path d="M7 11.8 L39 7.6M7 12.6 L39.2 8.6M7 13.4 L39.3 9.6" stroke="#fff6e6" stroke-width=".35"/></svg>';
+  // ein Banjo wie beim Gartenzwerg: runde helle Trommel mit Metallrand, langer Hals
+  let banjoNr = 0;
+  const banjoSvg = () => {
+    const id = "banjoFell" + ++banjoNr;
+    let haken = "";
+    for (let k = 0; k < 14; k++) { const w = (k / 14) * Math.PI * 2; haken += '<circle cx="' + (11 + Math.cos(w) * 10.3).toFixed(1) + '" cy="' + (13 + Math.sin(w) * 10.3).toFixed(1) + '" r=".7" fill="#7d8592"/>'; }
+    return '<svg viewBox="0 0 48 26" aria-hidden="true"><defs><radialGradient id="' + id + '" cx="40%" cy="38%" r="70%"><stop offset="0" stop-color="#fffdf6"/><stop offset="1" stop-color="#e6dcc6"/></radialGradient></defs>' +
+      '<path d="M19 11.4 L41.5 6.6 L42 9 L19.6 13.8Z" fill="#7a4a2a"/><path d="M19.4 12.6 L41.7 7.8" stroke="#a8744a" stroke-width=".5"/>' +
+      '<path d="M41 5 L47 3.6 L47.6 9 L41.8 10.2Z" fill="#5a3420"/><circle cx="43.4" cy="4.2" r=".9" fill="#dfe3ea"/><circle cx="46" cy="3.7" r=".9" fill="#dfe3ea"/><circle cx="44" cy="9.6" r=".9" fill="#dfe3ea"/><circle cx="46.6" cy="9.1" r=".9" fill="#dfe3ea"/>' +
+      '<circle cx="31" cy="11.2" r=".9" fill="#dfe3ea"/>' +
+      '<circle cx="11" cy="13" r="11.4" fill="#9aa1ad"/><circle cx="11" cy="13" r="10.2" fill="#c9ced6"/><circle cx="11" cy="13" r="9" fill="url(#' + id + ')"/>' + haken +
+      '<rect x="8" y="12.2" width="6" height="1.6" rx=".5" fill="#6b4226"/><rect x="3.6" y="11.6" width="2.4" height="2.8" rx=".6" fill="#7d8592"/>' +
+      '<path d="M4.8 12.4 L41.6 7 M4.8 13 L41.8 7.6 M4.8 13.6 L42 8.2 M4.8 14.2 L42.2 8.8 M4.8 14.8 L31 11.4" stroke="#f5f1e8" stroke-width=".3"/></svg>';
+  };
   // Gitarre zeigen, solange er keinen anderen Auftrag hat; Noten steigen auf
-  let notenZeit = 0;
+  let notenZeit = 0, zwergZuletzt = false;
+  function zwergAn() { return gitarrenZeit(); }
   function gitarreZeigen() {
     const v = maennchen;
     const an = gitarrenZeit() && !v.auftrag && !v.vomNest && v.el.isConnected && !v.el.hidden;
     let g = v.el.querySelector(".gitarre");
-    if (an && !g) { g = document.createElement("span"); g.className = "gitarre"; g.setAttribute("aria-hidden", "true"); g.innerHTML = GITARRE_SVG; v.el.appendChild(g); }
+    if (an && !g) { g = document.createElement("span"); g.className = "gitarre"; g.setAttribute("aria-hidden", "true"); g.innerHTML = banjoSvg(); v.el.appendChild(g); }
+    // Gartenzwerg-Outfit an- und wieder ausziehen
+    const zwerg = zwergAn();
+    if (zwerg !== zwergZuletzt) { zwergZuletzt = zwerg; einkleiden(false); }
     if (!an && g) g.remove();
     v.el.classList.toggle("spielt", !!an && v.zustand === "sitzt");
     if (g) g.style.setProperty("--blick", v.blick < 0 ? "-1" : "1");
@@ -1712,6 +1738,7 @@
     get kueken() { return kueken && kueken.el.isConnected ? kueken : null; },
     neuesWeibchen, holeHer, heimfliegen, sag, animiere, setzePosition, zeigeBlase, pause, teilchen, kruemelFliegt, amVogel, bild, ankerPunkt, kontext, W, H, ruhig,
     hut: (v, an, art) => {
+      if (an && v === maennchen && zwergAn()) return;
       let h = v.el.querySelector(".partyhut");
       if (!an) { if (h) h.remove(); return; }
       if (h && h.dataset.art === (art || "party")) return;

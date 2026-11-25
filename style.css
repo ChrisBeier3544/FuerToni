@@ -4744,7 +4744,7 @@ html.voegel-vorne .vogel-ebene { z-index: 97; }
 .dez-zettel { margin: 6px 4px 14px !important; padding: 12px 14px; border-radius: 10px; background: #fffdf3; box-shadow: 0 2px 8px rgba(90, 50, 30, 0.15); rotate: -1.5deg; font: 700 1.15rem/1.35 "Dancing Script", cursive !important; color: var(--beere) !important; opacity: 1 !important; }
 
 /* 25.11. abends: der Munkelvogel spielt vor Aufregung Gitarre */
-.vogel .gitarre { position: absolute; left: 50%; bottom: 7px; width: 34px; transform: translateX(-50%) scaleX(var(--blick, 1)) translateX(2px) rotate(-24deg); pointer-events: none; z-index: 2; }
+.vogel .gitarre { position: absolute; left: 50%; bottom: 3px; width: 40px; transform: translateX(-50%) scaleX(var(--blick, 1)) translateX(3px) rotate(-12deg); pointer-events: none; z-index: 2; }
 .vogel .gitarre svg { display: block; width: 100%; height: auto; transform-origin: 35% 55%; }
 .vogel.spielt .gitarre svg { animation: gitarre-wippen 0.42s ease-in-out infinite alternate; }
 .vogel.spielt .fluegel-vorne { transform-box: fill-box; transform-origin: 50% 0; animation: gitarre-zupfen 0.21s ease-in-out infinite alternate; }
