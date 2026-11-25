@@ -78,7 +78,9 @@
     for (let k = 0; k < 13; k++) { const x = 18 + k * 7, y = 36.5 + Math.sin(k * 1.7) * 1.2; s += '<circle cx="' + x + '" cy="' + f1(y) + '" r="' + (p.wolle ? 3.6 : 3.2) + '" fill="' + (k % 2 ? p.f : p.f2) + '"/>'; }
     if (mitZusatz) s += zusatz("mulde", mitZusatz === "gross" ? "gross" : "bank");
     // die Vögel sitzen im Nest
-    if (mitVoegeln) s += vogelIm(false, 16, 44, 1) + vogelIm(true, 58, 44, -1);
+    // in der Nacht vor dem Geburtstag schläft sie allein, er spielt draußen Gitarre
+    if (mitVoegeln === "schlafW") s += vogelIm(true, 38, 44, -1);
+    else if (mitVoegeln) s += vogelIm(false, 16, 44, 1) + vogelIm(true, 58, 44, -1);
     // Vorderseite aus Zweigen
     s += '<path d="M7 42 Q8 76 60 76 Q112 76 113 42 Q60 58 7 42Z" fill="' + z.f + '"/>';
     for (let k = 0; k < 7; k++) {
@@ -131,7 +133,7 @@
     }
     if (mitZusatz) s += zusatz("vorne", mitZusatz === "gross" ? "gross" : "bank");
     // schlafende Vögel: Zzz
-    if (mitVoegeln === "schlaf") s += '<text class="nest-z z1" x="40" y="12" font-size="7" font-weight="800" fill="#e6dcff">z</text><text class="nest-z z2" x="86" y="10" font-size="6" font-weight="800" fill="#e6dcff">z</text>';
+    if (mitVoegeln === "schlaf" || mitVoegeln === "schlafW") s += '<text class="nest-z z1" x="40" y="12" font-size="7" font-weight="800" fill="#e6dcff">z</text><text class="nest-z z2" x="86" y="10" font-size="6" font-weight="800" fill="#e6dcff">z</text>';
     return s + "</svg>";
   }
 
@@ -166,9 +168,10 @@
     if (!da) { if (nestEl) { nestEl.remove(); nestEl = null; zuletzt = ""; } nestKnopf.hidden = true; return; }
     if (!nestEl || !nestEl.isConnected) { nestEl = document.createElement("div"); nestEl.className = "nest"; nestEl.setAttribute("aria-hidden", "true"); bank.appendChild(nestEl); zuletzt = ""; }
     const schlaf = nachts();
+    const allein = !!(schlaf && ak.voegel && ak.voegel.intern && ak.voegel.intern.gitarrenNacht && ak.voegel.intern.gitarrenNacht());
     const extra = zusatz("mulde") + zusatz("vorne");
-    const schluessel = JSON.stringify(stand.wahl) + (schlaf ? "|schlaf" : "") + extra.length + extra.slice(0, 80) + (schlaf && ak.styling ? JSON.stringify(ak.styling.schichten ? [ak.styling.schichten(false), ak.styling.schichten(true)].map((x) => Object.values(x).join("").length) : "") : "");
-    if (schluessel !== zuletzt) { zuletzt = schluessel; nestEl.innerHTML = nestSvg(stand.wahl, schlaf ? "schlaf" : false, true); }
+    const schluessel = JSON.stringify(stand.wahl) + (schlaf ? "|schlaf" : "") + (allein ? "|allein" : "") + extra.length + extra.slice(0, 80) + (schlaf && ak.styling ? JSON.stringify(ak.styling.schichten ? [ak.styling.schichten(false), ak.styling.schichten(true)].map((x) => Object.values(x).join("").length) : "") : "");
+    if (schluessel !== zuletzt) { zuletzt = schluessel; nestEl.innerHTML = nestSvg(stand.wahl, schlaf ? (allein ? "schlafW" : "schlaf") : false, true); }
     nestEl.classList.toggle("schlaeft", schlaf);
     if (nestKnopf.parentNode !== bank) bank.appendChild(nestKnopf);
     nestKnopf.hidden = !schlaf || !!document.querySelector(".munkel-buehne, .special-buehne");

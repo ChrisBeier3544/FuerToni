@@ -564,7 +564,11 @@
     el.dialogBrief.hidden = !hat(i.briefzahl);
     el.dialogBriefZahl.textContent = hat(i.briefzahl) ? String(i.briefzahl) : "";
     el.dialogPaeckchen.hidden = !hat(i.paeckchen);
-    el.dialogPaeckchenZahl.textContent = hat(i.paeckchen) ? "Nr. " + i.paeckchen : "";
+    // manchmal gibt es zwei Päckchen mit derselben Nummer
+    const mehrere = hat(i.paeckchen) && +i.paeckchenAnzahl > 1;
+    el.dialogPaeckchenZahl.textContent = hat(i.paeckchen) ? (mehrere ? i.paeckchenAnzahl + " × Nr. " : "Nr. ") + i.paeckchen : "";
+    const paeckchenText = el.dialogPaeckchen.querySelector(".extra-label");
+    if (paeckchenText) paeckchenText.textContent = mehrere ? "Heute darfst du zusätzlich " + i.paeckchenAnzahl + " Päckchen öffnen" : "Heute darfst du zusätzlich dieses Päckchen öffnen";
 
     el.dialogHinweis.hidden = !i.hinweis;
     el.dialogHinweisText.textContent = i.hinweis || "";
