@@ -167,6 +167,13 @@
   }
 
   // Ist Türchen n (1 bis 24) an diesem Kalendertag schon offen?
+  // Ausnahme: das 6. Türchen darf Toni schon ab dem 26.11. öffnen (alles andere bleibt wie geplant)
+  const FRUEHES_TUERCHEN = 6;
+  function fruehFrei(n, d) {
+    return n === FRUEHES_TUERCHEN && d.jahr === KALENDER.jahr && d.monat === 11 && d.tag >= 26;
+  }
+  // gilt nur für die Türchen selbst (Ostereier und alles andere richten sich weiter nach dem Datum)
+  function tuerFrei(n, d) { return istVerfuegbar(n, d) || fruehFrei(n, d); }
   function istVerfuegbar(n, d) {
     if (d.jahr > KALENDER.jahr) return true;
     if (d.jahr < KALENDER.jahr) return false;
@@ -264,7 +271,7 @@
     const roh = KALENDER.tage && KALENDER.tage[n];
     if (!roh) return {};
     if (typeof roh === "object") return roh;
-    if (!zeitBereit || !istVerfuegbar(n, kalenderDatum())) return {};
+    if (!zeitBereit || !tuerFrei(n, kalenderDatum())) return {};
     if (!inhaltCache.has(n)) inhaltCache.set(n, entschluessle(roh, "tag-" + n));
     return inhaltCache.get(n);
   }
@@ -394,7 +401,7 @@
     const d = kalenderDatum();
     const echt = berlinDatum(jetzt());
     for (const [n, t] of tueren) {
-      const frei = zeitBereit && istVerfuegbar(n, d);
+      const frei = zeitBereit && tuerFrei(n, d);
       const istOffen = frei && geoeffnet.has(n);
       const istHeute = frei && d.jahr === KALENDER.jahr && d.monat === 12 && d.tag === n;
 
@@ -508,7 +515,7 @@
     const d = kalenderDatum();
     if (n === 24 && lichtershow) { zeigeToast("Einen Moment, die Lichter gehen an ✨"); return; }
 
-    if (!istVerfuegbar(n, d)) {
+    if (!tuerFrei(n, d)) {
       t.knopf.classList.remove("wackeln");
       void t.knopf.offsetWidth; // Animation neu starten
       t.knopf.classList.add("wackeln");
@@ -533,7 +540,7 @@
 
   function zeigeInhalt(n) {
     // Sicherheitsnetz: Inhalt nur zeigen, wenn der Tag wirklich erreicht ist
-    if (!istVerfuegbar(n, kalenderDatum())) return;
+    if (!tuerFrei(n, kalenderDatum())) return;
 
     const i = inhalt(n);
     // Der Inhalt fliegt aus dem Türchen heraus
@@ -1113,7 +1120,7 @@
   function aktualisiereLichter(d) {
     let an = 0;
     for (const [n, b] of birnen) {
-      const leuchtet = zeitBereit && istVerfuegbar(n, d) && geoeffnet.has(n);
+      const leuchtet = zeitBereit && tuerFrei(n, d) && geoeffnet.has(n);
       if (leuchtet) an++;
       if (leuchtet && !b.classList.contains("an") && lichterBereit && !bewegungReduziert) {
         b.classList.add("neu");
