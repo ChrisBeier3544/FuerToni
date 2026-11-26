@@ -57,6 +57,9 @@
     const amTag = (tag) => nov && d.tag === tag;
     const leer = vorDem(27) || (amTag(27) && !istFertig(27));
     kal.classList.toggle("leer", leer);
+    // das 6. Türchen hängt schon ab dem 26.11. im Regal und darf geöffnet werden
+    const frueh = kal.querySelector(':scope > .tuer[data-tag="6"]');
+    if (frueh && leer && nov && d.tag >= 26) frueh.classList.add("angebracht");
     schild.hidden = !vorDem(27);
     if (!leer) tueren().forEach((t) => t.classList.remove("angebracht"));
     const ohneDeko = vorDem(28) || (amTag(28) && !istFertig(28));
@@ -143,15 +146,17 @@
   async function aufbauen() {
     kal.classList.add("leer");
     schild.hidden = true;
-    const liste = sortiert();
+    // das 6. Türchen hängt schon (Toni durfte es früher öffnen), die Capys bringen die anderen 23
+    const liste = sortiert().filter((t) => t.dataset.tag !== "6");
+    const schonDa = 24 - liste.length;
     liste.forEach((t) => t.classList.remove("angebracht"));
-    zeigeBanner("Die Capy Crew baut deinen Kalender auf 🐹", "Päckchen 0 von 24");
+    zeigeBanner("Die Capy Crew baut deinen Kalender auf 🐹", "Päckchen " + schonDa + " von 24");
     await zeige(0, 200);
     await warte(1200);
     const breiteKal = kal.clientWidth;
     for (let i = 0; i < liste.length; i++) {
       const t = liste[i], r = rechteck(t);
-      zeigeBanner("Die Capy Crew baut deinen Kalender auf 🐹", "Päckchen " + (i + 1) + " von 24");
+      zeigeBanner("Die Capy Crew baut deinen Kalender auf 🐹", "Päckchen " + (i + 1 + schonDa) + " von 24");
       await zeige(r.y, r.h);
       const gross = t.classList.contains("gross") || t.classList.contains("breit");
       const cb = Math.max(56, Math.min(92, r.h * 0.72));
