@@ -1755,7 +1755,7 @@
     hops: (v) => { v.el.classList.remove("hopst"); void v.el.offsetWidth; v.el.classList.add("hopst"); },
     still: (v) => { v.blase.hidden = true; v.el.classList.remove("redet"); },
   };
-  window.adventkalender.voegel = { voegel, raumFertig, nestFertig, kommentiere, aufwachen: () => aufwachen(false), schlaeftNoch: () => !!maennchen.vomNest, intern, kuekenDazu, kuekenSvg, registriere: (e) => { ANFRAGEN.push(e); ANFRAGEN.sort((x, y) => (x.prio || 9) - (y.prio || 9)); }, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
+  window.adventkalender.voegel = { gastSvg: (i) => vogelSvg(false, FREUNDE[i % FREUNDE.length]), voegel, raumFertig, nestFertig, kommentiere, aufwachen: () => aufwachen(false), schlaeftNoch: () => !!maennchen.vomNest, intern, kuekenDazu, kuekenSvg, registriere: (e) => { ANFRAGEN.push(e); ANFRAGEN.sort((x, y) => (x.prio || 9) - (y.prio || 9)); }, svg: (weiblich, kleidung) => vogelSvg(weiblich, undefined, kleidung), einkleiden, sage, fliegeZu, sagKurz, fliegeDavon, weiter, istDa, frage: () => {
     // erst wenn er gelandet ist und seine Sätze gesagt hat (höchstens 30 Sekunden warten)
     let n = 0;
     const los = () => {
