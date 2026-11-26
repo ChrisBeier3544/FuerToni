@@ -873,6 +873,16 @@
       '<rect width="200" height="150" fill="url(#' + id + ')"/>';
     for (let k = 0; k < 9; k++) s += '<circle cx="' + (12 + k * 23) + '" cy="' + (18 + (k % 3) * 9) + '" r="' + (2 + (k % 2)) + '" fill="#fff" opacity=".7"/>';
     s += '<rect y="118" width="200" height="32" fill="#ecd3b6"/><rect y="116" width="200" height="4" fill="#c99c74"/>';
+    if (pose === "familie") {
+      // das erste Familienfoto: Papa, Mama und Krümel in der Mitte, alle mit Partyhut
+      const kueken = ak.voegel.kuekenSvg ? ak.voegel.kuekenSvg(false).replace("<svg ", '<svg x="76" y="70" width="48" height="48" ') : "";
+      s += vogelImFoto(false, 20, 50, 66, false) + vogelImFoto(true, 114, 50, 66, true) + kueken;
+      const hut = (x, y, g, f, d) => '<g transform="rotate(' + d + " " + x + " " + y + ')"><path d="M' + (x - g * 0.45) + " " + y + "L" + x + " " + (y - g) + "L" + (x + g * 0.45) + " " + y + 'z" fill="' + f + '"/><circle cx="' + x + '" cy="' + (y - g) + '" r="' + (g * 0.17) + '" fill="#f3c84b"/><path d="M' + (x - g * 0.25) + " " + (y - g * 0.4) + "h" + g * 0.5 + '" stroke="#fff3b0" stroke-width="1.6"/></g>';
+      s += hut(54, 63, 22, "#5aa9e6", -8) + hut(146, 63, 22, "#ff7aa2", 8) + hut(101, 82, 15, "#9be3a8", 6);
+      for (const [x, y] of [[30, 26], [170, 30], [100, 22], [60, 18], [140, 16]]) s += '<path d="M' + x + " " + y + 'l2 4 4 .6-3 3 .8 4-3.8-2-3.8 2 .8-4-3-3 4-.6z" fill="#f3c84b" opacity=".85"/>';
+      s += '<text x="100" y="142" text-anchor="middle" font-family="Dancing Script, cursive" font-size="13" font-weight="700" fill="#9d2449">Unser erstes Familienfoto ♥️</text>';
+      return s + "</svg>";
+    }
     s += vogelImFoto(false, 36 + nah, 52, 66, false) + vogelImFoto(true, 98 - nah, 52, 66, true);
     const herz = (x, y, g, f) => '<path d="M' + x + " " + (y + g * 0.85) + "C" + (x - g * 1.25) + " " + y + " " + (x - g * 0.6) + " " + (y - g) + " " + x + " " + (y - g * 0.35) + "C" + (x + g * 0.6) + " " + (y - g) + " " + (x + g * 1.25) + " " + y + " " + x + " " + (y + g * 0.85) + 'Z" fill="' + f + '"/>';
     if (pose === "herz") s += herz(100, 34, 16, "#e8455a") + herz(70, 24, 6, "#ff8fab") + herz(132, 26, 5, "#ff8fab");
@@ -1130,5 +1140,5 @@
     ak.ecke.eintrag({ id: "fuettern", symbol: "🍓", name: "Füttern", text: "Was schmeckt wem?", da: () => !!lies().fuettern && frei(), los: () => fuettern() });
   }
 
-  window.adventkalender.munkelspiele = { kaffee, fotobox, album, geschichte, mitternacht, versteckJetzt: () => (aktuellesVersteck ? Object.assign({ id: aktuellesVersteck.id }, aktuellesVersteck.wo()) : null), verstecken, wettfliegen, fuettern, feder, laeuft: () => !!buehne };
+  window.adventkalender.munkelspiele = { fotoSvg: (pose) => fotoSvg(pose), kaffee, fotobox, album, geschichte, mitternacht, versteckJetzt: () => (aktuellesVersteck ? Object.assign({ id: aktuellesVersteck.id }, aktuellesVersteck.wo()) : null), verstecken, wettfliegen, fuettern, feder, laeuft: () => !!buehne };
 })();

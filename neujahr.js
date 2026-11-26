@@ -37,22 +37,24 @@
   }
 
   /* ---------- Feuerwerk ---------- */
-  function feuerwerk() {
+  // opt (für andere Anlässe, z. B. Tonis Geburtstag): { gross, titel, text, ohneMerken, beimEnde }
+  function feuerwerk(opt) {
     if (laeuft) return;
     laeuft = true;
-    merke();
+    opt = opt || {};
+    if (!opt.ohneMerken) merke();
     if (countdown) { countdown.remove(); countdown = null; }
     const ebene = document.createElement("div");
     ebene.className = "neujahr";
     ebene.innerHTML =
       '<canvas class="neujahr-himmel"></canvas>' +
-      '<div class="neujahr-gruss"><p class="neujahr-jahr">' + NEU + '</p>' +
-      '<p class="neujahr-titel">Frohes neues Jahr, mein Schatz ♥️</p>' +
-      '<p class="neujahr-text">Danke für ' + JAHR + '. Ich freu mich auf jeden Tag ' + NEU + ' mit dir</p></div>';
+      '<div class="neujahr-gruss"><p class="neujahr-jahr">' + (opt.gross || NEU) + '</p>' +
+      '<p class="neujahr-titel">' + (opt.titel || "Frohes neues Jahr, mein Schatz ♥️") + '</p>' +
+      '<p class="neujahr-text">' + (opt.text || "Danke für " + JAHR + ". Ich freu mich auf jeden Tag " + NEU + " mit dir") + "</p></div>";
     document.body.appendChild(ebene);
     const zu = () => {
       ebene.classList.add("weg");
-      setTimeout(() => { ebene.remove(); laeuft = false; }, 900);
+      setTimeout(() => { ebene.remove(); laeuft = false; if (opt.beimEnde) opt.beimEnde(); }, 900);
     };
     ebene.addEventListener("click", zu);
     if (ruhig) { setTimeout(zu, 7000); return; }
