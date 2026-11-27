@@ -4732,6 +4732,25 @@ html:has(.schluepf-buehne) .vogel-ebene { visibility: hidden; }
 .vb-getragen.stiefel { width: 24px; }
 .vb-getragen.keks { width: 14px; transform: translate(-50%, -50%); }
 .vb-getragen svg { display: block; width: 100%; height: auto; }
+.vb-haus { width: clamp(60px, 20vw, 80px); }
+.vb-haus[hidden] { display: none; }
+.vogel-brett.mit-haus .vb-stiefel:empty { display: none; }
+.vb-haus-knopf { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.vb-haus-knopf svg, .zuhause-bild svg { display: block; width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 3px 2px rgba(90, 50, 30, 0.25)); }
+.vb-haus .bau-neu, .zuhause-bild .bau-neu { transform-box: fill-box; transform-origin: 50% 100%; animation: haus-neu 0.7s cubic-bezier(.3, 1.4, .5, 1) both; }
+@keyframes haus-neu { from { transform: scale(0.4); opacity: 0; } to { transform: none; opacity: 1; } }
+.vb-name { font-family: "Dancing Script", cursive; font-weight: 700; font-size: 7.4px; fill: #9d2449; }
+.vb-name.klein { font-family: "Nunito", sans-serif; font-size: 3.6px; }
+.vb-rauch circle { opacity: 0; transform-box: fill-box; transform-origin: center; animation: haus-rauch 3.2s ease-out infinite; }
+.vb-rauch circle:last-child { animation-delay: 1.6s; }
+@keyframes haus-rauch { 0% { opacity: 0; transform: translateY(6px) scale(0.5); } 30% { opacity: 0.75; } 100% { opacity: 0; transform: translateY(-6px) scale(1.3); } }
+.vb-lampe { animation: haus-lampe 1.6s ease-in-out infinite alternate; }
+.vb-lampe:nth-child(even) { animation-delay: 0.8s; }
+@keyframes haus-lampe { from { opacity: 0.55; } to { opacity: 1; } }
+.vogel-brett.schlaeft .vb-fenster, html[data-abend] .vb-fenster { fill: #ffd36b; filter: drop-shadow(0 0 3px rgba(255, 200, 90, 0.9)); }
+.vb-getragen.teil { width: auto; font-size: 16px; line-height: 1; transform: translate(-50%, -30%); }
+.zuhause-bild { width: min(56vw, 210px); margin: 0 auto 6px; }
+@media (prefers-reduced-motion: reduce) { .vb-rauch circle, .vb-lampe, .vb-haus .bau-neu, .zuhause-bild .bau-neu { animation: none; opacity: 1; } }
 .adventskranz[class*="zuenden-"] .kerze .flamme { transition: opacity 0.3s ease; }
 .adventskranz.zuenden-1 .kerze[data-nr="1"] .flamme, .adventskranz.zuenden-2 .kerze[data-nr="2"] .flamme, .adventskranz.zuenden-3 .kerze[data-nr="3"] .flamme { opacity: 0; }
 .dez-effekte { position: fixed; inset: 0; z-index: 97; pointer-events: none; overflow: hidden; }

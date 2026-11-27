@@ -106,6 +106,7 @@
       '<path d="M24 16 q2 -11 9 -10 q5 2 1 12z" fill="#7a4526"/><circle cx="31" cy="9" r="1.2" fill="#fff"/><path d="M19 10c-1.8-1.4-3.4-2.7-3.4-4.1 0-1 .8-1.7 1.7-1.7.7 0 1.3.4 1.7.9.4-.5 1-.9 1.7-.9.9 0 1.7.7 1.7 1.7 0 1.4-1.6 2.7-3.4 4.1z" fill="#ff8fab"/>' : "") +
     '<path d="M10 14h20v22q0 4 4 5l6 2q3 1 3 5v2H10z" fill="#d6304f"/><path d="M10 40h33" stroke="#9d2449" stroke-width="1.4"/><rect x="7" y="10" width="26" height="8" rx="4" fill="#fff"/><circle cx="26" cy="27" r="2" fill="#f3c84b"/></svg>';
 
+  let hausPlatz = null, hausEl = null;
   let brett = null, baumEl = null, kugelnEl = null, nestEl = null, nestKnopf = null, stiefelEl = null, zuletztNest = "";
   function baueBrett() {
     const reihe = document.querySelector(".kranz-reihe");
@@ -115,6 +116,7 @@
       '<div class="vb-platz vb-baum"><button type="button" class="vb-baum-knopf" aria-label="Vogelbäumchen">' + BAUM_SVG + '<span class="vb-kugeln"></span></button></div>' +
       '<div class="vb-platz vb-nest"><div class="vb-nest-bild"></div><span class="vb-kueken-schlaf"></span><button type="button" class="vb-nest-knopf" aria-label="Geschichte zum Einschlafen hören" hidden></button></div>' +
       '<div class="vb-platz vb-stiefel"></div>' +
+      '<div class="vb-platz vb-haus" hidden><button type="button" class="vb-haus-knopf" aria-label="Das kleine Haus"></button></div>' +
       '<div class="vb-holz"><i></i><i></i></div>';
     reihe.after(brett);
     baumEl = brett.querySelector(".vb-baum-knopf");
@@ -122,6 +124,9 @@
     nestEl = brett.querySelector(".vb-nest-bild");
     nestKnopf = brett.querySelector(".vb-nest-knopf");
     stiefelEl = brett.querySelector(".vb-stiefel");
+    hausPlatz = brett.querySelector(".vb-haus");
+    hausEl = brett.querySelector(".vb-haus-knopf");
+    hausEl.addEventListener("click", hausGetippt);
     baumEl.addEventListener("click", baumGetippt);
     nestKnopf.addEventListener("click", () => geschichte());
     return brett;
@@ -207,6 +212,207 @@
     if (k) k.addEventListener("click", nikolausGetippt);
   }
 
+
+  /* =========================================================
+     DAS KLEINE HAUS (8. bis 24.12.)
+     Die Munkelvögel bauen rechts auf dem Brett Stück für Stück
+     ein Haus. An Heiligabend hängen sie die Namensschilder auf:
+     Toni und Chris, und ein ganz kleines für das Küken.
+     ========================================================= */
+  const BAU = [8, 11, 14, 17, 20, 22, 24];
+  // 99 = Januar, da steht das Haus fertig auf dem Brett
+  const bauTag = () => { const d = datum(); return d.jahr === KALENDER.jahr + 1 && d.monat === 1 ? 99 : dTag(); };
+  const gebaut = () => { const g = lies().haus; return g && typeof g === "object" ? g : {}; };
+  // wie viele Bauschritte stehen schon? Die Schilder hängen erst, wenn Toni dabei war (oder ab Januar)
+  function hausStufe() {
+    const t = bauTag(), g = gebaut();
+    let n = 0;
+    for (const b of BAU) {
+      if (b === 24 && t !== 99 && !g[24]) continue;
+      if (b < t || (b === t && g[b])) n++;
+    }
+    return n;
+  }
+  // welcher Bauschritt wartet gerade auf seine Szene?
+  function hausFaellig() {
+    const t = bauTag(), g = gebaut();
+    if (t >= 24 && t <= 31 && !g[24]) return 24;
+    return BAU.includes(t) && !g[t] ? t : 0;
+  }
+  const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  // stufe 1 bis 7, schilder 0 bis 3, neu = Stufe, die gerade dazukommt
+  function hausSvg(stufe, schilder, neu) {
+    const g = (n, inhalt) => (stufe >= n ? '<g class="bau bau-' + n + (neu === n ? " bau-neu" : "") + '">' + inhalt + "</g>" : "");
+    const lichter = () => {
+      const farben = ["#ff6b81", "#f3c84b", "#7cc6ff", "#9be3a8"];
+      let p = "";
+      for (let i = 0; i <= 8; i++) {
+        const a = i / 8;
+        p += '<circle class="vb-lampe" cx="' + f1(4 + 34.5 * a) + '" cy="' + f1(54.5 - 33.5 * a) + '" r="1.5" fill="' + farben[i % 4] + '"/>';
+        if (i) p += '<circle class="vb-lampe" cx="' + f1(76 - 34.5 * a) + '" cy="' + f1(54.5 - 33.5 * a) + '" r="1.5" fill="' + farben[(i + 2) % 4] + '"/>';
+      }
+      return p;
+    };
+    const kn = kName();
+    const knLaenge = Math.min(10.4, kn.length * 2.1);
+    return '<svg viewBox="0 0 80 100" aria-hidden="true">' +
+      // Schornstein (hinter dem Dach)
+      g(5, '<rect x="55" y="20" width="9" height="22" fill="#b5524a"/><rect x="53.5" y="17" width="12" height="4.5" rx="1.5" fill="#8f3c37"/><rect x="53.5" y="15.6" width="12" height="2.4" rx="1.2" fill="#fff"/>' +
+        '<g class="vb-rauch"><circle cx="59.5" cy="10" r="2.6" fill="#fff"/><circle cx="62.5" cy="4.5" r="2" fill="#fff"/></g>') +
+      // Fundament
+      g(1, '<rect x="3" y="91" width="74" height="7" rx="2.5" fill="#a39389"/><rect x="3" y="91" width="74" height="2.4" rx="1.2" fill="#c2b5ab"/>') +
+      // Gerüst (nur solange noch keine Wände stehen)
+      (stufe === 1 ? g(1, '<rect x="10" y="50" width="4.5" height="41" fill="#c98d5a"/><rect x="65.5" y="50" width="4.5" height="41" fill="#c98d5a"/><rect x="8" y="46.5" width="64" height="4.5" rx="1" fill="#b97d4c"/><path d="M14.5 88 L65.5 52" stroke="#d9a877" stroke-width="3" stroke-linecap="round"/>') : "") +
+      // Wände aus Holzbrettern
+      g(2, '<rect x="10" y="49" width="60" height="42" fill="#f2c99d" stroke="#c98d5a" stroke-width="1.2"/><path d="M10 56h60M10 63h60M10 70h60M10 77h60M10 84h60" stroke="#e0b07f" stroke-width=".8"/>') +
+      // Dach
+      g(3, '<path d="M1 53.5 L40 15 L79 53.5 Z" fill="#d9576d" stroke="#a83a50" stroke-width="1.6" stroke-linejoin="round"/><path d="M14.5 40.5h51M27 28.5h26" stroke="#c24660" stroke-width=".9"/>') +
+      // Fenster mit warmem Licht und eine Tür
+      g(4, '<rect class="vb-fenster" x="16" y="65" width="17" height="15" rx="2" fill="#ffe39a" stroke="#fff" stroke-width="1.6"/><path d="M24.5 65v15M16 72.5h17" stroke="#fff" stroke-width="1.4"/><rect x="14.5" y="80" width="20" height="2.4" rx="1" fill="#fff"/>' +
+        '<path d="M45 91 V74 a7.5 7.5 0 0 1 15 0 V91 Z" fill="#a5643c" stroke="#7a4526" stroke-width="1"/><circle cx="57" cy="83.5" r="1.1" fill="#f3c84b"/>') +
+      // Schnee auf dem Dach
+      g(5, '<path d="M3.5 52 L40 16.5 L76.5 52" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>') +
+      // Herz am Giebel und eine Lichterkette
+      g(6, '<path transform="translate(40 37) scale(.62)" d="M0 7C-4.8 3.4-9 0-9-4.3-9-7-6.9-9-4.4-9-2.5-9-.9-8 0-6.5.9-8 2.5-9 4.4-9 6.9-9 9-7 9-4.3 9 0 4.8 3.4 0 7Z" fill="#ffe0e8" stroke="#fff" stroke-width="1"/>' + lichter()) +
+      // Namensschilder
+      (stufe >= 7 && schilder >= 1 ? '<g class="vb-schild' + (neu === 71 ? " bau-neu" : "") + '"><path d="M17 53.5v1.5M32 53.5v1.5" stroke="#8a5a3a" stroke-width=".7"/><rect x="11.5" y="55" width="26" height="8.6" rx="2" fill="#fffaf0" stroke="#c99528" stroke-width=".9"/><text x="24.5" y="61.7" text-anchor="middle" class="vb-name">Toni</text></g>' : "") +
+      (stufe >= 7 && schilder >= 2 ? '<path d="M40.5 61.2c-1.3-1-2.4-1.9-2.4-2.9 0-.7.6-1.2 1.2-1.2.5 0 .9.3 1.2.6.3-.3.7-.6 1.2-.6.7 0 1.2.5 1.2 1.2 0 1-1.1 1.9-2.4 2.9z" fill="#e8455a"/>' +
+        '<g class="vb-schild' + (neu === 72 ? " bau-neu" : "") + '"><path d="M49 53.5v1.5M64 53.5v1.5" stroke="#8a5a3a" stroke-width=".7"/><rect x="43.5" y="55" width="26" height="8.6" rx="2" fill="#fffaf0" stroke="#c99528" stroke-width=".9"/><text x="56.5" y="61.7" text-anchor="middle" class="vb-name">Chris</text></g>' : "") +
+      (stufe >= 7 && schilder >= 3 ? '<g class="vb-schild' + (neu === 73 ? " bau-neu" : "") + '"><rect x="46.3" y="75.6" width="12.4" height="5" rx="1.2" fill="#fffaf0" stroke="#c99528" stroke-width=".5"/><text x="52.5" y="79.4" text-anchor="middle" class="vb-name klein" textLength="' + f1(knLaenge) + '" lengthAdjust="spacingAndGlyphs">' + esc(kn) + "</text></g>" : "") +
+      "</svg>";
+  }
+  // hausFest: während einer Bauszene steht das Haus noch wie vorher, bis gehämmert ist
+  let hausZuletzt = "", hausSchilder = 3, hausNeu = 0, hausFest = null;
+  function malHaus(erzwingen) {
+    if (!hausEl) return;
+    const stufe = hausFest !== null ? hausFest : hausStufe();
+    const schluessel = stufe + "/" + hausSchilder + "/" + hausNeu + "/" + kName();
+    brett.classList.toggle("mit-haus", stufe > 0 || hausFest !== null);
+    hausPlatz.hidden = stufe === 0 && hausFest === null;
+    if (schluessel === hausZuletzt && !erzwingen) return;
+    hausZuletzt = schluessel;
+    hausEl.innerHTML = stufe ? hausSvg(stufe, hausSchilder, hausNeu) : "";
+    hausEl.setAttribute("aria-label", stufe >= 7 ? "Unser Zuhause" : "Das kleine Haus");
+  }
+  // Punkt am Haus (Anteil von Breite und Höhe), in Bildschirmkoordinaten
+  const amHaus = (ax, ay) => () => {
+    if (!hausEl || hausPlatz.hidden) return null;
+    const r = hausEl.getBoundingClientRect();
+    return r.width ? { x: r.left + r.width * ax, y: r.top + r.height * ay } : null;
+  };
+  // ganz oben auf dem Haus: auf dem Gerüst oder den Wänden, später auf dem Dachfirst
+  const hausOben = () => amHaus(0.5, hausStufe() >= 3 ? 0.165 : 0.47)();
+
+  const BAU_SAETZE = {
+    8: [["m", "Toni, wir bauen was! 🔨"], ["m", "Was es wird, verraten wir noch nicht 🤫"]],
+    11: [["m", "Klopf, klopf! Die Wände stehen 🪵"], ["k", "Piep! Ich hab mitgehämmert 🐣"]],
+    14: [["w", "Jetzt hat es ein Dach. Damit es drinnen immer warm bleibt, Toni 🏠"], ["m", "Und trocken, auch wenn es draußen schneit ❄️"]],
+    17: [["m", "Ein Fenster und eine Tür 🚪"], ["m", "Damit immer ein Licht brennt, wenn jemand nach Hause kommt ✨"]],
+    20: [["m", "Ein Schornstein! Damit es drinnen nach Plätzchen duftet 🍪"], ["k", "Piep! Und Schnee aufs Dach ❄️"]],
+    22: [["w", "Ein Herz für den Giebel und Lichter fürs Dach ✨"], ["m", "Damit jeder sieht, wie viel Liebe hier wohnt ♥️"]],
+  };
+  const BAU_TEIL = { 8: "🪵", 11: "🪵", 14: "🧱", 17: "🪟", 20: "🧱", 22: "♥️" };
+  function hammer(v, n) {
+    return new Promise((fertig) => {
+      let i = 0;
+      const schlag = () => {
+        if (i >= n) { fertig(); return; }
+        i++;
+        ton(180 + Math.random() * 40, 0.07, "square", 0.025);
+        if (v.pos) teilchen(v.pos.x, v.pos.y - 8, 1, ["✨"], 24);
+        I.hops(v);
+        setTimeout(schlag, 380);
+      };
+      schlag();
+    });
+  }
+  async function hausBauen(tag) {
+    if (!frei() || !imBild(brett, 0.85)) return;
+    if (tag === 24) return schilderAufhaengen();
+    szene = true;
+    const g = gebaut(); g[tag] = true; merke("haus", g);
+    const saetze = BAU_SAETZE[tag] || [];
+    const mitMama = saetze.some(([w]) => w === "w");
+    const mitKueken = saetze.some(([w]) => w === "k") && !!I.kueken;
+    const f = await familieHolen(mitMama);
+    // erst steht das Haus noch wie gestern, dann kommt das neue Stück dazu
+    const vorher = hausStufe() - 1;
+    hausNeu = 0; hausFest = vorher; malHaus(true);
+    const oben = () => amHaus(0.5, vorher >= 3 ? 0.165 : vorher >= 1 ? 0.47 : 0.9)();
+    const getragen = el("span", "vb-getragen teil", BAU_TEIL[tag] || "🪵");
+    document.body.appendChild(getragen);
+    let tragen = true;
+    const mit = () => { if (!tragen) return; if (f.m.pos) { getragen.style.left = f.m.pos.x + "px"; getragen.style.top = f.m.pos.y + 2 + "px"; } requestAnimationFrame(mit); };
+    requestAnimationFrame(mit);
+    const wege = [I.holeHer(f.m, oben)];
+    if (mitMama && f.w) wege.push(pause(300).then(() => I.holeHer(f.w, nestPlatz)));
+    if (mitKueken && f.k) wege.push(pause(300).then(() => I.holeHer(f.k, nestPlatz)));
+    await Promise.all(wege);
+    tragen = false; getragen.remove();
+    await hammer(f.m, 4);
+    hausFest = null; hausNeu = vorher + 1; malHaus(true);
+    I.setzePosition(f.m, hausOben() || f.m.pos); f.m.folge = hausOben;
+    const r = hausEl.getBoundingClientRect();
+    teilchen(r.left + r.width / 2, r.top + r.height * 0.4, 10, ["✨", "⭐"], 90);
+    ton(660, 0.12); ton(880, 0.16, "triangle", 0.04, 0.12);
+    setTimeout(() => { hausNeu = 0; malHaus(); }, 1400);
+    for (const [wer, satz] of saetze) {
+      const v = wer === "w" ? f.w : wer === "k" ? f.k : f.m;
+      if (v) await I.sag(v, satz, Math.max(2600, satz.length * 60));
+    }
+    familieLos(f);
+    szene = false;
+  }
+  async function schilderAufhaengen() {
+    szene = true;
+    const g = gebaut(); g[24] = true; merke("haus", g);
+    const f = await familieHolen(true);
+    hausSchilder = 0; malHaus(true);
+    const wege = [I.holeHer(f.m, hausOben), pause(300).then(() => I.holeHer(f.w, f.k ? imNest(-22) : nestPlatz))];
+    if (f.k) wege.push(pause(600).then(() => I.holeHer(f.k, imNest(26))));
+    await Promise.all(wege);
+    f.w.blick = 1;
+    await I.sag(f.w, "Toni, weißt du, was wir den ganzen Dezember gebaut haben? 🏠", 3600);
+    await I.sag(f.m, "Es ist gar nicht für uns Vögel 🪶", 2800);
+    const schild = async (n, v, satz) => {
+      hausSchilder = n; hausNeu = 70 + n; malHaus(true);
+      const r = hausEl.getBoundingClientRect();
+      teilchen(r.left + r.width * (n === 1 ? 0.3 : n === 2 ? 0.7 : 0.66), r.top + r.height * (n === 3 ? 0.78 : 0.59), 7, ["✨", "♥️"], 50);
+      ton(n === 3 ? 1046 : 784, 0.14); ton(n === 3 ? 1318 : 988, 0.18, "triangle", 0.04, 0.13);
+      if (v) { I.hops(v); await I.sag(v, satz, 3000); }
+    };
+    await schild(1, f.m, "Hier wohnt Toni ♥️");
+    await schild(2, f.w, "Und hier wohnt Chris ♥️");
+    await schild(3, f.k, "Piep! Und ich darf mit einziehen 🐣");
+    hausNeu = 0; malHaus(true);
+    const r = hausEl.getBoundingClientRect();
+    teilchen(r.left + r.width / 2, r.top + r.height * 0.3, 16, ["♥️", "✨", "⭐"], 150);
+    ton(523, 0.14); ton(659, 0.16, "triangle", 0.04, 0.15); ton(784, 0.18, "triangle", 0.04, 0.3); ton(1046, 0.3, "triangle", 0.04, 0.45);
+    await I.sag(f.m, "Ein Zuhause für euch zwei, in dem ganz viel Liebe wohnt ♥️", 3800);
+    await I.sag(f.w, "Denn Zuhause ist da, wo ihr zwei zusammen seid 🥹", 3800);
+    familieLos(f);
+    await pause(2200);
+    szene = false;
+    zuhauseKarte();
+  }
+  function zuhauseKarte() {
+    if (document.querySelector(".zuhause-buehne")) return;
+    const b = el("div", "munkel-buehne dez-buehne zuhause-buehne gedimmt", '<div class="munkel-dimmer"></div><button type="button" class="munkel-zu" aria-label="Schließen">✕</button>' +
+      '<div class="munkel-karte dez-karte zuhause-karte"><div class="zuhause-bild">' + hausSvg(7, 3, 0) + '</div><h3>Ein Zuhause für euch zwei ♥️</h3>' +
+      '<p>Den ganzen Dezember haben wir daran gebaut, Brett für Brett. Für Toni und Chris. Und ein kleines bisschen auch für ' + esc(kName()) + ' 🐣</p>' +
+      '<p class="dez-zettel">Denn Zuhause ist da, wo ihr zwei zusammen seid ♥️</p><div class="munkel-knoepfe"><button type="button" class="munkel-knopf" data-wahl="zu">Ich hab euch lieb 🥹</button></div></div>');
+    document.body.appendChild(b);
+    requestAnimationFrame(() => b.classList.add("da"));
+    const zu = () => { b.classList.add("vorbei"); setTimeout(() => b.remove(), 450); };
+    b.querySelector(".munkel-zu").addEventListener("click", zu);
+    b.querySelector("[data-wahl]").addEventListener("click", zu);
+  }
+  function hausGetippt() {
+    const stufe = hausStufe();
+    if (stufe >= 7) { zuhauseKarte(); return; }
+    if (ak.wartezeit && ak.wartezeit.blase) ak.wartezeit.blase(hausEl, stufe >= 3 ? "Psst, das wird eine Überraschung 🤫" : "Hier wird gebaut 🔨", 2600);
+  }
+
   /* ---------- Zustand ---------- */
   function pruefe() {
     const an = brettZeit();
@@ -217,6 +423,7 @@
     malNest();
     if (!kugelnEl.dataset.gemalt) { kugelnEl.dataset.gemalt = "1"; fehlendeKugeln(); malBaum(); }
     malStiefel();
+    malHaus();
   }
   setInterval(pruefe, 1000);
 
@@ -280,6 +487,8 @@
     const r = nestEl.getBoundingClientRect();
     return r.width ? { x: r.left + r.width * 0.5, y: r.top + r.height * 0.56 } : null;
   };
+  // zwei Vögel nebeneinander im Nest
+  const imNest = (dx) => () => { const p = nestPlatz(); return p ? { x: p.x + dx, y: p.y } : null; };
   // Szene läuft: niemand fliegt dazwischen
   let szene = false;
   async function familieHolen(mitMama) {
@@ -689,7 +898,9 @@
     szene = true;
     merke("heiligabend", true);
     const f = await familieHolen(true);
-    await Promise.all([I.holeHer(f.m, aufBrett(0.56)), pause(250).then(() => I.holeHer(f.w, aufBrett(0.84))), f.k ? pause(500).then(() => I.holeHer(f.k, aufBrett(0.7))) : null]);
+    // steht das Haus, sitzt Mama auf dem Dachfirst, Papa und das Küken zusammen im Nest
+    const mitHaus = hausStufe() >= 3;
+    await Promise.all([I.holeHer(f.m, mitHaus ? (f.k ? imNest(-22) : nestPlatz) : aufBrett(0.56)), pause(250).then(() => I.holeHer(f.w, mitHaus ? hausOben : aufBrett(0.84))), f.k ? pause(500).then(() => I.holeHer(f.k, mitHaus ? imNest(26) : aufBrett(0.7))) : null]);
     f.m.blick = 1; f.w.blick = -1;
     [f.m, f.w, f.k].forEach((v) => { if (v) { I.hut(v, true, "weihnacht"); I.hops(v); } });
     await I.sag(f.w, "Toni, wir haben ein Lied für dich geübt 🎶", 2800);
@@ -765,6 +976,8 @@
       aktiv: () => dTag() === 5 && stunde() >= 17 && !s().stiefel && frei() && !!I.kueken && imBild(brett, 0.85), ja: () => stiefelStellen() });
     ak.voegel.registriere({ art: "dez-jahrestag", vogel: "m", prio: 11.5, ohneFrage: true, ueberall: true, frage: () => "",
       aktiv: () => dTag() === 21 && stunde() >= 8 && !s().jahrestag && frei() && !!I.weibchen && I.weibchen.zustand === "sitzt", ja: () => jahrestag() });
+    ak.voegel.registriere({ art: "dez-haus", vogel: "m", prio: 11.8, ohneFrage: true, ueberall: true, frage: () => "",
+      aktiv: () => { const t = hausFaellig(); return !!t && stunde() >= (t === 24 ? 9 : 10) && stunde() < 22 && frei() && imBild(brett, 0.85); }, ja: () => hausBauen(hausFaellig()) });
     ak.voegel.registriere({ art: "dez-heiligabend", vogel: "m", prio: 12, ohneFrage: true, ueberall: true, frage: () => "",
       aktiv: () => dTag() === 24 && stunde() >= 16 && !s().heiligabend && frei() && imBild(brett, 0.85), ja: () => heiligabend() });
     ak.voegel.registriere({ art: "dez-kranz", vogel: "m", prio: 12.5, ohneFrage: true, ueberall: true, frage: () => "",
@@ -780,11 +993,14 @@
       ja: () => { const t = dTag(); plaetzchen([5, 6].includes(t) ? 5 : [12, 13].includes(t) ? 12 : 19); } });
   }
 
+  if (ak.ecke) ak.ecke.eintrag({ id: "zuhause", symbol: "🏠", name: "Unser Zuhause", text: "Toni und Chris", da: () => brettZeit() && hausStufe() >= 7, los: () => zuhauseKarte() });
+
   window.adventkalender.dezember = {
     schlafen: () => !!(brett && !brett.hidden && nachts()),
     platz: () => (brett && !brett.hidden && imBild(nestEl, 0.6) ? nestPlatz() : null),
     // zum Testen und für die Entdeckungen
     _zustand: () => ({ frei: frei(), kueken: !!I.kueken, kz: I.kueken && I.kueken.zustand, brett: imBild(brett, 0.85), szene, ruhig: kalenderRuhig(), nachts: nachts(), pos: !!I.maennchen.pos, auftrag: !!I.maennchen.auftrag, kugeln: kugeln().length }),
+    hausBauen, zuhauseKarte, hausStufe,
     flugschule, tuerErinnern, baumSchmuecken, plaetzchen, kranzKerze, stiefelStellen, jahrestag, heiligabend, silvesterParty, geschichte,
   };
 })();
