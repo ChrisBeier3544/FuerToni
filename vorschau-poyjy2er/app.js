@@ -1378,7 +1378,7 @@
     });
   }
 
-  /* Umschlag zum Einstieg, einmal pro Besuch */
+  /* Umschlag zum Einstieg, nur noch während eines Countdowns */
   /* Zeitpunkt „2026-11-26T00:30“ in deutscher Zeit (im Winter UTC + 1) */
   function berlinZeitpunkt(text) {
     const m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(text || "");
@@ -1412,8 +1412,6 @@
     const cdGruss = document.getElementById("countdown-gruss");
     const cdTitel = document.getElementById("countdown-titel");
     const cdZiffern = document.getElementById("countdown-ziffern");
-    let gesehen = false;
-    try { gesehen = sessionStorage.getItem("toni-intro") === "1"; } catch (_) { /* egal */ }
     let offen = false, phase = null, konfettiGezeigt = false;
 
     function zeigen() {
@@ -1421,7 +1419,8 @@
       intro.classList.remove("weg", "geoeffnet");
       document.documentElement.style.overflow = "hidden";
     }
-    if (!gesehen) zeigen();
+    // Der Brief ist geöffnet: danach geht es immer direkt in den Kalender.
+    // Der Umschlag erscheint nur noch, solange ein Countdown läuft (siehe tick).
 
     const zwei = (z) => String(z).padStart(2, "0");
     function ziffern(ms, mitTagen) {
